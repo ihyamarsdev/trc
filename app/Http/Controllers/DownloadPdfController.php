@@ -18,6 +18,8 @@ class DownloadPdfController extends Controller
     {
 
         $digit = new NumberFormatter("id", NumberFormatter::SPELLOUT);
+        $newPrice = $record->price / 100;
+        $newTotal = $record->total / 100;
 
 
         $templateProcessor = new TemplateProcessor('template/rasyidu/anbk.docx');
@@ -26,18 +28,18 @@ class DownloadPdfController extends Controller
             'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
             'year' => '2021/2022',
             'tanggal' => self::tanggal($record->date_register->format('Y-m-d')),
-            'to' => 'ENAY WINARNI, S.Pd., M.Pd',
-            'jabatan' => 'KEPALA SEKOLAH SMP NEGERI 1 DRAMAGA',
+            'to' => $record->principal,
+            'jabatan' => 'KEPALA SEKOLAH ' . $record->schools,
             'siswa' => $record->student_count,
             'siswaSpell' => $digit->format($record->student_count),
-            'harga' => '150.000',
-            'hargaSpell' => 'Seratus Lima Puluh Ribu Rupiah',
-            'total' => '30.000.000',
-            'totalSpell' => 'Tiga Puluh Juta Rupiah',
-            'payment' => 'SIPLAH'
+            'harga' => number_format($newPrice, 0,',','.'),
+            'hargaSpell' => self::formatKeRupiah($newPrice),
+            'total' => number_format($newTotal, 0, ',', '.'),
+            'totalSpell' => self::formatKeRupiah($newTotal),
+            'payment' => $record->payment,
         ]);
 
-        $doc_name = 'tes.docx';
+        $doc_name = $record->schools . '.docx';
 
         $templateProcessor->saveAs($doc_name);
 
@@ -146,6 +148,71 @@ class DownloadPdfController extends Controller
         ];
 
         return $angkaKata[$angka] ?? $angka; // Kembalikan angka jika tidak ada terjemahan
+    }
+
+    public function angkaKeTeks($angka)
+    {
+        // Array untuk menyimpan nama angka
+        $huruf = [
+            0 => 'Nol',
+            1 => 'Satu',
+            2 => 'Dua',
+            3 => 'Tiga',
+            4 => 'Empat',
+            5 => 'Lima',
+            6 => 'Enam',
+            7 => 'Tujuh',
+            8 => 'Delapan',
+            9 => 'Sembilan',
+            10 => 'Sepuluh',
+            11 => 'Sebelas',
+            12 => 'Dua Belas',
+            13 => 'Tiga Belas',
+            14 => 'Empat Belas',
+            15 => 'Lima Belas',
+            16 => 'Enam Belas',
+            17 => 'Tujuh Belas',
+            18 => 'Delapan Belas',
+            19 => 'Sembilan Belas',
+            20 => 'Dua Puluh',
+            30 => 'Tiga Puluh',
+            40 => 'Empat Puluh',
+            50 => 'Lima Puluh',
+            60 => 'Enam Puluh',
+            70 => 'Tujuh Puluh',
+            80 => 'Delapan Puluh',
+            90 => 'Sembilan Puluh',
+            100 => 'Seratus',
+            1000 => 'Seribu',
+            1000000 => 'Satu Juta',
+            1000000000 => 'Satu Miliar'
+        ];
+
+        // Cek jika angka lebih dari 1 miliar
+        if ($angka >= 1000000000) {
+            return 'Angka terlalu besar';
+        }
+
+        // Proses konversi
+        if ($angka < 0) {
+            return 'Minus ' . self::angkaKeTeks(abs($angka));
+        } elseif ($angka < 21) {
+            return $huruf[$angka];
+        } elseif ($angka < 100) {
+            return $huruf[floor($angka / 10) * 10] . ($angka % 10 ? ' ' . $huruf[$angka % 10] : '');
+        } elseif ($angka < 1000) {
+            return $huruf[floor($angka / 100) * 100] . ($angka % 100 ? ' ' . self::angkaKeTeks($angka % 100) : '');
+        } elseif ($angka < 1000000) {
+            return self::angkaKeTeks(floor($angka / 1000)) . ' Ribu' . ($angka % 1000 ? ' ' . self::angkaKeTeks($angka % 1000) : '');
+        } elseif ($angka < 1000000000) {
+            return self::angkaKeTeks(floor($angka / 1000000)) . ' Juta' . ($angka % 1000000 ? ' ' . self::angkaKeTeks($angka % 1000000) : '');
+        }
+    }
+
+    // Fungsi untuk mengonversi angka menjadi teks dan menambahkan "Rupiah"
+    public function formatKeRupiah($angka)
+    {
+        return self::angkaKeTeks($angka) . ' Rupiah';
     }
 
 }
