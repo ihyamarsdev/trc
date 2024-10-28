@@ -54,7 +54,7 @@ class AppsAcademicResource extends Resource
                     Forms\Components\TextInput::make('account_count_created')
                         ->label('Akun Dibuat')
                         ->required()
-                        ->live()
+                        ->live(debounce: 500)
                         ->default('0')
                         ->afterStateUpdated(function (Get $get, Set $set) {
                             Academic::getDifference($get, $set);
@@ -62,7 +62,7 @@ class AppsAcademicResource extends Resource
                     Forms\Components\TextInput::make('implementer_count')
                         ->label('Pelaksanaan')
                         ->required()
-                        ->live()
+                        ->live(debounce: 500)
                         ->default('0')
                         ->afterStateUpdated(function (Get $get, Set $set) {
                             Academic::getDifference($get, $set);
@@ -241,7 +241,7 @@ class AppsAcademicResource extends Resource
                                     })
                                     ->color(fn (string $state): string => match ($state) {
                                         'ya' => 'success',
-                                        'tidak' => 'warning',
+                                        'tidak' => 'danger',
                                     }),
                                 Infolists\Components\IconEntry::make('schools_download')
                                     ->label('Download Sekolah')
@@ -251,7 +251,7 @@ class AppsAcademicResource extends Resource
                                     })
                                     ->color(fn (string $state): string => match ($state) {
                                         'ya' => 'success',
-                                        'tidak' => 'warning',
+                                        'tidak' => 'danger',
                                     }),
                             ]),
 

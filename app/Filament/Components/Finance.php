@@ -29,17 +29,17 @@ class Finance
 
                     Fieldset::make('')
                         ->schema([
-                            MoneyInput::make('price')
+                            TextInput::make('price')
                                 ->label('Harga')
-                                ->currency('IDR')
-                                ->locale('id_ID'),
+                                ->prefix('Rp')
+                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0),
                         ]),
 
                     Fieldset::make('')
                         ->schema([
                             Radio::make('option_price')
                                 ->label('Pilih Opsi')
-                                ->options(function (Get $get) :array{
+                                ->options(function (Get $get): array {
                                     $accountCount = (int) $get('account_count_created');
                                     $implementerCount = (int) $get('implementer_count');
 
@@ -51,43 +51,80 @@ class Finance
                                 ->reactive()
                                 ->afterStateUpdated(fn (Get $get, Set $set) => $set('total', (float) $get('price') * $get('option_price'))),
 
-                            MoneyInput::make('total')
+                            TextInput::make('total')
                                 ->label('Total')
+                                ->prefix('Rp')
+                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0)
                                 ->readOnly(),
                         ]),
 
                     Fieldset::make('')
+                        ->label('Exclusion policy')
                         ->schema([
-                            MoneyInput::make('net')
-                                ->label('Net')
-                                ->currency('IDR')
-                                ->locale('id_ID'),
-                        ]),
+                            TextInput::make('student_count_1')
+                                ->label('Jumlah Siswa 1')
+                                ->numeric()
+                                ->live(debounce: 500)
+                                ->afterStateUpdated(function (Get $get, Set $set) {
+                                    $set('student_count_2', (float) $get('student_count') - (float) $get('student_count_1'));
+                                    $set('subtotal_1', (float) $get('student_count_1') * (float) $get('net'));
+                                    $set('subtotal_2', (float) $get('student_count_2') * (float) $get('net_2'));
+                                    $set('total_net', (float) $get('subtotal_1') + (float) $get('subtotal_2'));
+                                    $set('difference_total', abs((float) $get('total') - (float) $get('total_net')));
+                                }),
+                            TextInput::make('net')
+                                ->label('Net 1')
+                                ->live(debounce: 1000)
+                                ->prefix('Rp')
+                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0)
+                                ->numeric()
+                                ->afterStateUpdated(function (Get $get, Set $set) {
+                                    $set('subtotal_1', (float) $get('student_count_1') * (float) $get('net'));
+                                    $set('subtotal_2', (float) $get('student_count_2') * (float) $get('net_2'));
+                                    $set('total_net', (float) $get('subtotal_1') + (float) $get('subtotal_2'));
+                                    $set('difference_total', abs((float) $get('total') - (float) $get('total_net')));
+                                }),
+                            TextInput::make('subtotal_1')
+                                ->label('Sub Total 1')
+                                ->prefix('Rp')
+                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0)
+                                ->numeric()
+                                ->readOnly(),
+                            TextInput::make('student_count_2')
+                                ->label('Jumlah Siswa 2')
+                                ->live()
+                                ->numeric(),
+                            TextInput::make('net_2')
+                                ->label('Net 2')
+                                ->live(debounce: 1000)
+                                ->prefix('Rp')
+                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0)
+                                ->afterStateUpdated(function (Get $get, Set $set) {
+                                    $set('subtotal_2', (float) $get('student_count_2') * (float) $get('net_2'));
+                                    $set('total_net', (float) $get('subtotal_1') + (float) $get('subtotal_2'));
+                                    $set('difference_total', abs((float) $get('total') - (float) $get('total_net')));
+                                }),
+                            TextInput::make('subtotal_2')
+                                ->label('Sub Total 2')
+                                ->prefix('Rp')
+                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0)
+                                ->readOnly(),
+                        ])->columns(3),
 
                     Fieldset::make('')
                         ->schema([
-                            Radio::make('option_net')
-                                ->label('Pilih Opsi')
-                                ->options(function (Get $get) :array{
-                                    $accountCount = (int) $get('account_count_created');
-                                    $implementerCount = (int) $get('implementer_count');
-
-                                    return [
-                                        $accountCount => 'Jumlah Akun',
-                                        $implementerCount => 'Jumlah Pelaksanaan'
-                                    ];
-                                })
-                                ->reactive()
-                                ->afterStateUpdated(fn (Get $get, Set $set) => $set('total_net', (float) $get('net') * $get('option_net'))),
-
-                            MoneyInput::make('total_net')
+                            TextInput::make('total_net')
                                 ->label('Total Net')
+                                ->prefix('Rp')
+                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0)
+                                ->readOnly(),
+                            TextInput::make('difference_total')
+                                ->label('Selisih Total')
+                                ->prefix('Rp')
+                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0)
                                 ->readOnly(),
                         ]),
-                ])->columns(2),
 
-            Section::make()
-                ->schema([
                     Fieldset::make('')
                         ->schema([
                             DatePicker::make('invoice_date')
@@ -108,6 +145,19 @@ class Finance
                                 ])
                         ]),
                 ])->columns(2),
+
+            Section::make('Kwitansi')
+                ->schema([
+                    Fieldset::make('')
+                        ->schema([
+                            TextInput::make('schools')
+                                ->label('Sekolah')
+                                ->readOnly(),
+                            TextInput::make('detail_kwitansi')
+                                ->label('Guna Pembayaran')
+                                ->helperText('Contoh: 146 Paket Program TRY OUT Ujian Tertulis Berbasis Komputer (UTBK SNBT)'),
+                        ])->columns(1),
+                ]),
         ];
     }
 

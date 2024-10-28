@@ -189,7 +189,7 @@ class SnbtFinanceResource extends Resource
                                     })
                                     ->color(fn (string $state): string => match ($state) {
                                         'ya' => 'success',
-                                        'tidak' => 'warning',
+                                        'tidak' => 'danger',
                                     }),
                                 IconEntry::make('pm')
                                     ->label('PM')
@@ -199,7 +199,7 @@ class SnbtFinanceResource extends Resource
                                     })
                                     ->color(fn (string $state): string => match ($state) {
                                         'ya' => 'success',
-                                        'tidak' => 'warning',
+                                        'tidak' => 'danger',
                                     }),
                             ]),
 
@@ -212,39 +212,83 @@ class SnbtFinanceResource extends Resource
 
                     ])->columns(2),
 
-                Section::make('Finance')
-                    ->description('Detail Data Finance')
-                    ->schema([
+                    Section::make('Finance')
+                        ->description('Detail Data Finance')
+                        ->schema([
 
-                        Fieldset::make('')
-                            ->schema([
-                                MoneyEntry::make('price')
-                                    ->label('Harga'),
-                                MoneyEntry::make('total')
-                                    ->label('Total Harga'),
-                                MoneyEntry::make('net')
-                                    ->label('Harga'),
-                                MoneyEntry::make('total_net')
-                                    ->label('Total Net'),
-                            ]),
+                            Fieldset::make('')
+                                ->schema([
+                                    TextEntry::make('price')
+                                        ->label('Harga')
+                                        ->money('IDR'),
+                                    TextEntry::make('total')
+                                        ->label('Total Harga')
+                                        ->money('IDR'),
+                                ]),
 
-                        Fieldset::make('')
-                            ->schema([
-                                TextEntry::make('invoice_date')
-                                    ->label('Invoice')
-                                    ->dateTime('l, jS F Y'),
-                                TextEntry::make('payment_date')
-                                    ->label('Pembayaran')
-                                    ->dateTime('l, jS F Y'),
-                                TextEntry::make('spk_sent')
-                                    ->label('SPK di Kirim')
-                                    ->dateTime('l, jS F Y'),
-                                TextEntry::make('payment')
-                                    ->label('Pembayaran Via')
-                            ]),
+                            Fieldset::make('')
+                                ->label('Exclusion policy')
+                                ->schema([
+                                    TextEntry::make('student_count_1')
+                                        ->label('Jumlah Siswa Net 1'),
+                                    TextEntry::make('student_count_2')
+                                        ->label('Jumlah Siswa Net 2'),
+                                    TextEntry::make('net')
+                                        ->label('Net 1')
+                                        ->money('IDR'),
+                                    TextEntry::make('net_2')
+                                        ->label('Net 2')
+                                        ->money('IDR'),
+                                    TextEntry::make('subtotal_1')
+                                        ->label('Sub Total 1')
+                                        ->money('IDR'),
+                                    TextEntry::make('subtotal_2')
+                                        ->label('Sub Total 2')
+                                        ->money('IDR'),
+                                ]),
 
+                            Fieldset::make('')
+                                ->schema([
+                                    TextEntry::make('total_net')
+                                        ->label('Total Net')
+                                        ->money('IDR'),
+                                    TextEntry::make('difference_total')
+                                        ->label('Selisih Total')
+                                        ->money('IDR'),
+                                ]),
 
+                            Fieldset::make('')
+                                ->schema([
+                                    TextEntry::make('invoice_date')
+                                        ->label('Invoice')
+                                        ->dateTime('l, jS F Y'),
+                                    TextEntry::make('payment_date')
+                                        ->label('Pembayaran')
+                                        ->dateTime('l, jS F Y'),
+                                    TextEntry::make('spk_sent')
+                                        ->label('SPK di Kirim')
+                                        ->dateTime('l, jS F Y'),
+                                    TextEntry::make('payment')
+                                        ->label('Pembayaran Via')
+                                ]),
                     ])->columns(2),
+
+                    Section::make('Kwitansi')
+                        ->description('Detail Kwitansi')
+                        ->schema([
+
+                            Fieldset::make('')
+                                ->schema([
+                                    TextEntry::make('schools')
+                                        ->label('Telah Terima Dari')
+                                        ->money('IDR'),
+                                    TextEntry::make('total')
+                                        ->label('Uang Sejumlah')
+                                        ->money('IDR'),
+                                    TextEntry::make('detail_kwitansi')
+                                        ->label('Guna Pembayaran'),
+                                ])->columns(1),
+                    ]),
             ]);
     }
 

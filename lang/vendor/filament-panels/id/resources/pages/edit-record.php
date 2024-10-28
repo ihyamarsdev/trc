@@ -4,7 +4,7 @@ return [
 
     'title' => 'Ubah :label',
 
-    'breadcrumb' => 'Ubah',
+    'breadcrumb' => 'Edit',
 
     'form' => [
 
@@ -25,7 +25,7 @@ return [
     'content' => [
 
         'tab' => [
-            'label' => 'Ubah',
+            'label' => 'Edit',
         ],
 
     ],

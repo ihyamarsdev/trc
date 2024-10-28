@@ -1,0 +1,70 @@
+@import "/vendor/filament/filament/resources/css/theme.css";
+
+@config 'tailwind.config.js';
+
+.fi-sidebar-header {
+    @apply justify-center h-52 dark:bg-gray-950 bg-sky-900 ring-0;
+}
+
+.fi-topbar {
+    @apply h-24;
+}
+
+.fi-logo {
+}
+
+.fi-sidebar-nav {
+    @apply no-scrollbar;
+}
+
+.fi {
+    @apply no-scrollbar bg-sky-950;
+}
+
+.fi-body{
+    @apply bg-sky-900;
+}
+
+.fi-sidebar-item-label {
+    @apply text-white hover:text-lime-500;
+}
+
+.fi-sidebar-item-button{
+    @apply bg-sky-900 hover:bg-white dark:bg-gray-950 focus:text-lime-500;
+}
+
+.fi-header-heading {
+    @apply font-bold text-white;
+}
+
+.fi-topbar nav {
+    @apply bg-sky-900 ring-0 dark:bg-gray-950;
+}
+
+.fi-sidebar-item-icon {
+    @apply text-lime-500;
+}
+
+.fi-sidebar-group-label{
+    @apply text-white;
+}
+
+.fi-breadcrumbs-item-label{
+    @apply text-white;
+}
+
+.fi-btn {
+    @apply bg-lime-500;
+}
+
+@layer utilities {
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+   /* Hide scrollbar for IE, Edge and Firefox */
+    .no-scrollbar {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+  }
+}

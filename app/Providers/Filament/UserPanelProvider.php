@@ -36,12 +36,15 @@ class UserPanelProvider extends PanelProvider
             ->passwordReset()
             ->maxContentWidth(MaxWidth::Full)
             ->font('Poppins')
-            ->brandName('TRC Management')
+            ->brandLogo(asset('images/logo.png'))
+            ->favicon(asset('images/logo.png'))
+            ->brandLogoHeight('8rem')
+            ->viteTheme('resources/css/filament/user/theme.css')
             ->colors([
                 'danger' => Color::Rose,
                 'gray' => Color::Gray,
-                'info' => Color::Blue,
-                'primary' => Color::Indigo,
+                'info' => Color::Red,
+                'primary' => Color::Lime,
                 'success' => Color::Emerald,
                 'warning' => Color::Orange,
             ])
@@ -50,6 +53,7 @@ class UserPanelProvider extends PanelProvider
                 'Program Datacenter',
                 'Program Akademik',
                 'Program Finance',
+                'Invoice',
                 'Rekap Datacenter',
                 'Rekap Akademik',
                 'Rekap Finance',
@@ -111,7 +115,7 @@ class UserPanelProvider extends PanelProvider
                     ]),
                 GreeterPlugin::make()
                     ->message('Selamat Datang,')
-                    ->name(text: fn() => Auth::user()->name)
+                    ->name(text: fn () => Auth::user()->name)
                     ->title('Satu-satunya cara untuk melakukan pekerjaan hebat yaitu dengan mencintai apa yang sedang kamu lakukan.')
                     ->avatar(size: 'w-16 h-16', enabled: true)
                     ->sort(-1)

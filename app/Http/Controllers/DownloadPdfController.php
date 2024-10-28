@@ -7,6 +7,7 @@ use NumberFormatter;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\RegistrationData;
+use App\Models\SchoolYear;
 use LaravelDaily\Invoices\Invoice;
 use LaravelDaily\Invoices\Classes\Buyer;
 use PhpOffice\PhpWord\TemplateProcessor;
@@ -14,32 +15,260 @@ use LaravelDaily\Invoices\Classes\InvoiceItem;
 
 class DownloadPdfController extends Controller
 {
-    public function download(RegistrationData $record)
+    public function anbk_rasyidu(RegistrationData $record)
     {
 
         $digit = new NumberFormatter("id", NumberFormatter::SPELLOUT);
-        $newPrice = $record->price / 100;
-        $newTotal = $record->total / 100;
 
+
+        $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
 
         $templateProcessor = new TemplateProcessor('template/rasyidu/anbk.docx');
 
         $templateProcessor->setValues([
             'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
-            'year' => '2021/2022',
+            'year' => $school_year->name,
             'tanggal' => self::tanggal($record->date_register->format('Y-m-d')),
             'to' => $record->principal,
             'jabatan' => 'KEPALA SEKOLAH ' . $record->schools,
             'siswa' => $record->student_count,
             'siswaSpell' => $digit->format($record->student_count),
-            'harga' => number_format($newPrice, 0,',','.'),
-            'hargaSpell' => self::formatKeRupiah($newPrice),
-            'total' => number_format($newTotal, 0, ',', '.'),
-            'totalSpell' => self::formatKeRupiah($newTotal),
+            'harga' => number_format($record->price, 0, ',', '.'),
+            'hargaSpell' => self::formatKeRupiah($record->price),
+            'total' => number_format($record->total, 0, ',', '.'),
+            'totalSpell' => self::formatKeRupiah($record->total),
             'payment' => $record->payment,
+            'province' => $record->provinces,
         ]);
 
-        $doc_name = $record->schools . '.docx';
+        $doc_name = 'SPK RASYIDUU ANBK ' . $record->schools . '.docx';
+
+        $templateProcessor->saveAs($doc_name);
+
+        return response()->download(public_path($doc_name))->deleteFileAfterSend(true);
+    }
+
+    public function apps_rasyidu(RegistrationData $record)
+    {
+
+        $digit = new NumberFormatter("id", NumberFormatter::SPELLOUT);
+        $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
+
+
+        $templateProcessor = new TemplateProcessor('template/rasyidu/apps.docx');
+
+        $templateProcessor->setValues([
+            'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
+            'year' => $school_year->name,
+            'tanggal' => self::tanggal($record->date_register->format('Y-m-d')),
+            'to' => $record->principal,
+            'jabatan' => 'KEPALA SEKOLAH ' . $record->schools,
+            'siswa' => $record->student_count,
+            'siswaSpell' => $digit->format($record->student_count),
+            'harga' => number_format($record->price, 0, ',', '.'),
+            'hargaSpell' => self::formatKeRupiah($record->price),
+            'total' => number_format($record->total, 0, ',', '.'),
+            'totalSpell' => self::formatKeRupiah($record->total),
+            'payment' => $record->payment,
+            'province' => $record->provinces,
+        ]);
+
+        $doc_name = 'SPK RASYIDUU APPS ' . $record->schools . '.docx';
+
+        $templateProcessor->saveAs($doc_name);
+
+        return response()->download(public_path($doc_name))->deleteFileAfterSend(true);
+    }
+
+    public function snbt_rasyidu(RegistrationData $record)
+    {
+
+        $digit = new NumberFormatter("id", NumberFormatter::SPELLOUT);
+        $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
+
+        $templateProcessor = new TemplateProcessor('template/rasyidu/snbt.docx');
+
+        $templateProcessor->setValues([
+            'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
+            'year' => $school_year->name,
+            'tanggal' => self::tanggal($record->date_register->format('Y-m-d')),
+            'to' => $record->principal,
+            'jabatan' => 'KEPALA SEKOLAH ' . $record->schools,
+            'siswa' => $record->student_count,
+            'siswaSpell' => $digit->format($record->student_count),
+            'harga' => number_format($record->price, 0, ',', '.'),
+            'hargaSpell' => self::formatKeRupiah($record->price),
+            'total' => number_format($record->total, 0, ',', '.'),
+            'totalSpell' => self::formatKeRupiah($record->total),
+            'payment' => $record->payment,
+            'province' => $record->provinces,
+        ]);
+
+        $doc_name = 'SPK RASYIDUU SNBT ' . $record->schools . '.docx';
+
+        $templateProcessor->saveAs($doc_name);
+
+        return response()->download(public_path($doc_name))->deleteFileAfterSend(true);
+    }
+
+    public function kwitansi_rasyidu(RegistrationData $record)
+    {
+
+        $digit = new NumberFormatter("id", NumberFormatter::SPELLOUT);
+
+        $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
+
+        $templateProcessor = new TemplateProcessor('template/rasyidu/kwitansi.docx');
+
+        $templateProcessor->setValues([
+            'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
+            'year' => $school_year->name,
+            'tanggal' => self::tanggal($record->date_register->format('Y-m-d')),
+            'to' => $record->principal,
+            'jabatan' => 'KEPALA SEKOLAH ' . $record->schools,
+            'siswa' => $record->student_count,
+            'siswaSpell' => $digit->format($record->student_count),
+            'harga' => number_format($record->price, 0, ',', '.'),
+            'hargaSpell' => self::formatKeRupiah($record->price),
+            'total' => number_format($record->total, 0, ',', '.'),
+            'totalSpell' => self::formatKeRupiah($record->total),
+            'payment' => $record->payment,
+            'province' => $record->provinces,
+            'schools' => $record->schools,
+            'detail' => $record->detail_kwitansi
+        ]);
+
+        $doc_name = 'KWITANSI RASYIDUU ' . $record->schools . '.docx';
+
+        $templateProcessor->saveAs($doc_name);
+
+        return response()->download(public_path($doc_name))->deleteFileAfterSend(true);
+    }
+
+    public function anbk_edunesia(RegistrationData $record)
+    {
+
+        $digit = new NumberFormatter("id", NumberFormatter::SPELLOUT);
+        $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
+
+
+        $templateProcessor = new TemplateProcessor('template/edunesia/anbk.docx');
+
+        $templateProcessor->setValues([
+            'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
+            'year' => $school_year->name,
+            'tanggal' => self::tanggal($record->date_register->format('Y-m-d')),
+            'to' => $record->principal,
+            'jabatan' => 'KEPALA SEKOLAH ' . $record->schools,
+            'siswa' => $record->student_count,
+            'siswaSpell' => $digit->format($record->student_count),
+            'harga' => number_format($record->price, 0, ',', '.'),
+            'hargaSpell' => self::formatKeRupiah($record->price),
+            'total' => number_format($record->total, 0, ',', '.'),
+            'totalSpell' => self::formatKeRupiah($record->total),
+            'payment' => $record->payment,
+            'province' => $record->provinces,
+        ]);
+
+        $doc_name = 'SPK EDUNESIA APPS ' . $record->schools . '.docx';
+
+        $templateProcessor->saveAs($doc_name);
+
+        return response()->download(public_path($doc_name))->deleteFileAfterSend(true);
+    }
+
+    public function apps_edunesia(RegistrationData $record)
+    {
+
+        $digit = new NumberFormatter("id", NumberFormatter::SPELLOUT);
+        $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
+
+
+        $templateProcessor = new TemplateProcessor('template/edunesia/apps.docx');
+
+        $templateProcessor->setValues([
+            'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
+            'year' => $school_year->name,
+            'tanggal' => self::tanggal($record->date_register->format('Y-m-d')),
+            'to' => $record->principal,
+            'jabatan' => 'KEPALA SEKOLAH ' . $record->schools,
+            'siswa' => $record->student_count,
+            'siswaSpell' => $digit->format($record->student_count),
+            'harga' => number_format($record->price, 0, ',', '.'),
+            'hargaSpell' => self::formatKeRupiah($record->price),
+            'total' => number_format($record->total, 0, ',', '.'),
+            'totalSpell' => self::formatKeRupiah($record->total),
+            'payment' => $record->payment,
+            'province' => $record->provinces,
+        ]);
+
+        $doc_name = 'SPK EDUNESIA APPS ' . $record->schools . '.docx';
+
+        $templateProcessor->saveAs($doc_name);
+
+        return response()->download(public_path($doc_name))->deleteFileAfterSend(true);
+    }
+
+    public function snbt_edunesia(RegistrationData $record)
+    {
+
+        $digit = new NumberFormatter("id", NumberFormatter::SPELLOUT);
+        $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
+
+
+        $templateProcessor = new TemplateProcessor('template/edunesia/snbt.docx');
+
+        $templateProcessor->setValues([
+            'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
+            'year' => $school_year->name,
+            'tanggal' => self::tanggal($record->date_register->format('Y-m-d')),
+            'to' => $record->principal,
+            'jabatan' => 'KEPALA SEKOLAH ' . $record->schools,
+            'siswa' => $record->student_count,
+            'siswaSpell' => $digit->format($record->student_count),
+            'harga' => number_format($record->price, 0, ',', '.'),
+            'hargaSpell' => self::formatKeRupiah($record->price),
+            'total' => number_format($record->total, 0, ',', '.'),
+            'totalSpell' => self::formatKeRupiah($record->total),
+            'payment' => $record->payment,
+            'province' => $record->provinces,
+        ]);
+
+        $doc_name = 'SPK EDUNESIA APPS ' . $record->schools . '.docx';
+
+        $templateProcessor->saveAs($doc_name);
+
+        return response()->download(public_path($doc_name))->deleteFileAfterSend(true);
+    }
+
+    public function kwitansi_edunesia(RegistrationData $record)
+    {
+
+        $digit = new NumberFormatter("id", NumberFormatter::SPELLOUT);
+
+        $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
+
+        $templateProcessor = new TemplateProcessor('template/edunesia/kwitansi.docx');
+
+        $templateProcessor->setValues([
+            'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
+            'year' => $school_year->name,
+            'tanggal' => self::tanggal($record->date_register->format('Y-m-d')),
+            'to' => $record->principal,
+            'jabatan' => 'KEPALA SEKOLAH ' . $record->schools,
+            'siswa' => $record->student_count,
+            'siswaSpell' => $digit->format($record->student_count),
+            'harga' => number_format($record->price, 0, ',', '.'),
+            'hargaSpell' => self::formatKeRupiah($record->price),
+            'total' => number_format($record->total, 0, ',', '.'),
+            'totalSpell' => self::formatKeRupiah($record->total),
+            'payment' => $record->payment,
+            'province' => $record->provinces,
+            'schools' => $record->schools,
+            'detail' => $record->detail_kwitansi
+        ]);
+
+        $doc_name = 'KWITANSI EDUNESIA ' . $record->schools . '.docx';
 
         $templateProcessor->saveAs($doc_name);
 
@@ -183,6 +412,14 @@ class DownloadPdfController extends Controller
             80 => 'Delapan Puluh',
             90 => 'Sembilan Puluh',
             100 => 'Seratus',
+            200 => 'Dua Ratus',
+            300 => 'Tiga Ratus',
+            400 => 'Empat Ratus',
+            500 => 'Lima Ratus',
+            600 => 'Enam Ratus',
+            700 => 'Tujuh Ratus',
+            800 => 'Delapan Ratus',
+            900 => 'Sembilan Ratus',
             1000 => 'Seribu',
             1000000 => 'Satu Juta',
             1000000000 => 'Satu Miliar'

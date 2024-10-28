@@ -78,13 +78,12 @@ class AnbkFinanceResource extends Resource
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make(),
-                    Action::make('Print Invoice')
-                        ->form([
-                            Forms\Components\TextInput::make('subject')->required(),
-                        ])
+                    Action::make('spk')
+                        ->label('Print SPK')
                         ->icon('heroicon-o-arrow-down-tray')
-                        ->url(fn (RegistrationData $record) => route('finance.invoice.download', $record))
-                        ->openUrlInNewTab()
+                        ->color('success')
+                        ->url(fn (RegistrationData $record) => route('rasyidu.anbk.download', $record))
+                        ->openUrlInNewTab(),
 
                 ]),
             ])
@@ -198,7 +197,7 @@ class AnbkFinanceResource extends Resource
                                     })
                                     ->color(fn (string $state): string => match ($state) {
                                         'ya' => 'success',
-                                        'tidak' => 'warning',
+                                        'tidak' => 'danger',
                                     }),
                                 IconEntry::make('pm')
                                     ->label('PM')
@@ -208,7 +207,7 @@ class AnbkFinanceResource extends Resource
                                     })
                                     ->color(fn (string $state): string => match ($state) {
                                         'ya' => 'success',
-                                        'tidak' => 'warning',
+                                        'tidak' => 'danger',
                                     }),
                             ]),
 
@@ -220,14 +219,43 @@ class AnbkFinanceResource extends Resource
 
                         Fieldset::make('')
                             ->schema([
-                                MoneyEntry::make('price')
-                                    ->label('Harga'),
-                                MoneyEntry::make('total')
-                                    ->label('Total Harga'),
-                                MoneyEntry::make('net')
-                                    ->label('Harga'),
-                                MoneyEntry::make('total_net')
-                                    ->label('Total Net'),
+                                TextEntry::make('price')
+                                    ->label('Harga')
+                                    ->money('IDR'),
+                                TextEntry::make('total')
+                                    ->label('Total Harga')
+                                    ->money('IDR'),
+                            ]),
+
+                        Fieldset::make('')
+                            ->label('Exclusion policy')
+                            ->schema([
+                                TextEntry::make('student_count_1')
+                                    ->label('Jumlah Siswa Net 1'),
+                                TextEntry::make('student_count_2')
+                                    ->label('Jumlah Siswa Net 2'),
+                                TextEntry::make('net')
+                                    ->label('Net 1')
+                                    ->money('IDR'),
+                                TextEntry::make('net_2')
+                                    ->label('Net 2')
+                                    ->money('IDR'),
+                                TextEntry::make('subtotal_1')
+                                    ->label('Sub Total 1')
+                                    ->money('IDR'),
+                                TextEntry::make('subtotal_2')
+                                    ->label('Sub Total 2')
+                                    ->money('IDR'),
+                            ]),
+
+                        Fieldset::make('')
+                            ->schema([
+                                TextEntry::make('total_net')
+                                    ->label('Total Net')
+                                    ->money('IDR'),
+                                TextEntry::make('difference_total')
+                                    ->label('Selisih Total')
+                                    ->money('IDR'),
                             ]),
 
                         Fieldset::make('')
@@ -245,6 +273,23 @@ class AnbkFinanceResource extends Resource
                                     ->label('Pembayaran Via')
                             ]),
                     ])->columns(2),
+
+                Section::make('Kwitansi')
+                    ->description('Lakukan Edit untuk merubah Kwitansi')
+                    ->schema([
+
+                        Fieldset::make('')
+                            ->schema([
+                                TextEntry::make('schools')
+                                    ->label('Telah Terima Dari')
+                                    ->money('IDR'),
+                                TextEntry::make('total')
+                                    ->label('Uang Sejumlah')
+                                    ->money('IDR'),
+                                TextEntry::make('detail_kwitansi')
+                                    ->label('Guna Pembayaran'),
+                            ])->columns(1),
+                    ]),
             ]);
     }
 

@@ -47,7 +47,14 @@ class RegistrationData extends Model
         'phone',
         'phone_principal',
         'education_level_type',
-        'monthYear'
+        'monthYear',
+        'net_2',
+        'student_count_1',
+        'student_count_2',
+        'subtotal_1',
+        'subtotal_2',
+        'difference_total',
+        'detail_kwitansi',
     ];
 
     protected $casts = [

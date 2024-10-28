@@ -29,7 +29,7 @@ class Academic {
                     TextInput::make('account_count_created')
                         ->label('Akun Dibuat')
                         ->required()
-                        ->live()
+                        ->live(debounce: 500)
                         ->default('0')
                         ->afterStateUpdated(function (Get $get, Set $set) {
                             self::getDifference($get, $set);
@@ -37,7 +37,7 @@ class Academic {
                     TextInput::make('implementer_count')
                         ->label('Pelaksanaan')
                         ->required()
-                        ->live()
+                        ->live(debounce: 500)
                         ->default('0')
                         ->afterStateUpdated(function (Get $get, Set $set) {
                             self::getDifference($get, $set);
