@@ -17,6 +17,8 @@ use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Auth;
 use App\Filament\Components\Academic;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Exports\AcademicExporter;
+use Filament\Actions\Exports\Enums\ExportFormat;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\User\Resources\AppsAcademicResource\Pages;
 use App\Filament\User\Resources\AppsAcademicResource\RelationManagers;
@@ -135,6 +137,11 @@ class AppsAcademicResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\ExportBulkAction::make()
+                    ->exporter(AcademicExporter::class)
+                    ->formats([
+                        ExportFormat::Xlsx,
+                    ]),
                 ]),
             ]);
     }

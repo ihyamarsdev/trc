@@ -158,6 +158,78 @@ class Finance
                                 ->helperText('Contoh: 146 Paket Program TRY OUT Ujian Tertulis Berbasis Komputer (UTBK SNBT)'),
                         ])->columns(1),
                 ]),
+
+            Section::make('Invoice')
+                ->schema([
+                    Fieldset::make('')
+                        ->schema([
+                            TextInput::make('schools')
+                                ->label('Sekolah')
+                                ->readOnly(),
+                            TextInput::make('number_invoice')
+                                ->label('Nomor Invoice')
+                                ->live()
+                                ->numeric(),
+                            TextInput::make('detail_invoice')
+                                ->label('Deskripsi')
+                                ->helperText('Contoh: Try Out Asesmen Nasional (AKM)'),
+                        ])->columns(1),
+
+                    Fieldset::make('')
+                        ->schema([
+                            TextInput::make('qty_invoice')
+                                ->label('Quantity')
+                                ->live(500)
+                                ->numeric(),
+                            TextInput::make('unit_price')
+                                ->label('Unit Price')
+                                ->prefix('Rp')
+                                ->live(500)
+                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0)
+                                ->afterStateUpdated(function (Get $get, Set $set) {
+                                    $set('amount_invoice', abs((float) $get('qty_invoice') * (float) $get('unit_price')));
+                                    $set('subtotal_invoice', abs((float) $get('amount_invoice')));
+                                    $set('total_invoice', abs((float) $get('subtotal_invoice')));
+                                }),
+                            TextInput::make('amount_invoice')
+                                ->label('Amount')
+                                ->prefix('Rp')
+                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0)
+                                ->numeric()
+                                ->readOnly(),
+                            TextInput::make('subtotal_invoice')
+                                ->label('Sub Total')
+                                ->prefix('Rp')
+                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0)
+                                ->numeric()
+                                ->readOnly(),
+
+                        ])->columns(2),
+
+                    Fieldset::make('')
+                        ->schema([
+                            TextInput::make('tax_rate')
+                                ->label('Tax Rate')
+                                ->live(500)
+                                ->numeric(),
+                            TextInput::make('sales_tsx')
+                                ->label('Sales Tax')
+                                ->prefix('Rp')
+                                ->live(500)
+                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0),
+                            TextInput::make('other')
+                                ->label('Other')
+                                ->live(500)
+                                ->numeric(),
+                            TextInput::make('total_invoice')
+                                ->label('Total')
+                                ->prefix('Rp')
+                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0)
+                                ->numeric()
+                                ->readOnly(),
+
+                        ])->columns(2),
+                ]),
         ];
     }
 

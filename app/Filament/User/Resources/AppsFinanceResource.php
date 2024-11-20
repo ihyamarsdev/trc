@@ -14,6 +14,8 @@ use Filament\Resources\Resource;
 use App\Filament\Components\Finance;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Actions\Exports\Enums\ExportFormat;
+use App\Filament\Exports\RegistrationDataExporter;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\User\Resources\AppsFinanceResource\Pages;
 use Pelmered\FilamentMoneyField\Infolists\Components\MoneyEntry;
@@ -81,6 +83,11 @@ class AppsFinanceResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\ExportBulkAction::make()
+                    ->exporter(RegistrationDataExporter::class)
+                    ->formats([
+                        ExportFormat::Xlsx,
+                    ]),
                 ]),
             ]);
     }
@@ -154,65 +161,58 @@ class AppsFinanceResource extends Resource
                             ]),
                         ]),
 
-                Section::make('Academic')
-                    ->description('Detail Data Academik')
-                    ->schema([
+                        Section::make('Academic')
+                        ->description('Detail Data Academik')
+                        ->schema([
 
-                        Fieldset::make('')
-                            ->schema([
-                                TextEntry::make('group')
-                                    ->label('Grup')
-                                    ->dateTime('l, jS F Y'),
-                                TextEntry::make('bimtek')
-                                    ->label('Bimtek')
-                                    ->dateTime('l, jS F Y'),
-                            ]),
+                            Fieldset::make('')
+                                ->schema([
+                                    TextEntry::make('group')
+                                        ->label('Grup')
+                                        ->dateTime('l, jS F Y'),
+                                    TextEntry::make('bimtek')
+                                        ->label('Bimtek')
+                                        ->dateTime('l, jS F Y'),
+                                ]),
 
-                        Fieldset::make('')
-                            ->schema([
-                                TextEntry::make('account_count_created')
-                                    ->label('Akun Dibuat'),
-                                TextEntry::make('implementer_count')
-                                    ->label('Pelaksanaan'),
-                                TextEntry::make('difference')
-                                    ->label('Selisih'),
-                            ]),
+                            Fieldset::make('')
+                                ->schema([
+                                    TextEntry::make('account_count_created')
+                                        ->label('Akun Dibuat')
+                                        ->default('-'),
+                                    TextEntry::make('implementer_count')
+                                        ->label('Pelaksanaan')
+                                        ->default('-'),
+                                    TextEntry::make('difference')
+                                        ->label('Selisih')
+                                        ->default('-'),
+                                ]),
 
-                        Fieldset::make('')
-                            ->schema([
-                                IconEntry::make('students_download')
-                                    ->label('Download Siswa')
-                                    ->icon(fn (string $state): string => match ($state) {
-                                        'ya' => 'heroicon-s-check-circle',
-                                        'tidak' => 'heroicon-s-x-circle',
-                                    })
-                                    ->color(fn (string $state): string => match ($state) {
-                                        'ya' => 'success',
-                                        'tidak' => 'danger',
-                                    }),
-                                IconEntry::make('schools_download')
-                                    ->label('Download Sekolah')
-                                    ->icon(fn (string $state): string => match ($state) {
-                                        'ya' => 'heroicon-s-check-circle',
-                                        'tidak' => 'heroicon-s-x-circle',
-                                    })
-                                    ->color(fn (string $state): string => match ($state) {
-                                        'ya' => 'success',
-                                        'tidak' => 'danger',
-                                    }),
-                            ]),
+                            Fieldset::make('')
+                                ->schema([
+                                    IconEntry::make('schools_download')
+                                        ->label('Download Sekolah')
+                                        ->icon(fn (string $state): string => match ($state) {
+                                            'ya' => 'heroicon-s-check-circle',
+                                            'tidak' => 'heroicon-s-x-circle',
+                                        })
+                                        ->color(fn (string $state): string => match ($state) {
+                                            'ya' => 'success',
+                                            'tidak' => 'danger',
+                                        }),
+                                    IconEntry::make('pm')
+                                        ->label('PM')
+                                        ->icon(fn (string $state): string => match ($state) {
+                                            'ya' => 'heroicon-s-check-circle',
+                                            'Tidak' => 'heroicon-s-x-circle',
+                                        })
+                                        ->color(fn (string $state): string => match ($state) {
+                                            'ya' => 'success',
+                                            'tidak' => 'danger',
+                                        }),
+                                ]),
 
-                        Fieldset::make('')
-                            ->schema([
-                                TextEntry::make('counselor_consultation_date')
-                                    ->label('Konsul BK')
-                                    ->dateTime('l, jS F Y'),
-                                TextEntry::make('student_consultation_date')
-                                    ->label('Konsul Siswa')
-                                    ->dateTime('l, jS F Y'),
-                            ]),
-
-                    ])->columns(2),
+                        ])->columns(2),
 
                     Section::make('Finance')
                         ->description('Detail Data Finance')
@@ -222,41 +222,51 @@ class AppsFinanceResource extends Resource
                                 ->schema([
                                     TextEntry::make('price')
                                         ->label('Harga')
-                                        ->money('IDR'),
+                                        ->money('IDR')
+                                        ->default('0'),
                                     TextEntry::make('total')
                                         ->label('Total Harga')
-                                        ->money('IDR'),
+                                        ->money('IDR')
+                                        ->default('0'),
                                 ]),
 
                             Fieldset::make('')
                                 ->label('Exclusion policy')
                                 ->schema([
                                     TextEntry::make('student_count_1')
-                                        ->label('Jumlah Siswa Net 1'),
+                                        ->label('Jumlah Siswa Net 1')
+                                        ->default('-'),
                                     TextEntry::make('student_count_2')
-                                        ->label('Jumlah Siswa Net 2'),
+                                        ->label('Jumlah Siswa Net 2')
+                                        ->default('-'),
                                     TextEntry::make('net')
                                         ->label('Net 1')
-                                        ->money('IDR'),
+                                        ->money('IDR')
+                                        ->default('0'),
                                     TextEntry::make('net_2')
                                         ->label('Net 2')
-                                        ->money('IDR'),
+                                        ->money('IDR')
+                                        ->default('0'),
                                     TextEntry::make('subtotal_1')
                                         ->label('Sub Total 1')
-                                        ->money('IDR'),
+                                        ->money('IDR')
+                                        ->default('0'),
                                     TextEntry::make('subtotal_2')
                                         ->label('Sub Total 2')
-                                        ->money('IDR'),
+                                        ->money('IDR')
+                                        ->default('0'),
                                 ]),
 
                             Fieldset::make('')
                                 ->schema([
                                     TextEntry::make('total_net')
                                         ->label('Total Net')
-                                        ->money('IDR'),
+                                        ->money('IDR')
+                                        ->default('0'),
                                     TextEntry::make('difference_total')
                                         ->label('Selisih Total')
-                                        ->money('IDR'),
+                                        ->money('IDR')
+                                        ->default('0'),
                                 ]),
 
                             Fieldset::make('')
@@ -272,26 +282,83 @@ class AppsFinanceResource extends Resource
                                         ->dateTime('l, jS F Y'),
                                     TextEntry::make('payment')
                                         ->label('Pembayaran Via')
+                                        ->default('-')
                                 ]),
-
-                    ])->columns(2),
+                        ])->columns(2),
 
                     Section::make('Kwitansi')
-                        ->description('Detail Kwitansi')
+                        ->description('Lakukan Edit untuk merubah Kwitansi')
                         ->schema([
 
                             Fieldset::make('')
                                 ->schema([
                                     TextEntry::make('schools')
                                         ->label('Telah Terima Dari')
-                                        ->money('IDR'),
+                                        ->default('-'),
                                     TextEntry::make('total')
                                         ->label('Uang Sejumlah')
-                                        ->money('IDR'),
+                                        ->money('IDR')
+                                        ->default('0'),
                                     TextEntry::make('detail_kwitansi')
-                                        ->label('Guna Pembayaran'),
+                                        ->label('Guna Pembayaran')
+                                        ->default('-'),
                                 ])->columns(1),
-                    ]),
+                        ]),
+
+                    Section::make('Invoice')
+                        ->description('Lakukan Edit untuk merubah Invoice')
+                        ->schema([
+
+                            Fieldset::make('')
+                                ->schema([
+                                    TextEntry::make('schools')
+                                        ->label('Bill To')
+                                        ->default('-'),
+                                    TextEntry::make('number_invoice')
+                                        ->label('Nomor Invoice')
+                                        ->default('-'),
+                                    TextEntry::make('detail_invoice')
+                                        ->label('Deskripsi')
+                                        ->default('-'),
+                                ])->columns(1),
+
+                            Fieldset::make('')
+                                ->schema([
+                                    TextEntry::make('qty_invoice')
+                                        ->label('Kuantitas')
+                                        ->default('0'),
+                                    TextEntry::make('unit_price')
+                                        ->label('Harga Per Unit')
+                                        ->money('IDR')
+                                        ->default('0'),
+                                    TextEntry::make('amount_invoice')
+                                        ->label('Jumlah')
+                                        ->money('IDR')
+                                        ->default('-'),
+                                    TextEntry::make('subtotal_invoice')
+                                        ->label('Sub Total')
+                                        ->money('IDR')
+                                        ->default('-'),
+                                ])->columns(2),
+
+                            Fieldset::make('')
+                                ->schema([
+                                    TextEntry::make('tax_rate')
+                                        ->label('Tax Rate')
+                                        ->default('-'),
+                                    TextEntry::make('sales_tsx')
+                                        ->label('Sales Tax')
+                                        ->default('-')
+                                        ->money('IDR'),
+                                    TextEntry::make('other')
+                                        ->label('Other')
+                                        ->default('-'),
+                                    TextEntry::make('total_invoice')
+                                        ->label('Total')
+                                        ->money('IDR')
+                                        ->default('-'),
+                                ])->columns(2),
+                        ]),
             ]);
     }
 

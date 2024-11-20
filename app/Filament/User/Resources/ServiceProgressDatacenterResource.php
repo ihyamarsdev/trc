@@ -105,11 +105,20 @@ class ServiceProgressDatacenterResource extends Resource
                     ->preload()
                     ->searchable()
                     ->indicator('Tahun Ajaran'),
+                Tables\Filters\SelectFilter::make('type')
+                    ->label('Program')
+                    ->options([
+                        'anbk' => 'ANBK',
+                        'apps' => 'APPS',
+                        'snbt' => 'SNBT',
+                    ])
+                    ->preload()
+                    ->indicator('Periode'),
                 Tables\Filters\QueryBuilder::make()
                     ->constraints([
                         Tables\Filters\QueryBuilder\Constraints\DateConstraint::make('date_register')
                             ->label('Tanggal Pendaftaran'),
-                    ])
+                    ]),
             ])
             ->actions([
             ])

@@ -37,6 +37,11 @@ class ViewAnbkFinance extends ViewRecord
                         ->label('Kwitansi EDUNESIA')
                         ->icon('heroicon-o-arrow-down-tray')
                         ->url(fn (RegistrationData $record) => route('edunesia.kwitansi.download', $record))
+                        ->openUrlInNewTab(),
+                    Action::make('invoice_rasyidu')
+                        ->label('Invoice RASYIDUU')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->url(fn (RegistrationData $record) => route('rasyidu.invoice.download', $record))
                         ->openUrlInNewTab()
                 ])
                 ->label('Detail')

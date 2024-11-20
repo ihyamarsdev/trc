@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Filament\Components\SalesForce;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Exports\SalesforceExporter;
+use Filament\Actions\Exports\Enums\ExportFormat;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\User\Resources\AnbkSalesForceResource\Pages;
 use App\Filament\User\Resources\AnbkSalesForceResource\RelationManagers;
@@ -82,6 +84,11 @@ class AnbkSalesForceResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\ExportBulkAction::make()
+                    ->exporter(SalesforceExporter::class)
+                    ->formats([
+                        ExportFormat::Xlsx,
+                    ]),
                 ]),
             ]);
     }

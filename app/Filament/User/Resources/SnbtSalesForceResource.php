@@ -19,8 +19,10 @@ use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Exports\SalesforceExporter;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Actions\Exports\Enums\ExportFormat;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\User\Resources\SnbtSalesForceResource\Pages;
 use App\Filament\User\Resources\SnbtSalesForceResource\RelationManagers;
@@ -89,6 +91,11 @@ class SnbtSalesForceResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\ExportBulkAction::make()
+                    ->exporter(SalesforceExporter::class)
+                    ->formats([
+                        ExportFormat::Xlsx,
+                    ]),
                 ]),
             ]);
     }

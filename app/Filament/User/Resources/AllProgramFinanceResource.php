@@ -6,6 +6,7 @@ use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
 use Illuminate\Database;
+use App\Models\SchoolYear;
 use Filament\Tables\Table;
 use App\Models\RegistrationData;
 use Filament\Resources\Resource;
@@ -74,7 +75,12 @@ class AllProgramFinanceResource extends Resource
                     ])
                     ->preload()
                     ->indicator('Periode'),
-            ], layout: Tables\Enums\FiltersLayout::AboveContent)
+                Tables\Filters\SelectFilter::make('school_years_id')
+                    ->label('Tahun Ajaran')
+                    ->options(SchoolYear::all()->pluck('name', 'id'))
+                    ->preload()
+                    ->searchable(),
+            ])
             ->actions([
             ])
             ->bulkActions([

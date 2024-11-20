@@ -40,6 +40,7 @@ class UserPanelProvider extends PanelProvider
             ->favicon(asset('images/logo.png'))
             ->brandLogoHeight('8rem')
             ->viteTheme('resources/css/filament/user/theme.css')
+            ->databaseNotifications()
             ->colors([
                 'danger' => Color::Rose,
                 'gray' => Color::Gray,

@@ -14,8 +14,12 @@ return new class extends Migration
         Schema::table('registration_data', function (Blueprint $table) {
             $table->string('detail_invoice')->nullable();
             $table->string('number_invoice')->nullable();
+            $table->string('qty_invoice')->nullable();
+            $table->string('unit_price')->nullable();
+            $table->string('amount_invoice')->nullable();
             $table->string('tax_rate')->nullable();
             $table->string('sales_tsx')->nullable();
+            $table->string('other')->nullable();
             $table->string('subtotal_invoice')->nullable();
         });
     }

@@ -21,15 +21,19 @@
     @apply no-scrollbar bg-sky-950;
 }
 
-.fi-body{
+.fi-body {
     @apply bg-sky-900;
+}
+
+.fi-sidebar-item-active {
+    @apply rounded-lg ring-lime-500 ring-1;
 }
 
 .fi-sidebar-item-label {
     @apply text-white hover:text-lime-500;
 }
 
-.fi-sidebar-item-button{
+.fi-sidebar-item-button {
     @apply bg-sky-900 hover:bg-white dark:bg-gray-950 focus:text-lime-500;
 }
 
@@ -45,11 +49,11 @@
     @apply text-lime-500;
 }
 
-.fi-sidebar-group-label{
+.fi-sidebar-group-label {
     @apply text-white;
 }
 
-.fi-breadcrumbs-item-label{
+.fi-breadcrumbs-item-label {
     @apply text-white;
 }
 
@@ -57,14 +61,26 @@
     @apply bg-lime-500;
 }
 
+.fi-fieldset {
+    @apply border-lime-500;
+}
+
+.fi-dropdown-list-item-icon {
+    @apply text-lime-500;
+}
+
+.fi-section {
+    @apply ring-lime-500 ring-2;
+}
+
 @layer utilities {
     /* Hide scrollbar for Chrome, Safari and Opera */
     .no-scrollbar::-webkit-scrollbar {
         display: none;
     }
-   /* Hide scrollbar for IE, Edge and Firefox */
+    /* Hide scrollbar for IE, Edge and Firefox */
     .no-scrollbar {
-        -ms-overflow-style: none;  /* IE and Edge */
-        scrollbar-width: none;  /* Firefox */
-  }
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+    }
 }

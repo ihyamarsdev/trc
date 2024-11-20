@@ -6,6 +6,7 @@ use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
 use Illuminate\Database;
+use App\Models\SchoolYear;
 use Filament\Tables\Table;
 use Database\Query\Builder;
 use App\Models\RegistrationData;
@@ -66,12 +67,12 @@ class AllProgramAcademicResource extends Resource
                     ])
                     ->preload()
                     ->indicator('Periode'),
-                Tables\Filters\QueryBuilder::make()
-                    ->constraints([
-                        Tables\Filters\QueryBuilder\Constraints\DateConstraint::make('date_register')
-                            ->label('Tanggal Pendaftaran'),
-                    ])
-            ], layout: Tables\Enums\FiltersLayout::AboveContent)
+                Tables\Filters\SelectFilter::make('school_years_id')
+                    ->label('Tahun Ajaran')
+                    ->options(SchoolYear::all()->pluck('name', 'id'))
+                    ->preload()
+                    ->searchable(),
+            ])
             ->filtersFormColumns(1)
             ->actions([
             ])

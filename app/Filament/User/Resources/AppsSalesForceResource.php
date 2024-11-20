@@ -11,7 +11,9 @@ use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Auth;
 use App\Filament\Components\SalesForce;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Exports\SalesforceExporter;
 use App\Models\{SchoolYear, RegistrationData};
+use Filament\Actions\Exports\Enums\ExportFormat;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\User\Resources\AppsSalesForceResource\Pages;
 use App\Filament\User\Resources\AppsSalesForceResource\RelationManagers;
@@ -81,6 +83,11 @@ class AppsSalesForceResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\ExportBulkAction::make()
+                    ->exporter(SalesforceExporter::class)
+                    ->formats([
+                        ExportFormat::Xlsx,
+                    ]),
                 ]),
             ]);
     }

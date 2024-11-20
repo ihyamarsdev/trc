@@ -55,6 +55,17 @@ class RegistrationData extends Model
         'subtotal_2',
         'difference_total',
         'detail_kwitansi',
+
+        'detail_invoice',
+        'number_invoice',
+        'qty_invoice',
+        'unit_price',
+        'amount_invoice',
+        'tax_rate',
+        'sales_tsx',
+        'other',
+        'subtotal_invoice',
+        'total_invoice'
     ];
 
     protected $casts = [
