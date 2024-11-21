@@ -15,6 +15,7 @@ use Orion\FilamentGreeter\GreeterPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
+use App\Http\Middleware\UpgradeToHttpsUnderNgrok;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
@@ -86,6 +87,7 @@ class UserPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                UpgradeToHttpsUnderNgrok::class,
             ])
             ->authMiddleware([
                 Authenticate::class,

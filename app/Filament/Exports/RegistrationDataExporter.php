@@ -164,6 +164,6 @@ class RegistrationDataExporter extends Exporter
 
     public function getFileName(Export $export): string
     {
-        return "registration-data-{$export->getKey()}";
+        return "Finance-data-{$export->getKey()}";
     }
 }

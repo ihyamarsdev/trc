@@ -85,6 +85,6 @@ class DatacenterExporter extends Exporter
 
     public function getFileName(Export $export): string
     {
-        return "registration-data-{$export->getKey()}";
+        return "Datacenter-data-{$export->getKey()}";
     }
 }

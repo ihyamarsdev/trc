@@ -108,6 +108,6 @@ class AcademicExporter extends Exporter
 
     public function getFileName(Export $export): string
     {
-        return "registration-data-{$export->getKey()}";
+        return "Akademik-data-{$export->getKey()}";
     }
 }

@@ -72,12 +72,23 @@ class AppsFinanceResource extends Resource
                     ->options(SchoolYear::all()->pluck('name', 'id'))
                     ->preload()
                     ->searchable(),
+                Tables\Filters\TernaryFilter::make('payment_date')
+                    ->label('Status Pembayaran Sekolah')
+                    ->placeholder('Semua Sekolah')
+                    ->trueLabel('Sudah Bayar')
+                    ->falseLabel('Belum Bayar')
+                    ->queries(
+                        true: fn (Builder $query) => $query->whereNotNull('payment_date'),
+                        false: fn (Builder $query) => $query->whereNull('payment_date'),
+                        blank: fn (Builder $query) => $query,
+                    )
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make(),
+
                 ]),
             ])
             ->bulkActions([

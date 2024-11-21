@@ -10,9 +10,11 @@ use App\Livewire\DetailProfile;
 use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
 use Illuminate\Support\Facades\Auth;
+use Orion\FilamentGreeter\GreeterPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
+use App\Http\Middleware\UpgradeToHttpsUnderNgrok;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
@@ -34,7 +36,10 @@ class AdminPanelProvider extends PanelProvider
             ->passwordReset()
             ->login()
             ->font('Poppins')
-            ->brandName('TRC Management')
+            ->brandLogo(asset('images/logo.png'))
+            ->favicon(asset('images/logo.png'))
+            ->brandLogoHeight('8rem')
+            ->databaseNotifications()
             ->colors([
                 'danger' => Color::Rose,
                 'gray' => Color::Gray,
@@ -43,6 +48,7 @@ class AdminPanelProvider extends PanelProvider
                 'success' => Color::Emerald,
                 'warning' => Color::Orange,
             ])
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->navigationGroups([
                 'Rekapitulation',
                 'Management User',
@@ -56,7 +62,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
+
             ])
             ->userMenuItems([
                 'profile' => MenuItem::make()
@@ -74,6 +80,7 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                UpgradeToHttpsUnderNgrok::class
             ])
             ->authMiddleware([
                 Authenticate::class,
@@ -101,7 +108,14 @@ class AdminPanelProvider extends PanelProvider
                     )
                     ->customProfileComponents([
                         DetailProfile::class,
-                    ])
+                    ]),
+                GreeterPlugin::make()
+                    ->message('Selamat Datang,')
+                    ->name(text: fn () => Auth::user()->name)
+                    ->title('Satu-satunya cara untuk melakukan pekerjaan hebat yaitu dengan mencintai apa yang sedang kamu lakukan.')
+                    ->avatar(size: 'w-16 h-16', enabled: true)
+                    ->sort(-1)
+                    ->columnSpan('full'),
             ]);
     }
 }
