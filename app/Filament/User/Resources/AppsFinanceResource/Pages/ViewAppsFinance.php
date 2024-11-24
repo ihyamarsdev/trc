@@ -37,6 +37,16 @@ class ViewAppsFinance extends ViewRecord
                         ->label('Kwitansi EDUNESIA')
                         ->icon('heroicon-o-arrow-down-tray')
                         ->url(fn (RegistrationData $record) => route('edunesia.kwitansi.download', $record))
+                        ->openUrlInNewTab(),
+                    Action::make('invoice_edunesia')
+                        ->label('Invoice EDUNESIA')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->url(fn (RegistrationData $record) => route('edunesia.invoice.download', $record))
+                        ->openUrlInNewTab(),
+                    Action::make('invoice_edunesia')
+                        ->label('Invoice EDUNESIA')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->url(fn (RegistrationData $record) => route('edunesia.invoice.download', $record))
                         ->openUrlInNewTab()
                 ])
                 ->label('Detail')

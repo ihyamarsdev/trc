@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use NumberFormatter;
+use App\Models\SchoolYear;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\RegistrationData;
-use App\Models\SchoolYear;
 use LaravelDaily\Invoices\Invoice;
+use Filament\Notifications\Notification;
 use LaravelDaily\Invoices\Classes\Buyer;
 use PhpOffice\PhpWord\TemplateProcessor;
 use LaravelDaily\Invoices\Classes\InvoiceItem;
@@ -23,7 +24,7 @@ class DownloadPdfController extends Controller
 
         $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
 
-        $templateProcessor = new TemplateProcessor('template/rasyidu/anbk.docx');
+        $templateProcessor = new TemplateProcessor('template/rasyidu/spk.docx');
 
         $templateProcessor->setValues([
             'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
@@ -43,6 +44,16 @@ class DownloadPdfController extends Controller
 
         $doc_name = 'SPK RASYIDUU ANBK ' . $record->schools . '.docx';
 
+        $recipient = auth()->user();
+
+        $recipient->notify(
+            Notification::make()
+                ->title('SPK Berhasil di Download')
+                ->icon('heroicon-o-document-text')
+                ->success()
+                ->toDatabase(),
+        );
+
         $templateProcessor->saveAs($doc_name);
 
         return response()->download(public_path($doc_name))->deleteFileAfterSend(true);
@@ -55,7 +66,7 @@ class DownloadPdfController extends Controller
         $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
 
 
-        $templateProcessor = new TemplateProcessor('template/rasyidu/apps.docx');
+        $templateProcessor = new TemplateProcessor('template/rasyidu/spk.docx');
 
         $templateProcessor->setValues([
             'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
@@ -75,6 +86,16 @@ class DownloadPdfController extends Controller
 
         $doc_name = 'SPK RASYIDUU APPS ' . $record->schools . '.docx';
 
+        $recipient = auth()->user();
+
+        $recipient->notify(
+            Notification::make()
+                ->title('SPK Berhasil di Download')
+                ->icon('heroicon-o-document-text')
+                ->success()
+                ->toDatabase(),
+        );
+
         $templateProcessor->saveAs($doc_name);
 
         return response()->download(public_path($doc_name))->deleteFileAfterSend(true);
@@ -86,7 +107,7 @@ class DownloadPdfController extends Controller
         $digit = new NumberFormatter("id", NumberFormatter::SPELLOUT);
         $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
 
-        $templateProcessor = new TemplateProcessor('template/rasyidu/snbt.docx');
+        $templateProcessor = new TemplateProcessor('template/rasyidu/spk.docx');
 
         $templateProcessor->setValues([
             'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
@@ -106,6 +127,16 @@ class DownloadPdfController extends Controller
 
         $doc_name = 'SPK RASYIDUU SNBT ' . $record->schools . '.docx';
 
+        $recipient = auth()->user();
+
+        $recipient->notify(
+            Notification::make()
+                ->title('SPK Berhasil di Download')
+                ->icon('heroicon-o-document-text')
+                ->success()
+                ->toDatabase(),
+        );
+
         $templateProcessor->saveAs($doc_name);
 
         return response()->download(public_path($doc_name))->deleteFileAfterSend(true);
@@ -118,7 +149,7 @@ class DownloadPdfController extends Controller
 
         $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
 
-        $templateProcessor = new TemplateProcessor('template/rasyidu/kwitansi.docx');
+        $templateProcessor = new TemplateProcessor('template/rasyidu/kuitansi.docx');
 
         $templateProcessor->setValues([
             'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
@@ -140,6 +171,16 @@ class DownloadPdfController extends Controller
 
         $doc_name = 'KWITANSI RASYIDUU ' . $record->schools . '.docx';
 
+        $recipient = auth()->user();
+
+        $recipient->notify(
+            Notification::make()
+                ->title('Kwitansi Berhasil di Download')
+                ->icon('heroicon-o-document-text')
+                ->success()
+                ->toDatabase(),
+        );
+
         $templateProcessor->saveAs($doc_name);
 
         return response()->download(public_path($doc_name))->deleteFileAfterSend(true);
@@ -152,7 +193,7 @@ class DownloadPdfController extends Controller
         $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
 
 
-        $templateProcessor = new TemplateProcessor('template/edunesia/anbk.docx');
+        $templateProcessor = new TemplateProcessor('template/edunesia/spk.docx');
 
         $templateProcessor->setValues([
             'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
@@ -171,6 +212,16 @@ class DownloadPdfController extends Controller
         ]);
 
         $doc_name = 'SPK EDUNESIA APPS ' . $record->schools . '.docx';
+
+        $recipient = auth()->user();
+
+        $recipient->notify(
+            Notification::make()
+                ->title('SPK Berhasil di Download')
+                ->icon('heroicon-o-document-text')
+                ->success()
+                ->toDatabase(),
+        );
 
         $templateProcessor->saveAs($doc_name);
 
@@ -184,7 +235,7 @@ class DownloadPdfController extends Controller
         $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
 
 
-        $templateProcessor = new TemplateProcessor('template/edunesia/apps.docx');
+        $templateProcessor = new TemplateProcessor('template/edunesia/spk.docx');
 
         $templateProcessor->setValues([
             'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
@@ -203,6 +254,16 @@ class DownloadPdfController extends Controller
         ]);
 
         $doc_name = 'SPK EDUNESIA APPS ' . $record->schools . '.docx';
+
+        $recipient = auth()->user();
+
+        $recipient->notify(
+            Notification::make()
+                ->title('SPK Berhasil di Download')
+                ->icon('heroicon-o-document-text')
+                ->success()
+                ->toDatabase(),
+        );
 
         $templateProcessor->saveAs($doc_name);
 
@@ -216,7 +277,7 @@ class DownloadPdfController extends Controller
         $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
 
 
-        $templateProcessor = new TemplateProcessor('template/edunesia/snbt.docx');
+        $templateProcessor = new TemplateProcessor('template/edunesia/spk.docx');
 
         $templateProcessor->setValues([
             'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
@@ -236,6 +297,16 @@ class DownloadPdfController extends Controller
 
         $doc_name = 'SPK EDUNESIA APPS ' . $record->schools . '.docx';
 
+        $recipient = auth()->user();
+
+        $recipient->notify(
+            Notification::make()
+                ->title('SPK Berhasil di Download')
+                ->icon('heroicon-o-document-text')
+                ->success()
+                ->toDatabase(),
+        );
+
         $templateProcessor->saveAs($doc_name);
 
         return response()->download(public_path($doc_name))->deleteFileAfterSend(true);
@@ -248,7 +319,7 @@ class DownloadPdfController extends Controller
 
         $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
 
-        $templateProcessor = new TemplateProcessor('template/edunesia/kwitansi.docx');
+        $templateProcessor = new TemplateProcessor('template/edunesia/kuitansi.docx');
 
         $templateProcessor->setValues([
             'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
@@ -269,6 +340,16 @@ class DownloadPdfController extends Controller
         ]);
 
         $doc_name = 'KWITANSI EDUNESIA ' . $record->schools . '.docx';
+
+        $recipient = auth()->user();
+
+        $recipient->notify(
+            Notification::make()
+                ->title('Kwitansi Berhasil di Download')
+                ->icon('heroicon-o-document-text')
+                ->success()
+                ->toDatabase(),
+        );
 
         $templateProcessor->saveAs($doc_name);
 
