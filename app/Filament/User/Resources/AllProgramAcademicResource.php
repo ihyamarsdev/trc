@@ -34,7 +34,7 @@ class AllProgramAcademicResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole('academic');
+        return Auth::user()->hasRole(['academic', 'admin']);
     }
 
 

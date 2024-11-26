@@ -25,7 +25,7 @@ class SalesForceStatsWidget extends BaseWidget
 
     public static function canView(): bool
     {
-        return Auth::user()->hasRole(['salesforce','datacenter','academic','finance']);
+        return Auth::user()->hasRole(['salesforce','admin']);
     }
 
     public function table(Table $table): Table

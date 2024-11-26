@@ -33,7 +33,7 @@ class AnbkDatacenterResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole('datacenter');
+        return Auth::user()->hasRole(['datacenter', 'admin']);
     }
 
     public static function form(Form $form): Form

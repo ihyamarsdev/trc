@@ -38,7 +38,7 @@ class AnbkFinanceResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole('finance');
+        return Auth::user()->hasRole(['finance', 'admin']);
     }
 
     public static function form(Form $form): Form
@@ -82,7 +82,7 @@ class AnbkFinanceResource extends Resource
                     ->queries(
                         true: fn (Builder $query) => $query->whereNotNull('payment_date'),
                         false: fn (Builder $query) => $query->whereNull('payment_date'),
-                        blank: fn (Builder $query) => $query, 
+                        blank: fn (Builder $query) => $query,
                     )
             ])
             ->actions([
@@ -357,15 +357,13 @@ class AnbkFinanceResource extends Resource
                         Fieldset::make('')
                             ->schema([
                                 TextEntry::make('tax_rate')
-                                    ->label('Tax Rate')
-                                    ->default('-'),
+                                    ->label('PPH 23')
+                                    ->formatStateUsing(fn (string $state): string => __("{$state}%"))
+                                    ->default('0'),
                                 TextEntry::make('sales_tsx')
-                                    ->label('Sales Tax')
-                                    ->default('-')
-                                    ->money('IDR'),
-                                TextEntry::make('other')
-                                    ->label('Other')
-                                    ->default('-'),
+                                    ->label('PPN')
+                                    ->formatStateUsing(fn (string $state): string => __("{$state}%"))
+                                    ->default('0'),
                                 TextEntry::make('total_invoice')
                                     ->label('Total')
                                     ->money('IDR')

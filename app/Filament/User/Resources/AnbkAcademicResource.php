@@ -37,13 +37,14 @@ class AnbkAcademicResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole('academic');
+        return Auth::user()->hasRole(['academic', 'admin']);    
     }
 
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([
+            ->schema(
+                [
                 Forms\Components\Section::make('ANBK')
                 ->description('ASESMEN NASIONAL BERBASIS KOMPUTER')
                 ->schema([

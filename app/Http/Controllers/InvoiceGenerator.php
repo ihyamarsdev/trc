@@ -6,34 +6,56 @@ use NumberFormatter;
 use App\Models\SchoolYear;
 use Illuminate\Http\Request;
 use App\Models\RegistrationData;
-use PhpOffice\PhpWord\TemplateProcessor;
 use LaravelDaily\Invoices\Invoice;
+use Filament\Notifications\Notification;
 use LaravelDaily\Invoices\Classes\Buyer;
+use PhpOffice\PhpWord\TemplateProcessor;
 use LaravelDaily\Invoices\Classes\InvoiceItem;
 
 class InvoiceGenerator extends Controller
 {
     public function rasyidu_invoice(RegistrationData $record)
     {
-        $digit = new NumberFormatter("id", NumberFormatter::SPELLOUT);
-
-
-        $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
+        $pph = $record->tax_rate;
+        $ppn = $record->sales_tsx;
 
         $templateProcessor = new TemplateProcessor('template/rasyidu/invoice.docx');
 
+        if ($pph == 0) {
+            $pph = "-";
+            $ppn = $record->sales_tsx . "%";
+        }
+
+        if ($ppn == 0) {
+            $ppn = "-";
+            $pph = $record->tax_rate . "%";
+        }
+
         $templateProcessor->setValues([
-            'deskripsi' => '',
+            'detail' => $record->detail_invoice,
             'schools' => $record->schools,
-            'year' => $school_year->name,
-            'tanggal' => $record->date_register->format('F d, Y'),
-            'harga' => number_format($record->price, 0, ',', '.'),
+            'qty' => $record->qty_invoice,
+            'tanggal' => $record->date_register->format('d/m/Y'),
+            'price' => number_format($record->unit_price, 0, ',', '.'),
+            'amount' => number_format($record->amount_invoice, 0, ',', '.'),
             'total_invoice' => number_format($record->total_invoice, 0, ',', '.'),
-            'payment' => $record->payment,
-            'province' => $record->provinces,
+            'subtotal' => number_format($record->subtotal_invoice, 0, ',', '.'),
+            'number' => $record->number_invoice,
+            'pph' => $pph,
+            'ppn' => $ppn,
         ]);
 
         $doc_name = 'INVOICE RASYIDUU ANBK ' . $record->schools . '.docx';
+
+        $recipient = auth()->user();
+
+        $recipient->notify(
+            Notification::make()
+                ->title('Invoice Berhasil di Download')
+                ->icon('heroicon-o-document-text')
+                ->success()
+                ->toDatabase(),
+        );
 
         $templateProcessor->saveAs($doc_name);
 
@@ -42,25 +64,49 @@ class InvoiceGenerator extends Controller
 
     public function edunesia_invoice(RegistrationData $record)
     {
-        $digit = new NumberFormatter("id", NumberFormatter::SPELLOUT);
+        $pph = $record->tax_rate;
+        $ppn = $record->sales_tsx;
 
+        $templateProcessor = new TemplateProcessor('template/edunesia/invoice.docx');
 
-        $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
+        if ($pph == 0) {
+            $pph = "-";
+            $ppn = $record->sales_tsx . "%";
+        }
 
-        $templateProcessor = new TemplateProcessor('template/rasyidu/invoice.docx');
+        if ($ppn == 0) {
+            $ppn = "-";
+            $pph = $record->tax_rate . "%";
+        }
 
         $templateProcessor->setValues([
-            'deskripsi' => '',
+            'detail' => $record->detail_invoice,
             'schools' => $record->schools,
-            'year' => $school_year->name,
-            'tanggal' => $record->date_register->format('F d, Y'),
-            'harga' => number_format($record->price, 0, ',', '.'),
+            'qty' => $record->qty_invoice,
+            'tanggal' => $record->date_register->format('d/m/Y'),
+            'price' => number_format($record->unit_price, 0, ',', '.'),
+            'amount' => number_format($record->amount_invoice, 0, ',', '.'),
             'total_invoice' => number_format($record->total_invoice, 0, ',', '.'),
-            'payment' => $record->payment,
-            'province' => $record->provinces,
+            'subtotal' => number_format($record->subtotal_invoice, 0, ',', '.'),
+            'number' => $record->number_invoice,
+            'pph' => $pph,
+            'ppn' => $ppn,
         ]);
 
+
         $doc_name = 'INVOICE EDUNESIA ANBK ' . $record->schools . '.docx';
+
+
+        $recipient = auth()->user();
+
+        $recipient->notify(
+            Notification::make()
+                ->title('Invoice Berhasil di Download')
+                ->icon('heroicon-o-document-text')
+                ->success()
+                ->toDatabase(),
+        );
+
 
         $templateProcessor->saveAs($doc_name);
 

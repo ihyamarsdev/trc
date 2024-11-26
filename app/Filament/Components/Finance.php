@@ -6,7 +6,7 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Tables\Columns\{TextColumn};
 use Pelmered\FilamentMoneyField\Forms\Components\MoneyInput;
-use Filament\Forms\Components\{Select, TextInput, Section, DatePicker, Radio, Fieldset};
+use Filament\Forms\Components\{Select, TextInput, Section, DatePicker, Radio, Fieldset, Group};
 
 class Finance
 {
@@ -32,7 +32,7 @@ class Finance
                             TextInput::make('price')
                                 ->label('Harga')
                                 ->prefix('Rp')
-                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0),
+                                ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0),
                         ]),
 
                     Fieldset::make('')
@@ -40,21 +40,22 @@ class Finance
                             Radio::make('option_price')
                                 ->label('Pilih Opsi')
                                 ->options(function (Get $get): array {
-                                    $accountCount = (int) $get('account_count_created');
-                                    $implementerCount = (int) $get('implementer_count');
+                                    $accountCount = (float) $get('account_count_created');
+                                    $implementerCount = (float) $get('implementer_count');
 
                                     return [
                                         $accountCount => 'Jumlah Akun',
                                         $implementerCount => 'Jumlah Pelaksanaan'
                                     ];
                                 })
+                                ->live(200)
                                 ->reactive()
-                                ->afterStateUpdated(fn (Get $get, Set $set) => $set('total', (float) $get('price') * $get('option_price'))),
+                                ->afterStateUpdated(fn (Get $get, Set $set) => $set('total', (float) $get('price') * (float) $get('option_price'))),
 
                             TextInput::make('total')
                                 ->label('Total')
                                 ->prefix('Rp')
-                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0)
+                                ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
                                 ->readOnly(),
                         ]),
 
@@ -64,7 +65,7 @@ class Finance
                             TextInput::make('student_count_1')
                                 ->label('Jumlah Siswa 1')
                                 ->numeric()
-                                ->live(debounce: 500)
+                                ->live(debounce: 200)
                                 ->afterStateUpdated(function (Get $get, Set $set) {
                                     $set('student_count_2', (float) $get('student_count') - (float) $get('student_count_1'));
                                     $set('subtotal_1', (float) $get('student_count_1') * (float) $get('net'));
@@ -76,7 +77,7 @@ class Finance
                                 ->label('Net 1')
                                 ->live(debounce: 1000)
                                 ->prefix('Rp')
-                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0)
+                                ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
                                 ->numeric()
                                 ->afterStateUpdated(function (Get $get, Set $set) {
                                     $set('subtotal_1', (float) $get('student_count_1') * (float) $get('net'));
@@ -87,7 +88,7 @@ class Finance
                             TextInput::make('subtotal_1')
                                 ->label('Sub Total 1')
                                 ->prefix('Rp')
-                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0)
+                                ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
                                 ->numeric()
                                 ->readOnly(),
                             TextInput::make('student_count_2')
@@ -98,7 +99,7 @@ class Finance
                                 ->label('Net 2')
                                 ->live(debounce: 1000)
                                 ->prefix('Rp')
-                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0)
+                                ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
                                 ->afterStateUpdated(function (Get $get, Set $set) {
                                     $set('subtotal_2', (float) $get('student_count_2') * (float) $get('net_2'));
                                     $set('total_net', (float) $get('subtotal_1') + (float) $get('subtotal_2'));
@@ -107,7 +108,7 @@ class Finance
                             TextInput::make('subtotal_2')
                                 ->label('Sub Total 2')
                                 ->prefix('Rp')
-                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0)
+                                ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
                                 ->readOnly(),
                         ])->columns(3),
 
@@ -116,12 +117,12 @@ class Finance
                             TextInput::make('total_net')
                                 ->label('Total Net')
                                 ->prefix('Rp')
-                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0)
+                                ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
                                 ->readOnly(),
                             TextInput::make('difference_total')
                                 ->label('Selisih Total')
                                 ->prefix('Rp')
-                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0)
+                                ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
                                 ->readOnly(),
                         ]),
 
@@ -167,6 +168,7 @@ class Finance
                                 ->label('Sekolah')
                                 ->readOnly(),
                             TextInput::make('number_invoice')
+                                ->prefix('#')
                                 ->label('Nomor Invoice')
                                 ->live()
                                 ->numeric(),
@@ -179,13 +181,18 @@ class Finance
                         ->schema([
                             TextInput::make('qty_invoice')
                                 ->label('Quantity')
-                                ->live(500)
-                                ->numeric(),
+                                ->live(200)
+                                ->numeric()
+                                ->afterStateUpdated(function (Get $get, Set $set) {
+                                    $set('amount_invoice', abs((float) $get('qty_invoice') * (float) $get('unit_price')));
+                                    $set('subtotal_invoice', abs((float) $get('amount_invoice')));
+                                    $set('total_invoice', abs((float) $get('subtotal_invoice')));
+                                }),
                             TextInput::make('unit_price')
                                 ->label('Unit Price')
                                 ->prefix('Rp')
-                                ->live(500)
-                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0)
+                                ->live(200)
+                                ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
                                 ->afterStateUpdated(function (Get $get, Set $set) {
                                     $set('amount_invoice', abs((float) $get('qty_invoice') * (float) $get('unit_price')));
                                     $set('subtotal_invoice', abs((float) $get('amount_invoice')));
@@ -194,40 +201,60 @@ class Finance
                             TextInput::make('amount_invoice')
                                 ->label('Amount')
                                 ->prefix('Rp')
-                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0)
+                                ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
                                 ->numeric()
                                 ->readOnly(),
                             TextInput::make('subtotal_invoice')
                                 ->label('Sub Total')
                                 ->prefix('Rp')
-                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0)
+                                ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
                                 ->numeric()
                                 ->readOnly(),
 
                         ])->columns(2),
 
+                    Fieldset::make('Pajak')
+                        ->schema([
+                            Radio::make('option_tax')
+                                ->label('Pilih Opsi Pajak')
+                                ->options([
+                                    '0.02' => 'PPH 23',
+                                    '0.11' => 'PPN',
+                                ])
+                                ->live(200)
+                                ->reactive()
+                                ->afterStateUpdated(function (Get $get, Set $set) {
+                                    $set('total_invoice', (float) $get('subtotal_invoice') + ((float) $get('subtotal_invoice') * (float) $get('option_tax')));
+                                    if ($get('option_tax') == '0.02') {
+                                        $set('tax_rate', "2");
+                                        $set('sales_tsx', "0");
+                                    } elseif ($get('option_tax') == '0.11') {
+                                        $set('tax_rate', "0");
+                                        $set('sales_tsx', "11");
+                                    }
+                                }),
+                            Group::make([
+                                TextInput::make('tax_rate')
+                                    ->label('PPH 23')
+                                    ->suffix('%')
+                                    ->readOnly()
+                                    ->live(200),
+                                TextInput::make('sales_tsx')
+                                    ->label('PPN')
+                                    ->suffix('%')
+                                    ->readOnly()
+                                    ->live(200),
+                            ]),
+
+                        ])->columns(2),
+
                     Fieldset::make('')
                         ->schema([
-                            TextInput::make('tax_rate')
-                                ->label('Tax Rate')
-                                ->live(500)
-                                ->numeric(),
-                            TextInput::make('sales_tsx')
-                                ->label('Sales Tax')
-                                ->prefix('Rp')
-                                ->live(500)
-                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0),
-                            TextInput::make('other')
-                                ->label('Other')
-                                ->live(500)
-                                ->numeric(),
                             TextInput::make('total_invoice')
                                 ->label('Total')
                                 ->prefix('Rp')
-                                ->currencyMask(thousandSeparator: ',',decimalSeparator: '.',precision: 0)
-                                ->numeric()
+                                ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
                                 ->readOnly(),
-
                         ])->columns(2),
                 ]),
         ];

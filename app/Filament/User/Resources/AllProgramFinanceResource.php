@@ -34,7 +34,7 @@ class AllProgramFinanceResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole('finance');
+        return Auth::user()->hasRole(['finance', 'admin']);
     }
 
     public static function form(Form $form): Form

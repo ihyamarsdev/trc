@@ -6,6 +6,7 @@ use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
 use Illuminate\Database;
+use App\Models\SchoolYear;
 use Filament\Tables\Table;
 use App\Models\MonthJumsis;
 use App\Models\RegistrationData;
@@ -34,7 +35,7 @@ class MonthJumsisResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole('datacenter');
+        return Auth::user()->hasRole(['datacenter', 'admin']);
     }
 
 
@@ -61,7 +62,19 @@ class MonthJumsisResource extends Resource
                     ),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('periode')
+                    ->label('Periode')
+                    ->options([
+                        'Januari - Juni' => 'Januari - Juni',
+                        'Juli - Desember' => 'Juli - Desember',
+                    ])
+                    ->preload()
+                    ->indicator('Periode'),
+                Tables\Filters\SelectFilter::make('school_years_id')
+                    ->label('Tahun Ajaran')
+                    ->options(SchoolYear::all()->pluck('name', 'id'))
+                    ->preload()
+                    ->searchable(),
             ])
             ->actions([
             ])
