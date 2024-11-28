@@ -69,11 +69,7 @@ class AnbkDatacenterResource extends Resource
                     ->indicator('Tahun Ajaran'),
             ])
             ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make(),
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
-                ]),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -98,8 +94,6 @@ class AnbkDatacenterResource extends Resource
     {
         return [
             'index' => Pages\ListAnbkDatacenters::route('/'),
-            'create' => Pages\CreateAnbkDatacenter::route('/create'),
-            'edit' => Pages\EditAnbkDatacenter::route('/{record}/edit'),
         ];
     }
 }

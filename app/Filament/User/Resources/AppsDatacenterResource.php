@@ -69,11 +69,7 @@ class AppsDatacenterResource extends Resource
                     ->searchable(),
             ])
             ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make(),
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
-                ]),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -98,8 +94,6 @@ class AppsDatacenterResource extends Resource
     {
         return [
             'index' => Pages\ListAppsDatacenters::route('/'),
-            'create' => Pages\CreateAppsDatacenter::route('/create'),
-            'edit' => Pages\EditAppsDatacenter::route('/{record}/edit'),
         ];
     }
 }

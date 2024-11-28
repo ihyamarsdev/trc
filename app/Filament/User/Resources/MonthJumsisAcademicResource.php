@@ -35,7 +35,7 @@ class MonthJumsisAcademicResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole(['academic', 'finance', 'admin']);
+        return Auth::user()->hasRole(['academic','finance', 'admin']);
     }
 
     public static function form(Form $form): Form
@@ -52,12 +52,12 @@ class MonthJumsisAcademicResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('monthYear')
                     ->label('Bulan'),
-                Tables\Columns\TextColumn::make('id')
+                Tables\Columns\TextColumn::make('implementer_count')
                     ->label('Jumlah')
                     ->summarize(
                         Summarizer::make()
                             ->label('')
-                            ->using(fn (Database\Query\Builder $query) => $query->count('id'))
+                            ->using(fn (Database\Query\Builder $query) => $query->sum('implementer_count'))
                     ),
             ])
             ->filters([
@@ -87,7 +87,7 @@ class MonthJumsisAcademicResource extends Resource
                     ->collapsible()
                     ->titlePrefixedWithLabel(false)
                     ->orderQueryUsing(
-                        fn(Builder $query) => $query->orderBy('date_register', 'asc')
+                        fn (Builder $query) => $query->orderBy('date_register', 'asc')
                     ),
             ])
             ->defaultGroup('monthYear')

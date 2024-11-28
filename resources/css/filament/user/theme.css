@@ -73,6 +73,10 @@
     @apply ring-lime-500 ring-2;
 }
 
+.fi-radio-input {
+    @apply ring-lime-500 ring-1;
+}
+
 @layer utilities {
     /* Hide scrollbar for Chrome, Safari and Opera */
     .no-scrollbar::-webkit-scrollbar {
