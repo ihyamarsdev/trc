@@ -59,7 +59,7 @@ class AllProgramFinanceResource extends Resource
                             ->using(fn (Database\Query\Builder $query) => $query->count('schools'))
                     ),
                 Tables\Columns\TextColumn::make('payment')
-                    ->label('Jumlah Siswa Bayar')
+                    ->label('Jumlah Terbayarkan')
                     ->summarize(
                         Summarizer::make()
                             ->label('')

@@ -10,9 +10,6 @@
     @apply h-24;
 }
 
-.fi-logo {
-}
-
 .fi-sidebar-nav {
     @apply no-scrollbar;
 }
@@ -34,7 +31,7 @@
 }
 
 .fi-sidebar-item-button {
-    @apply bg-sky-900 hover:bg-white dark:bg-gray-950 focus:text-lime-500;
+    @apply bg-sky-900 hover:bg-white hover:text-lime-500 dark:bg-gray-950 focus:text-lime-500;
 }
 
 .fi-header-heading {
@@ -77,6 +74,21 @@
     @apply ring-lime-500 ring-1;
 }
 
+.fi-btn-label {
+    @apply text-white;
+}
+
+.fi-section {
+    @apply ring-0;
+}
+
+.fi-section-header-heading {
+    @apply text-white;
+}
+
+.fi-section-header-description {
+    @apply text-white;
+}
 @layer utilities {
     /* Hide scrollbar for Chrome, Safari and Opera */
     .no-scrollbar::-webkit-scrollbar {
