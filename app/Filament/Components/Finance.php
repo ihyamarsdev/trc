@@ -520,11 +520,31 @@ class Finance
                                     }),
                             ]),
 
+                        Infolists\Components\Fieldset::make('')
+                            ->schema([
+                                TextEntry::make('counselor_consultation_date')
+                                    ->label('Konsul BK')
+                                    ->dateTime('l, jS F Y')
+                                    ->default(null),
+                                TextEntry::make('student_consultation_date')
+                                    ->label('Konsul Siswa')
+                                    ->dateTime('l, jS F Y')
+                                    ->default(null),
+                            ]),
+
                     ])->columns(2),
 
                 Infolists\Components\Section::make('Finance')
                     ->description('Detail Data Finance')
                     ->schema([
+
+                        Infolists\Components\Fieldset::make('Opsi Jumlah Akun / Jumlah Pelaksanaan')
+                        ->schema([
+                            TextEntry::make('option_price')
+                                ->label('')
+                                ->default('-'),
+                        ]),
+
 
                         Infolists\Components\Fieldset::make('Nominal')
                             ->schema([

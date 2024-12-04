@@ -79,6 +79,8 @@ class RegistrationData extends Model
         'dll_difference',
         'dll_net',
         'dll_subtotal',
+
+        'option_price',
     ];
 
     protected $casts = [

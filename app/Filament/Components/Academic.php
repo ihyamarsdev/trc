@@ -242,11 +242,24 @@ class Academic
                                     }),
                             ]),
 
+                        Infolists\Components\Fieldset::make('')
+                            ->schema([
+                                Infolists\Components\TextEntry::make('counselor_consultation_date')
+                                    ->label('Konsul BK')
+                                    ->dateTime('l, jS F Y')
+                                    ->default(null),
+                                Infolists\Components\TextEntry::make('student_consultation_date')
+                                    ->label('Konsul Siswa')
+                                    ->dateTime('l, jS F Y')
+                                    ->default(null),
+                            ]),
+
                     ])->columns(2),
         ];
     }
 
-    public static function filters(): array {
+    public static function filters(): array
+    {
         return [
             Tables\Filters\SelectFilter::make('periode')
                 ->label('Periode')
