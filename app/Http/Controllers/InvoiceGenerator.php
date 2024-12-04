@@ -32,17 +32,17 @@ class InvoiceGenerator extends Controller
         }
 
         $templateProcessor->setValues([
-            'detail' => $record->detail_invoice,
-            'schools' => $record->schools,
-            'qty' => $record->qty_invoice,
-            'tanggal' => $record->date_register->format('d/m/Y'),
-            'price' => number_format($record->unit_price, 0, ',', '.'),
-            'amount' => number_format($record->amount_invoice, 0, ',', '.'),
-            'total_invoice' => number_format($record->total_invoice, 0, ',', '.'),
-            'subtotal' => number_format($record->subtotal_invoice, 0, ',', '.'),
-            'number' => $record->number_invoice,
-            'pph' => $pph,
-            'ppn' => $ppn,
+            'detail' => $record->detail_invoice ?? '-',
+            'schools' => $record->schools ?? '-',
+            'qty' => $record->qty_invoice ?? '0',
+            'tanggal' => $record->date_register->format('d/m/Y') ?? '-/-/-',
+            'price' => number_format($record->unit_price, 0, ',', '.') ?? '0',
+            'amount' => number_format($record->amount_invoice, 0, ',', '.') ?? '0',
+            'total_invoice' => number_format($record->total_invoice, 0, ',', '.') ?? '0',
+            'subtotal' => number_format($record->subtotal_invoice, 0, ',', '.') ?? '0',
+            'number' => $record->number_invoice ?? '-',
+            'pph' => $pph ?? '-',
+            'ppn' => $ppn ?? '-',
         ]);
 
         $doc_name = 'INVOICE RASYIDUU ANBK ' . $record->schools . '.docx';
@@ -80,19 +80,18 @@ class InvoiceGenerator extends Controller
         }
 
         $templateProcessor->setValues([
-            'detail' => $record->detail_invoice,
-            'schools' => $record->schools,
-            'qty' => $record->qty_invoice,
-            'tanggal' => $record->date_register->format('d/m/Y'),
-            'price' => number_format($record->unit_price, 0, ',', '.'),
-            'amount' => number_format($record->amount_invoice, 0, ',', '.'),
-            'total_invoice' => number_format($record->total_invoice, 0, ',', '.'),
-            'subtotal' => number_format($record->subtotal_invoice, 0, ',', '.'),
-            'number' => $record->number_invoice,
-            'pph' => $pph,
-            'ppn' => $ppn,
+            'detail' => $record->detail_invoice ?? '-',
+            'schools' => $record->schools ?? '-',
+            'qty' => $record->qty_invoice ?? '0',
+            'tanggal' => $record->date_register->format('d/m/Y') ?? '-/-/-',
+            'price' => number_format($record->unit_price, 0, ',', '.') ?? '0',
+            'amount' => number_format($record->amount_invoice, 0, ',', '.') ?? '0',
+            'total_invoice' => number_format($record->total_invoice, 0, ',', '.') ?? '0',
+            'subtotal' => number_format($record->subtotal_invoice, 0, ',', '.') ?? '0',
+            'number' => $record->number_invoice ?? '-',
+            'pph' => $pph ?? '-',
+            'ppn' => $ppn ?? '-',
         ]);
-
 
         $doc_name = 'INVOICE EDUNESIA ANBK ' . $record->schools . '.docx';
 

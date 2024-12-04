@@ -65,21 +65,7 @@ class SnbtSalesForceResource extends Resource
             ->columns(
                 SalesForce::columns()
             )
-            ->filters([
-                Tables\Filters\SelectFilter::make('periode')
-                    ->label('Periode')
-                    ->options([
-                        'Januari - Juni' => 'Januari - Juni',
-                        'Juli - Desember' => 'Juli - Desember',
-                    ])
-                    ->preload()
-                    ->searchable(),
-                Tables\Filters\SelectFilter::make('school_years_id')
-                    ->label('Tahun Ajaran')
-                    ->options(SchoolYear::all()->pluck('name', 'id'))
-                    ->preload()
-                    ->searchable(),
-            ])
+            ->filters(SalesForce::filters())
             ->filtersFormColumns(2)
             ->actions([
                 Tables\Actions\ActionGroup::make([

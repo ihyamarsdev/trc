@@ -39,14 +39,10 @@ class AppsSalesForceResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->schema(
-                SalesForce::schema(
-                    options: [
+            ->schema(SalesForce::schema(options: [
                 'nameRegister' => 'APPS',
                 'DescriptionRegister' => 'ASESMEN PSIKOTES POTENSI SISWA'
-            ]
-                )
-            );
+            ]));
     }
 
     public static function table(Table $table): Table
@@ -57,21 +53,7 @@ class AppsSalesForceResource extends Resource
             ->columns(
                 SalesForce::columns()
             )
-            ->filters([
-                Tables\Filters\SelectFilter::make('periode')
-                    ->label('Periode')
-                    ->options([
-                        'Januari - Juni' => 'Januari - Juni',
-                        'Juli - Desember' => 'Juli - Desember',
-                    ])
-                    ->preload()
-                    ->searchable(),
-                Tables\Filters\SelectFilter::make('schoolyears_id')
-                    ->label('Tahun Ajaran')
-                    ->options(SchoolYear::all()->pluck('name', 'id'))
-                    ->preload()
-                    ->searchable(),
-            ])
+            ->filters(SalesForce::filters())
             ->filtersFormColumns(2)
             ->actions([
                 Tables\Actions\ActionGroup::make([

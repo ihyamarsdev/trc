@@ -12,6 +12,7 @@ use App\Models\RegistrationData;
 use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Auth;
 use App\Filament\Components\Datacenter;
+use App\Filament\Components\SalesForce;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Exports\DatacenterExporter;
 use Filament\Actions\Exports\Enums\ExportFormat;
@@ -39,9 +40,10 @@ class AnbkDatacenterResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([
-                //
-            ]);
+            ->schema(SalesForce::schema(options: [
+                'nameRegister' => 'ANBK',
+                'DescriptionRegister' => 'ASESMEN NASIONAL BERBASIS KOMPUTER'
+            ]));
     }
 
     public static function table(Table $table): Table
@@ -69,7 +71,10 @@ class AnbkDatacenterResource extends Resource
                     ->indicator('Tahun Ajaran'),
             ])
             ->actions([
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -94,6 +99,7 @@ class AnbkDatacenterResource extends Resource
     {
         return [
             'index' => Pages\ListAnbkDatacenters::route('/'),
+            'edit' => Pages\EditAnbkDatacenter::route('/{record}/edit'),
         ];
     }
 }

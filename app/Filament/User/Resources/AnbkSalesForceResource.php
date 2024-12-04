@@ -42,8 +42,8 @@ class AnbkSalesForceResource extends Resource
     {
         return $form
             ->schema(SalesForce::schema(options: [
-                'nameRegister' => 'ANBK',
-                'DescriptionRegister' => 'ASESMEN NASIONAL BERBASIS KOMPUTER'
+                'nameRegister' => 'APPS',
+                'DescriptionRegister' => 'ASESMEN PSIKOTES POTENSI SISWA'
             ]));
     }
 
@@ -55,29 +55,12 @@ class AnbkSalesForceResource extends Resource
             ->columns(
                 SalesForce::columns()
             )
-            ->filters([
-                Tables\Filters\SelectFilter::make('periode')
-                    ->label('Periode')
-                    ->options([
-                        'Januari - Juni' => 'Januari - Juni',
-                        'Juli - Desember' => 'Juli - Desember',
-                    ])
-                    ->preload()
-                    ->indicator('Periode'),
-                Tables\Filters\SelectFilter::make('school_years_id')
-                    ->label('Tahun Ajaran')
-                    ->options(SchoolYear::all()->pluck('name', 'id'))
-                    ->preload()
-                    ->searchable()
-                    ->indicator('Tahun Ajaran'),
-                    ])
-            // ], layout: Tables\Enums\FiltersLayout::AboveContent)
-            // ->filtersFormColumns(2)
+            ->filters(SalesForce::filters())
             ->persistFiltersInSession()
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
-                    Tables\Actions\EditAction::make(),
+                    // Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make(),
                 ]),
             ])
@@ -105,7 +88,7 @@ class AnbkSalesForceResource extends Resource
         return [
             'index' => Pages\ListAnbkSalesForces::route('/'),
             'create' => Pages\CreateAnbkSalesForce::route('/create'),
-            'edit' => Pages\EditAnbkSalesForce::route('/{record}/edit'),
+            // 'edit' => Pages\EditAnbkSalesForce::route('/{record}/edit'),
         ];
     }
 }
