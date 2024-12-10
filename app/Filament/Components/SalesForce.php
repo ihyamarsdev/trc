@@ -53,7 +53,7 @@ class SalesForce
                     Select::make('provinces')
                         ->label('Provinsi')
                         ->required()
-                        ->options(Province::all()->pluck('name', 'code'))
+                        ->options(Province::all()->pluck('name', 'name'))
                         ->searchable()
                         ->reactive()
                         ->live(500),
@@ -65,19 +65,21 @@ class SalesForce
                         ->reactive()
                         ->live(100)
                         ->options(function (Get $get) {
-                            $provinceCode = $get('provinces');
+                            $province = Province::where('name', $get('provinces'))->first();
+                            $provinceCode = $province ? $province->code : null;
                             if ($provinceCode) {
-                                return Regency::where('province_code', $provinceCode)->pluck('name', 'code');
+                                return Regency::where('province_code', $provinceCode)->pluck('name', 'name');
                             }
                             return [];
                         }),
                     Select::make('sudin')
                         ->label('Kota / Kab')
                         ->options(function (Get $get) {
-                            $regenciesCode = $get('regencies');
+                            $regencies = Regency::where('name', $get('regencies'))->first();
+                            $regenciesCode = $regencies ? $regencies->code : null;
                             if ($regenciesCode) {
                                 if ($regenciesCode == '3101') {
-                                    return ['ks_01' => 'KS 01', 'ks_02' => 'KS 02',];
+                                    return ['kS_01' => 'KS 01', 'KS_02' => 'KS 02',];
                                 } elseif ($regenciesCode == '3171') {
                                     return ['JP_01' => 'JP 01', 'JP_02' => 'JP 02',];
                                 } elseif ($regenciesCode == '3172') {
@@ -95,7 +97,7 @@ class SalesForce
                             return [];
                         })
                         ->visible(function (Get $get) {
-                            return $get('provinces') === '31';
+                            return $get('provinces') === 'Dki Jakarta';
                         }),
                     Select::make('curriculum_deputies_id')
                         ->label('Wakakurikulum')
@@ -187,9 +189,19 @@ class SalesForce
                 ->date()
                 ->sortable(),
             TextColumn::make('provinces')
-                ->label('Provinsi'),
+                ->label('Provinsi')
+                ->formatStateUsing(function ($state) {
+                    $province = Province::search($state)->first() ;
+                    return $province ? $province->name : 'Unknown';
+                }),
             TextColumn::make('regencies')
-                ->label('Kota / Kabupaten'),
+                ->label('Kota / Kabupaten')
+                ->formatStateUsing(function ($state) {
+                    $regency = Regency::search($state)->first();
+                    return $regency ? $regency->name : 'Unknown';
+                }),
+            TextColumn::make('sudin')
+                ->label('Daerah Tambahan'),
             TextColumn::make('schools')
                 ->label('Sekolah'),
             TextColumn::make('education_level')
@@ -221,7 +233,8 @@ class SalesForce
             ];
     }
 
-    public static function filters(): array {
+    public static function filters(): array
+    {
         return [
             Tables\Filters\SelectFilter::make('periode')
                 ->label('Periode')

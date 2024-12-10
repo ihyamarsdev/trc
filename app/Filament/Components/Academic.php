@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Tables\Columns\{TextColumn};
 use Illuminate\Database\Eloquent\Builder;
+use Creasi\Nusa\Models\{Province, Regency};
 use Filament\Forms\Components\{Select, TextInput, Section, DatePicker, Radio};
 use App\Models\{SchoolYear, CurriculumDeputies, CounselorCoordinator, Proctors, Schools};
 use App\Filament\Resources\{SchoolYearResource, CurriculumDeputiesResource, CounselorCoordinatorResource, ProctorsResource, SchoolsResource};
@@ -93,9 +94,19 @@ class Academic
                 ->date()
                 ->sortable(),
             TextColumn::make('provinces')
-                ->label('Provinsi'),
+                ->label('Provinsi')
+                ->formatStateUsing(function ($state) {
+                    $province = Province::search($state)->first() ;
+                    return $province ? $province->name : 'Unknown';
+                }),
             TextColumn::make('regencies')
-                ->label('Kota / Kabupaten'),
+                ->label('Kota / Kabupaten')
+                ->formatStateUsing(function ($state) {
+                    $regency = Regency::search($state)->first();
+                    return $regency ? $regency->name : 'Unknown';
+                }),
+            TextColumn::make('sudin')
+                ->label('Daerah Tambahan'),
             TextColumn::make('schools')
                 ->label('Sekolah'),
             TextColumn::make('education_level')

@@ -3,9 +3,10 @@
 namespace App\Filament\Components;
 
 use Filament\Tables\Columns\TextColumn;
+use Creasi\Nusa\Models\{Province, Regency};
 
-
-class Datacenter{
+class Datacenter
+{
     public static function columns(): array
     {
         return [
@@ -23,9 +24,19 @@ class Datacenter{
                 ->date()
                 ->sortable(),
             TextColumn::make('provinces')
-                ->label('Provinsi'),
+                ->label('Provinsi')
+                ->formatStateUsing(function ($state) {
+                    $province = Province::search($state)->first() ;
+                    return $province ? $province->name : 'Unknown';
+                }),
             TextColumn::make('regencies')
-                ->label('Kota / Kabupaten'),
+                ->label('Kota / Kabupaten')
+                ->formatStateUsing(function ($state) {
+                    $regency = Regency::search($state)->first();
+                    return $regency ? $regency->name : 'Unknown';
+                }),
+            TextColumn::make('sudin')
+                ->label('Daerah Tambahan'),
             TextColumn::make('schools')
                 ->label('Sekolah'),
             TextColumn::make('education_level')

@@ -5,6 +5,7 @@ namespace App\Filament\User\Resources\AnbkSalesForceResource\Pages;
 use App\Filament\User\Resources\AnbkSalesForceResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Creasi\Nusa\Models\{Province, Regency};
 
 class EditAnbkSalesForce extends EditRecord
 {
@@ -27,6 +28,7 @@ class EditAnbkSalesForce extends EditRecord
         $input = strtotime($data['date_register']);
         $date = getDate($input);
         $data['monthYear'] = $date['month'] . ' ' . $date['year'];
+
         return $data;
     }
 }

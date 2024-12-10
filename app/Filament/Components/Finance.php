@@ -11,6 +11,7 @@ use Filament\Tables\Columns\{TextColumn};
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Illuminate\Database\Eloquent\Builder;
+use Creasi\Nusa\Models\{Province, Regency};
 use Filament\Forms\Components\{Select, TextInput, Section, DatePicker, Radio, Fieldset, Group};
 
 class Finance
@@ -367,9 +368,19 @@ class Finance
                 ->date()
                 ->sortable(),
             TextColumn::make('provinces')
-                ->label('Provinsi'),
+                ->label('Provinsi')
+                ->formatStateUsing(function ($state) {
+                    $province = Province::search($state)->first() ;
+                    return $province ? $province->name : 'Unknown';
+                }),
             TextColumn::make('regencies')
-                ->label('Kota / Kabupaten'),
+                ->label('Kota / Kabupaten')
+                ->formatStateUsing(function ($state) {
+                    $regency = Regency::search($state)->first();
+                    return $regency ? $regency->name : 'Unknown';
+                }),
+            TextColumn::make('sudin')
+                ->label('Daerah Tambahan'),
             TextColumn::make('schools')
                 ->label('Sekolah'),
             TextColumn::make('education_level')
@@ -435,6 +446,9 @@ class Finance
                                     ->label('Provinsi'),
                                 TextEntry::make('regencies')
                                     ->label('Kota / Kabupaten'),
+                                TextEntry::make('sudin')
+                                    ->label('Daerah Tambahan')
+                                    ->default('-'),
                             ]),
 
 
@@ -556,7 +570,7 @@ class Finance
                                     ->label('Harga Net')
                                     ->money('IDR')
                                     ->default('0'),
-                            ]),
+                            ])->columns(3),
 
                         Infolists\Components\Fieldset::make('')
                             ->label('TRC')
@@ -625,7 +639,7 @@ class Finance
                                     ->label('Total Net')
                                     ->money('IDR')
                                     ->default('0'),
-                            ]),
+                            ])->columns(3),
 
                         Infolists\Components\Fieldset::make('')
                             ->label('Tanggal')
