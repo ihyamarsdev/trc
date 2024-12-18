@@ -646,7 +646,8 @@ class Finance
                             ->schema([
                                 TextEntry::make('invoice_date')
                                     ->label('Invoice')
-                                    ->dateTime('l, jS F Y'),
+                                    ->dateTime('l, jS F Y')
+                                    ->default(null),
                                 TextEntry::make('payment_date')
                                     ->label('Pembayaran')
                                     ->dateTime('l, jS F Y'),
