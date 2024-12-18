@@ -1,4 +1,4 @@
-# TRC (Your Project Name)
+# Dashboard TRC (The Rasyidu Center)
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
