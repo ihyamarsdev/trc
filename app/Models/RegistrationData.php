@@ -81,6 +81,7 @@ class RegistrationData extends Model
         'dll_subtotal',
 
         'option_price',
+        'cb,'
     ];
 
     protected $casts = [

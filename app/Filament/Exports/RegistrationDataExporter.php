@@ -21,22 +21,47 @@ class RegistrationDataExporter extends Exporter
         Carbon::setLocale('id');
 
         return [
+            //Datacenter
             ExportColumn::make('type')
                 ->label('Program'),
             ExportColumn::make('periode')
                 ->label('Periode'),
+            ExportColumn::make('school_years.name')
+                ->label('Tahun Ajaran'),
             ExportColumn::make('date_register')
                 ->label('Tanggal Pendaftaran')
                 ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
+            ExportColumn::make('users.name')
+                ->label('User Salesforce'),
             ExportColumn::make('provinces')
                 ->label('Provinsi'),
             ExportColumn::make('regencies')
                 ->label('Kota / Kabupaten'),
+            ExportColumn::make('sudin')
+                ->label('Daerah Tambahan'),
+            ExportColumn::make('schools')
+                ->label('Sekolah'),
+            ExportColumn::make('education_level')
+                ->label('Jenjang'),
+            ExportColumn::make('principal')
+                ->label('Kepala Sekolah'),
+            ExportColumn::make('phone_principal')
+                ->label('No Hp Kepala Sekolah'),
+            ExportColumn::make('education_level_type')
+                ->label('Negeri / Swasta'),
+            ExportColumn::make('curriculum_deputies.name')
+                ->label('Wakakurikulum'),
+            ExportColumn::make('counselor_coordinators.name')
+                ->label('Koordinator Konseling'),
+            ExportColumn::make('proctors.name')
+                ->label('Pembimbing'),
             ExportColumn::make('student_count')
                 ->label('Jumlah Siswa'),
             ExportColumn::make('implementation_estimate')
                 ->label('Estimasi Pelaksanaan')
                 ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
+
+            //Akademic
             ExportColumn::make('group')
                 ->label('Grup')
                 ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
@@ -61,14 +86,59 @@ class RegistrationDataExporter extends Exporter
             ExportColumn::make('student_consultation_date')
                 ->label('Tanggal Konseling Siswa')
                 ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
+
+            //Finance
             ExportColumn::make('price')
-                ->label('Harga'),
+                ->label('Harga SPJ')
+                ->prefix('Rp.'),
+            ExportColumn::make('net_2')
+                ->label('Harga NET')
+                ->prefix('Rp.'),
+            ExportColumn::make('option_price')
+                ->label('Opsi Jumlah Akun / Jumlah Pelaksanaan '),
             ExportColumn::make('total')
-                ->label('Total'),
-            ExportColumn::make('net')
-                ->label('Net'),
+                ->label('Total Dana Sesuai SPJ')
+                ->prefix('Rp.'),
             ExportColumn::make('total_net')
-                ->label('Total Net'),
+                ->label('Total Net')
+                ->prefix('Rp.'),
+
+            ExportColumn::make('student_count_1')
+                ->label('Selisih Siswa TRC'),
+            ExportColumn::make('net')
+                ->label('Satuan')
+                ->prefix('Rp.'),
+            ExportColumn::make('subtotal_1')
+                ->label('Subtotal')
+                ->prefix('Rp.'),
+
+            ExportColumn::make('mitra_difference')
+                ->label('elisih Siswa Sekolah'),
+            ExportColumn::make('net')
+                ->label('Satuan')
+                ->prefix('Rp.'),
+            ExportColumn::make('mitra_subtotal')
+                ->label('Subtotal')
+                ->prefix('Rp.'),
+
+            ExportColumn::make('implementer_count')
+                ->label('SS'),
+            ExportColumn::make('ss_net')
+                ->label('Satuan')
+                ->prefix('Rp.'),
+            ExportColumn::make('ss_subtotal')
+                ->label('Subtotal')
+                ->prefix('Rp.'),
+
+            ExportColumn::make('dll_difference')
+                ->label('Lain-lain'),
+            ExportColumn::make('dll_net')
+                ->label('Satuan')
+                ->prefix('Rp.'),
+            ExportColumn::make('dll_subtotal')
+                ->label('Subtotal')
+                ->prefix('Rp.'),
+
             ExportColumn::make('invoice_date')
                 ->label('Tanggal Invoice')
                 ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
@@ -80,42 +150,13 @@ class RegistrationDataExporter extends Exporter
                 ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
             ExportColumn::make('payment')
                 ->label('Pembayaran'),
-            ExportColumn::make('cb')
-                ->label('CB'),
-            ExportColumn::make('schools')
-                ->label('Sekolah'),
-            ExportColumn::make('education_level')
-                ->label('Jenjang'),
-            ExportColumn::make('principal')
-                ->label('Kepala Sekolah'),
-            ExportColumn::make('phone_principal')
-                ->label('No Hp Kepala Sekolah'),
-            ExportColumn::make('education_level_type')
-                ->label('Negeri / Swasta'),
-            ExportColumn::make('curriculum_deputies.name')
-                ->label('Wakakurikulum'),
-            ExportColumn::make('counselor_coordinators.name')
-                ->label('Koordinator Konseling'),
-            ExportColumn::make('proctors.name')
-                ->label('Pembimbing'),
-            ExportColumn::make('users.name')
-                ->label('User Salesforce'),
-            ExportColumn::make('school_years.name')
-                ->label('Tahun Ajaran'),
-            ExportColumn::make('net_2')
-                ->label('Net 2'),
-            ExportColumn::make('student_count_1')
-                ->label('Jumlah Siswa 1'),
-            ExportColumn::make('student_count_2')
-                ->label('Jumlah Siswa 2'),
-            ExportColumn::make('subtotal_1')
-                ->label('Subtotal 1'),
-            ExportColumn::make('subtotal_2')
-                ->label('Subtotal 2'),
-            ExportColumn::make('difference_total')
-                ->label('Selisih Total'),
+
+
+            //Kwitansi
             ExportColumn::make('detail_kwitansi')
                 ->label('Detail Kwitansi'),
+
+            //Invoice
             ExportColumn::make('detail_invoice')
                 ->label('Detail Invoice'),
             ExportColumn::make('number_invoice')
@@ -127,15 +168,17 @@ class RegistrationDataExporter extends Exporter
             ExportColumn::make('amount_invoice')
                 ->label('Jumlah Invoice'),
             ExportColumn::make('tax_rate')
-                ->label('Pajak'),
+                ->label('PPH 23')
+                ->suffix('%'),
             ExportColumn::make('sales_tsx')
-                ->label('Sales Tax'),
-            ExportColumn::make('other')
-                ->label('Lain-lain'),
+                ->label('PPN')
+                ->suffix('%'),
             ExportColumn::make('subtotal_invoice')
-                ->label('Subtotal Invoice'),
+                ->label('Subtotal Invoice')
+                ->prefix('Rp.'),
             ExportColumn::make('total_invoice')
-                ->label('Total Invoice'),
+                ->label('Total Invoice')
+                ->prefix('Rp.'),
         ];
     }
 

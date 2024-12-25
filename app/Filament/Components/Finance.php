@@ -88,18 +88,13 @@ class Finance
                                 ->reactive()
                                 ->afterStateUpdated(function (Get $get, Set $set) {
                                     $set('total', (float) $get('price') * (float) $get('option_price'));
-                                    $set('difference_total', abs((float) $get('total')));
                                 }),
-                            TextInput::make('total')
-                                ->label('Total')
-                                ->prefix('Rp')
-                                ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
-                                ->readOnly(),
+
                         ]),
 
                     Fieldset::make('Total')
                         ->schema([
-                            TextInput::make('difference_total')
+                            TextInput::make('total')
                                 ->label('Total Dana Sesuai SPJ')
                                 ->prefix('Rp')
                                 ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
@@ -380,7 +375,10 @@ class Finance
                     return $regency ? $regency->name : 'Unknown';
                 }),
             TextColumn::make('sudin')
-                ->label('Daerah Tambahan'),
+                ->label('Daerah Tambahan')
+                ->formatStateUsing(function ($state) {
+                    return $state ? $state : 'None';
+                }),
             TextColumn::make('schools')
                 ->label('Sekolah'),
             TextColumn::make('education_level')
