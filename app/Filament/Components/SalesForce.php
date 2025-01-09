@@ -9,7 +9,7 @@ use Filament\Forms\Form;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Tables\Columns\{TextColumn};
 use Illuminate\Database\Eloquent\Builder;
-use Creasi\Nusa\Models\{Province, Regency};
+use Creasi\Nusa\Models\{Province, Regency, District};
 use Filament\Forms\Components\{Select, TextInput, Section, DatePicker};
 use App\Models\{SchoolYear, CurriculumDeputies, CounselorCoordinator, Proctors, Schools};
 use App\Filament\Resources\{SchoolYearResource, CurriculumDeputiesResource, CounselorCoordinatorResource, ProctorsResource, SchoolsResource};
@@ -31,7 +31,7 @@ class SalesForce
                             'Juli - Desember' => 'Juli - Desember',
                         ]),
                     Select::make('school_years_id')
-                        ->label('Tahun Ajaran')
+                        ->label('Tahun')
                         ->required()
                         ->options(SchoolYear::all()->pluck('name', 'id'))
                         ->searchable()
@@ -49,6 +49,8 @@ class SalesForce
                 ->schema([
                     DatePicker::make('date_register')
                         ->label('Tanggal Pendaftaran')
+                        ->native(false)
+                        ->displayFormat('l, jS F Y')
                         ->required(),
                     Select::make('provinces')
                         ->label('Provinsi')
@@ -58,7 +60,7 @@ class SalesForce
                         ->reactive()
                         ->live(500),
                     Select::make('regencies')
-                        ->label('Kabupaten')
+                        ->label('Kota / Kabupaten')
                         ->required()
                         ->preload()
                         ->searchable()
@@ -73,7 +75,7 @@ class SalesForce
                             return [];
                         }),
                     Select::make('sudin')
-                        ->label('Kota / Kab')
+                        ->label('Wilayah')
                         ->options(function (Get $get) {
                             $regencies = Regency::where('name', $get('regencies'))->first();
                             $regenciesCode = $regencies ? $regencies->code : null;
@@ -99,6 +101,21 @@ class SalesForce
                         ->visible(function (Get $get) {
                             return $get('provinces') === 'Dki Jakarta';
                         }),
+                    Select::make('district')
+                        ->label('Kecamatan')
+                        ->required()
+                        ->preload()
+                        ->searchable()
+                        ->reactive()
+                        ->live(100)
+                        ->options(function (Get $get) {
+                            $district = Regency::where('name', $get('regencies'))->first();
+                            $regencyCode = $district ? $district ->code : null;
+                            if ($regencyCode) {
+                                return District::where('regency_code', $regencyCode)->pluck('name', 'name');
+                            }
+                            return [];
+                        }),
                     Select::make('curriculum_deputies_id')
                         ->label('Wakakurikulum')
                         ->required()
@@ -116,7 +133,7 @@ class SalesForce
                         ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->name} - No HP: {$record->phone}")
                         ->createOptionForm(fn (Form $form) => CounselorCoordinatorResource::form($form)),
                     Select::make('proctors_id')
-                        ->label('Proctor ')
+                        ->label('Proktor ')
                         ->required()
                         ->searchable()
                         ->preload()
@@ -129,6 +146,8 @@ class SalesForce
                         ->numeric(),
                     DatePicker::make('implementation_estimate')
                         ->label('Estimasi Pelaksanaan')
+                        ->native(false)
+                        ->displayFormat('l, jS F Y')
                         ->required(),
                 ])->columns(2),
 
@@ -139,6 +158,10 @@ class SalesForce
                         ->label('Nama Sekolah')
                         ->required()
                         ->maxLength(255),
+                    TextInput::make('class')
+                        ->label('Kelas')
+                        ->required()
+                        ->maxLength(10),
                     Select::make('education_level')
                         ->label('Jenjang')
                         ->options([
@@ -151,6 +174,20 @@ class SalesForce
                             'SMK' => 'SMK',
                         ])
                         ->native(false),
+                    select::make('description')
+                        ->label('Keterangan')
+                        ->options([
+                            'ABK' => 'ABK',
+                            'NON-ABK' => 'NON ABK',
+                        ])
+                        ->native(false),
+                    select::make('education_level_type')
+                        ->label('Negeri / Swasta')
+                        ->options([
+                            'Negeri' => 'Negeri',
+                            'Swasta' => 'Swasta',
+                        ])
+                        ->native(false),
                     TextInput::make('principal')
                         ->label('Nama Kepala Sekolah')
                         ->required()
@@ -160,12 +197,6 @@ class SalesForce
                         ->tel()
                         ->required()
                         ->maxLength(255),
-                    select::make('education_level_type')
-                        ->label('Negeri / Swasta')
-                        ->options([
-                            'Negeri' => 'Negeri',
-                            'Swasta' => 'Swasta',
-                        ]),
                 ])->columns(2),
 
 
@@ -180,13 +211,13 @@ class SalesForce
             TextColumn::make('periode')
                 ->label('Periode'),
             TextColumn::make('school_years.name')
-                ->label('Tahun Ajaran'),
+                ->label('Tahun'),
             TextColumn::make('users.name')
                 ->label('User')
                 ->searchable(),
             TextColumn::make('date_register')
                 ->label('Tanggal Pendaftaran')
-                ->date()
+                ->date('l, jS F Y')
                 ->sortable(),
             TextColumn::make('provinces')
                 ->label('Provinsi')
@@ -201,11 +232,22 @@ class SalesForce
                     return $regency ? $regency->name : 'Unknown';
                 }),
             TextColumn::make('sudin')
-                ->label('Daerah Tambahan'),
+                ->label('Wilayah')
+                ->badge(),
+            TextColumn::make('district')
+                ->label('Kecamatan')
+                ->formatStateUsing(function ($state) {
+                    $district = District::search($state)->first();
+                    return $district ? $district->name : 'Unknown';
+                }),
             TextColumn::make('schools')
                 ->label('Sekolah'),
+            TextColumn::make('class')
+                ->label('Kelas'),
             TextColumn::make('education_level')
                 ->label('Jenjang'),
+            TextColumn::make('description')
+                ->label('Keterangan'),
             TextColumn::make('education_level_type')
                 ->label('Negeri / Swasta'),
             TextColumn::make('principal')
@@ -229,7 +271,7 @@ class SalesForce
                 ->numeric(),
             TextColumn::make('implementation_estimate')
                 ->label('Estimasi Pelaksanaan')
-                ->date(),
+                ->date('l, jS F Y'),
             ];
     }
 

@@ -49,7 +49,10 @@ class AppsSalesForceResource extends Resource
     {
         return $table
             ->deferLoading()
-            ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'apps')->orderBy('implementation_estimate', 'asc'))
+            ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'apps')->when(!Auth::user()->hasRole(['admin']), function ($query) {
+                // Assuming you have a 'user_id' field in your 'apps' table
+                return $query->where('users_id', Auth::id());
+            })->orderBy('implementation_estimate', 'asc'))
             ->columns(
                 SalesForce::columns()
             )
@@ -58,8 +61,8 @@ class AppsSalesForceResource extends Resource
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
+                    // Tables\Actions\EditAction::make(),
+                    // Tables\Actions\DeleteAction::make(),
                 ]),
             ])
             ->bulkActions([
@@ -86,7 +89,7 @@ class AppsSalesForceResource extends Resource
         return [
             'index' => Pages\ListAppsSalesForces::route('/'),
             'create' => Pages\CreateAppsSalesForce::route('/create'),
-            'edit' => Pages\EditAppsSalesForce::route('/{record}/edit'),
+            // 'edit' => Pages\EditAppsSalesForce::route('/{record}/edit'),
         ];
     }
 }

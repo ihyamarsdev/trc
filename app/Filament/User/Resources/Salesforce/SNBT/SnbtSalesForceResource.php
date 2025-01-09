@@ -50,7 +50,10 @@ class SnbtSalesForceResource extends Resource
     {
         return $table
             ->deferLoading()
-            ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'snbt')->orderBy('implementation_estimate', 'asc'))
+            ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'snbt')->when(!Auth::user()->hasRole(['admin']), function ($query) {
+                // Assuming you have a 'user_id' field in your 'apps' table
+                return $query->where('users_id', Auth::id());
+            })->orderBy('implementation_estimate', 'asc'))
             ->columns(
                 SalesForce::columns()
             )
@@ -59,8 +62,8 @@ class SnbtSalesForceResource extends Resource
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
+                    // Tables\Actions\EditAction::make(),
+                    // Tables\Actions\DeleteAction::make(),
                 ]),
             ])
             ->bulkActions([
@@ -87,7 +90,7 @@ class SnbtSalesForceResource extends Resource
         return [
             'index' => Pages\ListSnbtSalesForces::route('/'),
             'create' => Pages\CreateSnbtSalesForce::route('/create'),
-            'edit' => Pages\EditSnbtSalesForce::route('/{record}/edit'),
+            // 'edit' => Pages\EditSnbtSalesForce::route('/{record}/edit'),
         ];
     }
 }

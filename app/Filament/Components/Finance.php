@@ -46,11 +46,11 @@ class Finance
                                     $net = 0;
 
                                     if ($price >= 0 && $price <= 100000) {
-                                        $net = 210000;
-                                    } elseif ($price > 100000 && $price <= 1100000) {
-                                        $net = 100000;
-                                    } elseif ($price > 1100000 && $price <= 200000) {
-                                        $net = 710000;
+                                        $net = 25000;
+                                    } elseif ($price > 100000 && $price <= 150000) {
+                                        $net = 50000;
+                                    } elseif ($price > 150000 && $price <= 200000) {
+                                        $net = 75000;
                                     } elseif ($price > 200000) {
                                         $net = 100000;
                                     }
@@ -215,9 +215,13 @@ class Finance
                                 ->required(),
                             DatePicker::make('payment_date')
                                 ->label('Pembayaran')
+                                ->native(false)
+                                ->displayFormat('d/m/Y')
                                 ->required(),
                             DatePicker::make('spk_sent')
                                 ->label('SPK di Kirim')
+                                ->native(false)
+                                ->displayFormat('d/m/Y')
                                 ->required(),
                             Select::make('payment')
                                 ->label('Pembayaran Via')
@@ -354,13 +358,13 @@ class Finance
             TextColumn::make('periode')
                 ->label('Periode'),
             TextColumn::make('school_years.name')
-                ->label('Tahun Ajaran'),
+                ->label('Tahun'),
             TextColumn::make('users.name')
                 ->label('User')
                 ->searchable(),
             TextColumn::make('date_register')
                 ->label('Tanggal Pendaftaran')
-                ->date()
+                ->date('l, jS F Y')
                 ->sortable(),
             TextColumn::make('provinces')
                 ->label('Provinsi')
@@ -406,7 +410,7 @@ class Finance
                 ->numeric(),
             TextColumn::make('implementation_estimate')
                 ->label('Estimasi Pelaksana')
-                ->date(),
+                ->date('l, jS F Y'),
         ];
     }
 
@@ -432,20 +436,24 @@ class Finance
 
                         Infolists\Components\Fieldset::make('Sekolah')
                             ->schema([
-                                TextEntry::make('schools')
+                                Infolists\Components\TextEntry::make('schools')
                                     ->label('Sekolah'),
-                                TextEntry::make('education_level')
+                                Infolists\Components\TextEntry::make('class')
+                                    ->label('Kelas'),
+                                Infolists\Components\TextEntry::make('education_level')
                                     ->label('Jenjang'),
-                                TextEntry::make('education_level_type')
+                                Infolists\Components\TextEntry::make('description')
+                                    ->label('Keterangan'),
+                                Infolists\Components\TextEntry::make('education_level_type')
                                     ->label('Negeri / Swasta'),
-                                TextEntry::make('student_count')
+                                Infolists\Components\TextEntry::make('student_count')
                                     ->label('Jumlah Siswa'),
-                                TextEntry::make('provinces')
+                                Infolists\Components\TextEntry::make('provinces')
                                     ->label('Provinsi'),
-                                TextEntry::make('regencies')
+                                Infolists\Components\TextEntry::make('regencies')
                                     ->label('Kota / Kabupaten'),
-                                TextEntry::make('sudin')
-                                    ->label('Daerah Tambahan')
+                                Infolists\Components\TextEntry::make('sudin')
+                                    ->label('Wilayah')
                                     ->default('-'),
                             ]),
 
@@ -629,7 +637,7 @@ class Finance
                         Infolists\Components\Fieldset::make('')
                             ->label('Total')
                             ->schema([
-                                TextEntry::make('difference_total')
+                                TextEntry::make('total')
                                     ->label('Total Dana Sesuai SPJ')
                                     ->money('IDR')
                                     ->default('0'),

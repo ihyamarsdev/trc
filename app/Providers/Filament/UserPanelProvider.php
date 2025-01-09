@@ -6,6 +6,7 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\Widgets;
 use Filament\PanelProvider;
+use App\Livewire\EditProfile;
 use App\Livewire\DetailProfile;
 use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
@@ -104,22 +105,19 @@ class UserPanelProvider extends PanelProvider
                     ->shouldShowDeleteAccountForm(false)
                     ->shouldShowSanctumTokens(false)
                     ->shouldShowBrowserSessionsForm(false)
-                    ->shouldShowAvatarForm()
+                    // ->shouldShowAvatarForm(
+                    //     value: true,
+                    //     directory: 'avatars',
+                    //     rules: 'mimes:jpeg,png|max:1024'
+                    // )
                     ->customProfileComponents([
-
-                    ])
-                    ->shouldShowAvatarForm(
-                        value: true,
-                        directory: 'avatars', // image will be stored in 'storage/app/public/avatars
-                        rules: 'mimes:jpeg,png|max:1024' //only accept jpeg and png files with a maximum size of 1MB
-                    )
-                    ->customProfileComponents([
+                        EditProfile::class,
                         DetailProfile::class,
                     ]),
                 GreeterPlugin::make()
                     ->message('Selamat Datang,')
                     ->name(text: fn () => Auth::user()->name)
-                    ->title('Satu-satunya cara untuk melakukan pekerjaan hebat yaitu dengan mencintai apa yang sedang kamu lakukan.')
+                    ->title('BIG DREAM TRC : 1 JUTA SISWA / TAHUN, 100% BISA!!!')
                     ->avatar(size: 'w-16 h-16', enabled: true)
                     ->sort(-1)
                     ->columnSpan('full'),

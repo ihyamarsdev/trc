@@ -10,9 +10,6 @@
     @apply h-24;
 }
 
-.fi-logo {
-}
-
 .fi-sidebar-nav {
     @apply no-scrollbar;
 }
@@ -30,11 +27,11 @@
 }
 
 .fi-sidebar-item-label {
-    @apply text-white hover:text-lime-500;
+    @apply text-white;
 }
 
 .fi-sidebar-item-button {
-    @apply bg-sky-900 hover:bg-white dark:bg-gray-950 focus:text-lime-500;
+    @apply bg-sky-900 hover:bg-sky-800 dark:bg-gray-950;
 }
 
 .fi-header-heading {
@@ -58,7 +55,7 @@
 }
 
 .fi-btn {
-    @apply bg-lime-500;
+    @apply bg-lime-500 hover:bg-lime-700;
 }
 
 .fi-fieldset {
@@ -69,8 +66,24 @@
     @apply text-lime-500;
 }
 
-.fi-section {
+/* .fi-section {
     @apply ring-lime-500 ring-2;
+} */
+
+.fi-ac-btn-action {
+    @apply hover:bg-lime-700;
+}
+
+.fi-ac-btn-group {
+    @apply hover:bg-lime-700;
+}
+
+.fi-btn-icon {
+    @apply text-white;
+}
+
+.fi-btn-label {
+    @apply text-white;
 }
 
 @layer utilities {

@@ -51,7 +51,10 @@ class AnbkSalesForceResource extends Resource
     {
         return $table
             ->deferLoading()
-            ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'anbk')->orderBy('implementation_estimate', 'asc'))
+            ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'anbk')->when(!Auth::user()->hasRole(['admin']), function ($query) {
+                // Assuming you have a 'user_id' field in your 'apps' table
+                return $query->where('users_id', Auth::id());
+            })->orderBy('implementation_estimate', 'asc'))
             ->columns(
                 SalesForce::columns()
             )
@@ -61,17 +64,17 @@ class AnbkSalesForceResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                     // Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
+                    // Tables\Actions\DeleteAction::make(),
                 ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ExportBulkAction::make()
-                    ->exporter(SalesforceExporter::class)
-                    ->formats([
-                        ExportFormat::Xlsx,
-                    ]),
+                        ->exporter(SalesforceExporter::class)
+                        ->formats([
+                            ExportFormat::Xlsx,
+                        ]),
                 ]),
             ]);
     }

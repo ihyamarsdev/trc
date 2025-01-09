@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Spatie\Permission\Contracts\Role;
 
 class User extends Authenticatable implements HasAvatar, FilamentUser
 {
@@ -86,4 +87,5 @@ class User extends Authenticatable implements HasAvatar, FilamentUser
     {
         return $this->belongsTo(Devisions::class);
     }
+
 }

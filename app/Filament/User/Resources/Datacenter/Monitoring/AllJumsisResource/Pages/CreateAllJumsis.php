@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\User\Resources\Datacenter\MonitoringAllJumsisResource\Pages;
+namespace App\Filament\User\Resources\Datacenter\Monitoring\AllJumsisResource\Pages;
 
 use App\Filament\User\Resources\Datacenter\Monitoring\AllJumsisResource;
 use Filament\Actions;

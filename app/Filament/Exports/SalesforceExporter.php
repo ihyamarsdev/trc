@@ -23,6 +23,8 @@ class SalesforceExporter extends Exporter
     {
         Carbon::setLocale('id');
         return [
+            ExportColumn::make('users.name')
+                ->label('User'),
             ExportColumn::make('type')
                 ->label('Program'),
             ExportColumn::make('periode')
@@ -34,6 +36,10 @@ class SalesforceExporter extends Exporter
                 ->label('Provinsi'),
             ExportColumn::make('regencies')
                 ->label('Kota / Kabupaten'),
+            ExportColumn::make('sudin')
+                ->label('Wilayah'),
+            ExportColumn::make('district')
+                ->label('Kecamatan'),
             ExportColumn::make('student_count')
                 ->label('Jumlah Siswa'),
             ExportColumn::make('implementation_estimate')
@@ -41,8 +47,12 @@ class SalesforceExporter extends Exporter
                 ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
             ExportColumn::make('schools')
                 ->label('Sekolah'),
+            ExportColumn::make('class')
+                ->label('Kelas'),
             ExportColumn::make('education_level')
                 ->label('Jenjang'),
+            ExportColumn::make('description')
+                ->label('Keterangan'),
             ExportColumn::make('principal')
                 ->label('Kepala Sekolah'),
             ExportColumn::make('phone_principal')
@@ -51,10 +61,16 @@ class SalesforceExporter extends Exporter
                 ->label('Negeri / Swasta'),
             ExportColumn::make('curriculum_deputies.name')
                 ->label('Wakakurikulum'),
+            ExportColumn::make('curriculum_deputies.phone')
+                ->label('No Hp Wakakurikulum'),
             ExportColumn::make('counselor_coordinators.name')
-                ->label('Koordinator Konseling'),
+                ->label('Koordinator BK'),
+            ExportColumn::make('counselor_coordinators.phone')
+                ->label('No Hp Koordinator BK'),
             ExportColumn::make('proctors.name')
-                ->label('Pembimbing'),
+                ->label('Proktor'),
+            ExportColumn::make('proctors.phone')
+                ->label('No Hp Proktor'),
         ];
     }
 

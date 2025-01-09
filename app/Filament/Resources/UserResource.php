@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Imports\UserImporter;
 use Filament\Forms;
 use App\Models\User;
 use Filament\Tables;
@@ -9,12 +10,14 @@ use Filament\Forms\Form;
 use App\Models\Devisions;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Forms\Components\{TextInput, DateTimePicker, Select};
+use Filament\Tables\Actions\ImportAction;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\UserResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\UserResource\RelationManagers;
+use Filament\Forms\Components\{TextInput, DateTimePicker, Select};
 
 class UserResource extends Resource
 {
@@ -34,32 +37,34 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('email')
-                    ->unique()
-                    ->hiddenOn('edit')
-                    ->email()
-                    ->required()
-                    ->maxLength(255),
-                DateTimePicker::make('email_verified_at')
-                    ->label('Tanggal Verifikasi'),
-                TextInput::make('password')
-                    ->password()
-                    ->revealable()
-                    ->required()
-                    ->maxLength(255)
-                    ->hiddenOn('edit'),
-                Select::make('devisions_id')
-                    ->label('Devisi')
-                    ->options(Devisions::all()->pluck('name', 'id'))
-                    ->searchable(),
-                Select::make('roles')
-                    ->relationship('roles', 'name')
-                    ->multiple()
-                    ->preload()
-                    ->searchable()
+                Section::make('User')
+                    ->description('Membuat User')
+                    ->schema([
+                        TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+                        TextInput::make('email')
+                            ->unique()
+                            ->hiddenOn('edit')
+                            ->email()
+                            ->required()
+                            ->maxLength(255),
+                        TextInput::make('password')
+                            ->password()
+                            ->revealable()
+                            ->required()
+                            ->maxLength(255)
+                            ->hiddenOn('edit'),
+                        // Select::make('devisions_id')
+                        //     ->label('Devisi')
+                        //     ->options(Devisions::all()->pluck('name', 'id'))
+                        //     ->searchable(),
+                        Select::make('roles')
+                            ->relationship('roles', 'name')
+                            ->multiple()
+                            ->preload()
+                            ->searchable()
+                    ])->columns(2),
             ]);
     }
 
@@ -86,14 +91,16 @@ class UserResource extends Resource
                     //     'rejected' => 'danger',
                     // })
                     ->label('Role'),
-                TextColumn::make('devisions.name')
-                    ->badge()
-                    ->label('Devisi'),
+                // TextColumn::make('devisions.name')
+                //     ->badge()
+                //     ->label('Devisi'),
                 TextColumn::make('created_at')
+                    ->label('Tanggal Di Buat')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
+                    ->label('Tanggal Di Perbarui')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

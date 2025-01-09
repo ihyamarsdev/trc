@@ -85,13 +85,13 @@ class Academic
             TextColumn::make('periode')
                 ->label('Periode'),
             TextColumn::make('school_years.name')
-                ->label('Tahun Ajaran'),
+                ->label('Tahun'),
             TextColumn::make('users.name')
                 ->label('User')
                 ->searchable(),
             TextColumn::make('date_register')
                 ->label('Tanggal Pendaftaran')
-                ->date()
+                ->date('l, jS F Y')
                 ->sortable(),
             TextColumn::make('provinces')
                 ->label('Provinsi')
@@ -134,7 +134,7 @@ class Academic
                 ->numeric(),
             TextColumn::make('implementation_estimate')
                 ->label('Estimasi Pelaksana')
-                ->date(),
+                ->date('l, jS F Y'),
         ];
     }
 
@@ -149,7 +149,7 @@ class Academic
                                 Infolists\Components\TextEntry::make('periode')
                                         ->label('Periode'),
                                 Infolists\Components\TextEntry::make('school_years.name')
-                                        ->label('Tahun Ajaran'),
+                                        ->label('Tahun'),
                             ]),
 
                         Infolists\Components\Fieldset::make('Salesforce')
@@ -162,8 +162,12 @@ class Academic
                             ->schema([
                                 Infolists\Components\TextEntry::make('schools')
                                     ->label('Sekolah'),
+                                Infolists\Components\TextEntry::make('class')
+                                    ->label('Kelas'),
                                 Infolists\Components\TextEntry::make('education_level')
                                     ->label('Jenjang'),
+                                Infolists\Components\TextEntry::make('description')
+                                    ->label('Keterangan'),
                                 Infolists\Components\TextEntry::make('education_level_type')
                                     ->label('Negeri / Swasta'),
                                 Infolists\Components\TextEntry::make('student_count')
@@ -172,6 +176,9 @@ class Academic
                                     ->label('Provinsi'),
                                 Infolists\Components\TextEntry::make('regencies')
                                     ->label('Kota / Kabupaten'),
+                                Infolists\Components\TextEntry::make('sudin')
+                                    ->label('Wilayah')
+                                    ->default('-'),
                             ]),
 
 

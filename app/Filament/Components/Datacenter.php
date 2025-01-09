@@ -3,7 +3,7 @@
 namespace App\Filament\Components;
 
 use Filament\Tables\Columns\TextColumn;
-use Creasi\Nusa\Models\{Province, Regency};
+use Creasi\Nusa\Models\{Province, Regency, District};
 
 class Datacenter
 {
@@ -15,13 +15,13 @@ class Datacenter
             TextColumn::make('periode')
                 ->label('Periode'),
             TextColumn::make('school_years.name')
-                ->label('Tahun Ajaran'),
+                ->label('Tahun'),
             TextColumn::make('users.name')
                 ->label('User')
                 ->searchable(),
             TextColumn::make('date_register')
                 ->label('Tanggal Pendaftaran')
-                ->date()
+                ->date('l, jS F Y')
                 ->sortable(),
             TextColumn::make('provinces')
                 ->label('Provinsi')
@@ -36,7 +36,14 @@ class Datacenter
                     return $regency ? $regency->name : 'Unknown';
                 }),
             TextColumn::make('sudin')
-                ->label('Daerah Tambahan'),
+                ->label('Wilayah')
+                ->badge(),
+            TextColumn::make('district')
+                ->label('Kecamatan')
+                ->formatStateUsing(function ($state) {
+                    $district = District::search($state)->first();
+                    return $district ? $district->name : 'Unknown';
+                }),
             TextColumn::make('schools')
                 ->label('Sekolah'),
             TextColumn::make('education_level')
@@ -63,8 +70,8 @@ class Datacenter
                 ->label('Jumlah Siswa')
                 ->numeric(),
             TextColumn::make('implementation_estimate')
-                ->label('Estimasi Pelaksana')
-                ->date(),
+                ->label('Estimasi Pelaksanaan')
+                ->date('l, jS F Y'),
         ];
     }
 }
