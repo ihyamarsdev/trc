@@ -86,6 +86,9 @@
     @apply text-white;
 }
 
+.fi-sidebar-nav {
+    @apply bg-sky-900;
+}
 @layer utilities {
     /* Hide scrollbar for Chrome, Safari and Opera */
     .no-scrollbar::-webkit-scrollbar {
