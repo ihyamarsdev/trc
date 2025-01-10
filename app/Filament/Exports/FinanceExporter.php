@@ -12,7 +12,7 @@ use Filament\Actions\Exports\Models\Export;
 use OpenSpout\Common\Entity\Style\CellAlignment;
 use OpenSpout\Common\Entity\Style\CellVerticalAlignment;
 
-class RegistrationDataExporter extends Exporter
+class FinanceExporter extends Exporter
 {
     protected static ?string $model = RegistrationData::class;
 

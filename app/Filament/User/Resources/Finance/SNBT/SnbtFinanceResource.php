@@ -15,7 +15,7 @@ use App\Filament\Components\Finance;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Actions\Exports\Enums\ExportFormat;
-use App\Filament\Exports\RegistrationDataExporter;
+use App\Filament\Exports\FinanceExporter;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\User\Resources\Finance\SNBT\SnbtFinanceResource\Pages;
 use App\Filament\User\Resources\SnbtFinanceResource\RelationManagers;
@@ -69,7 +69,7 @@ class SnbtFinanceResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 Tables\Actions\ExportBulkAction::make()
-                    ->exporter(RegistrationDataExporter::class)
+                    ->exporter(FinanceExporter::class)
                     ->formats([
                         ExportFormat::Xlsx,
                     ]),
