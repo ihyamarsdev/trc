@@ -98,16 +98,20 @@
     @apply text-white;
 }
 
-.fi-section-header-heading {
+/* .fi-section-header-heading {
     @apply text-white;
 }
 
 .fi-section-header-description {
     @apply text-white;
+} */
+
+.fi-section-header {
+    @apply px-5 py-5 bg-white rounded-lg;
 }
 
 .fi-sidebar-nav {
-    @apply bg-sky-900;
+    @apply bg-sky-900 dark:bg-gray-950;
 }
 @layer utilities {
     /* Hide scrollbar for Chrome, Safari and Opera */

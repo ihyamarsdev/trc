@@ -87,7 +87,11 @@
 }
 
 .fi-sidebar-nav {
-    @apply bg-sky-900;
+    @apply bg-sky-900 dark:bg-gray-950;
+}
+
+.fi-section-header {
+    @apply px-5 py-5 bg-white rounded-lg;
 }
 @layer utilities {
     /* Hide scrollbar for Chrome, Safari and Opera */
