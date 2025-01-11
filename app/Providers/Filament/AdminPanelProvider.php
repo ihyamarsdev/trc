@@ -6,6 +6,7 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\Widgets;
 use Filament\PanelProvider;
+use App\Livewire\EditProfile;
 use App\Livewire\DetailProfile;
 use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
@@ -97,16 +98,13 @@ class AdminPanelProvider extends PanelProvider
                     ->shouldShowDeleteAccountForm(false)
                     ->shouldShowSanctumTokens(false)
                     ->shouldShowBrowserSessionsForm(false)
-                    ->shouldShowAvatarForm()
+                    // ->shouldShowAvatarForm(
+                    //     value: true,
+                    //     directory: 'avatars', // image will be stored in 'storage/app/public/avatars
+                    //     rules: 'mimes:jpeg,png|max:1024' //only accept jpeg and png files with a maximum size of 1MB
+                    // )
                     ->customProfileComponents([
-
-                    ])
-                    ->shouldShowAvatarForm(
-                        value: true,
-                        directory: 'avatars', // image will be stored in 'storage/app/public/avatars
-                        rules: 'mimes:jpeg,png|max:1024' //only accept jpeg and png files with a maximum size of 1MB
-                    )
-                    ->customProfileComponents([
+                        EditProfile::class,
                         DetailProfile::class,
                     ]),
                 GreeterPlugin::make()
