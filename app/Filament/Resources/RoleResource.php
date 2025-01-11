@@ -27,8 +27,13 @@ class RoleResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('name')
-                    ->unique()
+                Section::make('Roles')
+                    ->description('Membuat Roles')
+                    ->schema([
+                        TextInput::make('name')
+                            ->unique()
+                    ])->columns(2),
+
             ]);
     }
 
@@ -36,11 +41,7 @@ class RoleResource extends Resource
     {
         return $table
             ->columns([
-                Section::make('Roles')
-                    ->description('Membuat Roles')
-                    ->schema([
-                        TextColumn::make('name')->badge()
-                    ])->columns(2),
+                TextColumn::make('name')->badge()
             ])
             ->filters([
                 //
