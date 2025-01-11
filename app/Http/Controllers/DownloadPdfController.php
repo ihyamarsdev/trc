@@ -36,8 +36,8 @@ class DownloadPdfController extends Controller
             'siswaSpell' => $digit->format($record->student_count),
             'harga' => number_format($record->price, 0, ',', '.'),
             'hargaSpell' => self::formatKeRupiah($record->price),
-            'total' => number_format($record->difference_total, 0, ',', '.'),
-            'totalSpell' => self::formatKeRupiah($record->difference_total),
+            'total' => number_format($record->total, 0, ',', '.'),
+            'totalSpell' => self::formatKeRupiah($record->total),
             'payment' => $record->payment,
             'province' => $record->provinces,
         ]);
@@ -78,8 +78,8 @@ class DownloadPdfController extends Controller
             'siswaSpell' => $digit->format($record->student_count),
             'harga' => number_format($record->price, 0, ',', '.'),
             'hargaSpell' => self::formatKeRupiah($record->price),
-            'total' => number_format($record->difference_total, 0, ',', '.'),
-            'totalSpell' => self::formatKeRupiah($record->difference_total),
+            'total' => number_format($record->total, 0, ',', '.'),
+            'totalSpell' => self::formatKeRupiah($record->total),
             'payment' => $record->payment,
             'province' => $record->provinces,
         ]);
@@ -119,8 +119,8 @@ class DownloadPdfController extends Controller
             'siswaSpell' => $digit->format($record->student_count),
             'harga' => number_format($record->price, 0, ',', '.'),
             'hargaSpell' => self::formatKeRupiah($record->price),
-            'total' => number_format($record->difference_total, 0, ',', '.'),
-            'totalSpell' => self::formatKeRupiah($record->difference_total),
+            'total' => number_format($record->total, 0, ',', '.'),
+            'totalSpell' => self::formatKeRupiah($record->total),
             'payment' => $record->payment,
             'province' => $record->provinces,
         ]);
@@ -161,8 +161,8 @@ class DownloadPdfController extends Controller
             'siswaSpell' => $digit->format($record->student_count),
             'harga' => number_format($record->price, 0, ',', '.'),
             'hargaSpell' => self::formatKeRupiah($record->price),
-            'total' => number_format($record->difference_total, 0, ',', '.'),
-            'totalSpell' => self::formatKeRupiah($record->difference_total),
+            'total' => number_format($record->total, 0, ',', '.'),
+            'totalSpell' => self::formatKeRupiah($record->total),
             'payment' => $record->payment,
             'province' => $record->provinces,
             'schools' => $record->schools,
@@ -205,8 +205,8 @@ class DownloadPdfController extends Controller
             'siswaSpell' => $digit->format($record->student_count),
             'harga' => number_format($record->price, 0, ',', '.'),
             'hargaSpell' => self::formatKeRupiah($record->price),
-            'total' => number_format($record->difference_total, 0, ',', '.'),
-            'totalSpell' => self::formatKeRupiah($record->difference_total),
+            'total' => number_format($record->total, 0, ',', '.'),
+            'totalSpell' => self::formatKeRupiah($record->total),
             'payment' => $record->payment,
             'province' => $record->provinces,
         ]);
@@ -247,8 +247,8 @@ class DownloadPdfController extends Controller
             'siswaSpell' => $digit->format($record->student_count),
             'harga' => number_format($record->price, 0, ',', '.'),
             'hargaSpell' => self::formatKeRupiah($record->price),
-            'total' => number_format($record->difference_total, 0, ',', '.'),
-            'totalSpell' => self::formatKeRupiah($record->difference_total),
+            'total' => number_format($record->total, 0, ',', '.'),
+            'totalSpell' => self::formatKeRupiah($record->total),
             'payment' => $record->payment,
             'province' => $record->provinces,
         ]);
@@ -289,8 +289,8 @@ class DownloadPdfController extends Controller
             'siswaSpell' => $digit->format($record->student_count),
             'harga' => number_format($record->price, 0, ',', '.'),
             'hargaSpell' => self::formatKeRupiah($record->price),
-            'total' => number_format($record->difference_total, 0, ',', '.'),
-            'totalSpell' => self::formatKeRupiah($record->difference_total),
+            'total' => number_format($record->total, 0, ',', '.'),
+            'totalSpell' => self::formatKeRupiah($record->total),
             'payment' => $record->payment,
             'province' => $record->provinces,
         ]);
@@ -331,8 +331,8 @@ class DownloadPdfController extends Controller
             'siswaSpell' => $digit->format($record->student_count),
             'harga' => number_format($record->price, 0, ',', '.'),
             'hargaSpell' => self::formatKeRupiah($record->price),
-            'total' => number_format($record->difference_total, 0, ',', '.'),
-            'totalSpell' => self::formatKeRupiah($record->difference_total),
+            'total' => number_format($record->total, 0, ',', '.'),
+            'totalSpell' => self::formatKeRupiah($record->total),
             'payment' => $record->payment,
             'province' => $record->provinces,
             'schools' => $record->schools,
@@ -358,27 +358,8 @@ class DownloadPdfController extends Controller
 
     public function tanggal($tanggal): string
     {
-        $bulan = array(
-            1 =>   'Januari',
-            'Februari',
-            'Maret',
-            'April',
-            'Mei',
-            'Juni',
-            'Juli',
-            'Agustus',
-            'September',
-            'Oktober',
-            'November',
-            'Desember'
-        );
-        $pecahkan = explode('-', $tanggal);
-
-        // variabel pecahkan 0 = tanggal
-        // variabel pecahkan 1 = bulan
-        // variabel pecahkan 2 = tahun
-
-        return $pecahkan[2] . ' ' . $bulan[ (int)$pecahkan[1] ] . ' ' . $pecahkan[0];
+        Carbon::setLocale('id');
+        return Carbon::parse($tanggal)->translatedFormat('jS F Y');
     }
 
     public function formatTanggal($tanggalInput)
@@ -419,8 +400,8 @@ class DownloadPdfController extends Controller
         ];
 
         // Konversi tanggal dan tahun ke dalam kata
-        $tanggalDalamKata = $this->angkaKeKata($tanggalHari);
-        $tahunDalamKata = $this->angkaKeKata($tahun);
+        $tanggalDalamKata = terbilang($tanggalHari);
+        $tahunDalamKata = terbilang($tahun);
 
         // Gabungkan menjadi kalimat
         $kalimatTanggal = "{$hariTerjemahan[$hari]}, tanggal {$tanggalDalamKata} Bulan {$bulanTerjemahan[$bulan]} Tahun {$tahunDalamKata}";
@@ -428,109 +409,9 @@ class DownloadPdfController extends Controller
         return $kalimatTanggal;
     }
 
-    // Fungsi untuk mengonversi angka menjadi kata
-    private function angkaKeKata($angka)
-    {
-        $angkaKata = [
-            1 => 'Satu',
-            2 => 'Dua',
-            3 => 'Tiga',
-            4 => 'Empat',
-            5 => 'Lima',
-            6 => 'Enam',
-            7 => 'Tujuh',
-            8 => 'Delapan',
-            9 => 'Sembilan',
-            10 => 'Sepuluh',
-            11 => 'Sebelas',
-            12 => 'Dua belas',
-            13 => 'Tiga belas',
-            14 => 'Empat belas',
-            15 => 'Lima belas',
-            16 => 'Enam belas',
-            17 => 'Tujuh belas',
-            18 => 'Delapan belas',
-            19 => 'Sembilan belas',
-            20 => 'Dua puluh',
-            30 => 'Tiga puluh',
-            31 => 'Tiga puluh satu',
-            // Tambahkan lebih banyak angka sesuai kebutuhan
-        ];
-
-        return $angkaKata[$angka] ?? $angka; // Kembalikan angka jika tidak ada terjemahan
-    }
-
-    public function angkaKeTeks($angka)
-    {
-        // Array untuk menyimpan nama angka
-        $huruf = [
-            0 => 'Nol',
-            1 => 'Satu',
-            2 => 'Dua',
-            3 => 'Tiga',
-            4 => 'Empat',
-            5 => 'Lima',
-            6 => 'Enam',
-            7 => 'Tujuh',
-            8 => 'Delapan',
-            9 => 'Sembilan',
-            10 => 'Sepuluh',
-            11 => 'Sebelas',
-            12 => 'Dua Belas',
-            13 => 'Tiga Belas',
-            14 => 'Empat Belas',
-            15 => 'Lima Belas',
-            16 => 'Enam Belas',
-            17 => 'Tujuh Belas',
-            18 => 'Delapan Belas',
-            19 => 'Sembilan Belas',
-            20 => 'Dua Puluh',
-            30 => 'Tiga Puluh',
-            40 => 'Empat Puluh',
-            50 => 'Lima Puluh',
-            60 => 'Enam Puluh',
-            70 => 'Tujuh Puluh',
-            80 => 'Delapan Puluh',
-            90 => 'Sembilan Puluh',
-            100 => 'Seratus',
-            200 => 'Dua Ratus',
-            300 => 'Tiga Ratus',
-            400 => 'Empat Ratus',
-            500 => 'Lima Ratus',
-            600 => 'Enam Ratus',
-            700 => 'Tujuh Ratus',
-            800 => 'Delapan Ratus',
-            900 => 'Sembilan Ratus',
-            1000 => 'Seribu',
-            1000000 => 'Satu Juta',
-            1000000000 => 'Satu Miliar'
-        ];
-
-        // Cek jika angka lebih dari 1 miliar
-        if ($angka >= 1000000000) {
-            return 'Angka terlalu besar';
-        }
-
-        // Proses konversi
-        if ($angka < 0) {
-            return 'Minus ' . self::angkaKeTeks(abs($angka));
-        } elseif ($angka < 21) {
-            return $huruf[$angka];
-        } elseif ($angka < 100) {
-            return $huruf[floor($angka / 10) * 10] . ($angka % 10 ? ' ' . $huruf[$angka % 10] : '');
-        } elseif ($angka < 1000) {
-            return $huruf[floor($angka / 100) * 100] . ($angka % 100 ? ' ' . self::angkaKeTeks($angka % 100) : '');
-        } elseif ($angka < 1000000) {
-            return self::angkaKeTeks(floor($angka / 1000)) . ' Ribu' . ($angka % 1000 ? ' ' . self::angkaKeTeks($angka % 1000) : '');
-        } elseif ($angka < 1000000000) {
-            return self::angkaKeTeks(floor($angka / 1000000)) . ' Juta' . ($angka % 1000000 ? ' ' . self::angkaKeTeks($angka % 1000000) : '');
-        }
-    }
-
-    // Fungsi untuk mengonversi angka menjadi teks dan menambahkan "Rupiah"
     public function formatKeRupiah($angka)
     {
-        return self::angkaKeTeks($angka) . ' Rupiah';
+        return terbilang($angka) . ' Rupiah';
     }
 
 }

@@ -8,6 +8,7 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Spatie\Permission\Models\Role;
+use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
@@ -35,7 +36,11 @@ class RoleResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name')->badge()
+                Section::make('Roles')
+                    ->description('Membuat Roles')
+                    ->schema([
+                        TextColumn::make('name')->badge()
+                    ])->columns(2),
             ])
             ->filters([
                 //

@@ -25,6 +25,7 @@
         "laraveldaily/laravel-invoices": "^4.0",
         "livewire/livewire": "^3.5",
         "maatwebsite/excel": "^3.1",
+        "nasution/terbilang": "^0.1.0",
         "oriondevelops/filament-greeter": "^0.2.0",
         "pelmered/filament-money-field": "^1.4",
         "phpoffice/phpword": "^1.3",

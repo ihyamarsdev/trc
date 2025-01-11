@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Tables\Columns\{TextColumn};
 use Illuminate\Database\Eloquent\Builder;
-use Creasi\Nusa\Models\{Province, Regency};
+use Creasi\Nusa\Models\{Province, Regency,  District};
 use Filament\Forms\Components\{Select, TextInput, Section, DatePicker, Radio};
 use App\Models\{SchoolYear, CurriculumDeputies, CounselorCoordinator, Proctors, Schools};
 use App\Filament\Resources\{SchoolYearResource, CurriculumDeputiesResource, CounselorCoordinatorResource, ProctorsResource, SchoolsResource};
@@ -26,21 +26,25 @@ class Academic
                 ->schema([
                     DatePicker::make('group')
                         ->label('Grup')
+                        ->native(false)
+                        ->displayFormat('l, jS F Y')
                         ->required(),
                     DatePicker::make('bimtek')
                         ->label('Bimtek')
+                        ->native(false)
+                        ->displayFormat('l, jS F Y')
                         ->required(),
                     TextInput::make('account_count_created')
                         ->label('Jumlah Akun Dibuat')
                         ->required()
-                        ->live(debounce: 500)
+                        ->live(debounce: 1000)
                         ->default('0')
                         ->afterStateUpdated(function (Get $get, Set $set) {
                             self::getDifference($get, $set);
                         }),
                     TextInput::make('implementer_count')
                         ->label('Jumlah Akun Pelaksanaan')
-                        ->live(debounce: 500)
+                        ->live(debounce: 1000)
                         ->default('0')
                         ->afterStateUpdated(function (Get $get, Set $set) {
                             self::getDifference($get, $set);
@@ -70,9 +74,13 @@ class Academic
                         ])
                         ->inline(),
                     DatePicker::make('counselor_consultation_date')
-                        ->label('Konsul BK'),
+                        ->label('Konsul BK')
+                        ->native(false)
+                        ->displayFormat('l, jS F Y'),
                     DatePicker::make('student_consultation_date')
-                        ->label('Konsul Siswa'),
+                        ->label('Konsul Siswa')
+                        ->native(false)
+                        ->displayFormat('l, jS F Y'),
                 ])->columns(2),
         ];
     }
@@ -107,6 +115,12 @@ class Academic
                 }),
             TextColumn::make('sudin')
                 ->label('Daerah Tambahan'),
+            TextColumn::make('district')
+                ->label('Kecamatan')
+                ->formatStateUsing(function ($state) {
+                    $district = District::search($state)->first();
+                    return $district ? $district->name : 'Unknown';
+                }),
             TextColumn::make('schools')
                 ->label('Sekolah'),
             TextColumn::make('education_level')

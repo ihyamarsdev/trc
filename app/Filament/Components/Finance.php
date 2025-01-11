@@ -11,7 +11,7 @@ use Filament\Tables\Columns\{TextColumn};
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Illuminate\Database\Eloquent\Builder;
-use Creasi\Nusa\Models\{Province, Regency};
+use Creasi\Nusa\Models\{Province, Regency, District};
 use Filament\Forms\Components\{Select, TextInput, Section, DatePicker, Radio, Fieldset, Group};
 
 class Finance
@@ -212,6 +212,8 @@ class Finance
                         ->schema([
                             DatePicker::make('invoice_date')
                                 ->label('Invoice')
+                                ->native(false)
+                                ->displayFormat('l, jS F Y')
                                 ->required(),
                             DatePicker::make('payment_date')
                                 ->label('Pembayaran')
@@ -233,120 +235,6 @@ class Finance
                         ]),
                 ])->columns(2),
 
-            Section::make('Kwitansi')
-                ->schema([
-                    Fieldset::make('')
-                        ->schema([
-                            TextInput::make('schools')
-                                ->label('Sekolah')
-                                ->readOnly(),
-                            TextInput::make('detail_kwitansi')
-                                ->label('Guna Pembayaran')
-                                ->helperText('Contoh: 146 Paket Program TRY OUT Ujian Tertulis Berbasis Komputer (UTBK SNBT)'),
-                        ])->columns(1),
-                ]),
-
-            Section::make('Invoice')
-                ->schema([
-                    Fieldset::make('')
-                        ->schema([
-                            TextInput::make('schools')
-                                ->label('Sekolah')
-                                ->readOnly(),
-                            TextInput::make('number_invoice')
-                                ->prefix('#')
-                                ->label('Nomor Invoice')
-                                ->live()
-                                ->numeric(),
-                            TextInput::make('detail_invoice')
-                                ->label('Deskripsi')
-                                ->helperText('Contoh: Try Out Asesmen Nasional (AKM)'),
-                        ])->columns(1),
-
-                    Fieldset::make('')
-                        ->schema([
-                            TextInput::make('qty_invoice')
-                                ->label('Quantity')
-                                ->live(1000)
-                                ->numeric()
-                                ->afterStateUpdated(function (Get $get, Set $set) {
-                                    $set('amount_invoice', abs((float) $get('qty_invoice') * (float) $get('unit_price')));
-                                    $set('subtotal_invoice', abs((float) $get('amount_invoice')));
-                                    $set('total_invoice', abs((float) $get('subtotal_invoice')));
-                                }),
-                            TextInput::make('unit_price')
-                                ->label('Unit Price')
-                                ->prefix('Rp')
-                                ->live(1000)
-                                ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
-                                ->afterStateUpdated(function (Get $get, Set $set) {
-                                    $set('amount_invoice', abs((float) $get('qty_invoice') * (float) $get('unit_price')));
-                                    $set('subtotal_invoice', abs((float) $get('amount_invoice')));
-                                    $set('total_invoice', abs((float) $get('subtotal_invoice')));
-                                }),
-                            TextInput::make('amount_invoice')
-                                ->label('Amount')
-                                ->prefix('Rp')
-                                ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
-                                ->numeric()
-                                ->readOnly(),
-                            TextInput::make('subtotal_invoice')
-                                ->label('Sub Total')
-                                ->prefix('Rp')
-                                ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
-                                ->numeric()
-                                ->readOnly(),
-
-                        ])->columns(2),
-
-                    Fieldset::make('Pajak')
-                        ->schema([
-                            Radio::make('option_tax')
-                                ->label('Pilih Opsi Pajak')
-                                ->options([
-                                    '0.02' => 'PPH 23',
-                                    '0.11' => 'PPN',
-                                    '0' => 'None',
-                                ])
-                                ->live(1000)
-                                ->reactive()
-                                ->afterStateUpdated(function (Get $get, Set $set) {
-                                    $set('total_invoice', (float) $get('subtotal_invoice') + ((float) $get('subtotal_invoice') * (float) $get('option_tax')));
-                                    if ($get('option_tax') == '0.02') {
-                                        $set('tax_rate', "2");
-                                        $set('sales_tsx', "0");
-                                    } elseif ($get('option_tax') == '0.11') {
-                                        $set('tax_rate', "0");
-                                        $set('sales_tsx', "11");
-                                    } elseif ($get('option_tax') == '0') {
-                                        $set('tax_rate', "0");
-                                        $set('sales_tsx', "0");
-                                    }
-                                }),
-                            Group::make([
-                                TextInput::make('tax_rate')
-                                    ->label('PPH 23')
-                                    ->suffix('%')
-                                    ->readOnly()
-                                    ->live(1000),
-                                TextInput::make('sales_tsx')
-                                    ->label('PPN')
-                                    ->suffix('%')
-                                    ->readOnly()
-                                    ->live(1000),
-                            ]),
-
-                        ])->columns(2),
-
-                    Fieldset::make('')
-                        ->schema([
-                            TextInput::make('total_invoice')
-                                ->label('Total')
-                                ->prefix('Rp')
-                                ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
-                                ->readOnly(),
-                        ])->columns(2),
-                ]),
         ];
     }
 
@@ -382,6 +270,12 @@ class Finance
                 ->label('Daerah Tambahan')
                 ->formatStateUsing(function ($state) {
                     return $state ? $state : 'None';
+                }),
+            TextColumn::make('district')
+                ->label('Kecamatan')
+                ->formatStateUsing(function ($state) {
+                    $district = District::search($state)->first();
+                    return $district ? $district->name : 'Unknown';
                 }),
             TextColumn::make('schools')
                 ->label('Sekolah'),

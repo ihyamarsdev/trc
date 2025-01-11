@@ -51,6 +51,11 @@ class ListAnbkSalesForces extends ListRecords
                     }
 
                 })
+                ->modalHeading('Import Data')
+                ->modalContent(function () {
+                    return view('components.sample-excel-modal'); // Tampilkan view modal
+                })
+                ->openUrlInNewTab()
         ];
     }
 }
