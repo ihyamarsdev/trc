@@ -40,6 +40,12 @@ class ListAnbkSalesForces extends ListRecords
                             ->success()
                             ->send();
                     } catch (\Throwable $th) {
+                        Log::error('Error saat mengimpor file: ' . $th->getMessage(), [
+                            'file' => $file,
+                            'data' => $data,
+                            'trace' => $th->getTraceAsString(),
+                        ]);
+                        
                         Notification::make()
                             ->title('Terjadi Error ' . $th->getMessage())
                             ->danger()
@@ -53,7 +59,7 @@ class ListAnbkSalesForces extends ListRecords
                 })
                 ->modalHeading('Import Data')
                 ->modalContent(function () {
-                    return view('components.sample-excel-modal'); // Tampilkan view modal
+                    return view('components.sample-excel-modal');
                 })
                 ->openUrlInNewTab()
         ];

@@ -105,13 +105,13 @@ class UserPanelProvider extends PanelProvider
                     ->shouldShowDeleteAccountForm(false)
                     ->shouldShowSanctumTokens(false)
                     ->shouldShowBrowserSessionsForm(false)
-                    // ->shouldShowAvatarForm(
-                    //     value: true,
-                    //     directory: 'avatars',
-                    //     rules: 'mimes:jpeg,png|max:1024'
-                    // )
+                    ->shouldShowAvatarForm(
+                        value: true,
+                        directory: 'avatars',
+                        rules: 'mimes:jpg,jpeg,png|max:1024'
+                    )
                     ->customProfileComponents([
-                        EditProfile::class,
+                        // EditProfile::class,
                         DetailProfile::class,
                     ]),
                 GreeterPlugin::make()

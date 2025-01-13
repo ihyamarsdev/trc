@@ -4,6 +4,7 @@ namespace App\Filament\User\Resources\Salesforce\APPS\AppsSalesForceResource\Pag
 
 use Filament\Actions;
 use Filament\Actions\Action;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\salesforce\ANBKImport;
 use Filament\Notifications\Notification;
@@ -35,9 +36,16 @@ class ListAppsSalesForces extends ListRecords
                             ->title('Berhasil Import File')
                             ->success()
                             ->send();
+                        ;
                     } catch (\Throwable $th) {
+                        Log::error('Error saat mengimpor file: ' . $th->getMessage(), [
+                            'file' => $file,
+                            'data' => $data,
+                            'trace' => $th->getTraceAsString(),
+                        ]);
+
                         Notification::make()
-                            ->title('Terjadi Error ' . $th->getMessage())
+                            ->title('Terjadi Error: ' . $th->getMessage())
                             ->danger()
                             ->send();
                     } finally {
@@ -46,6 +54,11 @@ class ListAppsSalesForces extends ListRecords
                         }
                     }
                 })
+                ->modalHeading('Import Data')
+                ->modalContent(function () {
+                    return view('components.sample-excel-modal');
+                })
+                ->openUrlInNewTab()
         ];
     }
 }

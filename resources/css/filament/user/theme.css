@@ -107,7 +107,7 @@
 } */
 
 .fi-section-header {
-    @apply px-5 py-5 bg-white rounded-lg;
+    @apply px-5 py-5 bg-white rounded-lg dark:bg-gray-950;
 }
 
 .fi-sidebar-nav {

@@ -38,7 +38,7 @@ class EditProfile extends Component implements HasForms
 
         $this->userClass = get_class($this->user);
 
-        $this->form->fill($this->user->only('avatar_url', 'name', 'email'));
+        $this->form->fill($this->user->only(config('filament-edit-profile.avatar_column', 'avatar_url'), 'name', 'email'));
     }
 
     public function form(Form $form): Form

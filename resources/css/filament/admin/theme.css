@@ -91,7 +91,7 @@
 }
 
 .fi-section-header {
-    @apply px-5 py-5 bg-white rounded-lg;
+    @apply px-5 py-5 bg-white rounded-lg dark:bg-gray-950;
 }
 @layer utilities {
     /* Hide scrollbar for Chrome, Safari and Opera */

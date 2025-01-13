@@ -17,6 +17,7 @@
         "filament/infolists": "^3.2",
         "filament/notifications": "^3.2",
         "filament/widgets": "^3.2",
+        "filipfonal/filament-log-manager": "^2.0",
         "joaopaulolndev/filament-edit-profile": "^1.0",
         "laravel/framework": "^11.9",
         "laravel/octane": "^2.6",
