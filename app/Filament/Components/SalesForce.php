@@ -81,17 +81,17 @@ class SalesForce
                             $regenciesCode = $regencies ? $regencies->code : null;
                             if ($regenciesCode) {
                                 if ($regenciesCode == '3101') {
-                                    return ['kS_01' => 'KS 01', 'KS_02' => 'KS 02',];
+                                    return ['kS 01' => 'KS 01', 'KS_02' => 'KS 02',];
                                 } elseif ($regenciesCode == '3171') {
-                                    return ['JP_01' => 'JP 01', 'JP_02' => 'JP 02',];
+                                    return ['JP 01' => 'JP 01', 'JP 02' => 'JP 02',];
                                 } elseif ($regenciesCode == '3172') {
-                                    return ['JU_01' => 'JU 01', 'JU_02' => 'JU 02',];
+                                    return ['JU 01' => 'JU 01', 'JU 02' => 'JU 02',];
                                 } elseif ($regenciesCode == '3173') {
-                                    return ['JB_01' => 'JB 01', 'JB_02' => 'JB 02',];
+                                    return ['JB 01' => 'JB 01', 'JB 02' => 'JB 02',];
                                 } elseif ($regenciesCode == '3174') {
-                                    return ['JS_01' => 'JS 01', 'JS_02' => 'JU 02',];
+                                    return ['JS 01' => 'JS 01', 'JS 02' => 'JU 02',];
                                 } elseif ($regenciesCode == '3175') {
-                                    return ['JT_01' => 'JT 01', 'JT_02' => 'JT 02',];
+                                    return ['JT 01' => 'JT 01', 'JT 02' => 'JT 02',];
                                 } else {
                                     return [];
                                 }

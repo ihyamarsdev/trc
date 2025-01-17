@@ -45,9 +45,9 @@ class ListAnbkSalesForces extends ListRecords
                             'data' => $data,
                             'trace' => $th->getTraceAsString(),
                         ]);
-                        
+
                         Notification::make()
-                            ->title('Terjadi Error ' . $th->getMessage())
+                            ->title('Terjadi Error Saat Melakukan Import  File')
                             ->danger()
                             ->send();
                     } finally {

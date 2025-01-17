@@ -13,6 +13,8 @@ use App\Models\CounselorCoordinator;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class ANBKImport implements ToModel, WithHeadingRow
 {
@@ -23,6 +25,36 @@ class ANBKImport implements ToModel, WithHeadingRow
     */
     public function model(array $row)
     {
+        $validator = Validator::make($row, [
+            'tahun' => 'required',
+            'wakakurikulum' => 'required',
+            'no_hp_wakakurikulum' => 'required',
+            'koordinator_bk' => 'required',
+            'no_hp_koordinator_bk' => 'required',
+            'proktor' => 'required',
+            'no_hp_proktor' => 'required',
+            'provinsi' => 'required',
+            'kota_kabupaten' => 'required',
+            'kecamatan' => 'required',
+            'periode' => 'required',
+            'tanggal_pendaftaran' => 'required',
+            'jumlah_siswa' => 'required|integer',
+            'estimasi_pelaksanaan' => 'required',
+            'sekolah' => 'required|string',
+            'kelas' => 'required',
+            'jenjang' => 'required|string',
+            'keterangan' => 'nullable|string',
+            'kepala_sekolah' => 'required|string',
+            'no_hp_kepala_sekolah' => 'required',
+            'negeri_swasta' => 'required|string',
+        ]);
+
+
+        // Jika validasi gagal, lempar pengecualian
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
+
         $schoolYear = SchoolYear::firstOrCreate(
             ['name' => $row['tahun']],
         )->id;

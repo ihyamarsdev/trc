@@ -6,11 +6,11 @@ use Filament\Actions;
 use Filament\Actions\Action;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Imports\salesforce\ANBKImport;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\FileUpload;
 use Filament\Resources\Pages\ListRecords;
 use App\Filament\User\Resources\Salesforce\SNBT\SnbtSalesForceResource;
+use App\Imports\salesforce\SNBTImport;
 
 class ListSnbtSalesForces extends ListRecords
 {
@@ -30,7 +30,7 @@ class ListSnbtSalesForces extends ListRecords
                     $file = public_path('storage/' . $data['attachment']);
 
                     try {
-                        Excel::import(new ANBKImport(), $file);
+                        Excel::import(new SNBTImport, $file);
 
                         Notification::make()
                             ->title('Berhasil Import File')
@@ -44,7 +44,7 @@ class ListSnbtSalesForces extends ListRecords
                         ]);
 
                         Notification::make()
-                            ->title('Terjadi Error ' . $th->getMessage())
+                            ->title('Terjadi Error Saat Melakukan Import File')
                             ->danger()
                             ->send();
                     } finally {

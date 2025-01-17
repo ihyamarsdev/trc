@@ -6,7 +6,7 @@ use Filament\Actions;
 use Filament\Actions\Action;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Imports\salesforce\ANBKImport;
+use App\Imports\salesforce\APPSImport;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\FileUpload;
 use Filament\Resources\Pages\ListRecords;
@@ -30,7 +30,7 @@ class ListAppsSalesForces extends ListRecords
                     $file = public_path('storage/' . $data['attachment']);
 
                     try {
-                        Excel::import(new ANBKImport(), $file);
+                        Excel::import(new APPSImport(), $file);
 
                         Notification::make()
                             ->title('Berhasil Import File')
@@ -45,7 +45,7 @@ class ListAppsSalesForces extends ListRecords
                         ]);
 
                         Notification::make()
-                            ->title('Terjadi Error: ' . $th->getMessage())
+                            ->title('Terjadi Error Saat Melakukan Import File: ' . $th->getMessage())
                             ->danger()
                             ->send();
                     } finally {
