@@ -56,7 +56,6 @@ class EditProfile extends Component implements HasForms
                         ->disk(config('filament-edit-profile.disk', 'public'))
                         ->visibility(config('filament-edit-profile.visibility', 'public'))
                         ->directory('avatars')
-                        ->preserveFilenames()
                         ->rules('mimes:jpeg,png|max:1024'),
                     TextInput::make('name')
                         ->label(__('filament-edit-profile::default.name'))
@@ -75,6 +74,10 @@ class EditProfile extends Component implements HasForms
     {
         try {
             $data = $this->form->getState();
+
+            if ($this->user->avatar_url) {
+                Storage::delete($this->user->avatar_url);
+            }
 
             $this->user->update($data);
         } catch (Halt $exception) {
