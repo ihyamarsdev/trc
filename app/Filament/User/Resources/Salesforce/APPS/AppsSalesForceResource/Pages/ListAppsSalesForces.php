@@ -44,13 +44,17 @@ class ListAppsSalesForces extends ListRecords
                             'trace' => $th->getTraceAsString(),
                         ]);
 
+                        if (file_exists($file)) {
+                            unlink($file);
+                        }
+
                         Notification::make()
                             ->title('Terjadi Error Saat Melakukan Import File: ' . $th->getMessage())
                             ->danger()
                             ->send();
                     } finally {
                         if (file_exists($file)) {
-                            unlink($file); // Menghapus file
+                            unlink($file);
                         }
                     }
                 })

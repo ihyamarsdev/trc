@@ -37,7 +37,7 @@ class SnbtAcademicResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole(['academic', 'admin']);
+        return Auth::user()->hasRole(Academic::getRoles());
     }
 
     public static function form(Form $form): Form

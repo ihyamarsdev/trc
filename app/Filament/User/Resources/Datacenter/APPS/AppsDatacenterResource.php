@@ -34,7 +34,7 @@ class AppsDatacenterResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole(['datacenter', 'admin']);
+        return Auth::user()->hasRole(Datacenter::getRoles());
     }
 
 

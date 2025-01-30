@@ -46,6 +46,10 @@ class ListAnbkSalesForces extends ListRecords
                             'trace' => $th->getTraceAsString(),
                         ]);
 
+                        if (file_exists($file)) {
+                            unlink($file); 
+                        }
+
                         Notification::make()
                             ->title('Terjadi Error Saat Melakukan Import  File')
                             ->danger()

@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Imports\UserImporter;
 use Filament\Forms;
 use App\Models\User;
 use Filament\Tables;
@@ -10,7 +9,9 @@ use Filament\Forms\Form;
 use App\Models\Devisions;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use App\Filament\Imports\UserImporter;
 use Filament\Forms\Components\Section;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\ImportAction;
 use Illuminate\Database\Eloquent\Builder;
@@ -44,17 +45,16 @@ class UserResource extends Resource
                             ->required()
                             ->maxLength(255),
                         TextInput::make('email')
-                            ->unique()
-                            ->hiddenOn('edit')
+                            ->unique(ignoreRecord: true)
                             ->email()
                             ->required()
                             ->maxLength(255),
-                        TextInput::make('password')
-                            ->password()
-                            ->revealable()
-                            ->required()
-                            ->maxLength(255)
-                            ->hiddenOn('edit'),
+                        // TextInput::make('password')
+                        //     ->password()
+                        //     ->revealable()
+                        //     ->required()
+                        //     ->maxLength(255)
+                        //     ->hiddenOn('edit'),
                         // Select::make('devisions_id')
                         //     ->label('Devisi')
                         //     ->options(Devisions::all()->pluck('name', 'id'))
@@ -77,6 +77,9 @@ class UserResource extends Resource
                     ->label('Name'),
                 TextColumn::make('email')
                     ->searchable(),
+                IconColumn::make('force_renew_password')
+                    ->label('Status Ganti Sandi')
+                    ->boolean(),
                 TextColumn::make('email_verified_at')
                     ->label('Tanggal Verifikasi')
                     ->dateTime()
@@ -84,12 +87,6 @@ class UserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('roles.name')
                     ->badge()
-                    // ->color(fn (string $state): string => match ($state) {
-                    //     'salesforce' => 'success',
-                    //     'reviewing' => 'warning',
-                    //     'published' => 'success',
-                    //     'rejected' => 'danger',
-                    // })
                     ->label('Role'),
                 // TextColumn::make('devisions.name')
                 //     ->badge()

@@ -3,7 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Carbon\Carbon;
 use Filament\Panel;
+use Spatie\Permission\Contracts\Role;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Support\Facades\Storage;
 use Filament\Models\Contracts\HasAvatar;
@@ -14,13 +16,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Spatie\Permission\Contracts\Role;
+use Yebor974\Filament\RenewPassword\RenewPasswordPlugin;
+use Yebor974\Filament\RenewPassword\Traits\RenewPassword;
+use Yebor974\Filament\RenewPassword\Contracts\RenewPasswordContract;
 
-class User extends Authenticatable implements HasAvatar, FilamentUser
+class User extends Authenticatable implements HasAvatar, FilamentUser, RenewPasswordContract
 {
     use HasFactory;
     use Notifiable;
     use HasRoles;
+    use RenewPassword;
 
     public function getFilamentAvatarUrl(): ?string
     {
@@ -52,7 +57,8 @@ class User extends Authenticatable implements HasAvatar, FilamentUser
         'number_phone',
         'gender',
         'date_joined',
-        'devisions_id'
+        'devisions_id',
+        'force_renew_password'
     ];
 
     /**
@@ -88,4 +94,17 @@ class User extends Authenticatable implements HasAvatar, FilamentUser
         return $this->belongsTo(Devisions::class);
     }
 
+    public function needRenewPassword(): bool
+    {
+        $plugin = RenewPasswordPlugin::get();
+
+        return
+            (
+                !is_null($plugin->getPasswordExpiresIn())
+                && Carbon::parse($this->{$plugin->getTimestampColumn()})->addDays($plugin->getPasswordExpiresIn()) < now()
+            ) || (
+                $plugin->getForceRenewPassword()
+                && $this->{$plugin->getForceRenewColumn()}
+            );
+    }
 }

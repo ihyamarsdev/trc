@@ -664,4 +664,11 @@ class Finance
                 )
         ];
     }
+
+    public static function getRoles(): array
+    {
+        return [
+            'finance', 'admin'
+        ];
+    }
 }

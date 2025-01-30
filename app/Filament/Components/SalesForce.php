@@ -294,4 +294,9 @@ class SalesForce
                 ->indicator('Tahun Ajaran'),
                 ];
     }
+
+    public static function getRoles(): array
+    {
+        return ['admin', 'salesforce'];
+    }
 }

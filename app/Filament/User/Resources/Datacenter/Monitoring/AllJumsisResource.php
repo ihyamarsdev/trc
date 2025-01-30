@@ -11,12 +11,13 @@ use App\Models\RegistrationData;
 use Filament\Resources\Resource;
 use Filament\Tables\Grouping\Group;
 use Illuminate\Support\Facades\Auth;
+use App\Filament\Components\Datacenter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\Summarizers\Count;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\User\Resources\Datacenter\Monitoring\AllJumsisResource\Pages;
 use App\Filament\User\Resources\AllJumsisResource\RelationManagers;
+use App\Filament\User\Resources\Datacenter\Monitoring\AllJumsisResource\Pages;
 
 class AllJumsisResource extends Resource
 {
@@ -33,7 +34,7 @@ class AllJumsisResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole(['datacenter','admin']);
+        return Auth::user()->hasRole(Datacenter::getRoles());
     }
 
     public static function form(Form $form): Form

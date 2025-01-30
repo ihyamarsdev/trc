@@ -11,11 +11,12 @@ use App\Models\RegistrationData;
 use Filament\Resources\Resource;
 use Filament\Tables\Grouping\Group;
 use Illuminate\Support\Facades\Auth;
+use App\Filament\Components\Datacenter;
 use App\Models\ServiceProgressDatacenter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\User\Resources\Datacenter\Monitoring\ServiceProgressDatacenterResource\Pages;
 use App\Filament\User\Resources\ServiceProgressDatacenterResource\RelationManagers;
+use App\Filament\User\Resources\Datacenter\Monitoring\ServiceProgressDatacenterResource\Pages;
 
 class ServiceProgressDatacenterResource extends Resource
 {
@@ -32,7 +33,7 @@ class ServiceProgressDatacenterResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole(['datacenter', 'admin']);
+        return Auth::user()->hasRole(Datacenter::getRoles());
     }
 
     public static function form(Form $form): Form

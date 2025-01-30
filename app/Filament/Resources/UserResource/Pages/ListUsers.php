@@ -21,8 +21,8 @@ class ListUsers extends ListRecords
             \EightyNine\ExcelImport\ExcelImportAction::make()
                 ->sampleExcel(
                     sampleData: [
-                        ['name' => 'John Doe', 'email' => 'john@doe.com', 'password' => '123456789', 'roles' => 'admin'],
-                        ['name' => 'Marry Jane', 'email' => 'marry@doe.com', 'password' => '987654321', 'roles' => 'user'],
+                        ['name' => 'John Doe', 'email' => 'john@doe.com', 'roles' => 'admin'],
+                        ['name' => 'Marry Jane', 'email' => 'marry@doe.com', 'roles' => 'user'],
                     ],
                     fileName: 'user_sample.csv',
                     sampleButtonLabel: 'Download Sample',
@@ -34,7 +34,6 @@ class ListUsers extends ListRecords
                 ->validateUsing([
                     'name' => 'required',
                     'email' => 'required|email',
-                    'password' => 'required',
                 ])
                 ->color("primary")
                 ->use(UserImport::class),

@@ -99,11 +99,11 @@ class AdminPanelProvider extends PanelProvider
                     ->shouldShowDeleteAccountForm(false)
                     ->shouldShowSanctumTokens(false)
                     ->shouldShowBrowserSessionsForm(false)
-                    ->shouldShowAvatarForm(
-                        value: true,
-                        directory: 'avatars', // image will be stored in 'storage/app/public/avatars
-                        rules: 'mimes:jpeg,png|max:1024' //only accept jpeg and png files with a maximum size of 1MB
-                    )
+                    // ->shouldShowAvatarForm(
+                    //     value: true,
+                    //     directory: 'avatars', // image will be stored in 'storage/app/public/avatars
+                    //     rules: 'mimes:jpeg,png|max:1024' //only accept jpeg and png files with a maximum size of 1MB
+                    // )
                     ->customProfileComponents([
                         EditProfile::class,
                         DetailProfile::class,

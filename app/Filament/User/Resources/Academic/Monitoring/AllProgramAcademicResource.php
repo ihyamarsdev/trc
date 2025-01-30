@@ -14,11 +14,12 @@ use Filament\Resources\Resource;
 use App\Models\AllProgramAcademic;
 use Filament\Tables\Grouping\Group;
 use Illuminate\Support\Facades\Auth;
+use App\Filament\Components\Academic;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\Summarizers\Summarizer;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\User\Resources\Academic\Monitoring\AllProgramAcademicResource\Pages;
 use App\Filament\User\Resources\AllProgramAcademicResource\RelationManagers;
+use App\Filament\User\Resources\Academic\Monitoring\AllProgramAcademicResource\Pages;
 
 class AllProgramAcademicResource extends Resource
 {
@@ -34,7 +35,7 @@ class AllProgramAcademicResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole(['academic', 'admin']);
+        return Auth::user()->hasRole(Academic::getRoles());
     }
 
 

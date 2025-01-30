@@ -30,7 +30,7 @@ class ListSnbtSalesForces extends ListRecords
                     $file = public_path('storage/' . $data['attachment']);
 
                     try {
-                        Excel::import(new SNBTImport, $file);
+                        Excel::import(new SNBTImport(), $file);
 
                         Notification::make()
                             ->title('Berhasil Import File')
@@ -42,6 +42,10 @@ class ListSnbtSalesForces extends ListRecords
                             'data' => $data,
                             'trace' => $th->getTraceAsString(),
                         ]);
+
+                        if (file_exists($file)) {
+                            unlink($file);
+                        }
 
                         Notification::make()
                             ->title('Terjadi Error Saat Melakukan Import File')

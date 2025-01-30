@@ -21,6 +21,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
+use Yebor974\Filament\RenewPassword\RenewPasswordPlugin;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -121,7 +122,9 @@ class UserPanelProvider extends PanelProvider
                     ->avatar(size: 'w-16 h-16', enabled: true)
                     ->sort(-1)
                     ->columnSpan('full'),
-
+                (new RenewPasswordPlugin())
+                    ->forceRenewPassword() 
+                    ->timestampColumn()
             ]);
     }
 }

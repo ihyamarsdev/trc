@@ -34,7 +34,7 @@ class SnbtSalesForceResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole(['salesforce', 'admin']);
+        return Auth::user()->hasRole(Salesforce::getRoles());
     }
 
     public static function form(Form $form): Form

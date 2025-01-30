@@ -14,13 +14,14 @@ use Illuminate\Support\Facades\DB;
 use Filament\Tables\Grouping\Group;
 use App\Models\AllProgramDatacenter;
 use Illuminate\Support\Facades\Auth;
+use App\Filament\Components\Datacenter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\Summarizers\Count;
 use Filament\Tables\Columns\Summarizers\Summarizer;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\User\Resources\Datacenter\Monitoring\AllProgramDatacenterResource\Pages;
 use App\Filament\User\Resources\AllProgramDatacenterResource\RelationManagers;
+use App\Filament\User\Resources\Datacenter\Monitoring\AllProgramDatacenterResource\Pages;
 
 class AllProgramDatacenterResource extends Resource
 {
@@ -36,7 +37,7 @@ class AllProgramDatacenterResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole(['datacenter', 'admin']);
+        return Auth::user()->hasRole(Datacenter::getRoles());
     }
 
     public static function form(Form $form): Form

@@ -13,12 +13,13 @@ use App\Models\RegistrationData;
 use Filament\Resources\Resource;
 use Filament\Tables\Grouping\Group;
 use Illuminate\Support\Facades\Auth;
+use App\Filament\Components\Datacenter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Columns\Summarizers\Count;
 use Filament\Tables\Columns\Summarizers\Summarizer;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\User\Resources\Datacenter\Monitoring\MonthJumsisResource\Pages;
 use App\Filament\User\Resources\MonthJumsisResource\RelationManagers;
+use App\Filament\User\Resources\Datacenter\Monitoring\MonthJumsisResource\Pages;
 
 class MonthJumsisResource extends Resource
 {
@@ -35,7 +36,7 @@ class MonthJumsisResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole(['datacenter', 'admin']);
+        return Auth::user()->hasRole(Datacenter::getRoles());
     }
 
 

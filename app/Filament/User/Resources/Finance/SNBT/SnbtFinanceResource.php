@@ -34,7 +34,7 @@ class SnbtFinanceResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole(['finance', 'admin']);
+        return Auth::user()->hasRole(Finance::getRoles());
     }
 
 

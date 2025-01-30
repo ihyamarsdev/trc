@@ -12,13 +12,14 @@ use App\Models\RegistrationData;
 use Filament\Resources\Resource;
 use App\Models\AllProgramFinance;
 use Filament\Tables\Grouping\Group;
+use App\Filament\Components\Finance;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Columns\Summarizers\Count;
 use Filament\Tables\Columns\Summarizers\Summarizer;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\User\Resources\Finance\Monitoring\AllProgramFinanceResource\Pages;
 use App\Filament\User\Resources\AllProgramFinanceResource\RelationManagers;
+use App\Filament\User\Resources\Finance\Monitoring\AllProgramFinanceResource\Pages;
 
 class AllProgramFinanceResource extends Resource
 {
@@ -34,7 +35,7 @@ class AllProgramFinanceResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole(['finance', 'admin']);
+        return Auth::user()->hasRole(Finance::getRoles());
     }
 
     public static function form(Form $form): Form

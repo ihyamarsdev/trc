@@ -74,4 +74,12 @@ class Datacenter
                 ->date('l, jS F Y'),
         ];
     }
+
+    public static function getRoles(): array
+    {
+        return [
+            'datacenter',
+            'admin'
+        ];
+    }
 }

@@ -321,4 +321,11 @@ class Academic
             $set('difference', 0);
         }
     }
+
+    public static function getRoles(): array
+    {
+        return [
+            'academic', 'admin'
+        ];
+    }
 }

@@ -36,7 +36,7 @@ class AnbkFinanceResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole(['finance', 'admin']);
+        return Auth::user()->hasRole(Finance::getRoles());
     }
 
     public static function form(Form $form): Form
