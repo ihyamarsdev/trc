@@ -23,3 +23,4 @@ yarn-error.log
 **/caddy
 frankenphp
 frankenphp-worker.php
+/database/mysql-database

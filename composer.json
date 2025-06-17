@@ -8,7 +8,8 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
+        "php": "^8.4",
+        "akaunting/laravel-money": "^6.0",
         "ariaieboy/filament-currency": "^1.9",
         "barryvdh/laravel-dompdf": "^2.2",
         "creasi/laravel-nusa": "^0.1.8",

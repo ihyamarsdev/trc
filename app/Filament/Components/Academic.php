@@ -62,15 +62,15 @@ class Academic
                     Radio::make($options['radio_name_1'])
                         ->label($options['radio_label_1'])
                         ->options([
-                            'Ya' => 'Ya',
-                            'Tidak' => 'Tidak',
+                            'ya' => 'Ya',
+                            'tidak' => 'Tidak',
                         ])
                         ->inline(),
                     Radio::make($options['radio_name_2'])
                         ->label($options['radio_label_2'])
                         ->options([
-                            'Ya' => 'Ya',
-                            'Tidak' => 'Tidak',
+                            'ya' => 'Ya',
+                            'tidak' => 'Tidak',
                         ])
                         ->inline(),
                     DatePicker::make('counselor_consultation_date')

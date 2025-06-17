@@ -154,7 +154,7 @@ class DownloadPdfController extends Controller
         $templateProcessor->setValues([
             'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
             'year' => $school_year->name,
-            'tanggal' => self::tanggal($record->date_register->format('Y-m-d')),
+            'tanggal' => self::tanggal($record->payment_date),
             'to' => $record->principal,
             'jabatan' => 'KEPALA SEKOLAH ' . $record->schools,
             'siswa' => $record->student_count,
@@ -166,7 +166,8 @@ class DownloadPdfController extends Controller
             'payment' => $record->payment,
             'province' => $record->provinces,
             'schools' => $record->schools,
-            'detail' => $record->detail_kwitansi
+            'detail' => $record->detail_kwitansi,
+            'principal' => $record->principal
         ]);
 
         $doc_name = 'KWITANSI RASYIDUU ' . $record->schools . '.docx';
@@ -324,7 +325,7 @@ class DownloadPdfController extends Controller
         $templateProcessor->setValues([
             'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
             'year' => $school_year->name,
-            'tanggal' => self::tanggal($record->date_register->format('Y-m-d')),
+            'tanggal' => self::tanggal($record->payment_date),
             'to' => $record->principal,
             'jabatan' => 'KEPALA SEKOLAH ' . $record->schools,
             'siswa' => $record->student_count,
@@ -336,7 +337,8 @@ class DownloadPdfController extends Controller
             'payment' => $record->payment,
             'province' => $record->provinces,
             'schools' => $record->schools,
-            'detail' => $record->detail_kwitansi
+            'detail' => $record->detail_kwitansi,
+            'principal' => $record->principal
         ]);
 
         $doc_name = 'KWITANSI EDUNESIA ' . $record->schools . '.docx';

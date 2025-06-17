@@ -9,10 +9,12 @@ use Filament\Forms\Form;
 use App\Models\Devisions;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Hash;
 use App\Filament\Imports\UserImporter;
 use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Notifications\Notification;
 use Filament\Tables\Actions\ImportAction;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\UserResource\Pages;
@@ -49,16 +51,6 @@ class UserResource extends Resource
                             ->email()
                             ->required()
                             ->maxLength(255),
-                        // TextInput::make('password')
-                        //     ->password()
-                        //     ->revealable()
-                        //     ->required()
-                        //     ->maxLength(255)
-                        //     ->hiddenOn('edit'),
-                        // Select::make('devisions_id')
-                        //     ->label('Devisi')
-                        //     ->options(Devisions::all()->pluck('name', 'id'))
-                        //     ->searchable(),
                         Select::make('roles')
                             ->relationship('roles', 'name')
                             ->multiple()
@@ -88,9 +80,6 @@ class UserResource extends Resource
                 TextColumn::make('roles.name')
                     ->badge()
                     ->label('Role'),
-                // TextColumn::make('devisions.name')
-                //     ->badge()
-                //     ->label('Devisi'),
                 TextColumn::make('created_at')
                     ->label('Tanggal Di Buat')
                     ->dateTime()
@@ -106,7 +95,35 @@ class UserResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\Action::make('change-password')
+                    ->label('Ubah Password')
+                    ->icon('heroicon-o-key')
+                    ->action(function ($record, array $data) {
+                        // Logika untuk mengganti password
+                        $record->password = Hash::make($data['new_password']);
+                        $record->save();
+
+                        Notification::make()
+                            ->title('Password berhasil diubah')
+                            ->success()
+                            ->send();
+                    })
+                    ->form([
+                        Forms\Components\TextInput::make('new_password')
+                            ->label('Password Baru')
+                            ->password()
+                            ->required(),
+                        Forms\Components\TextInput::make('confirm_password')
+                            ->label('Konfirmasi Password')
+                            ->password()
+                            ->required()
+                            ->same('new_password')
+                            ->dehydrated(fn ($state) => ! is_null($state)),
+                    ])
+                    ->requiresConfirmation(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

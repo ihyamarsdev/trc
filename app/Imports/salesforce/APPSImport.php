@@ -37,7 +37,7 @@ class APPSImport implements ToModel, WithHeadingRow
             'kecamatan' => 'required',
             'periode' => 'required',
             'tanggal_pendaftaran' => 'required',
-            'jumlah_siswa' => 'required|integer',
+            'jumlah_siswa' => 'required',
             'estimasi_pelaksanaan' => 'required',
             'sekolah' => 'required|string',
             'kelas' => 'required',

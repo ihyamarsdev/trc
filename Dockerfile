@@ -1,14 +1,14 @@
-FROM dunglas/frankenphp
+FROM ronaregen/php:frankenphp-latest AS main
 
-# Be sure to replace "your-domain-name.example.com" by your domain name
-ENV SERVER_NAME=your-domain-name.example.com
-# If you want to disable HTTPS, use this value instead:
-#ENV SERVER_NAME=:80
+WORKDIR /app
 
-# Enable PHP production settings
-RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+COPY . /app
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
-# Copy the PHP files of your project in the public directory
-COPY . /app/public
-# If you use Symfony or Laravel, you need to copy the whole project instead:
-#COPY . /app
+RUN composer install
+
+RUN chmod +x /usr/local/bin/entrypoint.sh
+RUN /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["php", "artisan", "octane:frankenphp"]
+

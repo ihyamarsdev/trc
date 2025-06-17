@@ -1,0 +1,42 @@
+services:
+    app:
+        image: trc:latest
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: trc-app
+        restart: always
+        env_file:
+            - .env
+        ports:
+            - "80:8000"
+        volumes:
+            - app_log_data:/app/storage/logs
+            - public_data:/app/storage/app/public
+        command: php artisan octane:frankenphp
+
+    scheduler:
+        image: trc:latest
+        container_name: trc_scheduler
+        restart: always
+        env_file:
+            - .env
+        volumes:
+            - scheduler_log_data:/app/storage/logs
+        command: php artisan schedule:work
+
+    queue:
+        image: trc:latest
+        container_name: trc_queue
+        restart: always
+        env_file:
+            - .env
+        volumes:
+            - queue_log_data:/app/storage/logs
+        command: php artisan queue:work --timeout=300 --tries=3
+
+volumes:
+    app_log_data:
+    public_data:
+    scheduler_log_data:
+    queue_log_data:

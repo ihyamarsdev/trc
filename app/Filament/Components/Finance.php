@@ -76,18 +76,18 @@ class Finance
                             Radio::make('option_price')
                                 ->label('Pilih Opsi')
                                 ->options(function (Get $get): array {
-                                    $accountCount = (float) $get('account_count_created');
-                                    $implementerCount = (float) $get('implementer_count');
-
                                     return [
-                                        $accountCount => 'Jumlah Akun',
-                                        $implementerCount => 'Jumlah Pelaksanaan'
+                                        'implementer_' . $get('implementer_count') => 'Jumlah Pelaksanaan',
+                                        'account_' . $get('account_count_created') => 'Jumlah Akun',
                                     ];
                                 })
                                 ->live(1000)
                                 ->reactive()
-                                ->afterStateUpdated(function (Get $get, Set $set) {
-                                    $set('total', (float) $get('price') * (float) $get('option_price'));
+                                ->afterStateUpdated(function (Get $get, Set $set, $state) {
+                                    preg_match('/\d+/', $state, $matches);
+                                    $count = (float) ($matches[0] ?? 0);
+
+                                    $set('total', (float) $get('price') * $count);
                                 }),
 
                         ]),
@@ -457,6 +457,7 @@ class Finance
                             TextEntry::make('option_price')
                                 ->label('')
                                 ->default('-'),
+                            
                         ]),
 
 
