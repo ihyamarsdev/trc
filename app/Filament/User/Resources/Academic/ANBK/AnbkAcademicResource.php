@@ -56,7 +56,7 @@ class AnbkAcademicResource extends Resource
     {
         return $table
             ->deferLoading()
-            ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'anbk')->orderBy('implementation_estimate', 'asc'))
+            ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'anbk')->orderBy('implementation_estimate', 'desc'))
             ->columns(
                 Academic::columns()
             )

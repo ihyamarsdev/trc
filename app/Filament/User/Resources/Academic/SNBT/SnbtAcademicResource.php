@@ -57,7 +57,7 @@ class SnbtAcademicResource extends Resource
     {
         return $table
             ->deferLoading()
-            ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'snbt')->orderBy('implementation_estimate', 'asc'))
+            ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'snbt')->orderBy('implementation_estimate', 'desc'))
             ->columns(
                 Academic::columns()
             )
