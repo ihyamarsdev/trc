@@ -57,7 +57,7 @@ class AppsAcademicResource extends Resource
     {
         return $table
             ->deferLoading()
-            ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'apps')->orderBy('date_register', 'asc'))
+            ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'apps')->orderBy('implementation_estimate', 'asc'))
             ->columns(
                 Academic::columns()
             )

@@ -122,7 +122,8 @@ class Academic
                     return $district ? $district->name : 'Unknown';
                 }),
             TextColumn::make('schools')
-                ->label('Sekolah'),
+                ->label('Sekolah')
+                ->searchable(),
             TextColumn::make('education_level')
                 ->label('Jenjang'),
             TextColumn::make('education_level_type')
