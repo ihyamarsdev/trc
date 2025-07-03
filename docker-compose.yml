@@ -1,42 +1,48 @@
 services:
     app:
-        image: trc:latest
+        image: ihyamars/trc:1.1.0
         build:
             context: .
             dockerfile: Dockerfile
         container_name: trc-app
         restart: always
         env_file:
-            - .env
+            - .env.production
         ports:
-            - "80:8000"
+            - "8000:8000"
+            - "2019:2019"
         volumes:
             - app_log_data:/app/storage/logs
             - public_data:/app/storage/app/public
-        command: php artisan octane:frankenphp
+        depends_on:
+            - database
 
-    scheduler:
-        image: trc:latest
-        container_name: trc_scheduler
+    database:
+        image: postgres:15-alpine3.22
+        container_name: trc-database
         restart: always
-        env_file:
-            - .env
+        environment:
+            POSTGRES_USER: root
+            POSTGRES_PASSWORD: trc123
+            POSTGRES_DB: trc
+        ports:
+            - "5432:5432"
         volumes:
-            - scheduler_log_data:/app/storage/logs
-        command: php artisan schedule:work
+            - db_data:/var/lib/postgresql/data
 
-    queue:
-        image: trc:latest
-        container_name: trc_queue
+    database-admin:
+        image: elestio/pgadmin:latest
         restart: always
-        env_file:
-            - .env
+        environment:
+            PGADMIN_DEFAULT_EMAIL: admin@trc.com
+            PGADMIN_DEFAULT_PASSWORD: admin123
+            PGADMIN_LISTEN_PORT: 7000
+        ports:
+            - "7000:7000"
         volumes:
-            - queue_log_data:/app/storage/logs
-        command: php artisan queue:work --timeout=300 --tries=3
+            - ./servers.json:/pgadmin4/servers.json
 
 volumes:
     app_log_data:
     public_data:
-    scheduler_log_data:
-    queue_log_data:
+    db_data:

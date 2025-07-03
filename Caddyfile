@@ -1,0 +1,9 @@
+:8000 {
+    root * /app/public
+
+    php_fastcgi frankenphp
+
+    encode zstd gzip
+
+    file_server
+}
