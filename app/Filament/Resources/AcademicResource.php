@@ -5,7 +5,6 @@ namespace App\Filament\Resources;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
-use App\Models\SchoolYear;
 use Filament\Tables\Table;
 use App\Models\RegistrationData;
 use Filament\Infolists\Infolist;
@@ -54,17 +53,70 @@ class AcademicResource extends Resource
                     ])
                     ->preload()
                     ->indicator('Periode'),
-                Tables\Filters\SelectFilter::make('school_years_id')
-                    ->label('Tahun Ajaran')
-                    ->options(SchoolYear::all()->pluck('name', 'id'))
+                Tables\Filters\SelectFilter::make('status_id')
+                    ->label('Status')
+                    ->options(\App\Models\Status::active()->ordered()->pluck('name', 'id'))
                     ->preload()
-                    ->searchable()
-                    ->indicator('Tahun Ajaran'),
+                    ->indicator('Status'),
+                Tables\Filters\SelectFilter::make('color')
+                    ->label('Color Indicator')
+                    ->options([
+                        'yellow' => 'Kuning (Akademik)',
+                        'blue' => 'Biru (Teknisi)',
+                        'green' => 'Hijau (Finance)',
+                    ])
+                    ->preload()
+                    ->indicator('Color'),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
+                    Tables\Actions\Action::make('activity')
+                        ->label('Activity Timeline')
+                        ->icon('heroicon-o-clock')
+                        ->url(fn (RegistrationData $record) => route('filament.admin.pages.activity', ['record' => $record->id]))
+                        ->openUrlInNewTab(),
+                    Tables\Actions\Action::make('moveToNextStatus')
+                        ->label('Next Status')
+                        ->icon('heroicon-o-arrow-right')
+                        ->action(function (RegistrationData $record) {
+                            $nextStatus = $record->moveToNextStatus();
+                            if ($nextStatus) {
+                                \Filament\Notifications\Notification::make()
+                                    ->title('Status updated')
+                                    ->body("Status has been updated to: {$nextStatus->name}")
+                                    ->success()
+                                    ->send();
+                            } else {
+                                \Filament\Notifications\Notification::make()
+                                    ->title('Cannot update status')
+                                    ->body('This is already the final status')
+                                    ->warning()
+                                    ->send();
+                            }
+                        })
+                        ->visible(fn (RegistrationData $record) => $record->status && !$record->status->isLast()),
+                    Tables\Actions\Action::make('moveToPreviousStatus')
+                        ->label('Previous Status')
+                        ->icon('heroicon-o-arrow-left')
+                        ->action(function (RegistrationData $record) {
+                            $previousStatus = $record->moveToPreviousStatus();
+                            if ($previousStatus) {
+                                \Filament\Notifications\Notification::make()
+                                    ->title('Status updated')
+                                    ->body("Status has been updated to: {$previousStatus->name}")
+                                    ->success()
+                                    ->send();
+                            } else {
+                                \Filament\Notifications\Notification::make()
+                                    ->title('Cannot update status')
+                                    ->body('This is already the first status')
+                                    ->warning()
+                                    ->send();
+                            }
+                        })
+                        ->visible(fn (RegistrationData $record) => $record->status && !$record->status->isFirst()),
                     Tables\Actions\DeleteAction::make(),
                 ]),
             ])

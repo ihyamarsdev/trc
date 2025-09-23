@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use NumberFormatter;
-use App\Models\SchoolYear;
 use Illuminate\Http\Request;
 use App\Models\RegistrationData;
 use LaravelDaily\Invoices\Invoice;
@@ -47,7 +46,7 @@ class InvoiceGenerator extends Controller
 
         $doc_name = 'INVOICE RASYIDUU ANBK ' . $record->schools . '.docx';
 
-        $recipient = auth()->user();
+        $recipient = auth()->user;
 
         $recipient->notify(
             Notification::make()
@@ -96,7 +95,7 @@ class InvoiceGenerator extends Controller
         $doc_name = 'INVOICE EDUNESIA ANBK ' . $record->schools . '.docx';
 
 
-        $recipient = auth()->user();
+        $recipient = auth()->user;
 
         $recipient->notify(
             Notification::make()

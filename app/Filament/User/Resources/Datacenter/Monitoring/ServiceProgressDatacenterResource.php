@@ -5,7 +5,6 @@ namespace App\Filament\User\Resources\Datacenter\Monitoring;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
-use App\Models\SchoolYear;
 use Filament\Tables\Table;
 use App\Models\RegistrationData;
 use Filament\Resources\Resource;
@@ -29,7 +28,7 @@ class ServiceProgressDatacenterResource extends Resource
     protected static ?string $modelLabel = 'Progres Layanan Per Salesforce';
     protected static ?string $slug = 'services-progress';
     protected static ?int $navigationSort = 16;
-    protected static bool $shouldRegisterNavigation = true;
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function canViewAny(): bool
     {
@@ -100,12 +99,6 @@ class ServiceProgressDatacenterResource extends Resource
                     ])
                     ->preload()
                     ->indicator('Periode'),
-                Tables\Filters\SelectFilter::make('school_years_id')
-                    ->label('Tahun Ajaran')
-                    ->options(SchoolYear::all()->pluck('name', 'id'))
-                    ->preload()
-                    ->searchable()
-                    ->indicator('Tahun Ajaran'),
                 Tables\Filters\SelectFilter::make('type')
                     ->label('Program')
                     ->options([

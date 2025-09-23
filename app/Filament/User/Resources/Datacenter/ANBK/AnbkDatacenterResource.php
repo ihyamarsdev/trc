@@ -5,7 +5,6 @@ namespace App\Filament\User\Resources\Datacenter\ANBK;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
-use App\Models\SchoolYear;
 use Filament\Tables\Table;
 use App\Models\AnbkDatacenter;
 use App\Models\RegistrationData;
@@ -30,7 +29,7 @@ class AnbkDatacenterResource extends Resource
     protected static ?string $navigationLabel = 'ANBK';
     protected static ?string $modelLabel = 'ANBK';
     protected static ?string $slug = 'anbk-datacenter';
-    protected static bool $shouldRegisterNavigation = true;
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function canViewAny(): bool
     {
@@ -63,12 +62,6 @@ class AnbkDatacenterResource extends Resource
                     ])
                     ->preload()
                     ->indicator('Periode'),
-                Tables\Filters\SelectFilter::make('school_years_id')
-                    ->label('Tahun Ajaran')
-                    ->options(SchoolYear::all()->pluck('name', 'id'))
-                    ->preload()
-                    ->searchable()
-                    ->indicator('Tahun Ajaran'),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([

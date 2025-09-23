@@ -5,7 +5,6 @@ namespace App\Filament\User\Resources\Datacenter\Monitoring;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
-use App\Models\SchoolYear;
 use Filament\Tables\Table;
 use App\Models\RegistrationData;
 use Filament\Resources\Resource;
@@ -27,7 +26,7 @@ class EstimateExecutionDatacenterResource extends Resource
     protected static ?string $navigationLabel = 'Estimasi Pelaksanaan';
     protected static ?string $modelLabel = 'Rekap Berbasis Estimasi Pelaksanaan';
     protected static ?string $slug = 'rekap-execution';
-    protected static bool $shouldRegisterNavigation = true;
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function canViewAny(): bool
     {
@@ -57,11 +56,6 @@ class EstimateExecutionDatacenterResource extends Resource
                         'Januari - Juni' => 'Januari - Juni',
                         'Juli - Desember' => 'Juli - Desember',
                     ])
-                    ->preload()
-                    ->searchable(),
-                Tables\Filters\SelectFilter::make('school_years_id')
-                    ->label('Tahun Ajaran')
-                    ->options(SchoolYear::all()->pluck('name', 'id'))
                     ->preload()
                     ->searchable(),
             ])

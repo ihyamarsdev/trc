@@ -5,7 +5,6 @@ namespace App\Filament\User\Resources\Datacenter\Monitoring;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
-use App\Models\SchoolYear;
 use App\Models\SnbtJumsis;
 use Filament\Tables\Table;
 use App\Models\RegistrationData;
@@ -30,7 +29,7 @@ class SnbtJumsisResource extends Resource
     protected static ?string $navigationLabel = 'SNBT';
     protected static ?string $modelLabel = 'Jumlah Siswa Per SF';
     protected static ?string $slug = 'snbt-jumsis';
-    protected static bool $shouldRegisterNavigation = true;
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function canViewAny(): bool
     {
@@ -70,11 +69,6 @@ class SnbtJumsisResource extends Resource
                     ])
                     ->preload()
                     ->indicator('Periode'),
-                Tables\Filters\SelectFilter::make('school_years_id')
-                    ->label('Tahun Ajaran')
-                    ->options(SchoolYear::all()->pluck('name', 'id'))
-                    ->preload()
-                    ->searchable(),
             ])
             ->actions([
             ])

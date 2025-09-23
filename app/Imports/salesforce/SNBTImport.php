@@ -3,7 +3,6 @@
 namespace App\Imports\salesforce;
 
 use App\Models\Proctors;
-use App\Models\SchoolYear;
 use App\Models\RegistrationData;
 use App\Models\CurriculumDeputies;
 use App\Models\CounselorCoordinator;
@@ -53,25 +52,6 @@ class SNBTImport implements ToModel, WithHeadingRow
             throw new ValidationException($validator);
         }
 
-        $schoolYear = SchoolYear::firstOrCreate(
-            ['name' => $row['tahun']],
-        )->id;
-
-        $curriculum_deputies = CurriculumDeputies::firstOrCreate([
-            'name' => $row['wakakurikulum'],
-            'phone' => $row['no_hp_wakakurikulum'],
-        ])->id;
-
-        $counselor_coordinators = CounselorCoordinator::firstOrCreate([
-            'name' => $row['koordinator_bk'],
-            'phone' => $row['no_hp_koordinator_bk'],
-        ])->id;
-
-        $proctors = Proctors::firstOrCreate([
-            'name' => $row['proktor'],
-            'phone' => $row['no_hp_proktor'],
-        ])->id;
-
         $province = Province::search($row['provinsi'])->first();
         if (!$province) {
             throw new \Exception("Provinsi tidak ditemukan: " . $row['provinsi']);
@@ -94,15 +74,18 @@ class SNBTImport implements ToModel, WithHeadingRow
         $anbk = RegistrationData::updateOrCreate([
             'type' => 'snbt',
             'periode' => $row['periode'],
-            'school_years_id' => $schoolYear,
+            'years' => $row['tahun'],
             'date_register' => self::parseDate($row['tanggal_pendaftaran']),
             'provinces' => $provinceName,
             'regencies' => $regencyName,
             'district' => $districtName,
             'sudin' => $row['wilayah'],
-            'curriculum_deputies_id' => $curriculum_deputies,
-            'counselor_coordinators_id' => $counselor_coordinators,
-            'proctors_id' => $proctors,
+            'curriculum_deputies' => $row['wakakurikulum'],
+            'curriculum_deputies_phone' => $row['no_hp_wakakurikulum'],
+            'counselor_coordinators' => $row['koordinator_bk'],
+            'counselor_coordinators_phone' => $row['no_hp_koordinator_bk'],
+            'proctors' => $row['proktor'],
+            'proctors_phone' => $row['no_hp_proktor'],
             'student_count' => $row['jumlah_siswa'],
             'implementation_estimate' => self::parseDate($row['estimasi_pelaksanaan']),
 

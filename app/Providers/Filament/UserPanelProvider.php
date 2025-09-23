@@ -2,11 +2,12 @@
 
 namespace App\Providers\Filament;
 
-use Filament\Pages;
+use App\Filament\User\Pages\DashboardHome;
 use Filament\Panel;
 use Filament\Widgets;
 use Filament\PanelProvider;
 use App\Livewire\EditProfile;
+use Filament\Pages\Dashboard;
 use App\Livewire\DetailProfile;
 use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
@@ -17,6 +18,7 @@ use Filament\Http\Middleware\Authenticate;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use App\Http\Middleware\UpgradeToHttpsUnderNgrok;
+use App\Filament\User\Widgets\SalesForceStatsWidget;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
@@ -24,6 +26,7 @@ use Filament\Http\Middleware\DisableBladeIconComponents;
 use Yebor974\Filament\RenewPassword\RenewPasswordPlugin;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
 use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
@@ -51,13 +54,16 @@ class UserPanelProvider extends PanelProvider
                 'primary' => Color::Lime,
                 'success' => Color::Emerald,
                 'warning' => Color::Orange,
+                'kuning' => Color::Yellow,
+                'biru' => Color::Blue,
+                'hijau' => Color::Green,
+                'merah' => Color::Red,
             ])
             ->navigationGroups([
                 'Program Salesforce',
                 'Program Datacenter',
                 'Program Akademik',
                 'Program Finance',
-                'Invoice',
                 'Rekap Datacenter',
                 'Rekap Akademik',
                 'Rekap Finance',
@@ -67,7 +73,8 @@ class UserPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/User/Resources'), for: 'App\\Filament\\User\\Resources')
             ->discoverPages(in: app_path('Filament/User/Pages'), for: 'App\\Filament\\User\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                // Dashboard::class,
+                DashboardHome::class,
             ])
             ->userMenuItems([
                 'profile' => MenuItem::make()
@@ -78,6 +85,7 @@ class UserPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/User/Widgets'), for: 'App\\Filament\\User\\Widgets')
             ->widgets([
+                SalesForceStatsWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -95,6 +103,14 @@ class UserPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->plugins([
+                 FilamentFullCalendarPlugin::make()
+                    ->schedulerLicenseKey('')
+                    ->selectable()
+                    ->editable()
+                    ->timezone(config('app.timezone'))
+                    ->locale(config('app.locale'))
+                    ->plugins(['dayGrid', 'timeGrid'])
+                    ->config([]),
                 FilamentEditProfilePlugin::make()
                     ->slug('my-profile')
                     ->setTitle('My Profile')
@@ -123,7 +139,7 @@ class UserPanelProvider extends PanelProvider
                     ->sort(-1)
                     ->columnSpan('full'),
                 (new RenewPasswordPlugin())
-                    ->forceRenewPassword() 
+                    ->forceRenewPassword()
                     ->timestampColumn()
             ]);
     }

@@ -97,6 +97,11 @@ class UserResource extends Resource
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make(),
+                    Tables\Actions\Action::make('activity')
+                        ->label('Activity Timeline')
+                        ->icon('heroicon-o-clock')
+                        ->url(fn (User $record) => route('filament.admin.pages.activity', ['user' => $record->id]))
+                        ->openUrlInNewTab(),
                     Tables\Actions\Action::make('change-password')
                     ->label('Ubah Password')
                     ->icon('heroicon-o-key')

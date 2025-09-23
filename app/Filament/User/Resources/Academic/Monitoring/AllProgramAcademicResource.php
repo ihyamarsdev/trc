@@ -6,7 +6,6 @@ use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
 use Illuminate\Database;
-use App\Models\SchoolYear;
 use Filament\Tables\Table;
 use Database\Query\Builder;
 use App\Models\RegistrationData;
@@ -31,7 +30,7 @@ class AllProgramAcademicResource extends Resource
     protected static ?string $navigationLabel = 'All Program';
     protected static ?string $modelLabel = 'Rekap All Program';
     protected static ?string $slug = 'rekap-all-program-academic';
-    protected static bool $shouldRegisterNavigation = true;
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function canViewAny(): bool
     {
@@ -68,11 +67,6 @@ class AllProgramAcademicResource extends Resource
                     ])
                     ->preload()
                     ->indicator('Periode'),
-                Tables\Filters\SelectFilter::make('school_years_id')
-                    ->label('Tahun Ajaran')
-                    ->options(SchoolYear::all()->pluck('name', 'id'))
-                    ->preload()
-                    ->searchable(),
             ])
             ->filtersFormColumns(1)
             ->actions([

@@ -5,7 +5,6 @@ namespace App\Filament\User\Resources\Finance\APPS;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
-use App\Models\SchoolYear;
 use Filament\Tables\Table;
 use App\Models\AppsFinance;
 use App\Models\RegistrationData;

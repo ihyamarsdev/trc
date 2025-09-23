@@ -7,7 +7,6 @@ use Filament\Tables;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Forms\Form;
-use App\Models\SchoolYear;
 use Filament\Tables\Table;
 use App\Models\AnbkAcademic;
 use App\Models\RegistrationData;

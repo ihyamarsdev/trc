@@ -5,7 +5,6 @@ namespace App\Filament\User\Resources\Salesforce\ANBK;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
-use App\Models\SchoolYear;
 use Filament\Tables\Table;
 use App\Models\AnbkSalesForce;
 use App\Models\RegistrationData;
@@ -22,6 +21,7 @@ use App\Filament\User\Resources\AnbkSalesForceResource\RelationManagers;
 
 class AnbkSalesForceResource extends Resource
 {
+
     protected static ?string $model = RegistrationData::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
@@ -63,8 +63,8 @@ class AnbkSalesForceResource extends Resource
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
-                    // Tables\Actions\EditAction::make(),
-                    // Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
                 ]),
             ])
             ->bulkActions([

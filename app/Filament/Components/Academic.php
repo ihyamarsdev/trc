@@ -13,8 +13,6 @@ use Filament\Tables\Columns\{TextColumn};
 use Illuminate\Database\Eloquent\Builder;
 use Creasi\Nusa\Models\{Province, Regency,  District};
 use Filament\Forms\Components\{Select, TextInput, Section, DatePicker, Radio};
-use App\Models\{SchoolYear, CurriculumDeputies, CounselorCoordinator, Proctors, Schools};
-use App\Filament\Resources\{SchoolYearResource, CurriculumDeputiesResource, CounselorCoordinatorResource, ProctorsResource, SchoolsResource};
 
 class Academic
 {
@@ -27,16 +25,13 @@ class Academic
                     DatePicker::make('group')
                         ->label('Grup')
                         ->native(false)
-                        ->displayFormat('l, jS F Y')
-                        ->required(),
+                        ->displayFormat('l, jS F Y'),
                     DatePicker::make('bimtek')
                         ->label('Bimtek')
                         ->native(false)
-                        ->displayFormat('l, jS F Y')
-                        ->required(),
+                        ->displayFormat('l, jS F Y'),
                     TextInput::make('account_count_created')
                         ->label('Jumlah Akun Dibuat')
-                        ->required()
                         ->live(debounce: 1000)
                         ->default('0')
                         ->afterStateUpdated(function (Get $get, Set $set) {
@@ -82,6 +77,25 @@ class Academic
                         ->native(false)
                         ->displayFormat('l, jS F Y'),
                 ])->columns(2),
+
+                Section::make('Status')
+                    ->description('Merah = Belum dikerjakan • Kuning = Sales & Akademik')
+                    ->schema([
+                        Select::make('status_color')
+                            ->label('Status')
+                            ->native(false)
+                            ->options([
+                                'kuning' => 'Kuning (Sales & Akademik)',
+                                'biru'   => 'Biru (Teknisi)',
+                            ])
+                            ->searchable()
+                            ->placeholder('Pilih status...')
+                            ->helperText('Kuning: Sales & Akademik • Biru: Teknisi')
+                            ->columnSpan(1),
+                    ])->columns(2),
+
+
+
         ];
     }
 
@@ -92,64 +106,28 @@ class Academic
                 ->rowIndex(),
             TextColumn::make('periode')
                 ->label('Periode'),
-            TextColumn::make('school_years.name')
+            TextColumn::make('years')
                 ->label('Tahun'),
             TextColumn::make('users.name')
                 ->label('User')
                 ->searchable(),
-            TextColumn::make('date_register')
-                ->label('Tanggal Pendaftaran')
-                ->date('l, jS F Y')
-                ->sortable(),
-            TextColumn::make('provinces')
-                ->label('Provinsi')
-                ->formatStateUsing(function ($state) {
-                    $province = Province::search($state)->first() ;
-                    return $province ? $province->name : 'Unknown';
-                }),
-            TextColumn::make('regencies')
-                ->label('Kota / Kabupaten')
-                ->formatStateUsing(function ($state) {
-                    $regency = Regency::search($state)->first();
-                    return $regency ? $regency->name : 'Unknown';
-                }),
-            TextColumn::make('sudin')
-                ->label('Daerah Tambahan'),
-            TextColumn::make('district')
-                ->label('Kecamatan')
-                ->formatStateUsing(function ($state) {
-                    $district = District::search($state)->first();
-                    return $district ? $district->name : 'Unknown';
-                }),
             TextColumn::make('schools')
                 ->label('Sekolah')
                 ->searchable(),
             TextColumn::make('education_level')
                 ->label('Jenjang'),
-            TextColumn::make('education_level_type')
-                ->label('Negeri / Swasta'),
-            TextColumn::make('principal')
-                ->label('Kepala Sekolah'),
-            TextColumn::make('phone_principal')
-                ->label('No Hp Kepala Sekolah'),
-            TextColumn::make('curriculum_deputies.name')
-                ->label('Wakakurikulum'),
-            TextColumn::make('curriculum_deputies.phone')
-                ->label('No Hp Wakakurikulum'),
-            TextColumn::make('counselor_coordinators.name')
-                ->label('Koordinator BK'),
-            TextColumn::make('counselor_coordinators.phone')
-                ->label('No Hp Koordinator BK'),
-            TextColumn::make('proctors.name')
-                ->label('Proktor'),
-            TextColumn::make('proctors.phone')
-                ->label('No Hp Proktor'),
-            TextColumn::make('student_count')
-                ->label('Jumlah Siswa')
-                ->numeric(),
-            TextColumn::make('implementation_estimate')
-                ->label('Estimasi Pelaksana')
-                ->date('l, jS F Y'),
+            TextColumn::make('status_color')
+                ->label('Status')
+                ->badge()
+                ->formatStateUsing(fn ($state) => ucfirst($state)) // Kuning/Biru/Hijau
+                ->color(fn (string $state): string => match ($state) {
+                    'hijau'  => 'hijau',
+                    'biru'   => 'biru',
+                    'kuning' => 'kuning',
+                    'merah'  => 'merah',
+                })
+                ->sortable()
+                ->toggleable(),
         ];
     }
 
@@ -163,7 +141,7 @@ class Academic
                             ->schema([
                                 Infolists\Components\TextEntry::make('periode')
                                         ->label('Periode'),
-                                Infolists\Components\TextEntry::make('school_years.name')
+                                Infolists\Components\TextEntry::make('years')
                                         ->label('Tahun'),
                             ]),
 
@@ -183,7 +161,7 @@ class Academic
                                     ->label('Jenjang'),
                                 Infolists\Components\TextEntry::make('description')
                                     ->label('Keterangan'),
-                                Infolists\Components\TextEntry::make('education_level_type')
+                                Infolists\Components\TextEntry::make('schools_type')
                                     ->label('Negeri / Swasta'),
                                 Infolists\Components\TextEntry::make('student_count')
                                     ->label('Jumlah Siswa'),
@@ -191,7 +169,7 @@ class Academic
                                     ->label('Provinsi'),
                                 Infolists\Components\TextEntry::make('regencies')
                                     ->label('Kota / Kabupaten'),
-                                Infolists\Components\TextEntry::make('sudin')
+                                Infolists\Components\TextEntry::make('area')
                                     ->label('Wilayah')
                                     ->default('-'),
                             ]),
@@ -201,19 +179,19 @@ class Academic
                             ->schema([
                                 Infolists\Components\TextEntry::make('principal')
                                     ->label('Kepala Sekolah'),
-                                Infolists\Components\TextEntry::make('phone_principal')
+                                Infolists\Components\TextEntry::make('principal_phone')
                                     ->label('No Hp Kepala Sekolah'),
-                                Infolists\Components\TextEntry::make('curriculum_deputies.name')
+                                Infolists\Components\TextEntry::make('curriculum_deputies')
                                     ->label('Wakakurikulum'),
-                                Infolists\Components\TextEntry::make('curriculum_deputies.phone')
+                                Infolists\Components\TextEntry::make('curriculum_deputies_phone')
                                     ->label('No Hp Wakakurikulum'),
-                                Infolists\Components\TextEntry::make('counselor_coordinators.name')
+                                Infolists\Components\TextEntry::make('counselor_coordinators')
                                     ->label('Koordinator BK'),
-                                Infolists\Components\TextEntry::make('counselor_coordinators.phone')
+                                Infolists\Components\TextEntry::make('counselor_coordinators_phone')
                                     ->label('No Hp Koordinator BK'),
-                                Infolists\Components\TextEntry::make('proctors.name')
+                                Infolists\Components\TextEntry::make('proctors')
                                     ->label('Proktor'),
-                                Infolists\Components\TextEntry::make('proctors.phone')
+                                Infolists\Components\TextEntry::make('proctors_phone')
                                     ->label('No Hp Proktor'),
                             ]),
 
@@ -302,11 +280,13 @@ class Academic
                 ])
                 ->preload()
                 ->searchable(),
-            Tables\Filters\SelectFilter::make('school_years_id')
-                ->label('Tahun Ajaran')
-                ->options(SchoolYear::all()->pluck('name', 'id'))
+            Tables\Filters\SelectFilter::make('users_id')
+                ->label('User')
+                ->options(function () {
+                    return \App\Models\User::all()->pluck('name', 'id')->toArray();
+                })
                 ->preload()
-                ->searchable(),
+                ->indicator('user'),
             ];
     }
 
@@ -326,7 +306,7 @@ class Academic
     public static function getRoles(): array
     {
         return [
-            'academic', 'admin'
+            'academik', 'admin', 'teknisi'
         ];
     }
 }

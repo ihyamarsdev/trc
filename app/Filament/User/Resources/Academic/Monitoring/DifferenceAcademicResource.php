@@ -29,7 +29,7 @@ class DifferenceAcademicResource extends Resource
     protected static ?string $modelLabel = 'Perbandingan Data Kuning dan Biru';
     protected static ?string $slug = 'difference-academic';
     protected static ?int $navigationSort = 15;
-    protected static bool $shouldRegisterNavigation = true;
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function canViewAny(): bool
     {

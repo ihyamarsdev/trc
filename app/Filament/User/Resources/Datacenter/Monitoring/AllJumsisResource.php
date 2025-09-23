@@ -30,7 +30,7 @@ class AllJumsisResource extends Resource
     protected static ?string $modelLabel = 'Total Jumlah Siswa Per SF';
     protected static ?string $slug = 'all-jumsis';
     protected static ?int $navigationSort = 15;
-    protected static bool $shouldRegisterNavigation = true;
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function canViewAny(): bool
     {

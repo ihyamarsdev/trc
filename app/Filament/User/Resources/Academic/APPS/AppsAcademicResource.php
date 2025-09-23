@@ -8,7 +8,6 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Infolists;
 use Filament\Forms\Form;
-use App\Models\SchoolYear;
 use Filament\Tables\Table;
 use App\Models\AppsAcademic;
 use App\Models\RegistrationData;

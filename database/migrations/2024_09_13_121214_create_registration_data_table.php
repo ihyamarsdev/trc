@@ -12,14 +12,17 @@ return new class () extends Migration {
     {
         Schema::create('registration_data', function (Blueprint $table) {
             $table->id();
-
+            $table->string('description')->nullable();
+            
             ## Sales
             $table->enum('type', ['apps','anbk','snbt']);
             $table->enum('periode', ['Januari - Juni', 'Juli - Desember']);
-            $table->string('school_years');
-            $table->date('date_register');
+            $table->string('years');
+            $table->dateTime('date_register');
             $table->string('provinces');
             $table->string('regencies');
+            $table->string('district')->nullable();
+            $table->string('area')->nullable();
             $table->integer('student_count');
             $table->string('counselor_coordinators');
             $table->string('counselor_coordinators_phone')->nullable();
@@ -28,14 +31,15 @@ return new class () extends Migration {
             $table->string('proctors');
             $table->string('proctors_phone')->nullable();
             $table->string('schools');
+            $table->enum('schools_type', ['Negeri','Swasta']);
             $table->string('class')->nullable();
             $table->string('education_level');
             $table->string('principal');
             $table->string('principal_phone')->nullable();
-            $table->enum('education_level_type', ['Negeri','Swasta']);
-            
+            $table->dateTime('implementation_estimate');
+            $table->string('status_color')->nullable();
+
             ## Akademik dan Teknisi
-            $table->date('implementation_estimate');
             $table->date('group')->nullable();
             $table->date('bimtek')->nullable();
             $table->integer('account_count_created')->nullable();
@@ -53,15 +57,14 @@ return new class () extends Migration {
             $table->string('net')->nullable();
             $table->string('total_net')->nullable();
             $table->date('invoice_date')->nullable();
-            $table->date('spk_sent')->nullable();
+            $table->date('spk')->nullable();
+
             $table->date('payment_date')->nullable();
-            $table->string('payment')->nullable();
+            $table->string('payment_name')->nullable();
             $table->string('cb')->nullable();
             $table->string('option_price')->nullable();
             $table->string('monthYear')->nullable();
 
-
-            $table->string('sudin')->nullable();
 
             $table->string('mitra_difference')->nullable();
             $table->string('mitra_net')->nullable();

@@ -6,7 +6,6 @@ use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
 use App\Models\AppsJumsis;
-use App\Models\SchoolYear;
 use Filament\Tables\Table;
 use App\Models\RegistrationData;
 use Filament\Resources\Resource;
@@ -31,7 +30,7 @@ class AppsJumsisResource extends Resource
     protected static ?string $navigationLabel = 'APPS';
     protected static ?string $modelLabel = 'Jumlah Siswa Per SF';
     protected static ?string $slug = 'apps-jumsis';
-    protected static bool $shouldRegisterNavigation = true;
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function canViewAny(): bool
     {
@@ -71,11 +70,6 @@ class AppsJumsisResource extends Resource
                     ])
                     ->preload()
                     ->indicator('Periode'),
-                Tables\Filters\SelectFilter::make('school_years_id')
-                    ->label('Tahun Ajaran')
-                    ->options(SchoolYear::all()->pluck('name', 'id'))
-                    ->preload()
-                    ->searchable(),
             ])
             ->actions([
 

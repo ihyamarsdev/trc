@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $roleNames = ['sales', 'akademik', 'teknisi', 'finance'];
 
         $user = User::factory()->create([
             'name' => 'admin',
@@ -23,5 +24,17 @@ class DatabaseSeeder extends Seeder
 
         $role = Role::create(['name' => 'admin']);
         $user->assignRole($role);
+
+        foreach ($roleNames as $name) {
+            Role::firstOrCreate(
+                ['name' => $name, 'guard_name' => 'web'],
+            );
+        }
+
+        $this->call([
+            StatusSeeder::class,
+            UserSeeder::class,
+            Registration::class,
+        ]);
     }
 }

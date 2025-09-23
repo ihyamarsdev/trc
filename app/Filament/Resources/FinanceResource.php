@@ -6,7 +6,6 @@ use Filament\Forms;
 use Filament\Tables;
 use Filament\Infolists;
 use Filament\Forms\Form;
-use App\Models\SchoolYear;
 use Filament\Tables\Table;
 use App\Models\RegistrationData;
 use Filament\Infolists\Infolist;
@@ -55,12 +54,6 @@ class FinanceResource extends Resource
                     ])
                     ->preload()
                     ->indicator('Periode'),
-                Tables\Filters\SelectFilter::make('school_years_id')
-                    ->label('Tahun Ajaran')
-                    ->options(SchoolYear::all()->pluck('name', 'id'))
-                    ->preload()
-                    ->searchable()
-                    ->indicator('Tahun Ajaran'),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([

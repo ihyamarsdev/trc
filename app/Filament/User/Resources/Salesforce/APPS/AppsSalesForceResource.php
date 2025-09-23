@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Filament\Components\SalesForce;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Exports\SalesforceExporter;
-use App\Models\{SchoolYear, RegistrationData};
+use App\Models\{RegistrationData};
 use Filament\Actions\Exports\Enums\ExportFormat;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\User\Resources\Salesforce\APPS\AppsSalesForceResource\Pages;
@@ -61,8 +61,8 @@ class AppsSalesForceResource extends Resource
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
-                    // Tables\Actions\EditAction::make(),
-                    // Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
                 ]),
             ])
             ->bulkActions([

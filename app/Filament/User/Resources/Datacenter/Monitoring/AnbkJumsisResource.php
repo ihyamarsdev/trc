@@ -6,7 +6,6 @@ use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
 use App\Models\AnbkJumsis;
-use App\Models\SchoolYear;
 use Filament\Tables\Table;
 use App\Models\RegistrationData;
 use Filament\Resources\Resource;
@@ -30,7 +29,7 @@ class AnbkJumsisResource extends Resource
     protected static ?string $navigationLabel = 'ANBK';
     protected static ?string $modelLabel = 'Jumlah Siswa Per SF';
     protected static ?string $slug = 'anbk-jumsis';
-    protected static bool $shouldRegisterNavigation = true;
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function canViewAny(): bool
     {
@@ -69,11 +68,6 @@ class AnbkJumsisResource extends Resource
                     ])
                     ->preload()
                     ->indicator('Periode'),
-                Tables\Filters\SelectFilter::make('school_years_id')
-                    ->label('Tahun Ajaran')
-                    ->options(SchoolYear::all()->pluck('name', 'id'))
-                    ->preload()
-                    ->searchable(),
             ])
             ->actions([
 

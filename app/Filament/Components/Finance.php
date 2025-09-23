@@ -6,7 +6,6 @@ use Filament\Tables;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Infolists;
-use App\Models\SchoolYear;
 use Filament\Tables\Columns\{TextColumn};
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -213,18 +212,15 @@ class Finance
                             DatePicker::make('invoice_date')
                                 ->label('Invoice')
                                 ->native(false)
-                                ->displayFormat('l, jS F Y')
-                                ->required(),
+                                ->displayFormat('l, jS F Y')                             ,
                             DatePicker::make('payment_date')
                                 ->label('Pembayaran')
                                 ->native(false)
-                                ->displayFormat('d/m/Y')
-                                ->required(),
+                                ->displayFormat('d/m/Y')                             ,
                             DatePicker::make('spk_sent')
                                 ->label('SPK di Kirim')
                                 ->native(false)
-                                ->displayFormat('d/m/Y')
-                                ->required(),
+                                ->displayFormat('d/m/Y')                             ,
                             Select::make('payment')
                                 ->label('Pembayaran Via')
                                 ->options([
@@ -234,6 +230,22 @@ class Finance
                                 ])
                         ]),
                 ])->columns(2),
+
+                Section::make('Status')
+                    ->description('Merah = Belum dikerjakan • Kuning = Sales & Akademik')
+                    ->schema([
+                        Select::make('status_color')
+                            ->label('Status')
+                            ->native(false)
+                            ->options([
+                                'biru'   => 'Biru (Teknisi)',
+                                'hijau'  => 'Hijau (Finance)',
+                            ])
+                            ->searchable()
+                            ->placeholder('Pilih status...')
+                            ->helperText('Biru: Teknisi • Hijau: Finance')
+                            ->columnSpan(1),
+                    ])->columns(2),
 
         ];
     }
@@ -245,66 +257,27 @@ class Finance
                 ->rowIndex(),
             TextColumn::make('periode')
                 ->label('Periode'),
-            TextColumn::make('school_years.name')
+            TextColumn::make('years')
                 ->label('Tahun'),
             TextColumn::make('users.name')
                 ->label('User')
                 ->searchable(),
-            TextColumn::make('date_register')
-                ->label('Tanggal Pendaftaran')
-                ->date('l, jS F Y')
-                ->sortable(),
-            TextColumn::make('provinces')
-                ->label('Provinsi')
-                ->formatStateUsing(function ($state) {
-                    $province = Province::search($state)->first() ;
-                    return $province ? $province->name : 'Unknown';
-                }),
-            TextColumn::make('regencies')
-                ->label('Kota / Kabupaten')
-                ->formatStateUsing(function ($state) {
-                    $regency = Regency::search($state)->first();
-                    return $regency ? $regency->name : 'Unknown';
-                }),
-            TextColumn::make('sudin')
-                ->label('Daerah Tambahan')
-                ->formatStateUsing(function ($state) {
-                    return $state ? $state : 'None';
-                }),
-            TextColumn::make('district')
-                ->label('Kecamatan')
-                ->formatStateUsing(function ($state) {
-                    $district = District::search($state)->first();
-                    return $district ? $district->name : 'Unknown';
-                }),
             TextColumn::make('schools')
                 ->label('Sekolah'),
             TextColumn::make('education_level')
                 ->label('Jenjang'),
-            TextColumn::make('education_level_type')
-                ->label('Negeri / Swasta'),
-            TextColumn::make('principal')
-                ->label('Kepala Sekolah'),
-            TextColumn::make('phone_principal')
-                ->label('No Hp Kepala Sekolah'),
-            TextColumn::make('curriculum_deputies.name')
-                ->label('Wakakurikulum'),
-            TextColumn::make('curriculum_deputies.phone')
-                ->label('No Hp Wakakurikulum'),
-            TextColumn::make('counselor_coordinators.name')
-                ->label('Koordinator BK'),
-            TextColumn::make('counselor_coordinators.phone')
-                ->label('No Hp Koordinator BK'),
-            TextColumn::make('proctors.name')
-                ->label('Proktor'),
-            TextColumn::make('proctors.phone')
-                ->label('No Hp Proktor'),
-            TextColumn::make('student_count')
-                ->label('Jumlah Siswa')
-                ->numeric(),
-            TextColumn::make('implementation_estimate')
-                ->label('Estimasi Pelaksana')
-                ->date('l, jS F Y'),
+            TextColumn::make('status_color')
+                ->label('Status')
+                ->badge()
+                ->formatStateUsing(fn ($state) => ucfirst($state)) // Kuning/Biru/Hijau
+                ->color(fn (string $state): string => match ($state) {
+                    'hijau'  => 'hijau',
+                    'biru'   => 'biru',
+                    'kuning' => 'kuning',
+                    'merah'  => 'merah',
+                })
+                ->sortable()
+                ->toggleable(),
         ];
     }
 
@@ -648,11 +621,13 @@ class Finance
                 ])
                 ->preload()
                 ->searchable(),
-            Tables\Filters\SelectFilter::make('school_years_id')
-                ->label('Tahun Ajaran')
-                ->options(SchoolYear::all()->pluck('name', 'id'))
+            Tables\Filters\SelectFilter::make('users_id')
+                ->label('User')
+                ->options(function () {
+                    return \App\Models\User::all()->pluck('name', 'id')->toArray();
+                })
                 ->preload()
-                ->searchable(),
+                ->indicator('user'),
             Tables\Filters\TernaryFilter::make('payment_date')
                 ->label('Status Pembayaran Sekolah')
                 ->placeholder('Semua Sekolah')

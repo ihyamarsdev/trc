@@ -23,10 +23,10 @@ class SalesForceStatsWidget extends BaseWidget
     protected static ?string $title = 'Rekap Program';
     protected static ?string $heading = 'Rekap Program';
 
-    public static function canView(): bool
-    {
-        return Auth::user()->hasRole(['salesforce','admin']);
-    }
+    // public static function canView(): bool
+    // {
+    //     return Auth::user()->hasRole(['sales','admin']);
+    // }
 
     public function table(Table $table): Table
     {

@@ -28,8 +28,6 @@ use Filament\Forms\Components\{Select, TextInput, DatePicker};
 use App\Filament\Components\SalesForce as ComponentsSalesForce;
 use App\Filament\Resources\SalesForceResource\RelationManagers;
 use Filament\Infolists\Components\{TextEntry, Group, Grid, Fieldset, IconEntry};
-use App\Models\{SchoolYear, CurriculumDeputies, CounselorCoordinator, Proctors, Schools};
-use App\Filament\Resources\{SchoolYearResource, CurriculumDeputiesResource, CounselorCoordinatorResource, ProctorsResource, SchoolsResource};
 
 
 class SalesForceResource extends Resource
@@ -58,13 +56,6 @@ class SalesForceResource extends Resource
                                 'Januari - Juni' => 'Januari - Juni',
                                 'Juli - Desember' => 'Juli - Desember',
                             ]),
-                        Select::make('school_years_id')
-                            ->label('Tahun Ajaran')
-                            ->required()
-                            ->relationship('school_years', 'name')
-                            ->preload()
-                            ->searchable()
-                            ->createOptionForm(fn (Form $form) => SchoolYearResource::form($form))
                 ])->columns(2),
 
                 Forms\Components\Section::make()
@@ -82,30 +73,6 @@ class SalesForceResource extends Resource
                             ->required()
                             ->options(Regency::all()->pluck('name', 'name'))
                             ->searchable(),
-                        Select::make('curriculum_deputies_id')
-                            ->label('Wakakurikulum')
-                            ->required()
-                            ->searchable()
-                            ->preload()
-                            ->relationship('curriculum_deputies', modifyQueryUsing: fn (Builder $query) => $query->orderBy('name')->orderBy('phone'), )
-                            ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->name} - No HP: {$record->phone}")
-                            ->createOptionForm(fn (Form $form) => CurriculumDeputiesResource::form($form)),
-                        Select::make('counselor_coordinators_id')
-                            ->label('Koordinator BK ')
-                            ->required()
-                            ->searchable()
-                            ->preload()
-                            ->relationship('counselor_coordinators', modifyQueryUsing: fn (Builder $query) => $query->orderBy('name')->orderBy('phone'), )
-                            ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->name} - No HP: {$record->phone}")
-                            ->createOptionForm(fn (Form $form) => CounselorCoordinatorResource::form($form)),
-                        Select::make('proctors_id')
-                            ->label('Proctor ')
-                            ->required()
-                            ->searchable()
-                            ->preload()
-                            ->relationship('proctors', modifyQueryUsing: fn (Builder $query) => $query->orderBy('name')->orderBy('phone'), )
-                            ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->name} - No HP: {$record->phone}")
-                            ->createOptionForm(fn (Form $form) => ProctorsResource::form($form)),
                         TextInput::make('student_count')
                             ->label('Jumlah Siswa')
                             ->required()
@@ -113,53 +80,6 @@ class SalesForceResource extends Resource
                         DatePicker::make('implementation_estimate')
                             ->label('Estimasi Pelaksanaan')
                             ->required(),
-                    ])->columns(2),
-
-                Forms\Components\Section::make('Sekolah')
-                    ->description('Pilih Data Sekolah')
-                    ->schema([
-                        Select::make('schools_id')
-                            ->label('Name')
-                            ->options(Schools::all()->pluck('name', 'id'))
-                            ->reactive()
-                            ->afterStateUpdated(function ($state, Set $set) {
-                                $item = Schools::find($state);
-                                $set('phone', $item->phone);
-                                $set('education_level', $item->education_level);
-                                $set('education_level_type', $item->education_level_type);
-                                $set('principal', $item->principal);
-                                $set('phone_principal', $item->phone_principal);
-                            })
-                            ->searchable()
-                            ->preload()
-                            ->createOptionForm(fn (Form $form) => SchoolsResource::form($form))
-                            ->required()
-                            ->createOptionUsing(function (array $data): int {
-                                $schools = Schools::create([
-                                    'name' => $data['name'],
-                                    'phone' => $data['phone'],
-                                    'education_level' => $data['education_level'],
-                                    'education_level_type' => $data['education_level_type'],
-                                    'principal' => $data['principal'],
-                                    'phone_principal' => $data['phone_principal'],
-                                ]);
-                                return $schools->id;
-                            }),
-                                TextInput::make('phone')
-                                    ->label('No Handphone Sekolah')
-                                    ->disabled(),
-                                TextInput::make('education_level')
-                                    ->label('Jenjang')
-                                    ->disabled(),
-                                TextInput::make('education_level_type')
-                                    ->label('Negeri / Swasta')
-                                    ->disabled(),
-                                TextInput::make('principal')
-                                    ->label('Kepala Sekolah')
-                                    ->disabled(),
-                                TextInput::make('phone_principal')
-                                    ->label('No Handphone Kepala Sekolah')
-                                    ->disabled(),
                     ])->columns(2),
 
             ]);
@@ -181,12 +101,6 @@ class SalesForceResource extends Resource
                     ])
                     ->preload()
                     ->indicator('Periode'),
-                Tables\Filters\SelectFilter::make('school_years_id')
-                    ->label('Tahun Ajaran')
-                    ->options(SchoolYear::all()->pluck('name', 'id'))
-                    ->preload()
-                    ->searchable()
-                    ->indicator('Tahun Ajaran'),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([

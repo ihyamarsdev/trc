@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use NumberFormatter;
-use App\Models\SchoolYear;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\RegistrationData;
@@ -22,13 +21,11 @@ class DownloadPdfController extends Controller
         $digit = new NumberFormatter("id", NumberFormatter::SPELLOUT);
 
 
-        $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
-
         $templateProcessor = new TemplateProcessor('template/rasyidu/spk.docx');
 
         $templateProcessor->setValues([
             'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
-            'year' => $school_year->name,
+            'year' => $record->years,
             'tanggal' => self::tanggal($record->date_register->format('Y-m-d')),
             'to' => $record->principal,
             'jabatan' => 'KEPALA SEKOLAH ' . $record->schools,
@@ -44,7 +41,7 @@ class DownloadPdfController extends Controller
 
         $doc_name = 'SPK RASYIDUU ANBK ' . $record->schools . '.docx';
 
-        $recipient = auth()->user();
+        $recipient = auth()->user;
 
         $recipient->notify(
             Notification::make()
@@ -63,14 +60,13 @@ class DownloadPdfController extends Controller
     {
 
         $digit = new NumberFormatter("id", NumberFormatter::SPELLOUT);
-        $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
 
 
         $templateProcessor = new TemplateProcessor('template/rasyidu/spk.docx');
 
         $templateProcessor->setValues([
             'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
-            'year' => $school_year->name,
+            'year' => $record->years,
             'tanggal' => self::tanggal($record->date_register->format('Y-m-d')),
             'to' => $record->principal,
             'jabatan' => 'KEPALA SEKOLAH ' . $record->schools,
@@ -86,7 +82,7 @@ class DownloadPdfController extends Controller
 
         $doc_name = 'SPK RASYIDUU APPS ' . $record->schools . '.docx';
 
-        $recipient = auth()->user();
+        $recipient = auth()->user;
 
         $recipient->notify(
             Notification::make()
@@ -105,13 +101,12 @@ class DownloadPdfController extends Controller
     {
 
         $digit = new NumberFormatter("id", NumberFormatter::SPELLOUT);
-        $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
 
         $templateProcessor = new TemplateProcessor('template/rasyidu/spk.docx');
 
         $templateProcessor->setValues([
             'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
-            'year' => $school_year->name,
+            'year' => $record->years,
             'tanggal' => self::tanggal($record->date_register->format('Y-m-d')),
             'to' => $record->principal,
             'jabatan' => 'KEPALA SEKOLAH ' . $record->schools,
@@ -127,7 +122,7 @@ class DownloadPdfController extends Controller
 
         $doc_name = 'SPK RASYIDUU SNBT ' . $record->schools . '.docx';
 
-        $recipient = auth()->user();
+        $recipient = auth()->user;
 
         $recipient->notify(
             Notification::make()
@@ -147,13 +142,11 @@ class DownloadPdfController extends Controller
 
         $digit = new NumberFormatter("id", NumberFormatter::SPELLOUT);
 
-        $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
-
         $templateProcessor = new TemplateProcessor('template/rasyidu/kuitansi.docx');
 
         $templateProcessor->setValues([
             'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
-            'year' => $school_year->name,
+            'year' => $record->years,
             'tanggal' => self::tanggal($record->payment_date),
             'to' => $record->principal,
             'jabatan' => 'KEPALA SEKOLAH ' . $record->schools,
@@ -172,7 +165,7 @@ class DownloadPdfController extends Controller
 
         $doc_name = 'KWITANSI RASYIDUU ' . $record->schools . '.docx';
 
-        $recipient = auth()->user();
+        $recipient = auth()->user;
 
         $recipient->notify(
             Notification::make()
@@ -191,14 +184,12 @@ class DownloadPdfController extends Controller
     {
 
         $digit = new NumberFormatter("id", NumberFormatter::SPELLOUT);
-        $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
-
 
         $templateProcessor = new TemplateProcessor('template/edunesia/spk.docx');
 
         $templateProcessor->setValues([
             'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
-            'year' => $school_year->name,
+            'year' => $record->years,
             'tanggal' => self::tanggal($record->date_register->format('Y-m-d')),
             'to' => $record->principal,
             'jabatan' => 'KEPALA SEKOLAH ' . $record->schools,
@@ -214,7 +205,7 @@ class DownloadPdfController extends Controller
 
         $doc_name = 'SPK EDUNESIA APPS ' . $record->schools . '.docx';
 
-        $recipient = auth()->user();
+        $recipient = auth()->user;
 
         $recipient->notify(
             Notification::make()
@@ -233,14 +224,12 @@ class DownloadPdfController extends Controller
     {
 
         $digit = new NumberFormatter("id", NumberFormatter::SPELLOUT);
-        $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
-
 
         $templateProcessor = new TemplateProcessor('template/edunesia/spk.docx');
 
         $templateProcessor->setValues([
             'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
-            'year' => $school_year->name,
+            'year' => $record->years,
             'tanggal' => self::tanggal($record->date_register->format('Y-m-d')),
             'to' => $record->principal,
             'jabatan' => 'KEPALA SEKOLAH ' . $record->schools,
@@ -256,7 +245,7 @@ class DownloadPdfController extends Controller
 
         $doc_name = 'SPK EDUNESIA APPS ' . $record->schools . '.docx';
 
-        $recipient = auth()->user();
+        $recipient = auth()->user;
 
         $recipient->notify(
             Notification::make()
@@ -275,14 +264,13 @@ class DownloadPdfController extends Controller
     {
 
         $digit = new NumberFormatter("id", NumberFormatter::SPELLOUT);
-        $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
 
 
         $templateProcessor = new TemplateProcessor('template/edunesia/spk.docx');
 
         $templateProcessor->setValues([
             'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
-            'year' => $school_year->name,
+            'year' => $record->years,
             'tanggal' => self::tanggal($record->date_register->format('Y-m-d')),
             'to' => $record->principal,
             'jabatan' => 'KEPALA SEKOLAH ' . $record->schools,
@@ -298,7 +286,7 @@ class DownloadPdfController extends Controller
 
         $doc_name = 'SPK EDUNESIA APPS ' . $record->schools . '.docx';
 
-        $recipient = auth()->user();
+        $recipient = auth()->user;
 
         $recipient->notify(
             Notification::make()
@@ -318,13 +306,11 @@ class DownloadPdfController extends Controller
 
         $digit = new NumberFormatter("id", NumberFormatter::SPELLOUT);
 
-        $school_year = SchoolYear::where('id', '=', $record->school_years_id)->first();
-
         $templateProcessor = new TemplateProcessor('template/edunesia/kuitansi.docx');
 
         $templateProcessor->setValues([
             'deskripsi' => self::formatTanggal($record->date_register->format('Y-m-d')),
-            'year' => $school_year->name,
+            'year' => $record->years,
             'tanggal' => self::tanggal($record->payment_date),
             'to' => $record->principal,
             'jabatan' => 'KEPALA SEKOLAH ' . $record->schools,
@@ -343,7 +329,7 @@ class DownloadPdfController extends Controller
 
         $doc_name = 'KWITANSI EDUNESIA ' . $record->schools . '.docx';
 
-        $recipient = auth()->user();
+        $recipient = auth()->user;
 
         $recipient->notify(
             Notification::make()

@@ -5,7 +5,6 @@ namespace App\Filament\User\Resources\Datacenter\SNBT;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
-use App\Models\SchoolYear;
 use Filament\Tables\Table;
 use App\Models\SnbtDatacenter;
 use App\Models\RegistrationData;
@@ -30,7 +29,7 @@ class SnbtDatacenterResource extends Resource
     protected static ?string $navigationLabel = 'SNBT';
     protected static ?string $modelLabel = 'SNBT';
     protected static ?string $slug = 'snbt-datacenter';
-    protected static bool $shouldRegisterNavigation = true;
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function canViewAny(): bool
     {
@@ -62,11 +61,6 @@ class SnbtDatacenterResource extends Resource
                         'Januari - Juni' => 'Januari - Juni',
                         'Juli - Desember' => 'Juli - Desember',
                     ])
-                    ->preload()
-                    ->searchable(),
-                Tables\Filters\SelectFilter::make('school_years_id')
-                    ->label('Tahun Ajaran')
-                    ->options(SchoolYear::all()->pluck('name', 'id'))
                     ->preload()
                     ->searchable(),
             ])

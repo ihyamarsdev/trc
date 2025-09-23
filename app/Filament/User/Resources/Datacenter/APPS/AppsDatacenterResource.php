@@ -5,7 +5,6 @@ namespace App\Filament\User\Resources\Datacenter\APPS;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
-use App\Models\SchoolYear;
 use Filament\Tables\Table;
 use App\Models\AppsDatacenter;
 use App\Models\RegistrationData;
@@ -30,7 +29,7 @@ class AppsDatacenterResource extends Resource
     protected static ?string $navigationLabel = 'APPS';
     protected static ?string $modelLabel = 'APPS';
     protected static ?string $slug = 'apps-datacenter';
-    protected static bool $shouldRegisterNavigation = true;
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function canViewAny(): bool
     {
@@ -66,11 +65,6 @@ class AppsDatacenterResource extends Resource
                         'Januari - Juni' => 'Januari - Juni',
                         'Juli - Desember' => 'Juli - Desember',
                     ])
-                    ->preload()
-                    ->searchable(),
-                Tables\Filters\SelectFilter::make('school_years_id')
-                    ->label('Tahun Ajaran')
-                    ->options(SchoolYear::all()->pluck('name', 'id'))
                     ->preload()
                     ->searchable(),
             ])

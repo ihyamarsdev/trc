@@ -89,11 +89,6 @@ class User extends Authenticatable implements HasAvatar, FilamentUser, RenewPass
         return $this->hasMany(RegistrationData::class);
     }
 
-    public function devisions(): BelongsTo
-    {
-        return $this->belongsTo(Devisions::class);
-    }
-
     public function needRenewPassword(): bool
     {
         $plugin = RenewPasswordPlugin::get();

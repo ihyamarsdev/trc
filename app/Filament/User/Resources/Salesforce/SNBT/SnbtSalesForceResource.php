@@ -5,7 +5,6 @@ namespace App\Filament\User\Resources\Salesforce\SNBT;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
-use App\Models\SchoolYear;
 use Filament\Tables\Table;
 use App\Models\SnbtSalesForce;
 use App\Models\RegistrationData;
@@ -62,8 +61,8 @@ class SnbtSalesForceResource extends Resource
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
-                    // Tables\Actions\EditAction::make(),
-                    // Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
                 ]),
             ])
             ->bulkActions([
