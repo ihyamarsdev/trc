@@ -60,6 +60,7 @@ class UserPanelProvider extends PanelProvider
                 'merah' => Color::Red,
             ])
             ->navigationGroups([
+                'Activity',
                 'Program Salesforce',
                 'Program Datacenter',
                 'Program Akademik',

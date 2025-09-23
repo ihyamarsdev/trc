@@ -13,30 +13,30 @@ return new class () extends Migration {
         Schema::create('registration_data', function (Blueprint $table) {
             $table->id();
             $table->string('description')->nullable();
-            
+
             ## Sales
             $table->enum('type', ['apps','anbk','snbt']);
-            $table->enum('periode', ['Januari - Juni', 'Juli - Desember']);
-            $table->string('years');
-            $table->dateTime('date_register');
-            $table->string('provinces');
-            $table->string('regencies');
+            $table->enum('periode', ['Januari - Juni', 'Juli - Desember'])->nullable();
+            $table->string('years')->nullable();
+            $table->dateTime('date_register')->nullable();
+            $table->string('provinces')->nullable();
+            $table->string('regencies')->nullable();
             $table->string('district')->nullable();
             $table->string('area')->nullable();
-            $table->integer('student_count');
-            $table->string('counselor_coordinators');
+            $table->integer('student_count')->nullable();
+            $table->string('counselor_coordinators')->nullable();
             $table->string('counselor_coordinators_phone')->nullable();
-            $table->string('curriculum_deputies');
+            $table->string('curriculum_deputies')->nullable();
             $table->string('curriculum_deputies_phone')->nullable();
-            $table->string('proctors');
+            $table->string('proctors')->nullable();
             $table->string('proctors_phone')->nullable();
-            $table->string('schools');
-            $table->enum('schools_type', ['Negeri','Swasta']);
+            $table->string('schools')->nullable();
+            $table->enum('schools_type', ['Negeri','Swasta'])->nullable();
             $table->string('class')->nullable();
-            $table->string('education_level');
-            $table->string('principal');
+            $table->string('education_level')->nullable();
+            $table->string('principal')->nullable();
             $table->string('principal_phone')->nullable();
-            $table->dateTime('implementation_estimate');
+            $table->dateTime('implementation_estimate')->nullable();
             $table->string('status_color')->nullable();
 
             ## Akademik dan Teknisi
@@ -50,7 +50,7 @@ return new class () extends Migration {
             $table->enum('pm', ['ya', 'tidak'])->nullable();
             $table->date('counselor_consultation_date')->nullable();
             $table->date('student_consultation_date')->nullable();
-            
+
             ## Finance
             $table->string('price')->nullable();
             $table->string('total')->nullable();
