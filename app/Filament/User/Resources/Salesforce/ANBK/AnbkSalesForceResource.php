@@ -21,7 +21,6 @@ use App\Filament\User\Resources\AnbkSalesForceResource\RelationManagers;
 
 class AnbkSalesForceResource extends Resource
 {
-
     protected static ?string $model = RegistrationData::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
@@ -82,7 +81,7 @@ class AnbkSalesForceResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+
         ];
     }
 
@@ -91,7 +90,7 @@ class AnbkSalesForceResource extends Resource
         return [
             'index' => Pages\ListAnbkSalesForces::route('/'),
             'create' => Pages\CreateAnbkSalesForce::route('/create'),
-            // 'edit' => Pages\EditAnbkSalesForce::route('/{record}/edit'),
+            'edit' => Pages\EditAnbkSalesForce::route('/{record}/edit'),
         ];
     }
 }

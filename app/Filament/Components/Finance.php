@@ -238,8 +238,8 @@ class Finance
                             ->label('Status')
                             ->native(false)
                             ->options([
-                                'biru'   => 'Biru (Teknisi)',
-                                'hijau'  => 'Hijau (Finance)',
+                                'blue'   => 'Biru (Teknisi)',
+                                'green'  => 'Hijau (Finance)',
                             ])
                             ->searchable()
                             ->placeholder('Pilih status...')
@@ -271,10 +271,10 @@ class Finance
                 ->badge()
                 ->formatStateUsing(fn ($state) => ucfirst($state)) // Kuning/Biru/Hijau
                 ->color(fn (string $state): string => match ($state) {
-                    'hijau'  => 'hijau',
-                    'biru'   => 'biru',
-                    'kuning' => 'kuning',
-                    'merah'  => 'merah',
+                    'green'  => 'green',
+                    'blue'   => 'blue',
+                    'yellow' => 'yellow',
+                    'red'  => 'red',
                 })
                 ->sortable()
                 ->toggleable(),
@@ -430,7 +430,7 @@ class Finance
                             TextEntry::make('option_price')
                                 ->label('')
                                 ->default('-'),
-                            
+
                         ]),
 
 

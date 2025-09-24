@@ -18,60 +18,95 @@ class StatusSeeder extends Seeder
 
         // Create statuses
         $statuses = [
+            // SALES (kuning)
             [
-                'name' => 'Input Data',
-                'description' => 'Data awal telah diinput oleh tim Akademik',
-                'color' => 'yellow',
                 'order' => 1,
-                'category' => 'akademik',
-            ],
-            [
-                'name' => 'Membuat Grup WA',
-                'description' => 'Grup WhatsApp telah dibuat untuk koordinasi',
+                'name' => 'Registrasi / Input Data Sekolah',
+                'description' => 'Data awal sekolah diregistrasikan / diinput oleh tim sales.',
                 'color' => 'yellow',
+                'category' => 'sales',
+            ],
+
+            // PREPARATION (kuning)
+            [
                 'order' => 2,
-                'category' => 'akademik',
-            ],
-            [
-                'name' => 'Bimtek',
-                'description' => 'Pelatihan dan pembimbingan teknis telah dilaksanakan',
+                'name' => 'Buat Grup',
+                'description' => 'Pembuatan grup komunikasi (WA/Telegram) untuk koordinasi.',
                 'color' => 'yellow',
+                'category' => 'preparation',
+            ],
+            [
                 'order' => 3,
-                'category' => 'akademik',
+                'name' => 'Zoom Sosialisasi',
+                'description' => 'Sosialisasi awal via Zoom untuk seluruh pemangku kepentingan.',
+                'color' => 'yellow',
+                'category' => 'preparation',
             ],
             [
-                'name' => 'Pelaksanaan',
-                'description' => 'Pelaksanaan utama telah selesai oleh tim Teknisi',
-                'color' => 'blue',
                 'order' => 4,
-                'category' => 'teknisi',
+                'name' => 'Jadwal Zoom Bimtek',
+                'description' => 'Penentuan dan konfirmasi jadwal pelaksanaan sesi Bimtek.',
+                'color' => 'yellow',
+                'category' => 'preparation',
             ],
+
+            // SERVICE (biru)
             [
-                'name' => 'Pembacaan Hasil',
-                'description' => 'Hasil telah dibaca dan dianalisis',
-                'color' => 'blue',
                 'order' => 5,
-                'category' => 'teknisi',
-            ],
-            [
-                'name' => 'Pelaporan dan Administrasi',
-                'description' => 'Laporan dan administrasi telah selesai diproses',
+                'name' => 'Zoom Bimtek',
+                'description' => 'Pelaksanaan Bimbingan Teknis melalui Zoom.',
                 'color' => 'blue',
-                'order' => 6,
-                'category' => 'teknisi',
+                'category' => 'service',
             ],
             [
-                'name' => 'Pembayaran',
-                'description' => 'Pembayaran telah selesai diproses oleh tim Finance',
-                'color' => 'green',
+                'order' => 6,
+                'name' => 'Pembacaan Hasil',
+                'description' => 'Pembacaan dan pembahasan hasil pelaksanaan layanan.',
+                'color' => 'blue',
+                'category' => 'service',
+            ],
+            [
                 'order' => 7,
+                'name' => 'Penguatan Materi',
+                'description' => 'Sesi penguatan materi/pendampingan lanjutan.',
+                'color' => 'blue',
+                'category' => 'service',
+            ],
+
+            // FINANCE (hijau)
+            [
+                'order' => 8,
+                'name' => 'Kirim Invoice',
+                'description' => 'Penerbitan dan pengiriman invoice kepada sekolah.',
+                'color' => 'green',
                 'category' => 'finance',
             ],
             [
-                'name' => 'Support Sekolah (SS)',
-                'description' => 'Support sekolah telah diberikan',
+                'order' => 9,
+                'name' => 'Check Pembayaran',
+                'description' => 'Verifikasi dan pengecekan pembayaran dari sekolah.',
                 'color' => 'green',
-                'order' => 8,
+                'category' => 'finance',
+            ],
+            [
+                'order' => 10,
+                'name' => 'Kirim Kuitansi',
+                'description' => 'Penerbitan serta pengiriman kuitansi pembayaran.',
+                'color' => 'green',
+                'category' => 'finance',
+            ],
+            [
+                'order' => 11,
+                'name' => 'Kirim Report',
+                'description' => 'Pengiriman laporan/rekap hasil kegiatan ke pihak sekolah.',
+                'color' => 'green',
+                'category' => 'finance',
+            ],
+            [
+                'order' => 12,
+                'name' => 'Support Sekolah',
+                'description' => 'Dukungan pasca layanan untuk kebutuhan sekolah.',
+                'color' => 'green',
                 'category' => 'finance',
             ],
         ];

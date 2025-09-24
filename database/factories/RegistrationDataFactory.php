@@ -27,7 +27,7 @@ class RegistrationDataFactory extends Factory
         $periodes = ['Januari - Juni', 'Juli - Desember'];
         $schoolTypes = ['Negeri','Swasta'];
         $eduLevels = ['SD','SMP','SMA','SMK','MTS','MA'];
-        $statusColors = ['merah','kuning','biru','hijau'];
+        $statusColors = ['red','yellow','blue','green'];
         $description = ['ABK', 'Non ABK'];
 
         // angka & hitungan finansial sederhana
@@ -39,8 +39,6 @@ class RegistrationDataFactory extends Factory
 
 
         return [
-            'description' => $faker->randomElement($description),
-
             // Sales
             'type' => $faker->randomElement($types),
             'periode' => $faker->randomElement($periodes),
@@ -61,6 +59,7 @@ class RegistrationDataFactory extends Factory
             'schools_type' => $faker->randomElement($schoolTypes),
             'class' => $faker->randomElement(['1','2','3','4','5','6','7','8','9','10','11','12']),
             'education_level' => $schools_level,
+            'description' => fake()->randomElement($description),
             'principal' => $faker->name(),
             'principal_phone' => $faker->phoneNumber(),
             'implementation_estimate' => $implementEst,

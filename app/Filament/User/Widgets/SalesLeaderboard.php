@@ -30,19 +30,19 @@ class SalesLeaderboard extends BaseWidget
                     'green_count' => DB::table('registration_data as r2')
                         ->selectRaw('COUNT(*)')
                         ->whereColumn('r2.users_id', 'registration_data.users_id')
-                        ->where('r2.status_color', 'hijau'),
+                        ->where('r2.status_color', 'green'),
 
                     // hitung biru per user
                     'blue_count' => DB::table('registration_data as r3')
                         ->selectRaw('COUNT(*)')
                         ->whereColumn('r3.users_id', 'registration_data.users_id')
-                        ->where('r3.status_color', 'biru'),
+                        ->where('r3.status_color', 'blue'),
 
                     // hitung kuning per user
                     'yellow_count' => DB::table('registration_data as r4')
                         ->selectRaw('COUNT(*)')
                         ->whereColumn('r4.users_id', 'registration_data.users_id')
-                        ->where('r4.status_color', 'kuning'),
+                        ->where('r4.status_color', 'yellow'),
                 ])
                 ->orderByDesc('green_count')
                 ->orderByDesc('blue_count')
@@ -54,22 +54,22 @@ class SalesLeaderboard extends BaseWidget
                     Tables\Columns\TextColumn::make('red')->label('Data Merah')->summarize(
                         Summarizer::make()
                         ->label('')
-                        ->using(fn (Database\Query\Builder $query) => $query->where('status_color', '=', 'merah')->count())
+                        ->using(fn (Database\Query\Builder $query) => $query->where('status_color', '=', 'red')->count())
                     ),
                     Tables\Columns\TextColumn::make('yellow')->label('Data Kuning')->summarize(
                         Summarizer::make()
                         ->label('')
-                        ->using(fn (Database\Query\Builder $query) => $query->where('status_color', '=', 'kuning')->count())
+                        ->using(fn (Database\Query\Builder $query) => $query->where('status_color', '=', 'yellow')->count())
                     ),
                     Tables\Columns\TextColumn::make('blue')->label('Data Biru')->summarize(
                         Summarizer::make()
                         ->label('')
-                        ->using(fn (Database\Query\Builder $query) => $query->where('status_color', '=', 'biru')->count())
+                        ->using(fn (Database\Query\Builder $query) => $query->where('status_color', '=', 'blue')->count())
                     ),
                     Tables\Columns\TextColumn::make('green')->label('Data Hijau')->summarize(
                         Summarizer::make()
                         ->label('')
-                        ->using(fn (Database\Query\Builder $query) => $query->where('status_color', '=', 'hijau')->count())
+                        ->using(fn (Database\Query\Builder $query) => $query->where('status_color', '=', 'green')->count())
                     ),
             ])
             ->groups([

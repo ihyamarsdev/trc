@@ -25,7 +25,7 @@ class Registration extends Seeder
         // atau kalau mau termasuk admin: $userIds = User::pluck('id')->all();
 
         // Seed registration_data 100 baris, setiap baris users_id diacak dari $userIds
-        RegistrationData::factory(100)->state(fn () => [
+        RegistrationData::factory(3)->state(fn () => [
             'users_id' => Arr::random($userIds),
         ])->create();
     }

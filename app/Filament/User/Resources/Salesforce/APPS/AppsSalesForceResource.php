@@ -89,7 +89,7 @@ class AppsSalesForceResource extends Resource
         return [
             'index' => Pages\ListAppsSalesForces::route('/'),
             'create' => Pages\CreateAppsSalesForce::route('/create'),
-            // 'edit' => Pages\EditAppsSalesForce::route('/{record}/edit'),
+            'edit' => Pages\EditAppsSalesForce::route('/{record}/edit'),
         ];
     }
 }

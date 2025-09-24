@@ -12,11 +12,10 @@ return new class () extends Migration {
     {
         Schema::create('registration_data', function (Blueprint $table) {
             $table->id();
-            $table->string('description')->nullable();
 
             ## Sales
             $table->enum('type', ['apps','anbk','snbt']);
-            $table->enum('periode', ['Januari - Juni', 'Juli - Desember'])->nullable();
+            $table->string('periode')->nullable();
             $table->string('years')->nullable();
             $table->dateTime('date_register')->nullable();
             $table->string('provinces')->nullable();
@@ -31,13 +30,14 @@ return new class () extends Migration {
             $table->string('proctors')->nullable();
             $table->string('proctors_phone')->nullable();
             $table->string('schools')->nullable();
-            $table->enum('schools_type', ['Negeri','Swasta'])->nullable();
+            $table->string('schools_type')->nullable();
+            $table->string('description')->nullable();
             $table->string('class')->nullable();
             $table->string('education_level')->nullable();
             $table->string('principal')->nullable();
             $table->string('principal_phone')->nullable();
             $table->dateTime('implementation_estimate')->nullable();
-            $table->string('status_color')->nullable();
+            $table->string('status_color')->default('red');
 
             ## Akademik dan Teknisi
             $table->date('group')->nullable();
@@ -45,9 +45,9 @@ return new class () extends Migration {
             $table->integer('account_count_created')->nullable();
             $table->integer('implementer_count')->nullable();
             $table->integer('difference')->nullable();
-            $table->enum('students_download', ['ya', 'tidak'])->nullable();
-            $table->enum('schools_download', ['ya', 'tidak'])->nullable();
-            $table->enum('pm', ['ya', 'tidak'])->nullable();
+            $table->string('students_download')->nullable();
+            $table->string('schools_download')->nullable();
+            $table->string('pm')->nullable();
             $table->date('counselor_consultation_date')->nullable();
             $table->date('student_consultation_date')->nullable();
 
@@ -101,6 +101,7 @@ return new class () extends Migration {
 
 
             $table->foreignId('users_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('status_id')->nullable()->after('cb,')->constrained('statuses');
             $table->timestamps();
         });
     }

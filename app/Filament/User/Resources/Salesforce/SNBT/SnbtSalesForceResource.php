@@ -89,7 +89,7 @@ class SnbtSalesForceResource extends Resource
         return [
             'index' => Pages\ListSnbtSalesForces::route('/'),
             'create' => Pages\CreateSnbtSalesForce::route('/create'),
-            // 'edit' => Pages\EditSnbtSalesForce::route('/{record}/edit'),
+            'edit' => Pages\EditSnbtSalesForce::route('/{record}/edit'),
         ];
     }
 }

@@ -85,8 +85,8 @@ class Academic
                             ->label('Status')
                             ->native(false)
                             ->options([
-                                'kuning' => 'Kuning (Sales & Akademik)',
-                                'biru'   => 'Biru (Teknisi)',
+                                'yellow' => 'Kuning (Sales & Akademik)',
+                                'blue'   => 'Biru (Teknisi)',
                             ])
                             ->searchable()
                             ->placeholder('Pilih status...')
@@ -121,10 +121,10 @@ class Academic
                 ->badge()
                 ->formatStateUsing(fn ($state) => ucfirst($state)) // Kuning/Biru/Hijau
                 ->color(fn (string $state): string => match ($state) {
-                    'hijau'  => 'hijau',
-                    'biru'   => 'biru',
-                    'kuning' => 'kuning',
-                    'merah'  => 'merah',
+                    'green'  => 'green',
+                    'blue'   => 'blue',
+                    'yellow' => 'yellow',
+                    'red'  => 'red',
                 })
                 ->sortable()
                 ->toggleable(),

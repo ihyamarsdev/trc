@@ -54,10 +54,10 @@ class UserPanelProvider extends PanelProvider
                 'primary' => Color::Lime,
                 'success' => Color::Emerald,
                 'warning' => Color::Orange,
-                'kuning' => Color::Yellow,
-                'biru' => Color::Blue,
-                'hijau' => Color::Green,
-                'merah' => Color::Red,
+                'yellow' => Color::Yellow,
+                'blue' => Color::Blue,
+                'green' => Color::Green,
+                'red' => Color::Red,
             ])
             ->navigationGroups([
                 'Activity',

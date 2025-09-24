@@ -37,6 +37,7 @@ class RegistrationData extends Model
         'counselor_coordinators_phone',
         'proctors',
         'proctors_phone',
+        'status_color',
 
         'group',
         'bimtek',
@@ -117,89 +118,17 @@ class RegistrationData extends Model
         return $this->belongsTo(Status::class);
     }
 
-    /**
-     * Get the color indicator based on status
-     */
-    public function getColorIndicatorAttribute()
+    public function activity()
     {
-        return $this->status ? $this->status->color : 'gray';
+        return $this->hasMany(RegistrationStatus::class, 'registration_id')
+            ->with(['status:id,name,description,color,category','user:id,name']);
     }
 
-    /**
-     * Get the category based on status
-     */
-    public function getCategoryAttribute()
+    public function latestStatusLog()
     {
-        return $this->status ? $this->status->category : 'general';
+        return $this->hasOne(RegistrationStatus::class, 'registration_id')
+            ->latestOfMany(); // ambil baris log terakhir (created_at / id terbesar)
     }
 
-    /**
-     * Check if registration data is in academic phase (yellow)
-     */
-    public function isAcademicPhase()
-    {
-        return $this->getCategoryAttribute() === 'akademik';
-    }
 
-    /**
-     * Check if registration data is in technician phase (blue)
-     */
-    public function isTechnicianPhase()
-    {
-        return $this->getCategoryAttribute() === 'teknisi';
-    }
-
-    /**
-     * Check if registration data is in finance phase (green)
-     */
-    public function isFinancePhase()
-    {
-        return $this->getCategoryAttribute() === 'finance';
-    }
-
-    /**
-     * Move to the next status in the flow
-     */
-    public function moveToNextStatus()
-    {
-        if ($this->status) {
-            $nextStatus = $this->status->nextStatus();
-            if ($nextStatus) {
-                $this->status_id = $nextStatus->id;
-                $this->save();
-                return $nextStatus;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Move to the previous status in the flow
-     */
-    public function moveToPreviousStatus()
-    {
-        if ($this->status) {
-            $previousStatus = $this->status->previousStatus();
-            if ($previousStatus) {
-                $this->status_id = $previousStatus->id;
-                $this->save();
-                return $previousStatus;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Set status to the first status in the flow
-     */
-    public function setToFirstStatus()
-    {
-        $firstStatus = Status::active()->ordered()->first();
-        if ($firstStatus) {
-            $this->status_id = $firstStatus->id;
-            $this->save();
-            return $firstStatus;
-        }
-        return null;
-    }
 }

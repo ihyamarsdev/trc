@@ -5,6 +5,7 @@ namespace App\Filament\Components;
 use Filament\Tables;
 use Filament\Forms\Get;
 use Filament\Tables\Columns\{TextColumn};
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\DateTimePicker;
 use Creasi\Nusa\Models\{Province, Regency, District};
 use Filament\Forms\Components\{Select, TextInput, Section};
@@ -102,21 +103,21 @@ class SalesForce
                         ->maxLength(255),
                     TextInput::make('curriculum_deputies_phone')
                         ->label('No Handphone Wakakurikulum')
-                        ->tel()
+                        ->telRegex('/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/')
                         ->maxLength(255),
                     TextInput::make('counselor_coordinators')
                         ->label('Koordinator BK')
                         ->maxLength(255),
                     TextInput::make('counselor_coordinators_phone')
                         ->label('No Handphone Koordinator BK')
-                        ->tel()
+                        ->telRegex('/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/')
                         ->maxLength(255),
                     TextInput::make('proctors')
                         ->label('Proktor')
                         ->maxLength(255),
                     TextInput::make('proctors_phone')
                         ->label('No Handphone Proktor')
-                        ->tel()
+                        ->telRegex('/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/')
                         ->maxLength(255),
                     TextInput::make('student_count')
                         ->label('Jumlah Siswa')
@@ -131,10 +132,10 @@ class SalesForce
                 ->description('Masukkan Detail Data Sekolah')
                 ->schema([
                     TextInput::make('schools')
-                        ->label('Nama Sekolah')                      
+                        ->label('Nama Sekolah')
                         ->maxLength(255),
                     TextInput::make('class')
-                        ->label('Kelas')                      
+                        ->label('Kelas')
                         ->maxLength(10),
                     Select::make('education_level')
                         ->label('Jenjang')
@@ -163,11 +164,11 @@ class SalesForce
                         ])
                         ->native(false),
                     TextInput::make('principal')
-                        ->label('Nama Kepala Sekolah')                      
+                        ->label('Nama Kepala Sekolah')
                         ->maxLength(255),
                     TextInput::make('principal_phone')
                         ->label('No Handphone Kepala Sekolah')
-                        ->tel()                      
+                        ->telRegex('/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/')
                         ->maxLength(255),
                 ])->columns(2),
 
@@ -175,15 +176,27 @@ class SalesForce
                     ->description('Merah = Belum dikerjakan • Kuning = Sales & Akademik')
                     ->schema([
                         Select::make('status_color')
-                            ->label('Status')
+                            ->label('Warna Status')
                             ->native(false)
                             ->options([
-                                'kuning' => 'Kuning (Sales & Akademik)',
-                                'merah'  => 'Belum dikerjakan (Merah)',
+                                'yellow' => 'Kuning (Sales & Akademik)',
+                                'red'  => 'Merah (Belum dikerjakan)',
                             ])
                             ->searchable()
                             ->placeholder('Pilih status...')
                             ->helperText('Kuning: Sales & Akademik • Biru: Teknisi • Hijau: Finance')
+                            ->columnSpan(1),
+                        Select::make('status_id')
+                            ->label('Status')
+                            ->preload()
+                                ->relationship(
+                                    name: 'status',
+                                    titleAttribute: 'name',
+                                    modifyQueryUsing: fn (Builder $query) => $query
+                                        ->orderBy('order')
+                                )
+                            ->searchable()
+                            ->placeholder('Pilih status...')
                             ->columnSpan(1),
                     ])->columns(2),
 
@@ -204,17 +217,16 @@ class SalesForce
                 ->label('Sekolah'),
             TextColumn::make('education_level')
                 ->label('Jenjang'),
-            TextColumn::make('status_color')
+            TextColumn::make('latestStatusLog.status.color')
                 ->label('Status')
                 ->badge()
-                ->formatStateUsing(fn ($state) => ucfirst($state)) // Kuning/Biru/Hijau
+                ->formatStateUsing(fn ($state) => ucfirst($state))
                 ->color(fn (string $state): string => match ($state) {
-                    'hijau'  => 'hijau',
-                    'biru'   => 'biru',
-                    'kuning' => 'kuning',
-                    'merah'  => 'merah',
+                    'green'  => 'green',
+                    'blue'   => 'blue',
+                    'yellow' => 'yellow',
+                    'red'  => 'red',
                 })
-                ->sortable()
                 ->toggleable(),
             ];
     }
@@ -230,16 +242,22 @@ class SalesForce
                 ])
                 ->preload()
                 ->indicator('Periode'),
-            Tables\Filters\SelectFilter::make('status_color')
+            Tables\Filters\SelectFilter::make('status.color')
                 ->label('Status Warna')
                 ->options([
-                    'hijau'  => 'Hijau',
-                    'biru'   => 'Biru',
-                    'kuning' => 'Kuning',
-                    'merah'  => 'Merah',
+                    'yellow' => 'Kuning',
+                    'blue'   => 'Biru',
+                    'green'  => 'Hijau',
                 ])
                 ->preload()
-                ->indicator('Status Warna'),
+                ->indicator('Status Warna')
+                ->query(function (Builder $query, array $data) {
+                    if (empty($data['value'])) return;
+
+                    $query->whereHas('status', fn (Builder $q) =>
+                        $q->where('color', $data['value'])
+                    );
+                }),
         ];
     }
 
