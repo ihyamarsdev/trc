@@ -14,7 +14,7 @@ return new class () extends Migration {
             $table->id();
 
             ## Sales
-            $table->enum('type', ['apps','anbk','snbt']);
+            $table->string('type');
             $table->string('periode')->nullable();
             $table->string('years')->nullable();
             $table->dateTime('date_register')->nullable();
