@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Filament\Infolists\Infolist;
 use App\Models\RegistrationStatus;
 use Filament\Resources\Pages\Page;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
 use JaOcero\ActivityTimeline\Enums\IconAnimation;
 use JaOcero\ActivityTimeline\Components\ActivityDate;
@@ -38,8 +39,44 @@ class ViewActivities extends Page
         $logs = RegistrationStatus::query()
             ->where('registration_id', $this->record->id)
             ->with(['status', 'user'])
-            ->orderBy('order')  
+            ->orderBy('order')
             ->get();
+
+        if ($logs->isEmpty()) {
+            DB::transaction(function () {
+                // pastikan status default ada
+                $status = Status::query()
+                    ->where('order', 1)
+                    ->first();
+
+                // simpan log pertama (pilih salah satu skema sesuai kolom tabel-mu)
+                RegistrationStatus::create([
+                    'registration_id' => $this->record->id,
+                    'status_id'       => $status->id,
+                    'user_id'         => $this->record->users_id, // kalau ada kolom user_id
+                    'order'           => $status->order,
+
+                    // HANYA isi ini jika kolom-kolomnya memang ada di tabel registration_statuses
+                    'name'        => $status->name ?? null,
+                    'description' => $status->description ?? null,
+                    'color'       => $status->color ?? null,
+                    'category'    => $status->category ?? null,
+                ]);
+
+                // opsional: set current status pada record utama
+                $this->record->update([
+                    'status_id'    => $status->id,
+                    'status_color' => $status->color, // kalau kolom ini ada
+                ]);
+            });
+
+            // reload setelah insert
+            $logs = RegistrationStatus::query()
+                ->where('registration_id', $this->record->id)
+                ->with(['status', 'user'])
+                ->orderBy('order')
+                ->get();
+        }
 
         // ikon per kategori
         $iconByCategory = [

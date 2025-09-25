@@ -67,6 +67,7 @@ class RegistrationDataFactory extends Factory
 
 
             'users_id' => null,
+            'status_id' => 1,
         ];
     }
 }

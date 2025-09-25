@@ -15,17 +15,17 @@ class Registration extends Seeder
      */
     public function run(): void
     {
-         // Pastikan ada user untuk foreign key
+        // Pastikan ada user untuk foreign key
         if (User::count() === 0) {
-            User::factory()->count(5)->create();
+            User::factory()->count(30)->create();
         }
 
-         // Ambil semua user id yg mau dipakai (mis. exclude admin jika perlu)
+        // Ambil semua user id yg mau dipakai (mis. exclude admin jika perlu)
         $userIds = User::where('email', '!=', 'admin@trc.com')->pluck('id')->all();
         // atau kalau mau termasuk admin: $userIds = User::pluck('id')->all();
 
         // Seed registration_data 100 baris, setiap baris users_id diacak dari $userIds
-        RegistrationData::factory(3)->state(fn () => [
+        RegistrationData::factory(100)->state(fn () => [
             'users_id' => Arr::random($userIds),
         ])->create();
     }
