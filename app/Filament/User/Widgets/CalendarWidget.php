@@ -16,6 +16,7 @@ class CalendarWidget extends FullCalendarWidget
     // protected static string $view = 'filament.user.widgets.calendar-widget';
     // public Model | string | null $model = RegistrationData::class;
 
+
     public function config(): array
     {
         return [

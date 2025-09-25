@@ -23,12 +23,12 @@ class SnbtSalesForceResource extends Resource
     protected static ?string $model = RegistrationData::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Program Salesforce';
+    protected static ?string $navigationGroup = 'Salesforce';
     protected static ?string $title = 'SNBT';
     protected static ?string $navigationLabel = 'SNBT';
     protected static ?string $modelLabel = 'SNBT';
     protected static ?string $slug = 'snbt-salesforce';
-    protected static bool $shouldRegisterNavigation = true;
+    protected static bool $shouldRegisterNavigation = false;
 
 
     public static function canViewAny(): bool
@@ -39,10 +39,7 @@ class SnbtSalesForceResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->schema(SalesForce::schema(options: [
-                'nameRegister' => 'SNBT',
-                'DescriptionRegister' => 'SELEKSI NASIONAL BERDASARKAN TES'
-            ]));
+            ->schema(SalesForce::schema());
     }
 
     public static function table(Table $table): Table

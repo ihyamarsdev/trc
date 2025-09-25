@@ -22,7 +22,7 @@ class CreateAnbkSalesForce extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['users_id'] = Auth::id();
-        $data['type']     = 'anbk';
+        // $data['type']     = 'anbk';
 
         // monthYear aman dibentuk (jika date_register diisi)
         if (!empty($data['date_register'])) {

@@ -128,6 +128,7 @@ class Academic
                     'red'  => 'red',
                 })
                 ->sortable()
+                ->default('red')
                 ->toggleable(),
         ];
     }
@@ -288,6 +289,23 @@ class Academic
                 })
                 ->preload()
                 ->indicator('user'),
+            Tables\Filters\SelectFilter::make('latestStatusLog.status.color')
+                ->label('Status Warna')
+                ->options([
+                    'red'    => 'Merah',
+                    'yellow' => 'Kuning',
+                    'blue'   => 'Biru',
+                    'green'  => 'Hijau',
+                ])
+                ->preload()
+                ->indicator('Status Warna')
+                ->query(function (Builder $query, array $data) {
+                    if (empty($data['value'])) return;
+
+                    $query->whereHas('status', fn (Builder $q) =>
+                        $q->where('color', $data['value'])
+                    );
+                }),
             ];
     }
 

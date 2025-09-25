@@ -23,12 +23,12 @@ class AnbkSalesForceResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Program Salesforce';
-    protected static ?string $title = 'ANBK';
-    protected static ?string $navigationLabel = 'ANBK';
-    protected static ?string $modelLabel = 'ANBK';
-    protected static ?string $slug = 'anbk-salesforce';
+    protected static ?string $navigationIcon = 'heroicon-o-presentation-chart-line';
+    protected static ?string $navigationGroup = 'Salesforce';
+    protected static ?string $title = 'Database';
+    protected static ?string $navigationLabel = 'Database';
+    protected static ?string $modelLabel = 'database';
+    protected static ?string $slug = 'database-salesforce';
     protected static bool $shouldRegisterNavigation = true;
 
 
@@ -40,20 +40,20 @@ class AnbkSalesForceResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->schema(SalesForce::schema(options: [
-                'nameRegister' => 'APPS',
-                'DescriptionRegister' => 'ASESMEN PSIKOTES POTENSI SISWA'
-            ]));
+            ->schema(SalesForce::schema());
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->deferLoading()
-            ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'anbk')->when(!Auth::user()->hasRole(['admin']), function ($query) {
-                // Assuming you have a 'user_id' field in your 'apps' table
-                return $query->where('users_id', Auth::id());
-            })->orderBy('implementation_estimate', 'asc'))
+            // ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'anbk')->when(!Auth::user()->hasRole(['admin']), function ($query) {
+            //     // Assuming you have a 'user_id' field in your 'apps' table
+            //     return $query->where('users_id', Auth::id());
+            // })->orderBy('implementation_estimate', 'asc'))
+            ->modifyQueryUsing(fn (Builder $query) =>
+                $query->orderBy('implementation_estimate', 'asc')
+            )
             ->columns(
                 SalesForce::columns()
             )

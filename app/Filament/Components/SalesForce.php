@@ -12,9 +12,49 @@ use Filament\Forms\Components\{Select, TextInput, Section};
 
 class SalesForce
 {
-    public static function schema(array $options = []): array
+    protected static function meta(Get $get): array
+    {
+        $type = $get('type') ?? 'apps';
+
+        return match ($type) {
+            'anbk' => [
+                'nameRegister'        => 'ANBK',
+                'DescriptionRegister' => 'ASESMEN NASIONAL BERBASIS KOMPUTER',
+            ],
+            'apps' => [
+                'nameRegister'        => 'APPS',
+                'DescriptionRegister' => 'ASESMEN PSIKOTES POTENSI SISWA',
+            ],
+            'snbt' => [
+                'nameRegister'        => 'SNBT',
+                'DescriptionRegister' => 'SELEKSI NASIONAL BERDASARKAN TES',
+            ],
+            'tka' => [
+                'nameRegister'        => 'TKA',
+                'DescriptionRegister' => 'TEST KEMAMPUAN AKADEMIK',
+            ],
+            default => [ 
+                'nameRegister'        => 'APPS',
+                'DescriptionRegister' => 'ASESMEN PSIKOTES POTENSI SISWA',
+            ],
+        };
+    }
+
+    public static function schema(): array
     {
         return [
+            Section::make('Program')
+                ->description('Pilih Program')
+                ->schema([
+                    Select::make('type')
+                        ->label('Program')
+                        ->options([
+                            'apps' => 'APPS',
+                            'anbk' => 'ANBK',
+                            'snbt' => 'SNBT',
+                            'tka' => 'TKA',
+                        ]),
+                ])->columns(2),
 
             Section::make('Periode')
                 ->description('Pilih Periode dan Tahun Ajaran')
@@ -30,8 +70,8 @@ class SalesForce
                         ->maxLength(255),
                 ])->columns(2),
 
-            Section::make($options['nameRegister'])
-                ->description($options['DescriptionRegister'])
+            Section::make(fn (Get $get) => self::meta($get)['nameRegister'])
+                ->description(fn (Get $get) => self::meta($get)['DescriptionRegister'])
                 ->schema([
                     DateTimePicker::make('date_register')
                         ->label('Tanggal Pendaftaran')
@@ -198,6 +238,8 @@ class SalesForce
         return [
             TextColumn::make('no')
                 ->rowIndex(),
+            TextColumn::make('type')
+                ->label('Program'),
             TextColumn::make('periode')
                 ->label('Periode'),
             TextColumn::make('years')
@@ -216,6 +258,7 @@ class SalesForce
                     'yellow' => 'yellow',
                     'red'  => 'red',
                 })
+                ->default('red')
                 ->toggleable(),
             ];
     }
@@ -223,6 +266,16 @@ class SalesForce
     public static function filters(): array
     {
         return [
+            Tables\Filters\SelectFilter::make('type')
+                ->label('Program')
+                ->options([
+                    'anbk' => 'ANBK',
+                    'apps' => 'APPS',
+                    'snbt' => 'SNBT',
+                    'tka' => 'TKA',
+                ])
+                ->preload()
+                ->indicator('Program'),
             Tables\Filters\SelectFilter::make('periode')
                 ->label('Periode')
                 ->options([
@@ -231,9 +284,10 @@ class SalesForce
                 ])
                 ->preload()
                 ->indicator('Periode'),
-            Tables\Filters\SelectFilter::make('status.color')
+            Tables\Filters\SelectFilter::make('latestStatusLog.status.color')
                 ->label('Status Warna')
                 ->options([
+                    'red'    => 'Merah',
                     'yellow' => 'Kuning',
                     'blue'   => 'Biru',
                     'green'  => 'Hijau',
@@ -241,9 +295,13 @@ class SalesForce
                 ->preload()
                 ->indicator('Status Warna')
                 ->query(function (Builder $query, array $data) {
-                    if (empty($data['value'])) return;
+                    if (empty($data['value'])) {
+                        return;
+                    }
 
-                    $query->whereHas('status', fn (Builder $q) =>
+                    $query->whereHas(
+                        'status',
+                        fn (Builder $q) =>
                         $q->where('color', $data['value'])
                     );
                 }),

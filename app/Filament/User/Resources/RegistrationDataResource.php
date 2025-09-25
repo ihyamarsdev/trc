@@ -26,7 +26,7 @@ class RegistrationDataResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
     protected static ?string $navigationGroup = 'Activity';
     protected static ?string $title = 'Sekolah';
     protected static ?string $navigationLabel = 'Sekolah';
@@ -72,28 +72,49 @@ class RegistrationDataResource extends Resource
                     ->default('red'),
             ])
             ->filters([
-                 Tables\Filters\SelectFilter::make('type')
-                    ->label('Program')
-                    ->options([
-                        'anbk' => 'ANBK',
-                        'apps' => 'APPS',
-                        'snbt' => 'SNBT',
-                    ])
-                    ->preload()
-                    ->indicator('Program'),
+                    Tables\Filters\SelectFilter::make('type')
+                        ->label('Program')
+                        ->options([
+                            'anbk' => 'ANBK',
+                            'apps' => 'APPS',
+                            'snbt' => 'SNBT',
+                        ])
+                        ->preload()
+                        ->indicator('Program'),
+                    Tables\Filters\SelectFilter::make('latestStatusLog.status.color')
+                        ->label('Status Warna')
+                        ->options([
+                            'red'    => 'Merah',
+                            'yellow' => 'Kuning',
+                            'blue'   => 'Biru',
+                            'green'  => 'Hijau',
+                        ])
+                        ->preload()
+                        ->indicator('Status Warna')
+                        ->query(function (Builder $query, array $data) {
+                            if (empty($data['value'])) {
+                                return;
+                            }
+
+                            $query->whereHas(
+                                'status',
+                                fn (Builder $q) =>
+                                $q->where('color', $data['value'])
+                            );
+                        }),
             ])
             ->actions([
                 Tables\Actions\Action::make('view_activities')
-                        ->label('Progres')
-                        ->icon('heroicon-m-clock')
-                        ->color('purple')
-                        ->url(fn ($record) => RegistrationDataResource::getUrl('activities', ['record' => $record])),
-                        
+                            ->label('Progres')
+                            ->icon('heroicon-m-clock')
+                            ->color('purple')
+                            ->url(fn ($record) => RegistrationDataResource::getUrl('activities', ['record' => $record])),
+
                 ])
             ->bulkActions([
-                    Tables\Actions\BulkActionGroup::make([
-                        Tables\Actions\DeleteBulkAction::make(),
-                    ]),
+                        Tables\Actions\BulkActionGroup::make([
+                            Tables\Actions\DeleteBulkAction::make(),
+                        ]),
             ]);
     }
 

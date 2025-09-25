@@ -13,6 +13,10 @@ class CalenderPage extends Page
 
     protected static ?string $navigationLabel = 'Timeline';
 
+    protected static ?string $title = 'Timeline Sekolah';
+
+    protected static ?string $slug = 'timeline';
+
     protected static ?int $navigationSort = 2;
 
     protected function getHeaderWidgets(): array

@@ -28,7 +28,7 @@ class AppsSalesForceResource extends Resource
     protected static ?string $navigationLabel = 'APPS';
     protected static ?string $modelLabel = 'APPS';
     protected static ?string $slug = 'apps-salesforce';
-    protected static bool $shouldRegisterNavigation = true;
+    protected static bool $shouldRegisterNavigation = false;
 
 
     public static function canViewAny(): bool
@@ -39,10 +39,7 @@ class AppsSalesForceResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->schema(SalesForce::schema(options: [
-                'nameRegister' => 'APPS',
-                'DescriptionRegister' => 'ASESMEN PSIKOTES POTENSI SISWA'
-            ]));
+            ->schema(SalesForce::schema());
     }
 
     public static function table(Table $table): Table
