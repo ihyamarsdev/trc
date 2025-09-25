@@ -73,12 +73,6 @@ class ViewActivities extends Page
                 ]);
             });
 
-            // reload setelah insert
-            $logs = RegistrationStatus::query()
-                ->where('registration_id', $this->record->id)
-                ->with(['status', 'user'])
-                ->orderBy('order')
-                ->get();
         }
 
         // ikon per kategori
