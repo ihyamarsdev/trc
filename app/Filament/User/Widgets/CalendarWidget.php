@@ -42,7 +42,7 @@ class CalendarWidget extends FullCalendarWidget
                 ->title($event->schools)
                 ->start($event->implementation_estimate)
                 ->end($event->implementation_estimate)
-                ->url(url: $url);
+                ->url(url: $url, shouldOpenUrlInNewTab: true);
         })
         ->toArray();
     }

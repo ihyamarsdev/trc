@@ -175,17 +175,6 @@ class SalesForce
                 Section::make('Status')
                     ->description('Merah = Belum dikerjakan • Kuning = Sales & Akademik')
                     ->schema([
-                        Select::make('status_color')
-                            ->label('Warna Status')
-                            ->native(false)
-                            ->options([
-                                'yellow' => 'Kuning (Sales & Akademik)',
-                                'red'  => 'Merah (Belum dikerjakan)',
-                            ])
-                            ->searchable()
-                            ->placeholder('Pilih status...')
-                            ->helperText('Kuning: Sales & Akademik • Biru: Teknisi • Hijau: Finance')
-                            ->columnSpan(1),
                         Select::make('status_id')
                             ->label('Status')
                             ->preload()

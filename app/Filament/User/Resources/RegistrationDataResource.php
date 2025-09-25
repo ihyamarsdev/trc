@@ -28,9 +28,9 @@ class RegistrationDataResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationGroup = 'Activity';
-    protected static ?string $title = 'School';
-    protected static ?string $navigationLabel = 'School';
-    protected static ?string $modelLabel = 'School';
+    protected static ?string $title = 'Sekolah';
+    protected static ?string $navigationLabel = 'Sekolah';
+    protected static ?string $modelLabel = 'Sekolah';
     protected static ?string $slug = 'activity-school';
     protected static bool $shouldRegisterNavigation = true;
 
@@ -68,7 +68,8 @@ class RegistrationDataResource extends Resource
                         'yellow' => 'yellow',
                         'red'  => 'red',
                     })
-                    ->toggleable(),
+                    ->toggleable()
+                    ->default('red'),
             ])
             ->filters([
                  Tables\Filters\SelectFilter::make('type')
@@ -83,10 +84,11 @@ class RegistrationDataResource extends Resource
             ])
             ->actions([
                 Tables\Actions\Action::make('view_activities')
-                        ->label('Activities')
-                        ->icon('heroicon-m-bolt')
+                        ->label('Progres')
+                        ->icon('heroicon-m-clock')
                         ->color('purple')
                         ->url(fn ($record) => RegistrationDataResource::getUrl('activities', ['record' => $record])),
+                        
                 ])
             ->bulkActions([
                     Tables\Actions\BulkActionGroup::make([

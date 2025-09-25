@@ -78,19 +78,20 @@ class Academic
                         ->displayFormat('l, jS F Y'),
                 ])->columns(2),
 
-                Section::make('Status')
+              Section::make('Status')
                     ->description('Merah = Belum dikerjakan • Kuning = Sales & Akademik')
                     ->schema([
-                        Select::make('status_color')
+                        Select::make('status_id')
                             ->label('Status')
-                            ->native(false)
-                            ->options([
-                                'yellow' => 'Kuning (Sales & Akademik)',
-                                'blue'   => 'Biru (Teknisi)',
-                            ])
+                            ->preload()
+                                ->relationship(
+                                    name: 'status',
+                                    titleAttribute: 'name',
+                                    modifyQueryUsing: fn (Builder $query) => $query
+                                        ->orderBy('order')
+                                )
                             ->searchable()
                             ->placeholder('Pilih status...')
-                            ->helperText('Kuning: Sales & Akademik • Biru: Teknisi')
                             ->columnSpan(1),
                     ])->columns(2),
 
@@ -134,8 +135,8 @@ class Academic
     public static function infolist(array $options = []): array
     {
         return [
-            Infolists\Components\Section::make('Datacenter')
-                    ->description('Detail data dari datacenter')
+            Infolists\Components\Section::make('Sales')
+                    ->description('Detail data dari Sales')
                     ->schema([
                         Infolists\Components\Fieldset::make('Periode')
                             ->schema([
@@ -199,10 +200,10 @@ class Academic
                             ->schema([
                                 Infolists\Components\TextEntry::make('date_register')
                                     ->label('Tanggal Pendaftaran')
-                                    ->dateTime('l, jS F Y'),
+                                    ->dateTime('l, jS F Y H:i'),
                                 Infolists\Components\TextEntry::make('implementation_estimate')
                                     ->label('Estimasi Pelaksanaan')
-                                    ->dateTime('l, jS F Y'),
+                                    ->dateTime('l, jS F Y H:i'),
                             ]),
                         ]),
                 Infolists\Components\Section::make('Academic')

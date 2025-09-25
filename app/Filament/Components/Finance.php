@@ -231,22 +231,22 @@ class Finance
                         ]),
                 ])->columns(2),
 
-                Section::make('Status')
+                 Section::make('Status')
                     ->description('Merah = Belum dikerjakan • Kuning = Sales & Akademik')
                     ->schema([
-                        Select::make('status_color')
+                        Select::make('status_id')
                             ->label('Status')
-                            ->native(false)
-                            ->options([
-                                'blue'   => 'Biru (Teknisi)',
-                                'green'  => 'Hijau (Finance)',
-                            ])
+                            ->preload()
+                                ->relationship(
+                                    name: 'status',
+                                    titleAttribute: 'name',
+                                    modifyQueryUsing: fn (Builder $query) => $query
+                                        ->orderBy('order')
+                                )
                             ->searchable()
                             ->placeholder('Pilih status...')
-                            ->helperText('Biru: Teknisi • Hijau: Finance')
                             ->columnSpan(1),
                     ])->columns(2),
-
         ];
     }
 
