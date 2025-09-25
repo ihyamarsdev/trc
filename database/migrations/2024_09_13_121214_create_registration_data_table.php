@@ -101,7 +101,7 @@ return new class () extends Migration {
 
 
             $table->foreignId('users_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
-            $table->foreignId('status_id')->constrained('statuses');
+            $table->foreignId('status_id')->constrained('statuses')->nullable();
             $table->timestamps();
         });
     }
