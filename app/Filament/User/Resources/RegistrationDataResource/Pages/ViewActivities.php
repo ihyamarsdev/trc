@@ -39,7 +39,10 @@ class ViewActivities extends Page
         $logs = RegistrationStatus::query()
             ->where('registration_id', $this->record->id)
             ->with(['status', 'user'])
-            ->orderBy('order')
+            ->orderBy(
+                Status::select('order')
+                    ->whereColumn('statuses.id', 'registration_statuses.status_id')
+            )
             ->get();
 
         if ($logs->isEmpty()) {

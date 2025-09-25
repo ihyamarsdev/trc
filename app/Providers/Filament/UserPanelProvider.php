@@ -107,7 +107,6 @@ class UserPanelProvider extends PanelProvider
                  FilamentFullCalendarPlugin::make()
                     ->schedulerLicenseKey('')
                     ->selectable()
-                    ->editable()
                     ->timezone(config('app.timezone'))
                     ->locale(config('app.locale'))
                     ->plugins(['dayGrid', 'timeGrid'])
