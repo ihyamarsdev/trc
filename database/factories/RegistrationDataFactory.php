@@ -23,7 +23,7 @@ class RegistrationDataFactory extends Factory
     {
         $faker = $this->faker;
 
-        $types = ['apps','anbk','snbt'];
+        $types = ['apps','anbk','snbt','tka'];
         $periodes = ['Januari - Juni', 'Juli - Desember'];
         $schoolTypes = ['Negeri','Swasta'];
         $eduLevels = ['SD','SMP','SMA','SMK','MTS','MA'];
