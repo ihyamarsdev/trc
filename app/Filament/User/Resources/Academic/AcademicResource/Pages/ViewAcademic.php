@@ -16,8 +16,6 @@ class ViewAcademic extends ViewRecord
 
     protected static string $resource = AcademicResource::class;
 
-    // protected static string $view = 'filament.user.resources.academic.view-academic';
-
     public function mount(int | string $record): void
     {
         $this->record = $this->resolveRecord($record);

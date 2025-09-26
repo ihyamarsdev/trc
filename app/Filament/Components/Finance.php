@@ -6,10 +6,11 @@ use Filament\Tables;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Infolists;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Tables\Columns\{TextColumn};
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
-use Illuminate\Database\Eloquent\Builder;
 use Creasi\Nusa\Models\{Province, Regency, District};
 use Filament\Forms\Components\{Select, TextInput, Section, DatePicker, Radio, Fieldset, Group};
 
@@ -43,11 +44,40 @@ class Finance
         };
     }
 
-    public static function formSchema(array $options = []): array
+    protected static function metaInfo(Model $record): array
+    {
+        $type = $record->type ?? 'apps';
+
+        return match ($type) {
+            'anbk' => [
+                'nameRegister'        => 'ANBK',
+                'DescriptionRegister' => 'ASESMEN NASIONAL BERBASIS KOMPUTER',
+            ],
+            'apps' => [
+                'nameRegister'        => 'APPS',
+                'DescriptionRegister' => 'ASESMEN PSIKOTES POTENSI SISWA',
+            ],
+            'snbt' => [
+                'nameRegister'        => 'SNBT',
+                'DescriptionRegister' => 'SELEKSI NASIONAL BERDASARKAN TES',
+            ],
+            'tka' => [
+                'nameRegister'        => 'TKA',
+                'DescriptionRegister' => 'TEST KEMAMPUAN AKADEMIK',
+            ],
+            default => [
+                'nameRegister'        => 'APPS',
+                'DescriptionRegister' => 'ASESMEN PSIKOTES POTENSI SISWA',
+            ],
+        };
+    }
+
+
+    public static function formSchema(): array
     {
         return [
-            Section::make($options['nameRegister'])
-                ->description($options['DescriptionRegister'])
+            Section::make()
+                ->description()
                 ->schema([
 
                     Fieldset::make('')
@@ -309,9 +339,33 @@ class Finance
         ];
     }
 
-    public static function infolist(): array
+    public static function infolist(Model $record): array
     {
         return [
+             Infolists\Components\Section::make(fn () => self::metaInfo($record)['nameRegister'])
+                    ->description(fn () => self::metaInfo($record)['DescriptionRegister'])
+                    ->schema([
+                        Infolists\Components\Fieldset::make('Aktifitas Saat ini')
+                            ->schema([
+                                Infolists\Components\TextEntry::make('status.name')
+                                    ->label('Status'),
+                                Infolists\Components\IconEntry::make('latestStatusLog.status.color')
+                                    ->label('Status Warna dan Icon')
+                                    ->icon(fn (string $state): string => match ($state) {
+                                        'red' => 'heroicon-s-x-circle',
+                                        'yellow'  => 'heroicon-m-presentation-chart-line',
+                                        'blue'  => 'heroicon-m-academic-cap',
+                                        'green'  => 'heroicon-m-credit-card',
+                                    })
+                                    ->color(fn (string $state): string => match ($state) {
+                                        'yellow' => 'yellow',
+                                        'blue'   => 'blue',
+                                        'green'  => 'green',
+                                        'red'    => 'red',
+                                    })
+                                    ->default('red'),
+                            ]),
+                    ])->columns(2),
             Infolists\Components\Section::make('Salesforce')
                     ->description('Detail data dari Salesforce')
                     ->schema([
@@ -319,7 +373,7 @@ class Finance
                             ->schema([
                                 TextEntry::make('periode')
                                         ->label('Periode'),
-                                TextEntry::make('school_years.name')
+                                TextEntry::make('years')
                                         ->label('Tahun Ajaran'),
                             ]),
 
@@ -347,9 +401,9 @@ class Finance
                                     ->label('Provinsi'),
                                 Infolists\Components\TextEntry::make('regencies')
                                     ->label('Kota / Kabupaten'),
-                                Infolists\Components\TextEntry::make('sudin')
+                                Infolists\Components\TextEntry::make('area')
                                     ->label('Wilayah')
-                                    ->default('-'),
+                                    ->placeholder('tidak ada wilayah'),
                             ]),
 
 
@@ -357,19 +411,19 @@ class Finance
                             ->schema([
                                 TextEntry::make('principal')
                                     ->label('Kepala Sekolah'),
-                                TextEntry::make('phone_principal')
+                                TextEntry::make('principal_phone')
                                     ->label('No Hp Kepala Sekolah'),
-                                TextEntry::make('curriculum_deputies.name')
+                                TextEntry::make('curriculum_deputies')
                                     ->label('Wakakurikulum'),
-                                TextEntry::make('curriculum_deputies.phone')
+                                TextEntry::make('curriculum_deputies_phone')
                                     ->label('No Hp Wakakurikulum'),
-                                TextEntry::make('counselor_coordinators.name')
+                                TextEntry::make('counselor_coordinators')
                                     ->label('Koordinator BK'),
-                                TextEntry::make('counselor_coordinators.phone')
+                                TextEntry::make('counselor_coordinators_phone')
                                     ->label('No Hp Koordinator BK'),
-                                TextEntry::make('proctors.name')
+                                TextEntry::make('proctors')
                                     ->label('Proktor'),
-                                TextEntry::make('proctors.phone')
+                                TextEntry::make('proctors_phone')
                                     ->label('No Hp Proktor'),
                             ]),
 
@@ -390,30 +444,43 @@ class Finance
 
                         Infolists\Components\Fieldset::make('')
                             ->schema([
-                                TextEntry::make('group')
+                                Infolists\Components\TextEntry::make('group')
                                     ->label('Grup')
-                                    ->dateTime('l, jS F Y'),
-                                TextEntry::make('bimtek')
+                                    ->dateTime('l, jS F Y')
+                                    ->placeholder('Belum Terjadwal'),
+                                Infolists\Components\TextEntry::make('bimtek')
                                     ->label('Bimtek')
-                                    ->dateTime('l, jS F Y'),
+                                    ->dateTime('l, jS F Y')
+                                    ->placeholder('Belum Terjadwal'),
                             ]),
 
                         Infolists\Components\Fieldset::make('')
                             ->schema([
-                                TextEntry::make('account_count_created')
+                                Infolists\Components\TextEntry::make('account_count_created')
                                     ->label('Akun Dibuat')
-                                    ->default('-'),
-                                TextEntry::make('implementer_count')
+                                    ->placeholder('Belum Terbuat'),
+                                Infolists\Components\TextEntry::make('implementer_count')
                                     ->label('Pelaksanaan')
-                                    ->default('-'),
-                                TextEntry::make('difference')
+                                    ->placeholder('Belum terbuat'),
+                                Infolists\Components\TextEntry::make('difference')
                                     ->label('Selisih')
-                                    ->default('-'),
+                                    ->placeholder('Belum terbuat'),
                             ]),
 
-                        Infolists\Components\Fieldset::make('')
+                        Infolists\Components\Fieldset::make('Konsultasi')
                             ->schema([
-                                IconEntry::make('schools_download')
+                                Infolists\Components\IconEntry::make('students_download')
+                                    ->label('Download Siswa')
+                                    ->icon(fn (string $state): string => match ($state) {
+                                        'ya' => 'heroicon-s-check-circle',
+                                        'tidak' => 'heroicon-s-x-circle',
+                                    })
+                                    ->color(fn (string $state): string => match ($state) {
+                                        'ya' => 'success',
+                                        'tidak' => 'danger',
+                                    })
+                                    ->placeholder('Tidak Ada Status'),
+                                Infolists\Components\IconEntry::make('schools_download')
                                     ->label('Download Sekolah')
                                     ->icon(fn (string $state): string => match ($state) {
                                         'ya' => 'heroicon-s-check-circle',
@@ -422,29 +489,31 @@ class Finance
                                     ->color(fn (string $state): string => match ($state) {
                                         'ya' => 'success',
                                         'tidak' => 'danger',
-                                    }),
-                                IconEntry::make('pm')
+                                    })
+                                    ->placeholder('Tidak Ada Status'),
+                                Infolists\Components\IconEntry::make('pm')
                                     ->label('PM')
                                     ->icon(fn (string $state): string => match ($state) {
                                         'ya' => 'heroicon-s-check-circle',
-                                        'Tidak' => 'heroicon-s-x-circle',
+                                        'tidak' => 'heroicon-s-x-circle',
                                     })
                                     ->color(fn (string $state): string => match ($state) {
                                         'ya' => 'success',
                                         'tidak' => 'danger',
-                                    }),
-                            ]),
+                                    })
+                                    ->placeholder('Tidak Ada Status'),
+                            ])->columns(3),
 
                         Infolists\Components\Fieldset::make('')
                             ->schema([
-                                TextEntry::make('counselor_consultation_date')
+                                Infolists\Components\TextEntry::make('counselor_consultation_date')
                                     ->label('Konsul BK')
                                     ->dateTime('l, jS F Y')
-                                    ->default(null),
-                                TextEntry::make('student_consultation_date')
+                                    ->placeholder('Belum Terjadwal'),
+                                Infolists\Components\TextEntry::make('student_consultation_date')
                                     ->label('Konsul Siswa')
                                     ->dateTime('l, jS F Y')
-                                    ->default(null),
+                                    ->placeholder('Belum Terjadwal'),
                             ]),
 
                     ])->columns(2),
@@ -457,7 +526,7 @@ class Finance
                         ->schema([
                             TextEntry::make('option_price')
                                 ->label('')
-                                ->default('-'),
+                                ->placeholder('Belum di Pilih'),
 
                         ]),
 
@@ -467,11 +536,11 @@ class Finance
                                 TextEntry::make('price')
                                     ->label('Harga SPJ')
                                     ->money('IDR')
-                                    ->default('0'),
+                                    ->placeholder('Belum Terisi'),
                                 TextEntry::make('net_2')
                                     ->label('Harga Net')
                                     ->money('IDR')
-                                    ->default('0'),
+                                    ->placeholder('Belum Terisi'),
                             ])->columns(3),
 
                         Infolists\Components\Fieldset::make('')
@@ -479,15 +548,15 @@ class Finance
                             ->schema([
                                 TextEntry::make('student_count_1')
                                     ->label('Selisih Siswa TRC')
-                                    ->default('-'),
+                                    ->placeholder('Belum Terisi'),
                                 TextEntry::make('net')
                                     ->label('Satuan')
                                     ->money('IDR')
-                                    ->default('0'),
+                                    ->placeholder('Belum Terisi'),
                                 TextEntry::make('subtotal_1')
                                     ->label('Sub Total')
                                     ->money('IDR')
-                                    ->default('0'),
+                                    ->placeholder('Belum Terisi'),
                             ])->columns(3),
 
                         Infolists\Components\Fieldset::make('')
@@ -495,39 +564,39 @@ class Finance
                             ->schema([
                                 TextEntry::make('mitra_difference')
                                     ->label('Selisih Siswa Sekolah')
-                                    ->default('-'),
+                                    ->placeholder('Belum Terisi'),
                                 TextEntry::make('mitra_net')
                                     ->label('Satuan')
                                     ->money('IDR')
-                                    ->default('0'),
+                                    ->placeholder('Belum Terisi'),
                                 TextEntry::make('mitra_subtotal')
                                     ->label('Sub Total')
                                     ->money('IDR')
-                                    ->default('0'),
+                                    ->placeholder('Belum Terisi'),
 
                                 TextEntry::make('implementer_count')
                                     ->label('SS')
-                                    ->default('-'),
+                                    ->placeholder('Belum Terisi'),
                                 TextEntry::make('ss_net')
                                     ->label('Satuan')
                                     ->money('IDR')
-                                    ->default('0'),
+                                    ->placeholder('Belum Terisi'),
                                 TextEntry::make('ss_subtotal')
                                     ->label('Sub Total')
                                     ->money('IDR')
-                                    ->default('0'),
+                                    ->placeholder('Belum Terisi'),
 
                                 TextEntry::make('dll_difference')
                                     ->label('SS')
-                                    ->default('-'),
+                                    ->placeholder('Belum Terisi'),
                                 TextEntry::make('dll_net')
                                     ->label('Satuan')
                                     ->money('IDR')
-                                    ->default('0'),
+                                    ->placeholder('Belum Terisi'),
                                 TextEntry::make('dll_subtotal')
                                     ->label('Sub Total')
                                     ->money('IDR')
-                                    ->default('0'),
+                                    ->placeholder('Belum Terisi'),
                             ])->columns(3),
 
                         Infolists\Components\Fieldset::make('')
@@ -536,11 +605,11 @@ class Finance
                                 TextEntry::make('total')
                                     ->label('Total Dana Sesuai SPJ')
                                     ->money('IDR')
-                                    ->default('0'),
+                                    ->placeholder('Belum Terisi'),
                                 TextEntry::make('total_net')
                                     ->label('Total Net')
                                     ->money('IDR')
-                                    ->default('0'),
+                                    ->placeholder('Belum Terisi'),
                             ])->columns(3),
 
                         Infolists\Components\Fieldset::make('')
@@ -549,16 +618,18 @@ class Finance
                                 TextEntry::make('invoice_date')
                                     ->label('Invoice')
                                     ->dateTime('l, jS F Y')
-                                    ->default(null),
+                                    ->placeholder('Belum Terjadwal'),
                                 TextEntry::make('payment_date')
                                     ->label('Pembayaran')
-                                    ->dateTime('l, jS F Y'),
+                                    ->dateTime('l, jS F Y')
+                                    ->placeholder('Belum Terjadwal'),
                                 TextEntry::make('spk_sent')
                                     ->label('SPK di Kirim')
-                                    ->dateTime('l, jS F Y'),
+                                    ->dateTime('l, jS F Y')
+                                    ->placeholder('Belum Terjadwal'),
                                 TextEntry::make('payment')
                                     ->label('Pembayaran Via')
-                                    ->default('-')
+                                    ->placeholder('Belum Terisi')
                             ]),
                     ])->columns(3),
 
@@ -571,14 +642,14 @@ class Finance
                             ->schema([
                                 TextEntry::make('schools')
                                     ->label('Telah Terima Dari')
-                                    ->default('-'),
+                                    ->placeholder('Belum Terisi'),
                                 TextEntry::make('total')
                                     ->label('Uang Sejumlah')
                                     ->money('IDR')
-                                    ->default('0'),
+                                    ->placeholder('Belum Terisi'),
                                 TextEntry::make('detail_kwitansi')
                                     ->label('Guna Pembayaran')
-                                    ->default('-'),
+                                    ->placeholder('Belum Terisi'),
                             ])->columns(1),
                     ]),
 
@@ -591,32 +662,32 @@ class Finance
                             ->schema([
                                 TextEntry::make('schools')
                                     ->label('Bill To')
-                                    ->default('-'),
+                                    ->placeholder('Belum Terisi'),
                                 TextEntry::make('number_invoice')
                                     ->label('Nomor Invoice')
-                                    ->default('-'),
+                                    ->placeholder('Belum Terisi'),
                                 TextEntry::make('detail_invoice')
                                     ->label('Deskripsi')
-                                    ->default('-'),
+                                    ->placeholder('Belum Terisi'),
                             ])->columns(1),
 
                         Infolists\Components\Fieldset::make('')
                             ->schema([
                                 TextEntry::make('qty_invoice')
                                     ->label('Kuantitas')
-                                    ->default('0'),
+                                    ->placeholder('Belum Terisi'),
                                 TextEntry::make('unit_price')
                                     ->label('Harga Per Unit')
                                     ->money('IDR')
-                                    ->default('0'),
+                                    ->placeholder('Belum Terisi'),
                                 TextEntry::make('amount_invoice')
                                     ->label('Jumlah')
                                     ->money('IDR')
-                                    ->default('-'),
+                                    ->placeholder('Belum Terisi'),
                                 TextEntry::make('subtotal_invoice')
                                     ->label('Sub Total')
                                     ->money('IDR')
-                                    ->default('-'),
+                                    ->placeholder('Belum Terisi'),
                             ])->columns(2),
 
                         Infolists\Components\Fieldset::make('')
@@ -624,15 +695,15 @@ class Finance
                                 TextEntry::make('tax_rate')
                                     ->label('PPH 23')
                                     ->formatStateUsing(fn (string $state): string => __("{$state}%"))
-                                    ->default('0'),
+                                    ->placeholder('Belum Terisi'),
                                 TextEntry::make('sales_tsx')
                                     ->label('PPN')
                                     ->formatStateUsing(fn (string $state): string => __("{$state}%"))
-                                    ->default('0'),
+                                    ->placeholder('Belum Terisi'),
                                 TextEntry::make('total_invoice')
                                     ->label('Total')
                                     ->money('IDR')
-                                    ->default('-'),
+                                    ->placeholder('Belum Terisi'),
                             ])->columns(2),
                     ]),
         ];
