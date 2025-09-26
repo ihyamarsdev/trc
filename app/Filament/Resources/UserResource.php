@@ -15,6 +15,7 @@ use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Notifications\Notification;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Actions\ImportAction;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\UserResource\Pages;
@@ -64,14 +65,15 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
+                ImageColumn::make('avatar_url')
+                    ->label('Avatar')
+                    ->circular()
+                    ->size(40),
                 TextColumn::make('name')
                     ->searchable()
                     ->label('Name'),
                 TextColumn::make('email')
                     ->searchable(),
-                IconColumn::make('force_renew_password')
-                    ->label('Status Ganti Sandi')
-                    ->boolean(),
                 TextColumn::make('email_verified_at')
                     ->label('Tanggal Verifikasi')
                     ->dateTime()
@@ -79,60 +81,52 @@ class UserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('roles.name')
                     ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'finance'  => 'green',
+                        'akademik'   => 'blue',
+                        'teknisi'   => 'blue',
+                        'sales' => 'yellow',
+                        'admin'  => 'indigo',
+                    })
                     ->label('Role'),
-                TextColumn::make('created_at')
-                    ->label('Tanggal Di Buat')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->label('Tanggal Di Perbarui')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                    //
             ])
             ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\Action::make('activity')
-                        ->label('Activity Timeline')
-                        ->icon('heroicon-o-clock')
-                        ->url(fn (User $record) => route('filament.admin.pages.activity', ['user' => $record->id]))
-                        ->openUrlInNewTab(),
-                    Tables\Actions\Action::make('change-password')
-                    ->label('Ubah Password')
-                    ->icon('heroicon-o-key')
-                    ->action(function ($record, array $data) {
-                        // Logika untuk mengganti password
-                        $record->password = Hash::make($data['new_password']);
-                        $record->save();
+                    Tables\Actions\ActionGroup::make([
+                        Tables\Actions\EditAction::make(),
+                        Tables\Actions\Action::make('change-password')
+                        ->label('Ubah Password')
+                        ->icon('heroicon-o-key')
+                        ->action(function ($record, array $data) {
+                            // Logika untuk mengganti password
+                            $record->password = Hash::make($data['new_password']);
+                            $record->save();
 
-                        Notification::make()
-                            ->title('Password berhasil diubah')
-                            ->success()
-                            ->send();
-                    })
-                    ->form([
-                        Forms\Components\TextInput::make('new_password')
-                            ->label('Password Baru')
-                            ->password()
-                            ->required(),
-                        Forms\Components\TextInput::make('confirm_password')
-                            ->label('Konfirmasi Password')
-                            ->password()
-                            ->required()
-                            ->same('new_password')
-                            ->dehydrated(fn ($state) => ! is_null($state)),
-                    ])
-                    ->requiresConfirmation(),
-                ]),
+                            Notification::make()
+                                ->title('Password berhasil diubah')
+                                ->success()
+                                ->send();
+                        })
+                        ->form([
+                            Forms\Components\TextInput::make('new_password')
+                                ->label('Password Baru')
+                                ->password()
+                                ->required(),
+                            Forms\Components\TextInput::make('confirm_password')
+                                ->label('Konfirmasi Password')
+                                ->password()
+                                ->required()
+                                ->same('new_password')
+                                ->dehydrated(fn ($state) => ! is_null($state)),
+                        ])
+                        ->requiresConfirmation(),
+                    ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                        Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }

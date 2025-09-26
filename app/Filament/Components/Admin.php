@@ -5,21 +5,316 @@ namespace App\Filament\Components;
 use Filament\Tables;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
-use Filament\Infolists;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Fieldset;
+use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\{TextColumn};
-use Filament\Infolists\Components\IconEntry;
-use Filament\Infolists\Components\TextEntry;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\DateTimePicker;
 use Creasi\Nusa\Models\{Province, Regency, District};
-use Filament\Forms\Components\{Select, TextInput, Section, DatePicker, Radio, Fieldset, Group};
+use Filament\Forms\Components\{Select, TextInput, Section};
+use Filament\Infolists;
 
-class Finance
+class Admin
 {
-    public static function formSchema(array $options = []): array
+    protected static function meta(Get $get): array
+    {
+        $type = $get('type') ?? 'apps';
+
+        return match ($type) {
+            'anbk' => [
+                'nameRegister'        => 'ANBK',
+                'DescriptionRegister' => 'ASESMEN NASIONAL BERBASIS KOMPUTER',
+            ],
+            'apps' => [
+                'nameRegister'        => 'APPS',
+                'DescriptionRegister' => 'ASESMEN PSIKOTES POTENSI SISWA',
+            ],
+            'snbt' => [
+                'nameRegister'        => 'SNBT',
+                'DescriptionRegister' => 'SELEKSI NASIONAL BERDASARKAN TES',
+            ],
+            'tka' => [
+                'nameRegister'        => 'TKA',
+                'DescriptionRegister' => 'TEST KEMAMPUAN AKADEMIK',
+            ],
+            default => [
+                'nameRegister'        => 'APPS',
+                'DescriptionRegister' => 'ASESMEN PSIKOTES POTENSI SISWA',
+            ],
+        };
+    }
+
+    public static function getDifference(Get $get, Set $set): void
+    {
+
+        $accountCount = (int) $get('account_count_created');
+        $implementerCount = (int) $get('implementer_count');
+
+        if ($accountCount !== 0 || $implementerCount !== 0) {
+            $set('difference', abs($accountCount - $implementerCount));
+        } else {
+            $set('difference', 0);
+        }
+    }
+
+    public static function schema(): array
     {
         return [
-            Section::make($options['nameRegister'])
-                ->description($options['DescriptionRegister'])
+            Section::make('Program')
+                ->description('Pilih Program')
+                ->schema([
+                    Select::make('type')
+                        ->label('Program')
+                        ->options([
+                            'apps' => 'APPS',
+                            'anbk' => 'ANBK',
+                            'snbt' => 'SNBT',
+                            'tka' => 'TKA',
+                        ]),
+                    Select::make('status_id')
+                        ->label('Status')
+                        ->preload()
+                        ->relationship(
+                            name: 'status',
+                            titleAttribute: 'name',
+                            modifyQueryUsing: fn (Builder $query) => $query
+                                ->orderBy('order')
+                        )
+                        ->searchable()
+                        ->placeholder('Pilih status...')
+                        ->columnSpan(1),
+                ])->columns(2),
+
+            Section::make('Periode')
+                ->description('Pilih Periode dan Tahun Ajaran')
+                ->schema([
+                    Select::make('periode')
+                        ->label('Periode')
+                        ->options([
+                            'Januari - Juni' => 'Januari - Juni',
+                            'Juli - Desember' => 'Juli - Desember',
+                        ]),
+                    TextInput::make('years')
+                        ->label('Tahun')
+                        ->maxLength(255),
+                ])->columns(2),
+
+            Section::make(fn (Get $get) => self::meta($get)['nameRegister'])
+                ->description(fn (Get $get) => self::meta($get)['DescriptionRegister'])
+                ->schema([
+                    DateTimePicker::make('date_register')
+                        ->label('Tanggal Pendaftaran')
+                        ->native(false)
+                        ->displayFormat('l, jS F Y H:i'),
+                    Select::make('provinces')
+                        ->label('Provinsi')
+                        ->options(Province::all()->pluck('name', 'name'))
+                        ->searchable()
+                        ->reactive()
+                        ->live(500),
+                    Select::make('regencies')
+                        ->label('Kota / Kabupaten')
+                        ->preload()
+                        ->searchable()
+                        ->reactive()
+                        ->live(100)
+                        ->options(function (Get $get) {
+                            $province = Province::where('name', $get('provinces'))->first();
+                            $provinceCode = $province ? $province->code : null;
+                            if ($provinceCode) {
+                                return Regency::where('province_code', $provinceCode)->pluck('name', 'name');
+                            }
+                            return [];
+                        }),
+                    Select::make('area')
+                        ->label('Wilayah')
+                        ->options(function (Get $get) {
+                            $regencies = Regency::where('name', $get('regencies'))->first();
+                            $regenciesCode = $regencies ? $regencies->code : null;
+                            if ($regenciesCode) {
+                                if ($regenciesCode == '3101') {
+                                    return ['kS 01' => 'KS 01', 'KS_02' => 'KS 02',];
+                                } elseif ($regenciesCode == '3171') {
+                                    return ['JP 01' => 'JP 01', 'JP 02' => 'JP 02',];
+                                } elseif ($regenciesCode == '3172') {
+                                    return ['JU 01' => 'JU 01', 'JU 02' => 'JU 02',];
+                                } elseif ($regenciesCode == '3173') {
+                                    return ['JB 01' => 'JB 01', 'JB 02' => 'JB 02',];
+                                } elseif ($regenciesCode == '3174') {
+                                    return ['JS 01' => 'JS 01', 'JS 02' => 'JU 02',];
+                                } elseif ($regenciesCode == '3175') {
+                                    return ['JT 01' => 'JT 01', 'JT 02' => 'JT 02',];
+                                } else {
+                                    return [];
+                                }
+                            }
+                            return [];
+                        })
+                        ->visible(function (Get $get) {
+                            return $get('provinces') === 'Dki Jakarta';
+                        }),
+                    Select::make('district')
+                        ->label('Kecamatan')
+                        ->preload()
+                        ->searchable()
+                        ->reactive()
+                        ->live(100)
+                        ->options(function (Get $get) {
+                            $district = Regency::where('name', $get('regencies'))->first();
+                            $regencyCode = $district ? $district ->code : null;
+                            if ($regencyCode) {
+                                return District::where('regency_code', $regencyCode)->pluck('name', 'name');
+                            }
+                            return [];
+                        }),
+                    TextInput::make('curriculum_deputies')
+                        ->label('Wakakurikulum')
+                        ->maxLength(255),
+                    TextInput::make('curriculum_deputies_phone')
+                        ->label('No Handphone Wakakurikulum')
+                        ->telRegex('/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/')
+                        ->maxLength(255),
+                    TextInput::make('counselor_coordinators')
+                        ->label('Koordinator BK')
+                        ->maxLength(255),
+                    TextInput::make('counselor_coordinators_phone')
+                        ->label('No Handphone Koordinator BK')
+                        ->telRegex('/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/')
+                        ->maxLength(255),
+                    TextInput::make('proctors')
+                        ->label('Proktor')
+                        ->maxLength(255),
+                    TextInput::make('proctors_phone')
+                        ->label('No Handphone Proktor')
+                        ->telRegex('/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/')
+                        ->maxLength(255),
+                    TextInput::make('student_count')
+                        ->label('Jumlah Siswa')
+                        ->numeric(),
+                    DateTimePicker::make('implementation_estimate')
+                        ->label('Estimasi Pelaksanaan')
+                        ->native(false)
+                        ->displayFormat('l, jS F Y H:i'),
+                ])->columns(2),
+
+                Section::make('Sekolah')
+                ->description('Masukkan Detail Data Sekolah')
+                ->schema([
+                    TextInput::make('schools')
+                        ->label('Nama Sekolah')
+                        ->maxLength(255),
+                    TextInput::make('class')
+                        ->label('Kelas')
+                        ->maxLength(10),
+                    Select::make('education_level')
+                        ->label('Jenjang')
+                        ->options([
+                            'SD' => 'SD',
+                            'MI' => 'MI',
+                            'SMP' => 'SMP',
+                            'MTS' => 'MTS',
+                            'SMA' => 'SMA',
+                            'MA' => 'MA',
+                            'SMK' => 'SMK',
+                        ])
+                        ->native(false),
+                    select::make('description')
+                        ->label('Keterangan')
+                        ->options([
+                            'ABK' => 'ABK',
+                            'NON-ABK' => 'NON ABK',
+                        ])
+                        ->native(false),
+                    select::make('schools_type')
+                        ->label('Negeri / Swasta')
+                        ->options([
+                            'Negeri' => 'Negeri',
+                            'Swasta' => 'Swasta',
+                        ])
+                        ->native(false),
+                    TextInput::make('principal')
+                        ->label('Nama Kepala Sekolah')
+                        ->maxLength(255),
+                    TextInput::make('principal_phone')
+                        ->label('No Handphone Kepala Sekolah')
+                        ->telRegex('/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/')
+                        ->maxLength(255),
+                ])->columns(2),
+
+
+                Section::make('Akademik')
+                ->description('Detail Data Akademik')
+                ->schema([
+                    DatePicker::make('group')
+                        ->label('Grup')
+                        ->native(false)
+                        ->displayFormat('l, jS F Y'),
+                    DatePicker::make('bimtek')
+                        ->label('Bimtek')
+                        ->native(false)
+                        ->displayFormat('l, jS F Y'),
+                    TextInput::make('account_count_created')
+                        ->label('Jumlah Akun Dibuat')
+                        ->live(debounce: 1000)
+                        ->default('0')
+                        ->afterStateUpdated(function (Get $get, Set $set) {
+                            self::getDifference($get, $set);
+                        }),
+                    TextInput::make('implementer_count')
+                        ->label('Jumlah Akun Pelaksanaan')
+                        ->live(debounce: 1000)
+                        ->default('0')
+                        ->afterStateUpdated(function (Get $get, Set $set) {
+                            self::getDifference($get, $set);
+                        }),
+                    TextInput::make('difference')
+                        ->label('Akun Dibuat')
+                        ->readOnly()
+                        ->numeric()
+                        ->minValue(0)
+                        ->live(),
+                ])->columns(2),
+
+            Section::make('Konsultasi')
+                ->description('Detail Data Konsultasi')
+                ->schema([
+                    Section::make('')
+                        ->schema([
+                            Radio::make('schools_download')
+                                ->label('Download Sekolah')
+                                ->options([
+                                    'ya' => 'Ya',
+                                    'tidak' => 'Tidak',
+                                ])
+                                ->inline(),
+                            Radio::make('students_download')
+                                ->label('Download Siswa')
+                                ->options([
+                                    'ya' => 'Ya',
+                                    'tidak' => 'Tidak',
+                                ])
+                                ->inline(),
+                            Radio::make('pm')
+                                ->label('PM')
+                                ->options([
+                                    'ya' => 'Ya',
+                                    'tidak' => 'Tidak',
+                                ])
+                                ->inline(),
+                        ])->columns(2),
+                    DatePicker::make('counselor_consultation_date')
+                        ->label('Konsul BK')
+                        ->native(false)
+                        ->displayFormat('l, jS F Y'),
+                    DatePicker::make('student_consultation_date')
+                        ->label('Konsul Siswa')
+                        ->native(false)
+                        ->displayFormat('l, jS F Y'),
+                ])->columns(2),
+
+             Section::make(fn (Get $get) => self::meta($get)['nameRegister'])
+                ->description(fn (Get $get) => self::meta($get)['DescriptionRegister'])
                 ->schema([
 
                     Fieldset::make('')
@@ -212,15 +507,15 @@ class Finance
                             DatePicker::make('invoice_date')
                                 ->label('Invoice')
                                 ->native(false)
-                                ->displayFormat('l, jS F Y')                             ,
+                                ->displayFormat('l, jS F Y'),
                             DatePicker::make('payment_date')
                                 ->label('Pembayaran')
                                 ->native(false)
-                                ->displayFormat('d/m/Y')                             ,
+                                ->displayFormat('d/m/Y'),
                             DatePicker::make('spk_sent')
                                 ->label('SPK di Kirim')
                                 ->native(false)
-                                ->displayFormat('d/m/Y')                             ,
+                                ->displayFormat('d/m/Y'),
                             Select::make('payment')
                                 ->label('Pembayaran Via')
                                 ->options([
@@ -231,22 +526,6 @@ class Finance
                         ]),
                 ])->columns(2),
 
-                 Section::make('Status')
-                    ->description('Merah = Belum dikerjakan • Kuning = Sales & Akademik')
-                    ->schema([
-                        Select::make('status_id')
-                            ->label('Status')
-                            ->preload()
-                                ->relationship(
-                                    name: 'status',
-                                    titleAttribute: 'name',
-                                    modifyQueryUsing: fn (Builder $query) => $query
-                                        ->orderBy('order')
-                                )
-                            ->searchable()
-                            ->placeholder('Pilih status...')
-                            ->columnSpan(1),
-                    ])->columns(2),
         ];
     }
 
@@ -255,13 +534,12 @@ class Finance
         return [
             TextColumn::make('no')
                 ->rowIndex(),
+            TextColumn::make('type')
+                ->label('Program'),
             TextColumn::make('periode')
                 ->label('Periode'),
             TextColumn::make('years')
                 ->label('Tahun'),
-            TextColumn::make('users.name')
-                ->label('User')
-                ->searchable(),
             TextColumn::make('schools')
                 ->label('Sekolah'),
             TextColumn::make('education_level')
@@ -278,26 +556,26 @@ class Finance
                 })
                 ->default('red')
                 ->toggleable(),
-        ];
+            ];
     }
 
-    public static function infolist(): array
+     public static function infolist(): array
     {
         return [
-            Infolists\Components\Section::make('Datacenter')
-                    ->description('Detail data dari datacenter')
+            Infolists\Components\Section::make('Sales')
+                    ->description('Detail data dari Sales')
                     ->schema([
                         Infolists\Components\Fieldset::make('Periode')
                             ->schema([
-                                TextEntry::make('periode')
+                                Infolists\Components\TextEntry::make('periode')
                                         ->label('Periode'),
-                                TextEntry::make('school_years.name')
-                                        ->label('Tahun Ajaran'),
+                                Infolists\Components\TextEntry::make('years')
+                                        ->label('Tahun'),
                             ]),
 
                         Infolists\Components\Fieldset::make('Salesforce')
                             ->schema([
-                                TextEntry::make('users.name')
+                                Infolists\Components\TextEntry::make('users.name')
                                     ->label('User'),
                             ]),
 
@@ -311,7 +589,7 @@ class Finance
                                     ->label('Jenjang'),
                                 Infolists\Components\TextEntry::make('description')
                                     ->label('Keterangan'),
-                                Infolists\Components\TextEntry::make('education_level_type')
+                                Infolists\Components\TextEntry::make('schools_type')
                                     ->label('Negeri / Swasta'),
                                 Infolists\Components\TextEntry::make('student_count')
                                     ->label('Jumlah Siswa'),
@@ -319,7 +597,7 @@ class Finance
                                     ->label('Provinsi'),
                                 Infolists\Components\TextEntry::make('regencies')
                                     ->label('Kota / Kabupaten'),
-                                Infolists\Components\TextEntry::make('sudin')
+                                Infolists\Components\TextEntry::make('area')
                                     ->label('Wilayah')
                                     ->default('-'),
                             ]),
@@ -327,65 +605,71 @@ class Finance
 
                         Infolists\Components\Fieldset::make('Bagan')
                             ->schema([
-                                TextEntry::make('principal')
+                                Infolists\Components\TextEntry::make('principal')
                                     ->label('Kepala Sekolah'),
-                                TextEntry::make('phone_principal')
+                                Infolists\Components\TextEntry::make('principal_phone')
                                     ->label('No Hp Kepala Sekolah'),
-                                TextEntry::make('curriculum_deputies.name')
+                                Infolists\Components\TextEntry::make('curriculum_deputies')
                                     ->label('Wakakurikulum'),
-                                TextEntry::make('curriculum_deputies.phone')
+                                Infolists\Components\TextEntry::make('curriculum_deputies_phone')
                                     ->label('No Hp Wakakurikulum'),
-                                TextEntry::make('counselor_coordinators.name')
+                                Infolists\Components\TextEntry::make('counselor_coordinators')
                                     ->label('Koordinator BK'),
-                                TextEntry::make('counselor_coordinators.phone')
+                                Infolists\Components\TextEntry::make('counselor_coordinators_phone')
                                     ->label('No Hp Koordinator BK'),
-                                TextEntry::make('proctors.name')
+                                Infolists\Components\TextEntry::make('proctors')
                                     ->label('Proktor'),
-                                TextEntry::make('proctors.phone')
+                                Infolists\Components\TextEntry::make('proctors_phone')
                                     ->label('No Hp Proktor'),
                             ]),
 
                         Infolists\Components\Fieldset::make('')
                             ->schema([
-                                TextEntry::make('date_register')
+                                Infolists\Components\TextEntry::make('date_register')
                                     ->label('Tanggal Pendaftaran')
-                                    ->dateTime('l, jS F Y'),
-                                TextEntry::make('implementation_estimate')
+                                    ->dateTime('l, jS F Y H:i'),
+                                Infolists\Components\TextEntry::make('implementation_estimate')
                                     ->label('Estimasi Pelaksanaan')
-                                    ->dateTime('l, jS F Y'),
+                                    ->dateTime('l, jS F Y H:i'),
                             ]),
                         ]),
-
                 Infolists\Components\Section::make('Academic')
                     ->description('Detail Data Academik')
                     ->schema([
 
                         Infolists\Components\Fieldset::make('')
                             ->schema([
-                                TextEntry::make('group')
+                                Infolists\Components\TextEntry::make('group')
                                     ->label('Grup')
                                     ->dateTime('l, jS F Y'),
-                                TextEntry::make('bimtek')
+                                Infolists\Components\TextEntry::make('bimtek')
                                     ->label('Bimtek')
                                     ->dateTime('l, jS F Y'),
                             ]),
 
                         Infolists\Components\Fieldset::make('')
                             ->schema([
-                                TextEntry::make('account_count_created')
-                                    ->label('Akun Dibuat')
-                                    ->default('-'),
-                                TextEntry::make('implementer_count')
-                                    ->label('Pelaksanaan')
-                                    ->default('-'),
-                                TextEntry::make('difference')
-                                    ->label('Selisih')
-                                    ->default('-'),
+                                Infolists\Components\TextEntry::make('account_count_created')
+                                    ->label('Akun Dibuat'),
+                                Infolists\Components\TextEntry::make('implementer_count')
+                                    ->label('Pelaksanaan'),
+                                Infolists\Components\TextEntry::make('difference')
+                                    ->label('Selisih'),
                             ]),
 
-                        Infolists\Components\Fieldset::make('')
+                        Infolists\Components\Fieldset::make('Status')
                             ->schema([
-                                IconEntry::make('schools_download')
+                                Infolists\Components\IconEntry::make('students_download')
+                                    ->label('Download Siswa')
+                                    ->icon(fn (string $state): string => match ($state) {
+                                        'ya' => 'heroicon-s-check-circle',
+                                        'tidak' => 'heroicon-s-x-circle',
+                                    })
+                                    ->color(fn (string $state): string => match ($state) {
+                                        'ya' => 'success',
+                                        'tidak' => 'danger',
+                                    }),
+                                Infolists\Components\IconEntry::make('schools_download')
                                     ->label('Download Sekolah')
                                     ->icon(fn (string $state): string => match ($state) {
                                         'ya' => 'heroicon-s-check-circle',
@@ -395,11 +679,11 @@ class Finance
                                         'ya' => 'success',
                                         'tidak' => 'danger',
                                     }),
-                                IconEntry::make('pm')
+                                Infolists\Components\IconEntry::make('pm')
                                     ->label('PM')
                                     ->icon(fn (string $state): string => match ($state) {
                                         'ya' => 'heroicon-s-check-circle',
-                                        'Tidak' => 'heroicon-s-x-circle',
+                                        'tidak' => 'heroicon-s-x-circle',
                                     })
                                     ->color(fn (string $state): string => match ($state) {
                                         'ya' => 'success',
@@ -409,210 +693,34 @@ class Finance
 
                         Infolists\Components\Fieldset::make('')
                             ->schema([
-                                TextEntry::make('counselor_consultation_date')
+                                Infolists\Components\TextEntry::make('counselor_consultation_date')
                                     ->label('Konsul BK')
                                     ->dateTime('l, jS F Y')
                                     ->default(null),
-                                TextEntry::make('student_consultation_date')
+                                Infolists\Components\TextEntry::make('student_consultation_date')
                                     ->label('Konsul Siswa')
                                     ->dateTime('l, jS F Y')
                                     ->default(null),
                             ]),
 
                     ])->columns(2),
-
-                Infolists\Components\Section::make('Finance')
-                    ->description('Detail Data Finance')
-                    ->schema([
-
-                        Infolists\Components\Fieldset::make('Opsi Jumlah Akun / Jumlah Pelaksanaan')
-                        ->schema([
-                            TextEntry::make('option_price')
-                                ->label('')
-                                ->default('-'),
-
-                        ]),
-
-
-                        Infolists\Components\Fieldset::make('Nominal')
-                            ->schema([
-                                TextEntry::make('price')
-                                    ->label('Harga SPJ')
-                                    ->money('IDR')
-                                    ->default('0'),
-                                TextEntry::make('net_2')
-                                    ->label('Harga Net')
-                                    ->money('IDR')
-                                    ->default('0'),
-                            ])->columns(3),
-
-                        Infolists\Components\Fieldset::make('')
-                            ->label('TRC')
-                            ->schema([
-                                TextEntry::make('student_count_1')
-                                    ->label('Selisih Siswa TRC')
-                                    ->default('-'),
-                                TextEntry::make('net')
-                                    ->label('Satuan')
-                                    ->money('IDR')
-                                    ->default('0'),
-                                TextEntry::make('subtotal_1')
-                                    ->label('Sub Total')
-                                    ->money('IDR')
-                                    ->default('0'),
-                            ])->columns(3),
-
-                        Infolists\Components\Fieldset::make('')
-                            ->label('MITRA')
-                            ->schema([
-                                TextEntry::make('mitra_difference')
-                                    ->label('Selisih Siswa Sekolah')
-                                    ->default('-'),
-                                TextEntry::make('mitra_net')
-                                    ->label('Satuan')
-                                    ->money('IDR')
-                                    ->default('0'),
-                                TextEntry::make('mitra_subtotal')
-                                    ->label('Sub Total')
-                                    ->money('IDR')
-                                    ->default('0'),
-
-                                TextEntry::make('implementer_count')
-                                    ->label('SS')
-                                    ->default('-'),
-                                TextEntry::make('ss_net')
-                                    ->label('Satuan')
-                                    ->money('IDR')
-                                    ->default('0'),
-                                TextEntry::make('ss_subtotal')
-                                    ->label('Sub Total')
-                                    ->money('IDR')
-                                    ->default('0'),
-
-                                TextEntry::make('dll_difference')
-                                    ->label('SS')
-                                    ->default('-'),
-                                TextEntry::make('dll_net')
-                                    ->label('Satuan')
-                                    ->money('IDR')
-                                    ->default('0'),
-                                TextEntry::make('dll_subtotal')
-                                    ->label('Sub Total')
-                                    ->money('IDR')
-                                    ->default('0'),
-                            ])->columns(3),
-
-                        Infolists\Components\Fieldset::make('')
-                            ->label('Total')
-                            ->schema([
-                                TextEntry::make('total')
-                                    ->label('Total Dana Sesuai SPJ')
-                                    ->money('IDR')
-                                    ->default('0'),
-                                TextEntry::make('total_net')
-                                    ->label('Total Net')
-                                    ->money('IDR')
-                                    ->default('0'),
-                            ])->columns(3),
-
-                        Infolists\Components\Fieldset::make('')
-                            ->label('Tanggal')
-                            ->schema([
-                                TextEntry::make('invoice_date')
-                                    ->label('Invoice')
-                                    ->dateTime('l, jS F Y')
-                                    ->default(null),
-                                TextEntry::make('payment_date')
-                                    ->label('Pembayaran')
-                                    ->dateTime('l, jS F Y'),
-                                TextEntry::make('spk_sent')
-                                    ->label('SPK di Kirim')
-                                    ->dateTime('l, jS F Y'),
-                                TextEntry::make('payment')
-                                    ->label('Pembayaran Via')
-                                    ->default('-')
-                            ]),
-                    ])->columns(3),
-
-                Infolists\Components\Section::make('Kwitansi')
-                    ->description('Lakukan Edit untuk merubah Kwitansi')
-                    ->schema([
-
-                        Infolists\Components\Fieldset::make('')
-                            ->label('Detail Kwitansi')
-                            ->schema([
-                                TextEntry::make('schools')
-                                    ->label('Telah Terima Dari')
-                                    ->default('-'),
-                                TextEntry::make('total')
-                                    ->label('Uang Sejumlah')
-                                    ->money('IDR')
-                                    ->default('0'),
-                                TextEntry::make('detail_kwitansi')
-                                    ->label('Guna Pembayaran')
-                                    ->default('-'),
-                            ])->columns(1),
-                    ]),
-
-                Infolists\Components\Section::make('Invoice')
-                    ->description('Lakukan Edit untuk merubah Invoice')
-                    ->schema([
-
-                        Infolists\Components\Fieldset::make('')
-                            ->label('Detail Invoice')
-                            ->schema([
-                                TextEntry::make('schools')
-                                    ->label('Bill To')
-                                    ->default('-'),
-                                TextEntry::make('number_invoice')
-                                    ->label('Nomor Invoice')
-                                    ->default('-'),
-                                TextEntry::make('detail_invoice')
-                                    ->label('Deskripsi')
-                                    ->default('-'),
-                            ])->columns(1),
-
-                        Infolists\Components\Fieldset::make('')
-                            ->schema([
-                                TextEntry::make('qty_invoice')
-                                    ->label('Kuantitas')
-                                    ->default('0'),
-                                TextEntry::make('unit_price')
-                                    ->label('Harga Per Unit')
-                                    ->money('IDR')
-                                    ->default('0'),
-                                TextEntry::make('amount_invoice')
-                                    ->label('Jumlah')
-                                    ->money('IDR')
-                                    ->default('-'),
-                                TextEntry::make('subtotal_invoice')
-                                    ->label('Sub Total')
-                                    ->money('IDR')
-                                    ->default('-'),
-                            ])->columns(2),
-
-                        Infolists\Components\Fieldset::make('')
-                            ->schema([
-                                TextEntry::make('tax_rate')
-                                    ->label('PPH 23')
-                                    ->formatStateUsing(fn (string $state): string => __("{$state}%"))
-                                    ->default('0'),
-                                TextEntry::make('sales_tsx')
-                                    ->label('PPN')
-                                    ->formatStateUsing(fn (string $state): string => __("{$state}%"))
-                                    ->default('0'),
-                                TextEntry::make('total_invoice')
-                                    ->label('Total')
-                                    ->money('IDR')
-                                    ->default('-'),
-                            ])->columns(2),
-                    ]),
         ];
     }
+
 
     public static function filters(): array
     {
         return [
+            Tables\Filters\SelectFilter::make('type')
+                ->label('Program')
+                ->options([
+                    'anbk' => 'ANBK',
+                    'apps' => 'APPS',
+                    'snbt' => 'SNBT',
+                    'tka' => 'TKA',
+                ])
+                ->preload()
+                ->indicator('Program'),
             Tables\Filters\SelectFilter::make('periode')
                 ->label('Periode')
                 ->options([
@@ -620,14 +728,7 @@ class Finance
                     'Juli - Desember' => 'Juli - Desember',
                 ])
                 ->preload()
-                ->searchable(),
-            Tables\Filters\SelectFilter::make('users_id')
-                ->label('User')
-                ->options(function () {
-                    return \App\Models\User::all()->pluck('name', 'id')->toArray();
-                })
-                ->preload()
-                ->indicator('user'),
+                ->indicator('Periode'),
             Tables\Filters\SelectFilter::make('latestStatusLog.status.color')
                 ->label('Status Warna')
                 ->options([
@@ -649,23 +750,11 @@ class Finance
                         $q->where('color', $data['value'])
                     );
                 }),
-            Tables\Filters\TernaryFilter::make('payment_date')
-                ->label('Status Pembayaran Sekolah')
-                ->placeholder('Semua Sekolah')
-                ->trueLabel('Sudah Bayar')
-                ->falseLabel('Belum Bayar')
-                ->queries(
-                    true: fn (Builder $query) => $query->whereNotNull('payment_date'),
-                    false: fn (Builder $query) => $query->whereNull('payment_date'),
-                    blank: fn (Builder $query) => $query,
-                )
         ];
     }
 
     public static function getRoles(): array
     {
-        return [
-            'finance'
-        ];
+        return ['admin', 'sales'];
     }
 }

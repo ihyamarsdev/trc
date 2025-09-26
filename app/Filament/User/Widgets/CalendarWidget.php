@@ -3,13 +3,15 @@
 namespace App\Filament\User\Widgets;
 
 use App\Models\RegistrationData;
+use App\Filament\Components\Academic;
 use Illuminate\Database\Eloquent\Model;
-use App\Filament\Resources\AcademicResource;
 use Saade\FilamentFullCalendar\Data\EventData;
+use App\Filament\User\Resources\Academic\AcademicResource;
 use Saade\FilamentFullCalendar\Widgets\FullCalendarWidget;
 use App\Filament\User\Resources\Academic\ANBK\AnbkAcademicResource;
 use App\Filament\User\Resources\Academic\APPS\AppsAcademicResource;
 use App\Filament\User\Resources\Academic\SNBT\SnbtAcademicResource;
+use App\Filament\User\Resources\Academic\AcademicResource as AcademicAcademicResource;
 
 class CalendarWidget extends FullCalendarWidget
 {
@@ -37,26 +39,15 @@ class CalendarWidget extends FullCalendarWidget
             ->where('implementation_estimate', '<=', $fetchInfo['end'])
             ->get()
             ->map(function (RegistrationData $event) {
-                // Petakan program -> Resource class
-                $resourceMap = [
-                    'ANBK' => AnbkAcademicResource::class,
-                    'APPS' => AppsAcademicResource::class,
-                    'SNBT' => SnbtAcademicResource::class,
-                ];
-
-                $program = strtoupper($event->type ?? ''); // ganti 'program' jika nama kolom berbeda
-                $resourceClass = $resourceMap[$program] ?? null;
-
-                $url = $resourceClass
-                    ? $resourceClass::getUrl(name: 'view', parameters: ['record' => $event])
-                    : null; // fallback: bisa diarahkan ke halaman umum bila perlu
 
                 return EventData::make()
                     ->id($event->id)
                     ->title($event->schools)
                     ->start($event->implementation_estimate)
                     ->end($event->implementation_estimate)
-                    ->url(url: $url, shouldOpenUrlInNewTab: true);
+                    ->url(url: AcademicResource::getUrl(name: 'view', parameters: ['record' => $event]), shouldOpenUrlInNewTab: true);
+                
+                
             })
             ->toArray();
     }

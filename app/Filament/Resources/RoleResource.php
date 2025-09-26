@@ -41,7 +41,15 @@ class RoleResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name')->badge()
+                TextColumn::make('name')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'finance'  => 'green',
+                        'akademik'   => 'blue',
+                        'teknisi'   => 'blue',
+                        'sales' => 'yellow',
+                        'admin'  => 'indigo',
+                })
             ])
             ->filters([
                 //

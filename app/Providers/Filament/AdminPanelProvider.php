@@ -48,6 +48,11 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Lime,
                 'success' => Color::Emerald,
                 'warning' => Color::Orange,
+                'yellow' => Color::Yellow,
+                'blue' => Color::Blue,
+                'green' => Color::Green,
+                'red' => Color::Red,
+                'indigo' => Color::Indigo,
             ])
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->navigationGroups([

@@ -1,0 +1,39 @@
+<?php
+
+namespace App\Filament\User\Resources\Academic\AcademicResource\Pages;
+
+use Filament\Actions;
+use Filament\Infolists\Infolist;
+use Filament\Resources\Pages\Page;
+use App\Filament\Components\Academic;
+use Filament\Resources\Pages\ViewRecord;
+use App\Filament\User\Resources\Academic\AcademicResource;
+use Filament\Resources\Pages\Concerns\InteractsWithRecord;
+
+class ViewAcademic extends ViewRecord
+{
+    use InteractsWithRecord;
+
+    protected static string $resource = AcademicResource::class;
+
+    // protected static string $view = 'filament.user.resources.academic.view-academic';
+
+    public function mount(int | string $record): void
+    {
+        $this->record = $this->resolveRecord($record);
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Actions\EditAction::make(),
+        ];
+    }
+
+    public function infolist(Infolist $infolist): Infolist
+    {
+        $record = $this->record;
+        return $infolist
+            ->schema(Academic::infolist(record: $record));
+    }
+}

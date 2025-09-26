@@ -63,7 +63,7 @@ class UserPanelProvider extends PanelProvider
                 'Activity',
                 'Salesforce',
                 'Datacenter',
-                'Akademik',
+                'Akademik & Teknisi',
                 'Finance',
                 'Rekap Datacenter',
                 'Rekap Akademik',

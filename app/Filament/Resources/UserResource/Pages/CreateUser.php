@@ -5,9 +5,10 @@ namespace App\Filament\Resources\UserResource\Pages;
 use Filament\Actions;
 use Illuminate\Support\Str;
 use App\Notifications\NewAccount;
+use Illuminate\Database\Eloquent\Model;
 use App\Filament\Resources\UserResource;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class CreateUser extends CreateRecord
 {
