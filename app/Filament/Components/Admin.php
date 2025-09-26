@@ -313,11 +313,11 @@ class Admin
                         ->displayFormat('l, jS F Y'),
                 ])->columns(2),
 
-             Section::make(fn (Get $get) => self::meta($get)['nameRegister'])
-                ->description(fn (Get $get) => self::meta($get)['DescriptionRegister'])
+           Section::make('Finance')
+                ->description('Data dari Finance')
                 ->schema([
 
-                    Fieldset::make('')
+                    Fieldset::make('Akun Siswa')
                         ->schema([
                             TextInput::make('account_count_created')
                                 ->label('Jumlah Akun Dibuat')
@@ -507,16 +507,16 @@ class Admin
                             DatePicker::make('invoice_date')
                                 ->label('Invoice')
                                 ->native(false)
-                                ->displayFormat('l, jS F Y'),
+                                ->displayFormat('l, jS F Y')                             ,
                             DatePicker::make('payment_date')
-                                ->label('Pembayaran')
+                                ->label('Jadwal Pembayaran')
                                 ->native(false)
-                                ->displayFormat('d/m/Y'),
-                            DatePicker::make('spk_sent')
-                                ->label('SPK di Kirim')
+                                ->displayFormat('d/m/Y')                             ,
+                            DatePicker::make('spk')
+                                ->label('Jadwal SPK')
                                 ->native(false)
-                                ->displayFormat('d/m/Y'),
-                            Select::make('payment')
+                                ->displayFormat('d/m/Y')                             ,
+                            Select::make('payment_name')
                                 ->label('Pembayaran Via')
                                 ->options([
                                     'SIPLAH' => 'SIPLAH',
@@ -525,7 +525,6 @@ class Admin
                                 ])
                         ]),
                 ])->columns(2),
-
         ];
     }
 
@@ -559,7 +558,7 @@ class Admin
             ];
     }
 
-     public static function infolist(): array
+    public static function infolist(): array
     {
         return [
             Infolists\Components\Section::make('Sales')

@@ -50,12 +50,7 @@ class SalesLeaderboard extends BaseWidget
                 ->orderBy('users_id') // tie-breaker opsional
             )
             ->columns([
-                Tables\Columns\TextColumn::make('users.name')->label('Sales'),
-                    Tables\Columns\TextColumn::make('red')->label('Data Merah')->summarize(
-                        Summarizer::make()
-                        ->label('')
-                        ->using(fn (Database\Query\Builder $query) => $query->where('status_color', '=', 'red')->count())
-                    ),
+                    Tables\Columns\TextColumn::make('users.name')->label('Sales'),
                     Tables\Columns\TextColumn::make('yellow')->label('Data Kuning')->summarize(
                         Summarizer::make()
                         ->label('')
@@ -71,6 +66,12 @@ class SalesLeaderboard extends BaseWidget
                         ->label('')
                         ->using(fn (Database\Query\Builder $query) => $query->where('status_color', '=', 'green')->count())
                     ),
+                    Tables\Columns\TextColumn::make('schools')->label('Jumlah Sekolah')->summarize(
+                        Summarizer::make()
+                            ->label('')
+                            ->using(fn (Database\Query\Builder $query) => $query->count('schools'))
+                            ),
+                    Tables\Columns\TextColumn::make('student_count')->label('Jumlah Siswa')->summarize(Sum::make()->label('')),
             ])
             ->groups([
                 Group::make('users.name')

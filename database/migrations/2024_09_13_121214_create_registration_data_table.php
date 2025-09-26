@@ -37,7 +37,7 @@ return new class () extends Migration {
             $table->string('principal')->nullable();
             $table->string('principal_phone')->nullable();
             $table->dateTime('implementation_estimate')->nullable();
-            $table->string('status_color')->default('red');
+            $table->string('status_color')->default('red')->nullable();
 
             ## Akademik dan Teknisi
             $table->date('group')->nullable();

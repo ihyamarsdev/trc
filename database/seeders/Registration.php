@@ -27,6 +27,7 @@ class Registration extends Seeder
         // Seed registration_data 100 baris, setiap baris users_id diacak dari $userIds
         RegistrationData::factory(100)->state(fn () => [
             'users_id' => Arr::random($userIds),
-        ])->create();
+        ])
+        ->create();
     }
 }

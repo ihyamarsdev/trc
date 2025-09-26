@@ -15,6 +15,34 @@ use Filament\Forms\Components\{Select, TextInput, Section, DatePicker, Radio, Fi
 
 class Finance
 {
+    protected static function meta(Get $get): array
+    {
+        $type = $get('type') ?? 'apps';
+
+        return match ($type) {
+            'anbk' => [
+                'nameRegister'        => 'ANBK',
+                'DescriptionRegister' => 'ASESMEN NASIONAL BERBASIS KOMPUTER',
+            ],
+            'apps' => [
+                'nameRegister'        => 'APPS',
+                'DescriptionRegister' => 'ASESMEN PSIKOTES POTENSI SISWA',
+            ],
+            'snbt' => [
+                'nameRegister'        => 'SNBT',
+                'DescriptionRegister' => 'SELEKSI NASIONAL BERDASARKAN TES',
+            ],
+            'tka' => [
+                'nameRegister'        => 'TKA',
+                'DescriptionRegister' => 'TEST KEMAMPUAN AKADEMIK',
+            ],
+            default => [
+                'nameRegister'        => 'APPS',
+                'DescriptionRegister' => 'ASESMEN PSIKOTES POTENSI SISWA',
+            ],
+        };
+    }
+
     public static function formSchema(array $options = []): array
     {
         return [
@@ -214,14 +242,14 @@ class Finance
                                 ->native(false)
                                 ->displayFormat('l, jS F Y')                             ,
                             DatePicker::make('payment_date')
-                                ->label('Pembayaran')
+                                ->label('Jadwal Pembayaran')
                                 ->native(false)
                                 ->displayFormat('d/m/Y')                             ,
-                            DatePicker::make('spk_sent')
-                                ->label('SPK di Kirim')
+                            DatePicker::make('spk')
+                                ->label('Jadwal SPK')
                                 ->native(false)
                                 ->displayFormat('d/m/Y')                             ,
-                            Select::make('payment')
+                            Select::make('payment_name')
                                 ->label('Pembayaran Via')
                                 ->options([
                                     'SIPLAH' => 'SIPLAH',
@@ -284,8 +312,8 @@ class Finance
     public static function infolist(): array
     {
         return [
-            Infolists\Components\Section::make('Datacenter')
-                    ->description('Detail data dari datacenter')
+            Infolists\Components\Section::make('Salesforce')
+                    ->description('Detail data dari Salesforce')
                     ->schema([
                         Infolists\Components\Fieldset::make('Periode')
                             ->schema([
