@@ -9,11 +9,12 @@ use Filament\Tables\Table;
 use App\Models\RegistrationData;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use App\Filament\Components\Admin;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\User\Resources\Activity\ActivityResource\Pages;
 use App\Filament\User\Resources\RegistrationDataResource\RelationManagers;
-use Filament\Tables\Filters\SelectFilter;
 
 class ActivityResource extends Resource
 {
@@ -44,32 +45,7 @@ class ActivityResource extends Resource
                 $query->withMax('activity', 'id') // alias: registration_statuses_updated_at_max
                     ->orderByDesc('updated_at')
             )
-            ->columns([
-                TextColumn::make('no')
-                    ->rowIndex(),
-                TextColumn::make('periode')
-                    ->label('Periode'),
-                TextColumn::make('years')
-                    ->label('Tahun'),
-                TextColumn::make('schools')
-                    ->label('Sekolah')
-                    ->searchable(),
-                TextColumn::make('education_level')
-                    ->label('Jenjang')
-                    ->searchable(),
-                TextColumn::make('latestStatusLog.status.color')
-                    ->label('Status')
-                    ->badge()
-                    ->formatStateUsing(fn ($state) => ucfirst($state))
-                    ->color(fn (string $state): string => match ($state) {
-                        'green'  => 'green',
-                        'blue'   => 'blue',
-                        'yellow' => 'yellow',
-                        'red'  => 'red',
-                    })
-                    ->toggleable()
-                    ->default('red'),
-            ])
+            ->columns(Admin::columns())
             ->filters([
                     Tables\Filters\SelectFilter::make('type')
                         ->label('Program')

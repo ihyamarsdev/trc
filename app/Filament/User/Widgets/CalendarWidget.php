@@ -2,16 +2,12 @@
 
 namespace App\Filament\User\Widgets;
 
+use Filament\Actions\Action;
 use App\Models\RegistrationData;
-use App\Filament\Components\Academic;
-use Illuminate\Database\Eloquent\Model;
+use Saade\FilamentFullCalendar\Actions;
 use Saade\FilamentFullCalendar\Data\EventData;
-use App\Filament\User\Resources\Academic\AcademicResource;
+use App\Filament\User\Resources\TimelineResource;
 use Saade\FilamentFullCalendar\Widgets\FullCalendarWidget;
-use App\Filament\User\Resources\Academic\ANBK\AnbkAcademicResource;
-use App\Filament\User\Resources\Academic\APPS\AppsAcademicResource;
-use App\Filament\User\Resources\Academic\SNBT\SnbtAcademicResource;
-use App\Filament\User\Resources\Academic\AcademicResource as AcademicAcademicResource;
 
 class CalendarWidget extends FullCalendarWidget
 {
@@ -24,11 +20,24 @@ class CalendarWidget extends FullCalendarWidget
         return [
             'firstDay' => 1,
             'headerToolbar' => [
-                'left' => 'prev,next today',
-                'center' => 'title',
-                'right' => 'dayGridYear,dayGridMonth,dayGridWeek,dayGridDay',
+                'left' => 'title',
+                'center' => '',
+                'right' => 'prevYear,nextYear',
             ],
+            'footerToolbar' => [
+                'left' => 'prev,next',
+                'center' => 'today',
+                'right' => 'dayGridMonth,dayGridWeek,dayGridDay',
+            ],
+            'titleFormat' => [
+                ''
+            ]
         ];
+    }
+
+    protected function viewAction(): Action
+    {
+        return Actions\ViewAction::make();
     }
 
     public function fetchEvents(array $fetchInfo): array
@@ -45,9 +54,9 @@ class CalendarWidget extends FullCalendarWidget
                     ->title($event->schools)
                     ->start($event->implementation_estimate)
                     ->end($event->implementation_estimate)
-                    ->url(url: AcademicResource::getUrl(name: 'view', parameters: ['record' => $event]), shouldOpenUrlInNewTab: true);
-                
-                
+                    ->url(url: TimelineResource::getUrl(name: 'view', parameters: ['record' => $event]));
+
+
             })
             ->toArray();
     }

@@ -48,6 +48,7 @@ class UserPanelProvider extends PanelProvider
             ->viteTheme('resources/css/filament/user/theme.css')
             ->databaseNotifications()
             ->collapsedSidebarWidth('3rem')
+            ->breadcrumbs(false)
             ->colors([
                 'danger' => Color::Rose,
                 'gray' => Color::Gray,

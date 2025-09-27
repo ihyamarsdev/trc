@@ -239,18 +239,18 @@ class SalesForce
     {
         return [
             Split::make([
-                TextColumn::make('no')
-                    ->rowIndex(),
                 TextColumn::make('type')
-                    ->label('Program'),
+                    ->label('Program')
+                    ->extraAttributes(['class' => 'uppercase']),
+                TextColumn::make('schools')
+                    ->label('Sekolah')
+                    ->wrap(),
                 TextColumn::make('periode')
-                    ->label('Periode'),
+                    ->label('Periode')
+                    ->wrap(),
                 TextColumn::make('years')
                     ->label('Tahun'),
-                TextColumn::make('schools')
-                    ->label('Sekolah'),
-                TextColumn::make('education_level')
-                    ->label('Jenjang'),
+
                 TextColumn::make('latestStatusLog.status.color')
                     ->label('Status')
                     ->badge()
@@ -263,7 +263,8 @@ class SalesForce
                     })
                     ->default('red')
                     ->toggleable(),
-            ])
+            ])->from('md')
+
             ];
     }
 

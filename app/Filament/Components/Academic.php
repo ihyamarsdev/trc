@@ -170,36 +170,33 @@ class Academic
     {
         return [
             Split::make([
-                TextColumn::make('no')
-                ->rowIndex(),
-            TextColumn::make('type')
-                ->label('Program'),
-            TextColumn::make('periode')
-                ->label('Periode'),
-            TextColumn::make('years')
-                ->label('Tahun'),
-            TextColumn::make('users.name')
-                ->label('User')
-                ->searchable(),
-            TextColumn::make('schools')
-                ->label('Sekolah')
-                ->searchable(),
-            TextColumn::make('education_level')
-                ->label('Jenjang'),
-            TextColumn::make('latestStatusLog.status.color')
-                ->label('Status')
-                ->badge()
-                ->formatStateUsing(fn ($state) => ucfirst($state))
-                ->color(fn (string $state): string => match ($state) {
-                    'green'  => 'green',
-                    'blue'   => 'blue',
-                    'yellow' => 'yellow',
-                    'red'  => 'red',
-                })
-                ->default('red')
-                ->toggleable(),
-            ])
-        ];
+                TextColumn::make('type')
+                    ->label('Program')
+                    ->extraAttributes(['class' => 'uppercase']),
+                TextColumn::make('schools')
+                    ->label('Sekolah')
+                    ->wrap(),
+                TextColumn::make('periode')
+                    ->label('Periode')
+                    ->wrap(),
+                TextColumn::make('years')
+                    ->label('Tahun'),
+
+                TextColumn::make('latestStatusLog.status.color')
+                    ->label('Status')
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => ucfirst($state))
+                    ->color(fn (string $state): string => match ($state) {
+                        'green'  => 'green',
+                        'blue'   => 'blue',
+                        'yellow' => 'yellow',
+                        'red'  => 'red',
+                    })
+                    ->default('red')
+                    ->toggleable(),
+            ])->from('md')
+
+            ];
     }
 
     public static function infolist(Model $record): array

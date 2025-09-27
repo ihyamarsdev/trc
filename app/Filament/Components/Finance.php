@@ -312,20 +312,19 @@ class Finance
     public static function columns(): array
     {
         return [
-              Split::make([
-                TextColumn::make('no')
-                    ->rowIndex(),
+            Split::make([
+                TextColumn::make('type')
+                    ->label('Program')
+                    ->extraAttributes(['class' => 'uppercase']),
+                TextColumn::make('schools')
+                    ->label('Sekolah')
+                    ->wrap(),
                 TextColumn::make('periode')
-                    ->label('Periode'),
+                    ->label('Periode')
+                    ->wrap(),
                 TextColumn::make('years')
                     ->label('Tahun'),
-                TextColumn::make('users.name')
-                    ->label('User')
-                    ->searchable(),
-                TextColumn::make('schools')
-                    ->label('Sekolah'),
-                TextColumn::make('education_level')
-                    ->label('Jenjang'),
+
                 TextColumn::make('latestStatusLog.status.color')
                     ->label('Status')
                     ->badge()
@@ -338,8 +337,9 @@ class Finance
                     })
                     ->default('red')
                     ->toggleable(),
-            ])
-        ];
+            ])->from('md')
+
+            ];
     }
 
     public static function infolist(Model $record): array
