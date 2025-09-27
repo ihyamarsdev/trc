@@ -9,6 +9,7 @@ use Filament\Tables\Table;
 use App\Models\RegistrationData;
 use Filament\Resources\Resource;
 use App\Filament\Components\Finance;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Exports\AcademicExporter;
 use Filament\Actions\Exports\Enums\ExportFormat;
@@ -26,6 +27,11 @@ class FinanceResource extends Resource
     protected static ?string $modelLabel = 'database';
     protected static ?string $slug = 'database-finance';
     protected static bool $shouldRegisterNavigation = true;
+
+    public static function canViewAny(): bool
+    {
+        return Auth::user()->hasRole(Finance::getRoles());
+    }
 
     public static function form(Form $form): Form
     {

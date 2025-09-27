@@ -73,11 +73,11 @@ class SalesLeaderboard extends BaseWidget
                             ),
                     Tables\Columns\TextColumn::make('student_count')->label('Jumlah Siswa')->summarize(Sum::make()->label('')),
             ])
-            ->groups([
-                Group::make('users.name')
-                    ->collapsible()
-                    ->titlePrefixedWithLabel(false),
-            ])
+            // ->groups([
+            //     Group::make('users.name')
+            //         ->collapsible()
+            //         ->titlePrefixedWithLabel(false),
+            // ])
             ->defaultGroup('users.name')
             ->groupingSettingsHidden()
             ->groupsOnly();

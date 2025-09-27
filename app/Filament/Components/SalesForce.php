@@ -4,12 +4,13 @@ namespace App\Filament\Components;
 
 use Filament\Tables;
 use Filament\Forms\Get;
+use Filament\Infolists;
+use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\{TextColumn};
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\DateTimePicker;
 use Creasi\Nusa\Models\{Province, Regency, District};
 use Filament\Forms\Components\{Select, TextInput, Section};
-use Filament\Infolists;
 
 class SalesForce
 {
@@ -34,7 +35,7 @@ class SalesForce
                 'nameRegister'        => 'TKA',
                 'DescriptionRegister' => 'TEST KEMAMPUAN AKADEMIK',
             ],
-            default => [ 
+            default => [
                 'nameRegister'        => 'APPS',
                 'DescriptionRegister' => 'ASESMEN PSIKOTES POTENSI SISWA',
             ],
@@ -237,30 +238,32 @@ class SalesForce
     public static function columns(): array
     {
         return [
-            TextColumn::make('no')
-                ->rowIndex(),
-            TextColumn::make('type')
-                ->label('Program'),
-            TextColumn::make('periode')
-                ->label('Periode'),
-            TextColumn::make('years')
-                ->label('Tahun'),
-            TextColumn::make('schools')
-                ->label('Sekolah'),
-            TextColumn::make('education_level')
-                ->label('Jenjang'),
-            TextColumn::make('latestStatusLog.status.color')
-                ->label('Status')
-                ->badge()
-                ->formatStateUsing(fn ($state) => ucfirst($state))
-                ->color(fn (string $state): string => match ($state) {
-                    'green'  => 'green',
-                    'blue'   => 'blue',
-                    'yellow' => 'yellow',
-                    'red'  => 'red',
-                })
-                ->default('red')
-                ->toggleable(),
+            Split::make([
+                TextColumn::make('no')
+                    ->rowIndex(),
+                TextColumn::make('type')
+                    ->label('Program'),
+                TextColumn::make('periode')
+                    ->label('Periode'),
+                TextColumn::make('years')
+                    ->label('Tahun'),
+                TextColumn::make('schools')
+                    ->label('Sekolah'),
+                TextColumn::make('education_level')
+                    ->label('Jenjang'),
+                TextColumn::make('latestStatusLog.status.color')
+                    ->label('Status')
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => ucfirst($state))
+                    ->color(fn (string $state): string => match ($state) {
+                        'green'  => 'green',
+                        'blue'   => 'blue',
+                        'yellow' => 'yellow',
+                        'red'  => 'red',
+                    })
+                    ->default('red')
+                    ->toggleable(),
+            ])
             ];
     }
 
@@ -418,5 +421,10 @@ class SalesForce
         return [
             'sales'
         ];
+    }
+
+    public static function actions(): array
+    {
+        return [];
     }
 }

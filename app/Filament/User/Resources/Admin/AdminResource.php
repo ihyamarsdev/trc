@@ -19,7 +19,7 @@ use App\Filament\User\Resources\Admin\AdminResource\Pages\{ListAdmins, CreateAdm
 class AdminResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
-    
+
     protected static ?string $navigationIcon = 'heroicon-o-building-library';
     protected static ?string $title = 'Admin Database';
     protected static ?string $navigationLabel = 'Database';
@@ -45,18 +45,13 @@ class AdminResource extends Resource
         return $table
             ->columns(Admin::columns())
             ->filters(Admin::filters())
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make(),
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
-                ]),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->actions(Admin::actions())
+            ->bulkActions(Admin::bulkActions());
+            // ->contentGrid([
+            //     'md' => 1,
+            //     'xl' => 3,
+            //     '2xl' => 5,
+            // ]);
     }
 
     public static function getRelations(): array

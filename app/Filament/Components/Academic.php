@@ -5,10 +5,11 @@ namespace App\Filament\Components;
 use Filament\Tables;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
-use Filament\Forms\Form;
 use Filament\Infolists;
+use Filament\Forms\Form;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
+use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\{TextColumn};
 use Illuminate\Database\Eloquent\Builder;
 use Creasi\Nusa\Models\{Province, Regency,  District};
@@ -168,7 +169,8 @@ class Academic
     public static function columns(): array
     {
         return [
-            TextColumn::make('no')
+            Split::make([
+                TextColumn::make('no')
                 ->rowIndex(),
             TextColumn::make('type')
                 ->label('Program'),
@@ -196,6 +198,7 @@ class Academic
                 })
                 ->default('red')
                 ->toggleable(),
+            ])
         ];
     }
 

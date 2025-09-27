@@ -7,6 +7,7 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Infolists;
 use Illuminate\Database\Eloquent\Model;
+use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\{TextColumn};
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Infolists\Components\IconEntry;
@@ -217,12 +218,12 @@ class Finance
                                 ->numeric()
                                 ->readOnly(),
 
-                            TextInput::make('implementer_count')
+                            TextInput::make('ss_difference')
                                 ->label('SS')
                                 ->numeric()
                                 ->live(debounce: 1000)
                                 ->afterStateUpdated(function (Get $get, Set $set) {
-                                    $set('ss_subtotal', (float) $get('implementer_count') * (float) $get('ss_net'));
+                                    $set('ss_subtotal', (float) $get('ss_difference') * (float) $get('ss_net'));
                                 })
                                 ->readOnly(),
                             TextInput::make('ss_net')
@@ -232,7 +233,7 @@ class Finance
                                 ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
                                 ->numeric()
                                 ->afterStateUpdated(function (Get $get, Set $set) {
-                                    $set('ss_subtotal', (float) $get('implementer_count') * (float) $get('ss_net'));
+                                    $set('ss_subtotal', (float) $get('ss_difference') * (float) $get('ss_net'));
                                 }),
                             TextInput::make('ss_subtotal')
                                 ->label('Subtotal')
@@ -270,15 +271,15 @@ class Finance
                             DatePicker::make('invoice_date')
                                 ->label('Invoice')
                                 ->native(false)
-                                ->displayFormat('l, jS F Y')                             ,
+                                ->displayFormat('l, jS F Y'),
                             DatePicker::make('payment_date')
                                 ->label('Jadwal Pembayaran')
                                 ->native(false)
-                                ->displayFormat('d/m/Y')                             ,
+                                ->displayFormat('l, jS F Y'),
                             DatePicker::make('spk')
                                 ->label('Jadwal SPK')
                                 ->native(false)
-                                ->displayFormat('d/m/Y')                             ,
+                                ->displayFormat('l, jS F Y'),
                             Select::make('payment_name')
                                 ->label('Pembayaran Via')
                                 ->options([
@@ -289,7 +290,7 @@ class Finance
                         ]),
                 ])->columns(2),
 
-                 Section::make('Status')
+                Section::make('Status')
                     ->description('Merah = Belum dikerjakan • Kuning = Sales & Akademik')
                     ->schema([
                         Select::make('status_id')
@@ -311,38 +312,40 @@ class Finance
     public static function columns(): array
     {
         return [
-            TextColumn::make('no')
-                ->rowIndex(),
-            TextColumn::make('periode')
-                ->label('Periode'),
-            TextColumn::make('years')
-                ->label('Tahun'),
-            TextColumn::make('users.name')
-                ->label('User')
-                ->searchable(),
-            TextColumn::make('schools')
-                ->label('Sekolah'),
-            TextColumn::make('education_level')
-                ->label('Jenjang'),
-            TextColumn::make('latestStatusLog.status.color')
-                ->label('Status')
-                ->badge()
-                ->formatStateUsing(fn ($state) => ucfirst($state))
-                ->color(fn (string $state): string => match ($state) {
-                    'green'  => 'green',
-                    'blue'   => 'blue',
-                    'yellow' => 'yellow',
-                    'red'  => 'red',
-                })
-                ->default('red')
-                ->toggleable(),
+              Split::make([
+                TextColumn::make('no')
+                    ->rowIndex(),
+                TextColumn::make('periode')
+                    ->label('Periode'),
+                TextColumn::make('years')
+                    ->label('Tahun'),
+                TextColumn::make('users.name')
+                    ->label('User')
+                    ->searchable(),
+                TextColumn::make('schools')
+                    ->label('Sekolah'),
+                TextColumn::make('education_level')
+                    ->label('Jenjang'),
+                TextColumn::make('latestStatusLog.status.color')
+                    ->label('Status')
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => ucfirst($state))
+                    ->color(fn (string $state): string => match ($state) {
+                        'green'  => 'green',
+                        'blue'   => 'blue',
+                        'yellow' => 'yellow',
+                        'red'  => 'red',
+                    })
+                    ->default('red')
+                    ->toggleable(),
+            ])
         ];
     }
 
     public static function infolist(Model $record): array
     {
         return [
-             Infolists\Components\Section::make(fn () => self::metaInfo($record)['nameRegister'])
+            Infolists\Components\Section::make(fn () => self::metaInfo($record)['nameRegister'])
                     ->description(fn () => self::metaInfo($record)['DescriptionRegister'])
                     ->schema([
                         Infolists\Components\Fieldset::make('Aktifitas Saat ini')
@@ -393,7 +396,7 @@ class Finance
                                     ->label('Jenjang'),
                                 Infolists\Components\TextEntry::make('description')
                                     ->label('Keterangan'),
-                                Infolists\Components\TextEntry::make('education_level_type')
+                                Infolists\Components\TextEntry::make('schools_type')
                                     ->label('Negeri / Swasta'),
                                 Infolists\Components\TextEntry::make('student_count')
                                     ->label('Jumlah Siswa'),
@@ -623,11 +626,11 @@ class Finance
                                     ->label('Pembayaran')
                                     ->dateTime('l, jS F Y')
                                     ->placeholder('Belum Terjadwal'),
-                                TextEntry::make('spk_sent')
+                                TextEntry::make('spk')
                                     ->label('SPK di Kirim')
                                     ->dateTime('l, jS F Y')
                                     ->placeholder('Belum Terjadwal'),
-                                TextEntry::make('payment')
+                                TextEntry::make('payment_name')
                                     ->label('Pembayaran Via')
                                     ->placeholder('Belum Terisi')
                             ]),
@@ -694,11 +697,35 @@ class Finance
                             ->schema([
                                 TextEntry::make('tax_rate')
                                     ->label('PPH 23')
-                                    ->formatStateUsing(fn (string $state): string => __("{$state}%"))
+                                    ->formatStateUsing(function ($state) {
+
+                                        // Kalau disimpan 2 (artinya 2%), tampilkan "2%"
+                                        // Kalau disimpan 0.02 (decimal), ubah ke persen:
+                                        $value = is_numeric($state) && (float)$state > 0 && (float)$state < 1
+                                            ? (float)$state * 100
+                                            : (float)$state;
+
+                                        // Rapikan trailing .00
+                                        $str = rtrim(rtrim(number_format($value, 2, '.', ''), '0'), '.');
+
+                                        return $str . '%';
+                                    })
                                     ->placeholder('Belum Terisi'),
                                 TextEntry::make('sales_tsx')
                                     ->label('PPN')
-                                    ->formatStateUsing(fn (string $state): string => __("{$state}%"))
+                                    ->formatStateUsing(function ($state) {
+
+                                        // Kalau disimpan 2 (artinya 2%), tampilkan "2%"
+                                        // Kalau disimpan 0.02 (decimal), ubah ke persen:
+                                        $value = is_numeric($state) && (float)$state > 0 && (float)$state < 1
+                                            ? (float)$state * 100
+                                            : (float)$state;
+
+                                        // Rapikan trailing .00
+                                        $str = rtrim(rtrim(number_format($value, 2, '.', ''), '0'), '.');
+
+                                        return $str . '%';
+                                    })
                                     ->placeholder('Belum Terisi'),
                                 TextEntry::make('total_invoice')
                                     ->label('Total')

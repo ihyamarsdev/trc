@@ -6,6 +6,7 @@ use NumberFormatter;
 use Illuminate\Http\Request;
 use App\Models\RegistrationData;
 use LaravelDaily\Invoices\Invoice;
+use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
 use LaravelDaily\Invoices\Classes\Buyer;
 use PhpOffice\PhpWord\TemplateProcessor;
@@ -46,7 +47,7 @@ class InvoiceGenerator extends Controller
 
         $doc_name = 'INVOICE RASYIDUU ANBK ' . $record->schools . '.docx';
 
-        $recipient = auth()->user;
+        $recipient = Auth::user();
 
         $recipient->notify(
             Notification::make()
@@ -95,7 +96,7 @@ class InvoiceGenerator extends Controller
         $doc_name = 'INVOICE EDUNESIA ANBK ' . $record->schools . '.docx';
 
 
-        $recipient = auth()->user;
+        $recipient = Auth::user();
 
         $recipient->notify(
             Notification::make()
