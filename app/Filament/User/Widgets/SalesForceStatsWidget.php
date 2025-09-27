@@ -38,8 +38,6 @@ class SalesForceStatsWidget extends BaseWidget
                 })
             )
             ->columns([
-                Tables\Columns\ImageColumn::make('users.avatar_url')
-                    ->square(),
                 Tables\Columns\TextColumn::make('type')->label('Program'),
                 Tables\Columns\TextColumn::make('schools')->label('Jumlah Sekolah')->summarize(
                     Summarizer::make()

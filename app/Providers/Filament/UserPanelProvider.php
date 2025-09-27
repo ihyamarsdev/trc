@@ -47,7 +47,7 @@ class UserPanelProvider extends PanelProvider
             ->brandLogoHeight('8rem')
             ->viteTheme('resources/css/filament/user/theme.css')
             ->databaseNotifications()
-            ->collapsedSidebarWidth('3rem')
+            ->topbar(true)
             ->breadcrumbs(false)
             ->colors([
                 'danger' => Color::Rose,

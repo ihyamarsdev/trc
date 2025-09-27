@@ -44,7 +44,7 @@ class CalendarWidget extends FullCalendarWidget
     {
 
         return RegistrationData::query()
-            ->where('date_register', '>=', $fetchInfo['start'])
+            ->where('implementation_estimate', '>=', $fetchInfo['start'])
             ->where('implementation_estimate', '<=', $fetchInfo['end'])
             ->get()
             ->map(function (RegistrationData $event) {
