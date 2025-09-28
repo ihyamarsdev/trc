@@ -23,8 +23,8 @@ class CreateUser extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $this->password = Str::password(12); // generate a default password with length of 12 caracters
-        $data['password'] = bcrypt($this->password);
+        $this->password = '12345678'; // generate a default password with length of 12 caracters
+        $data['password'] = $this->password;
         $data['force_renew_password'] = true; // to force user to renew password on next login
 
         return $data;
