@@ -14,7 +14,7 @@ use LaravelDaily\Invoices\Classes\InvoiceItem;
 
 class InvoiceGenerator extends Controller
 {
-    public function rasyidu_invoice(RegistrationData $record)
+    public function rasyidu(RegistrationData $record)
     {
         $pph = $record->tax_rate;
         $ppn = $record->sales_tsx;
@@ -62,7 +62,7 @@ class InvoiceGenerator extends Controller
         return response()->download(public_path($doc_name))->deleteFileAfterSend(true);
     }
 
-    public function edunesia_invoice(RegistrationData $record)
+    public function edunesia(RegistrationData $record)
     {
         $pph = $record->tax_rate;
         $ppn = $record->sales_tsx;

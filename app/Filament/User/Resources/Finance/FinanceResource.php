@@ -16,6 +16,7 @@ use Filament\Actions\Exports\Enums\ExportFormat;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\User\Resources\Finance\FinanceResource\Pages;
 use App\Filament\User\Resources\FinanceResource\RelationManagers;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
 
 class FinanceResource extends Resource
 {
@@ -42,25 +43,16 @@ class FinanceResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->deferLoading()
+            ->modifyQueryUsing(
+                fn (Builder $query) =>
+                $query->withMax('activity', 'id') // alias: registration_statuses_updated_at_max
+                    ->orderByDesc('updated_at')
+            )
             ->columns(Finance::columns())
             ->filters(Finance::filters())
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make(),
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
-                ]),
-            ])
-            ->bulkActions([
-                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                Tables\Actions\ExportBulkAction::make()
-                    ->exporter(AcademicExporter::class)
-                    ->formats([
-                        ExportFormat::Xlsx,
-                    ]),
-                ]),
-            ]);
+            ->actions(Finance::actions())
+            ->bulkActions(Finance::bulkActions());
     }
 
     public static function getRelations(): array

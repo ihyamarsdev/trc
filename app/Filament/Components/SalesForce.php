@@ -3,6 +3,7 @@
 namespace App\Filament\Components;
 
 use Filament\Tables;
+use App\Models\Status;
 use Filament\Forms\Get;
 use Filament\Infolists;
 use Filament\Tables\Columns\Layout\Split;
@@ -278,21 +279,47 @@ class SalesForce
                             ->schema([
                                 Infolists\Components\TextEntry::make('status.name')
                                     ->label(''),
-                                Infolists\Components\IconEntry::make('latestStatusLog.status.color')
+                                Infolists\Components\IconEntry::make('latestStatusLog.status.order')
                                     ->label('')
-                                    ->icon(fn (string $state): string => match ($state) {
-                                        'red' => 'heroicon-s-x-circle',
-                                        'yellow'  => 'heroicon-m-presentation-chart-line',
-                                        'blue'  => 'heroicon-m-academic-cap',
-                                        'green'  => 'heroicon-m-credit-card',
+                                    ->icon(function ($state) {
+                                        // $state = nilai order (bisa null)
+                                        static $iconByOrder;
+
+                                        if ($iconByOrder === null) {
+                                            // Ambil sekali: [order => icon]
+                                            $iconByOrder = Status::query()
+                                                ->pluck('icon', 'order')  // pastikan kolom 'icon' ada
+                                                ->all();
+                                        }
+
+                                        $order = (int) $state;
+                                        return $iconByOrder[$order] ?? 'heroicon-m-clock';
                                     })
-                                    ->color(fn (string $state): string => match ($state) {
-                                        'yellow' => 'yellow',
-                                        'blue'   => 'blue',
-                                        'green'  => 'green',
-                                        'red'    => 'red',
+                                    ->color(function ($state) {
+                                        static $colorByOrder;
+
+                                        if ($colorByOrder === null) {
+                                            // Ambil sekali: [order => color_dari_DB]
+                                            $colorByOrder = Status::query()
+                                                ->pluck('color', 'order')
+                                                ->all();
+                                        }
+
+                                        $order = (int) $state;
+                                        $raw   = strtolower((string) ($colorByOrder[$order] ?? ''));
+
+                                        // Map warna DB -> warna Filament
+                                        return match ($raw) {
+                                            'green'  => 'green',
+                                            'blue'   => 'blue',
+                                            'yellow' => 'yellow',
+                                            'red'    => 'red',
+                                            default  => 'gray',
+                                        };
                                     })
-                                    ->default('red'),
+                                    ->default('red')
+                                    ->size('lg'),
+
                             ]),
                     ])->columns(2),
 
@@ -426,6 +453,18 @@ class SalesForce
 
     public static function actions(): array
     {
-        return [];
+        return [
+            Tables\Actions\ViewAction::make(),
+            Tables\Actions\EditAction::make(),
+        ];
+    }
+
+    public static function bulkActions(): array
+    {
+        return [
+            Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+        ];
     }
 }

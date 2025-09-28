@@ -62,9 +62,7 @@ class UserPanelProvider extends PanelProvider
                 'red' => Color::Red,
             ])
             ->navigationGroups([
-                'Activity',
                 'Salesforce',
-                'Datacenter',
                 'Akademik & Teknisi',
                 'Finance',
                 'Rekap Datacenter',

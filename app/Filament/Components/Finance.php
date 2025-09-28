@@ -2,7 +2,9 @@
 
 namespace App\Filament\Components;
 
+use Carbon\Carbon;
 use Filament\Tables;
+use App\Models\Status;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Infolists;
@@ -10,9 +12,12 @@ use Illuminate\Database\Eloquent\Model;
 use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\{TextColumn};
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Exports\AcademicExporter;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Actions\Exports\Enums\ExportFormat;
 use Creasi\Nusa\Models\{Province, Regency, District};
+use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
 use Filament\Forms\Components\{Select, TextInput, Section, DatePicker, Radio, Fieldset, Group};
 
 class Finance
@@ -80,6 +85,23 @@ class Finance
             Section::make()
                 ->description()
                 ->schema([
+
+                    Section::make('Status')
+                        ->description('Merah = Belum dikerjakan • Kuning = Sales & Akademik')
+                        ->schema([
+                            Select::make('status_id')
+                                ->label('Status')
+                                ->preload()
+                                    ->relationship(
+                                        name: 'status',
+                                        titleAttribute: 'name',
+                                        modifyQueryUsing: fn (Builder $query) => $query
+                                            ->orderBy('order')
+                                    )
+                                ->searchable()
+                                ->placeholder('Pilih status...')
+                                ->columnSpan(1),
+                    ])->columns(2),
 
                     Fieldset::make('')
                         ->schema([
@@ -289,23 +311,6 @@ class Finance
                                 ])
                         ]),
                 ])->columns(2),
-
-                Section::make('Status')
-                    ->description('Merah = Belum dikerjakan • Kuning = Sales & Akademik')
-                    ->schema([
-                        Select::make('status_id')
-                            ->label('Status')
-                            ->preload()
-                                ->relationship(
-                                    name: 'status',
-                                    titleAttribute: 'name',
-                                    modifyQueryUsing: fn (Builder $query) => $query
-                                        ->orderBy('order')
-                                )
-                            ->searchable()
-                            ->placeholder('Pilih status...')
-                            ->columnSpan(1),
-                    ])->columns(2),
         ];
     }
 
@@ -342,6 +347,74 @@ class Finance
             ];
     }
 
+    public static function exportColumns(): array
+    {
+        return [
+                 //Finance
+            TextColumn::make('price')
+                ->label('Harga SPJ')
+                ->prefix('Rp.'),
+            TextColumn::make('net_2')
+                ->label('Harga NET')
+                ->prefix('Rp.'),
+            TextColumn::make('total')
+                ->label('Total Dana Sesuai SPJ')
+                ->prefix('Rp.'),
+            TextColumn::make('total_net')
+                ->label('Total Net')
+                ->prefix('Rp.'),
+
+            TextColumn::make('student_count_1')
+                ->label('Selisih Siswa TRC'),
+            TextColumn::make('net')
+                ->label('Satuan')
+                ->prefix('Rp.'),
+            TextColumn::make('subtotal_1')
+                ->label('Subtotal')
+                ->prefix('Rp.'),
+
+            TextColumn::make('mitra_difference')
+                ->label('elisih Siswa Sekolah'),
+            TextColumn::make('net')
+                ->label('Satuan')
+                ->prefix('Rp.'),
+            TextColumn::make('mitra_subtotal')
+                ->label('Subtotal')
+                ->prefix('Rp.'),
+
+            TextColumn::make('ss_difference')
+                ->label('SS'),
+            TextColumn::make('ss_net')
+                ->label('Satuan')
+                ->prefix('Rp.'),
+            TextColumn::make('ss_subtotal')
+                ->label('Subtotal')
+                ->prefix('Rp.'),
+
+            TextColumn::make('dll_difference')
+                ->label('Lain-lain'),
+            TextColumn::make('dll_net')
+                ->label('Satuan')
+                ->prefix('Rp.'),
+            TextColumn::make('dll_subtotal')
+                ->label('Subtotal')
+                ->prefix('Rp.'),
+
+            TextColumn::make('invoice_date')
+                ->label('Tanggal Invoice')
+                ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
+            TextColumn::make('spk')
+                ->label('SPK Terkirim')
+                ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
+            TextColumn::make('payment_date')
+                ->label('Tanggal Pembayaran')
+                ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
+            TextColumn::make('payment_name')
+                ->label('Pembayaran'),
+
+            ];
+    }
+
     public static function infolist(Model $record): array
     {
         return [
@@ -352,21 +425,46 @@ class Finance
                             ->schema([
                                 Infolists\Components\TextEntry::make('status.name')
                                     ->label('Status'),
-                                Infolists\Components\IconEntry::make('latestStatusLog.status.color')
-                                    ->label('Status Warna dan Icon')
-                                    ->icon(fn (string $state): string => match ($state) {
-                                        'red' => 'heroicon-s-x-circle',
-                                        'yellow'  => 'heroicon-m-presentation-chart-line',
-                                        'blue'  => 'heroicon-m-academic-cap',
-                                        'green'  => 'heroicon-m-credit-card',
+                                Infolists\Components\IconEntry::make('latestStatusLog.status.order')
+                                    ->label('')
+                                    ->icon(function ($state) {
+                                        // $state = nilai order (bisa null)
+                                        static $iconByOrder;
+
+                                        if ($iconByOrder === null) {
+                                            // Ambil sekali: [order => icon]
+                                            $iconByOrder = Status::query()
+                                                ->pluck('icon', 'order')  // pastikan kolom 'icon' ada
+                                                ->all();
+                                        }
+
+                                        $order = (int) $state;
+                                        return $iconByOrder[$order] ?? 'heroicon-m-clock';
                                     })
-                                    ->color(fn (string $state): string => match ($state) {
-                                        'yellow' => 'yellow',
-                                        'blue'   => 'blue',
-                                        'green'  => 'green',
-                                        'red'    => 'red',
+                                    ->color(function ($state) {
+                                        static $colorByOrder;
+
+                                        if ($colorByOrder === null) {
+                                            // Ambil sekali: [order => color_dari_DB]
+                                            $colorByOrder = Status::query()
+                                                ->pluck('color', 'order')
+                                                ->all();
+                                        }
+
+                                        $order = (int) $state;
+                                        $raw   = strtolower((string) ($colorByOrder[$order] ?? ''));
+
+                                        // Map warna DB -> warna Filament
+                                        return match ($raw) {
+                                            'green'  => 'green',
+                                            'blue'   => 'blue',
+                                            'yellow' => 'yellow',
+                                            'red'    => 'red',
+                                            default  => 'gray',
+                                        };
                                     })
-                                    ->default('red'),
+                                    ->default('red')
+                                    ->size('lg'),
                             ]),
                     ])->columns(2),
             Infolists\Components\Section::make('Salesforce')
@@ -695,7 +793,7 @@ class Finance
 
                         Infolists\Components\Fieldset::make('')
                             ->schema([
-                                TextEntry::make('tax_rate')
+                                TextEntry::make('pph')
                                     ->label('PPH 23')
                                     ->formatStateUsing(function ($state) {
 
@@ -711,7 +809,7 @@ class Finance
                                         return $str . '%';
                                     })
                                     ->placeholder('Belum Terisi'),
-                                TextEntry::make('sales_tsx')
+                                TextEntry::make('ppn')
                                     ->label('PPN')
                                     ->formatStateUsing(function ($state) {
 
@@ -785,6 +883,27 @@ class Finance
                     false: fn (Builder $query) => $query->whereNull('payment_date'),
                     blank: fn (Builder $query) => $query,
                 )
+        ];
+    }
+
+    public static function actions(): array
+    {
+        return [
+            Tables\Actions\ViewAction::make(),
+        ];
+    }
+
+    public static function bulkActions(): array
+    {
+        return [
+            Tables\Actions\BulkActionGroup::make([
+                Tables\Actions\DeleteBulkAction::make(),
+                FilamentExportBulkAction::make('Export')
+                    ->withColumns(self::exportColumns())
+                    ->formatStates([
+                        'type' => fn (?Model $record) => strtoupper($record->type),
+                    ])
+                ]),
         ];
     }
 

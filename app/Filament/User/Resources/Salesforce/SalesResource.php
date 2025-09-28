@@ -24,7 +24,7 @@ class SalesResource extends Resource
     protected static ?string $model = RegistrationData::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-presentation-chart-line';
-    // protected static ?string $navigationGroup = 'Salesforce';
+    protected static ?string $navigationGroup = 'Salesforce';
     protected static ?string $title = 'Database';
     protected static ?string $navigationLabel = 'Database';
     protected static ?string $modelLabel = 'database';
@@ -57,23 +57,8 @@ class SalesResource extends Resource
             )
             ->columns(SalesForce::columns())
             ->filters(SalesForce::filters())
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make(),
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
-                ]),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ExportBulkAction::make()
-                        ->exporter(SalesforceExporter::class)
-                        ->formats([
-                            ExportFormat::Xlsx,
-                        ]),
-                ]),
-            ]);
+            ->actions(SalesForce::actions())
+            ->bulkActions(SalesForce::bulkActions());
     }
 
     public static function infolist(Infolist $infolist): Infolist

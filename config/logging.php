@@ -127,6 +127,13 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        'download' => [
+            'driver' => 'single',           // atau 'daily' jika mau rotate
+            'path' => storage_path('logs/download.log'),
+            'level' => 'error',             // bisa 'debug','info','warning','error', dst.
+            'replace_placeholders' => true, // biar {foo} di context terisi
+        ],
+
     ],
 
 ];

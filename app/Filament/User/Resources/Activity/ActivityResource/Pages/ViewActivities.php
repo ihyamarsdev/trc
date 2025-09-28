@@ -45,47 +45,47 @@ class ViewActivities extends Page
             )
             ->get();
 
-        if ($logs->isEmpty()) {
-            // DB::transaction(function () {
-            //     // pastikan status default ada
+        // if ($logs->isEmpty()) {
+        //     // DB::transaction(function () {
+        //     //     // pastikan status default ada
 
-            // });
-            $status = Status::query()
-                   ->where('order', 1)
-                   ->first();
+        //     // });
+        //     $status = Status::query()
+        //            ->where('order', 1)
+        //            ->first();
 
-            // simpan log pertama (pilih salah satu skema sesuai kolom tabel-mu)
-            RegistrationStatus::create([
-                'registration_id' => $this->record->id,
-                'status_id'       => $status->id,
-                'user_id'         => $this->record->users_id, // kalau ada kolom user_id
-                'order'           => $status->order,
+        //     // simpan log pertama (pilih salah satu skema sesuai kolom tabel-mu)
+        //     RegistrationStatus::create([
+        //         'registration_id' => $this->record->id,
+        //         'status_id'       => $status->id,
+        //         'user_id'         => $this->record->users_id, // kalau ada kolom user_id
+        //         'order'           => $status->order,
 
-                // HANYA isi ini jika kolom-kolomnya memang ada di tabel registration_statuses
-                'name'        => $status->name ?? null,
-                'description' => $status->description ?? null,
-                'color'       => $status->color ?? null,
-                'category'    => $status->category ?? null,
-            ]);
+        //         // HANYA isi ini jika kolom-kolomnya memang ada di tabel registration_statuses
+        //         'name'        => $status->name ?? null,
+        //         'description' => $status->description ?? null,
+        //         'color'       => $status->color ?? null,
+        //         'category'    => $status->category ?? null,
+        //     ]);
 
-        }
+        // }
 
-        // ikon per kategori
-        $iconByCategory = [
-            'akademik' => 'heroicon-m-academic-cap',
-            'teknisi'  => 'heroicon-m-wrench-screwdriver',
-            'finance'  => 'heroicon-m-banknotes',
-            'general'  => 'heroicon-m-bolt',
-        ];
+        // // ikon per kategori
+        // $iconByCategory = [
+        //     'akademik' => 'heroicon-m-academic-cap',
+        //     'teknisi'  => 'heroicon-m-wrench-screwdriver',
+        //     'finance'  => 'heroicon-m-banknotes',
+        //     'general'  => 'heroicon-m-bolt',
+        // ];
 
         // map warna DB -> warna Filament
-        $toFilamentColor = fn (?string $raw) => match (Str::lower((string)$raw)) {
-            'yellow','kuning' => 'yellow',
-            'blue','biru'     => 'blue',
-            'green','hijau'   => 'green',
-            'red','merah'     => 'red',
-            default           => 'gray',
-        };
+        // $toFilamentColor = fn (?string $raw) => match (Str::lower((string)$raw)) {
+        //     'yellow','kuning' => 'yellow',
+        //     'blue','biru'     => 'blue',
+        //     'green','hijau'   => 'green',
+        //     'red','merah'     => 'red',
+        //     default           => 'gray',
+        // };
 
         // Build state timeline
         $categoryBySlug = [];
@@ -94,7 +94,7 @@ class ViewActivities extends Page
 
         foreach ($logs as $s) {
             $slug  = Str::slug($s->status->name);
-            $color = $toFilamentColor($s->status->color);
+            // $color = $toFilamentColor($s->status->color);
 
             $title = "Status: <span class='font-semibold'>".e($s->status->name)."</span>";
             $desc  = $s->status->description ? e($s->status->description) : '—';
@@ -103,11 +103,11 @@ class ViewActivities extends Page
                 'title'       => $title,
                 'description' => $desc,
                 'status'      => $slug,
-                'updated_at'  => $s->created_at
+                'updated_at'  => $s->created_at,
             ];
 
-            $categoryBySlug[$slug] = $s->status->category ?? 'general';
-            $colorBySlug[$slug]    = $color;
+            $colorBySlug[$slug]    = $s->status->color;
+            $iconBySlug[$slug] = $s->status->icon;
         }
 
         return $infolist
@@ -130,7 +130,7 @@ class ViewActivities extends Page
                             ->placeholder('No date is set.'),
 
                         ActivityIcon::make('status')
-                            ->icon(fn (?string $state) => $iconByCategory[$categoryBySlug[$state] ?? 'general'] ?? 'heroicon-m-clock')
+                            ->icon(fn (?string $state) => $iconBySlug[$state] ?? 'heroicon-m-clock')
                             ->animation(IconAnimation::Pulse)
                             ->color(fn (?string $state) => $colorBySlug[$state] ?? 'gray'),
                     ])

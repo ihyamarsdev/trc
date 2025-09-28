@@ -23,7 +23,7 @@ class AcademicResource extends Resource
     protected static ?string $model = RegistrationData::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
-    // protected static ?string $navigationGroup = 'Akademik & Teknisi';
+    protected static ?string $navigationGroup = 'Akademik & Teknisi';
     protected static ?string $title = 'Database';
     protected static ?string $navigationLabel = 'Database';
     protected static ?string $modelLabel = 'database';
@@ -54,23 +54,8 @@ class AcademicResource extends Resource
                 Academic::columns()
             )
             ->filters(Academic::filters())
-            ->actions([
-                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make(),
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
-                ]),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                Tables\Actions\ExportBulkAction::make()
-                    ->exporter(AcademicExporter::class)
-                    ->formats([
-                        ExportFormat::Xlsx,
-                    ]),
-                ]),
-            ]);
+            ->actions(Academic::actions())
+            ->bulkActions(Academic::bulkActions());
     }
 
     public static function getRelations(): array
