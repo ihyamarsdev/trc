@@ -33,8 +33,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             StatusSeeder::class,
-            UserSeeder::class,
-            Registration::class,
+            // UserSeeder::class,
+            // Registration::class,
         ]);
     }
 }
