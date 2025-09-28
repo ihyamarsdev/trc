@@ -16,16 +16,18 @@ class ViewAcademic extends ViewRecord
 
     protected static string $resource = AcademicResource::class;
 
-    public function mount(int | string $record): void
-    {
-        $this->record = $this->resolveRecord($record);
-    }
-
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
+            Actions\EditAction::make('edit')
+                ->label('Ubah')
+                ->url($this->getResource()::getUrl('edit', ['record' => $this->record])),
         ];
+    }
+
+    public function mount(int | string $record): void
+    {
+        $this->record = $this->resolveRecord($record);
     }
 
     public function infolist(Infolist $infolist): Infolist

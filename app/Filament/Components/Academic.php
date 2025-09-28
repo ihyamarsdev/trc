@@ -476,7 +476,7 @@ class Academic
     {
         return [
             Tables\Actions\ViewAction::make(),
-            Tables\Actions\EditAction::make(),
+            // Tables\Actions\EditAction::make(),
         ];
     }
 
@@ -492,7 +492,7 @@ class Academic
     public static function getRoles(): array
     {
         return [
-            'akademik'
+            'akademik','teknisi'
         ];
     }
 }
