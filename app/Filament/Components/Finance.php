@@ -82,11 +82,7 @@ class Finance
     public static function formSchema(): array
     {
         return [
-            Section::make()
-                ->description()
-                ->schema([
-
-                    Section::make('Status')
+            Section::make('Status')
                         ->description('Merah = Belum dikerjakan • Kuning = Sales & Akademik')
                         ->schema([
                             Select::make('status_id')
@@ -102,6 +98,9 @@ class Finance
                                 ->placeholder('Pilih status...')
                                 ->columnSpan(1),
                     ])->columns(2),
+            Section::make()
+                ->description()
+                ->schema([
 
                     Fieldset::make('')
                         ->schema([

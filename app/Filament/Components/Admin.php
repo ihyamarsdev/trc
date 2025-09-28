@@ -1039,7 +1039,7 @@ class Admin
     {
         return [
             Tables\Actions\ViewAction::make(),
-            Tables\Actions\EditAction::make(),
+            // Tables\Actions\EditAction::make(),
         ];
     }
 

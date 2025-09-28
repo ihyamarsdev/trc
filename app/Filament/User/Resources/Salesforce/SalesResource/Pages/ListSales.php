@@ -19,7 +19,8 @@ class ListSales extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                 ->label('Buat'),
             Action::make('import')
                 ->label('Import')
                 ->icon('heroicon-o-arrow-up-tray')
@@ -44,7 +45,7 @@ class ListSales extends ListRecords
                         ]);
 
                         if (file_exists($file)) {
-                            unlink($file); 
+                            unlink($file);
                         }
 
                         Notification::make()
