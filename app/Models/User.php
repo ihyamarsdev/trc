@@ -37,7 +37,7 @@ class User extends Authenticatable implements HasAvatar, FilamentUser, RenewPass
         if ($panel->getId() === 'admin') {
             return $this->hasRole('admin');
         } elseif ($panel->getId() === 'user') {
-            return $this->hasRole(['sales','akademik','finance','admin']);
+            return $this->hasRole(['sales','akademik','teknisi','finance','admin']);
         }
 
         return false;
