@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Auth;
 use App\Filament\Components\SalesForce;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Enums\ActionsPosition;
 use App\Filament\Exports\SalesforceExporter;
 use Filament\Actions\Exports\Enums\ExportFormat;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -48,6 +49,9 @@ class SalesResource extends Resource
     {
         return $table
             ->deferLoading()
+            ->poll('5s')
+            ->searchable()
+            ->striped()
             // ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'anbk')->when(!Auth::user()->hasRole(['admin']), function ($query) {
             //     // Assuming you have a 'user_id' field in your 'apps' table
             //     return $query->where('users_id', Auth::id());
@@ -58,7 +62,7 @@ class SalesResource extends Resource
             )
             ->columns(SalesForce::columns())
             ->filters(SalesForce::filters())
-            ->actions(SalesForce::actions())
+            ->actions(SalesForce::actions(), position: ActionsPosition::BeforeColumns)
             ->bulkActions(SalesForce::bulkActions());
     }
 

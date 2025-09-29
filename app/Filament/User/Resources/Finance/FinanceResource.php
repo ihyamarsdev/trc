@@ -12,11 +12,12 @@ use App\Filament\Components\Finance;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Exports\AcademicExporter;
+use Filament\Tables\Enums\ActionsPosition;
 use Filament\Actions\Exports\Enums\ExportFormat;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\User\Resources\Finance\FinanceResource\Pages;
-use App\Filament\User\Resources\FinanceResource\RelationManagers;
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use App\Filament\User\Resources\FinanceResource\RelationManagers;
 
 class FinanceResource extends Resource
 {
@@ -44,6 +45,9 @@ class FinanceResource extends Resource
     {
         return $table
             ->deferLoading()
+            ->poll('5s')
+            ->searchable()
+            ->striped()
             ->modifyQueryUsing(
                 fn (Builder $query) =>
                 $query->withMax('activity', 'id') // alias: registration_statuses_updated_at_max
@@ -51,7 +55,7 @@ class FinanceResource extends Resource
             )
             ->columns(Finance::columns())
             ->filters(Finance::filters())
-            ->actions(Finance::actions())
+            ->actions(Finance::actions(), position: ActionsPosition::BeforeColumns)
             ->bulkActions(Finance::bulkActions());
     }
 

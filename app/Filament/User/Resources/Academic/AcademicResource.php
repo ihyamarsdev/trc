@@ -13,10 +13,11 @@ use Illuminate\Support\Facades\Auth;
 use App\Filament\Components\Academic;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Exports\AcademicExporter;
+use Filament\Tables\Enums\ActionsPosition;
+use Filament\Actions\Exports\Enums\ExportFormat;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\User\Resources\Academic\AcademicResource\Pages;
 use App\Filament\User\Resources\AcademicResource\RelationManagers;
-use Filament\Actions\Exports\Enums\ExportFormat;
 
 class AcademicResource extends Resource
 {
@@ -45,6 +46,9 @@ class AcademicResource extends Resource
     {
         return $table
             ->deferLoading()
+            ->poll('5s')
+            ->searchable()
+            ->striped()
             ->modifyQueryUsing(
                 fn (Builder $query) =>
                 $query->withMax('activity', 'id') // alias: registration_statuses_updated_at_max
@@ -54,7 +58,7 @@ class AcademicResource extends Resource
                 Academic::columns()
             )
             ->filters(Academic::filters())
-            ->actions(Academic::actions())
+            ->actions(Academic::actions(), position: ActionsPosition::BeforeColumns)
             ->bulkActions(Academic::bulkActions());
     }
 

@@ -13,6 +13,7 @@ use App\Filament\Components\Admin;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Enums\ActionsPosition;
 use App\Filament\User\Resources\Activity\ActivityResource\Pages;
 use App\Filament\User\Resources\RegistrationDataResource\RelationManagers;
 
@@ -40,6 +41,9 @@ class ActivityResource extends Resource
     {
         return $table
             ->deferLoading()
+            ->poll('3s')
+            ->searchable()
+            ->striped()
             ->modifyQueryUsing(
                 fn (Builder $query) =>
                 $query->withMax('activity', 'id') // alias: registration_statuses_updated_at_max
@@ -85,7 +89,7 @@ class ActivityResource extends Resource
                             ->color('purple')
                             ->url(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record])),
 
-                ])
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                         Tables\Actions\BulkActionGroup::make([
                             Tables\Actions\DeleteBulkAction::make(),

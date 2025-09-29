@@ -11,6 +11,7 @@ use Filament\Resources\Resource;
 use App\Filament\Components\Admin;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Enums\ActionsPosition;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\User\Resources\AdminResource\Pages;
 use App\Filament\User\Resources\AdminResource\RelationManagers;
@@ -43,9 +44,18 @@ class AdminResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->deferLoading()
+            ->poll('5s')
+            ->searchable()
+            ->striped()
+            ->modifyQueryUsing(
+                fn (Builder $query) =>
+                $query->withMax('activity', 'id') // alias: registration_statuses_updated_at_max
+                    ->orderByDesc('updated_at')
+            )
             ->columns(Admin::columns())
             ->filters(Admin::filters())
-            ->actions(Admin::actions())
+            ->actions(Admin::actions(), position: ActionsPosition::BeforeColumns)
             ->bulkActions(Admin::bulkActions());
             // ->contentGrid([
             //     'md' => 1,
