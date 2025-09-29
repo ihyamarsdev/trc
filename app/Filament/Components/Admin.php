@@ -604,7 +604,7 @@ class Admin
                         Infolists\Components\Fieldset::make('Aktifitas Saat ini')
                             ->schema([
                                 Infolists\Components\TextEntry::make('status.name')
-                                    ->label('Status'),
+                                    ->label(''),
                               Infolists\Components\IconEntry::make('latestStatusLog.status.order')
                                     ->label('')
                                     ->icon(function ($state) {
