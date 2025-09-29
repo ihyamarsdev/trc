@@ -2,6 +2,7 @@
 
 namespace App\Filament\Components;
 
+use Carbon\Carbon;
 use Filament\Tables;
 use App\Models\Status;
 use Filament\Forms\Get;
@@ -14,6 +15,7 @@ use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\{TextColumn};
 use Illuminate\Database\Eloquent\Builder;
 use Creasi\Nusa\Models\{Province, Regency,  District};
+use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
 use Filament\Forms\Components\{Select, TextInput, Section, DatePicker, Radio};
 
 class Academic
@@ -197,6 +199,36 @@ class Academic
                     ->toggleable(),
             ])->from('md')
 
+            ];
+    }
+
+    public static function TextColumns(): array
+    {
+        return [
+            TextColumn::make('group')
+                ->label('Grup')
+                ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
+            TextColumn::make('bimtek')
+                ->label('Bimtek')
+                ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
+            TextColumn::make('account_count_created')
+                ->label('Jumlah Akun Dibuat'),
+            TextColumn::make('implementer_count')
+                ->label('Jumlah Pelaksanaan'),
+            TextColumn::make('difference')
+                ->label('Selisih'),
+            TextColumn::make('students_download')
+                ->label('Siswa Download'),
+            TextColumn::make('schools_download')
+                ->label('Sekolah Download'),
+            TextColumn::make('pm')
+                ->label('PM'),
+            TextColumn::make('counselor_consultation_date')
+                ->label('Tanggal Konseling')
+                ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
+            TextColumn::make('student_consultation_date')
+                ->label('Tanggal Konseling Siswa')
+                ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
             ];
     }
 
@@ -485,6 +517,11 @@ class Academic
         return [
             Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    FilamentExportBulkAction::make('Export')
+                    ->withColumns(self::TextColumns())
+                    ->formatStates([
+                        'type' => fn (?Model $record) => strtoupper($record->type),
+                    ])
                 ]),
         ];
     }

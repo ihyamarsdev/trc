@@ -605,7 +605,7 @@ class Admin
                             ->schema([
                                 Infolists\Components\TextEntry::make('status.name')
                                     ->label(''),
-                              Infolists\Components\IconEntry::make('latestStatusLog.status.order')
+                                Infolists\Components\IconEntry::make('latestStatusLog.status.order')
                                     ->label('')
                                     ->icon(function ($state) {
                                         // $state = nilai order (bisa null)

@@ -22,6 +22,7 @@
         "filament/notifications": "^3.2",
         "filament/widgets": "^3.2",
         "filipfonal/filament-log-manager": "^2.0",
+        "hayderhatem/filament-excel-import": "^4.0",
         "jaocero/activity-timeline": "^1.2.12",
         "joaopaulolndev/filament-edit-profile": "^1.0",
         "laravel/framework": "^11.9",

@@ -21,6 +21,7 @@ use App\Filament\User\Resources\SalesResource\RelationManagers;
 
 class SalesResource extends Resource
 {
+    
     protected static ?string $model = RegistrationData::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-presentation-chart-line';

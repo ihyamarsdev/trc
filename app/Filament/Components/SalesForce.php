@@ -2,16 +2,19 @@
 
 namespace App\Filament\Components;
 
+use Carbon\Carbon;
 use Filament\Tables;
 use App\Models\Status;
 use Filament\Forms\Get;
 use Filament\Infolists;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\{TextColumn};
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\DateTimePicker;
 use Creasi\Nusa\Models\{Province, Regency, District};
 use Filament\Forms\Components\{Select, TextInput, Section};
+use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
 
 class SalesForce
 {
@@ -269,6 +272,62 @@ class SalesForce
             ];
     }
 
+    public static function TextColumns(): array
+    {
+        return [
+            TextColumn::make('type')
+                ->label('Program'),
+            TextColumn::make('periode')
+                ->label('Periode'),
+            TextColumn::make('years')
+                ->label('Tahun'),
+            TextColumn::make('date_register')
+                ->label('Tanggal Pendaftaran')
+                ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
+            TextColumn::make('provinces')
+                ->label('Provinsi'),
+            TextColumn::make('regencies')
+                ->label('Kota / Kabupaten'),
+            TextColumn::make('area')
+                ->label('Wilayah'),
+            TextColumn::make('district')
+                ->label('Kecamatan'),
+            TextColumn::make('student_count')
+                ->label('Jumlah Siswa'),
+            TextColumn::make('implementation_estimate')
+                ->label('Estimasi Pelaksanaan')
+                ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
+
+            TextColumn::make('curriculum_deputies')
+                ->label('Wakakurikulum'),
+            TextColumn::make('curriculum_deputies_phone')
+                ->label('No Hp Wakakurikulum'),
+            TextColumn::make('counselor_coordinators')
+                ->label('Koordinator BK'),
+            TextColumn::make('counselor_coordinators_phone')
+                ->label('No Hp Koordinator BK'),
+            TextColumn::make('proctors')
+                ->label('Proktor'),
+            TextColumn::make('proctors_phone')
+                ->label('No Hp Proktor'),
+
+            TextColumn::make('schools')
+                ->label('Sekolah'),
+            TextColumn::make('class')
+                ->label('Kelas'),
+            TextColumn::make('education_level')
+                ->label('Jenjang'),
+            TextColumn::make('description')
+                ->label('Keterangan'),
+            TextColumn::make('schools_type')
+                ->label('Negeri / Swasta'),
+            TextColumn::make('principal')
+                ->label('Kepala Sekolah'),
+            TextColumn::make('principal_phone')
+                ->label('No Hp Kepala Sekolah'),
+            ];
+    }
+
     public static function infolist(): array
     {
         return [
@@ -455,7 +514,6 @@ class SalesForce
     {
         return [
             Tables\Actions\ViewAction::make(),
-            Tables\Actions\EditAction::make(),
         ];
     }
 
@@ -464,6 +522,11 @@ class SalesForce
         return [
             Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                     FilamentExportBulkAction::make('Export')
+                    ->withColumns(self::TextColumns())
+                    ->formatStates([
+                        'type' => fn (?Model $record) => strtoupper($record->type),
+                    ])
                 ]),
         ];
     }
