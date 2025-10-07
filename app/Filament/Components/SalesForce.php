@@ -7,6 +7,8 @@ use Filament\Tables;
 use App\Models\Status;
 use Filament\Forms\Get;
 use Filament\Infolists;
+use App\Filament\Enum\Periode;
+use App\Filament\Enum\Program;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\{TextColumn};
@@ -54,12 +56,7 @@ class SalesForce
                 ->schema([
                     Select::make('type')
                         ->label('Program')
-                        ->options([
-                            'apps' => 'APPS',
-                            'anbk' => 'ANBK',
-                            'snbt' => 'SNBT',
-                            'tka' => 'TKA',
-                        ]),
+                        ->options(Program::list()),
                 ])->columns(2),
 
             Section::make('Periode')
@@ -67,10 +64,7 @@ class SalesForce
                 ->schema([
                     Select::make('periode')
                         ->label('Periode')
-                        ->options([
-                            'Januari - Juni' => 'Januari - Juni',
-                            'Juli - Desember' => 'Juli - Desember',
-                        ]),
+                        ->options(Periode::list()),
                     TextInput::make('years')
                         ->label('Tahun')
                         ->maxLength(255),
@@ -109,17 +103,17 @@ class SalesForce
                             $regencies = Regency::where('name', $get('regencies'))->first();
                             $regenciesCode = $regencies ? $regencies->code : null;
                             if ($regenciesCode) {
-                                if ($regenciesCode == '3101') {
+                                if ($regenciesCode == '31.01') {
                                     return ['kS 01' => 'KS 01', 'KS_02' => 'KS 02',];
-                                } elseif ($regenciesCode == '3171') {
+                                } elseif ($regenciesCode == '31.71') {
                                     return ['JP 01' => 'JP 01', 'JP 02' => 'JP 02',];
-                                } elseif ($regenciesCode == '3172') {
+                                } elseif ($regenciesCode == '31.72') {
                                     return ['JU 01' => 'JU 01', 'JU 02' => 'JU 02',];
-                                } elseif ($regenciesCode == '3173') {
+                                } elseif ($regenciesCode == '31.73') {
                                     return ['JB 01' => 'JB 01', 'JB 02' => 'JB 02',];
-                                } elseif ($regenciesCode == '3174') {
+                                } elseif ($regenciesCode == '31.74') {
                                     return ['JS 01' => 'JS 01', 'JS 02' => 'JU 02',];
-                                } elseif ($regenciesCode == '3175') {
+                                } elseif ($regenciesCode == '31.75') {
                                     return ['JT 01' => 'JT 01', 'JT 02' => 'JT 02',];
                                 } else {
                                     return [];
@@ -128,7 +122,7 @@ class SalesForce
                             return [];
                         })
                         ->visible(function (Get $get) {
-                            return $get('provinces') === 'Dki Jakarta';
+                            return $get('provinces') === 'Daerah Khusus Ibukota Jakarta';
                         }),
                     Select::make('district')
                         ->label('Kecamatan')
@@ -463,20 +457,12 @@ class SalesForce
         return [
             Tables\Filters\SelectFilter::make('type')
                 ->label('Program')
-                ->options([
-                    'anbk' => 'ANBK',
-                    'apps' => 'APPS',
-                    'snbt' => 'SNBT',
-                    'tka' => 'TKA',
-                ])
+                ->options(Program::list())
                 ->preload()
                 ->indicator('Program'),
             Tables\Filters\SelectFilter::make('periode')
                 ->label('Periode')
-                ->options([
-                    'Januari - Juni' => 'Januari - Juni',
-                    'Juli - Desember' => 'Juli - Desember',
-                ])
+                ->options(Periode::list())
                 ->preload()
                 ->indicator('Periode'),
             Tables\Filters\SelectFilter::make('latestStatusLog.status.color')

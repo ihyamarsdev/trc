@@ -9,6 +9,7 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Infolists;
 use Filament\Forms\Form;
+use App\Filament\Enum\Periode;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Tables\Columns\Layout\Split;
@@ -444,10 +445,7 @@ class Academic
         return [
             Tables\Filters\SelectFilter::make('periode')
                 ->label('Periode')
-                ->options([
-                    'Januari - Juni' => 'Januari - Juni',
-                    'Juli - Desember' => 'Juli - Desember',
-                ])
+                ->options(Periode::list())
                 ->preload()
                 ->searchable(),
             Tables\Filters\SelectFilter::make('type')

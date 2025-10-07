@@ -7,6 +7,8 @@ use App\Models\Status;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Infolists;
+use App\Filament\Enum\Periode;
+use App\Filament\Enum\Program;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Fieldset;
 use Illuminate\Database\Eloquent\Model;
@@ -100,12 +102,7 @@ class Admin
                 ->schema([
                     Select::make('type')
                         ->label('Program')
-                        ->options([
-                            'apps' => 'APPS',
-                            'anbk' => 'ANBK',
-                            'snbt' => 'SNBT',
-                            'tka' => 'TKA',
-                        ]),
+                        ->options(Program::list()),
                     Select::make('status_id')
                         ->label('Status')
                         ->preload()
@@ -125,10 +122,7 @@ class Admin
                 ->schema([
                     Select::make('periode')
                         ->label('Periode')
-                        ->options([
-                            'Januari - Juni' => 'Januari - Juni',
-                            'Juli - Desember' => 'Juli - Desember',
-                        ]),
+                        ->options(Periode::list()),
                     TextInput::make('years')
                         ->label('Tahun')
                         ->maxLength(255),
@@ -995,12 +989,7 @@ class Admin
         return [
             Tables\Filters\SelectFilter::make('type')
                 ->label('Program')
-                ->options([
-                    'anbk' => 'ANBK',
-                    'apps' => 'APPS',
-                    'snbt' => 'SNBT',
-                    'tka' => 'TKA',
-                ])
+                ->options(Program::list())
                 ->preload()
                 ->indicator('Program'),
             Tables\Filters\SelectFilter::make('periode')

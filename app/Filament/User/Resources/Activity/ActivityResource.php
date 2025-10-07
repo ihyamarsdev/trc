@@ -6,6 +6,7 @@ use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use App\Filament\Enum\Program;
 use App\Models\RegistrationData;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -53,11 +54,7 @@ class ActivityResource extends Resource
             ->filters([
                     Tables\Filters\SelectFilter::make('type')
                         ->label('Program')
-                        ->options([
-                            'anbk' => 'ANBK',
-                            'apps' => 'APPS',
-                            'snbt' => 'SNBT',
-                        ])
+                        ->options(Program::list())
                         ->preload()
                         ->indicator('Program'),
                     Tables\Filters\SelectFilter::make('latestStatusLog.status.color')
