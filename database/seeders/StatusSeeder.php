@@ -119,7 +119,7 @@ class StatusSeeder extends Seeder
             'description' => 'Dukungan pasca layanan untuk kebutuhan sekolah.',
             'color' => 'green',
             'category' => 'finance',
-            'icon' => 'heroicon-m-life-buoy',
+            'icon' => 'heroicon-m-building-office-2',
         ],
     ];
 
