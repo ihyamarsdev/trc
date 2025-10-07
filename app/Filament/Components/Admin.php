@@ -994,10 +994,7 @@ class Admin
                 ->indicator('Program'),
             Tables\Filters\SelectFilter::make('periode')
                 ->label('Periode')
-                ->options([
-                    'Januari - Juni' => 'Januari - Juni',
-                    'Juli - Desember' => 'Juli - Desember',
-                ])
+                ->options(Periode::list())
                 ->preload()
                 ->indicator('Periode'),
             Tables\Filters\SelectFilter::make('latestStatusLog.status.color')
