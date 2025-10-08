@@ -41,6 +41,9 @@ class AdminPanelProvider extends PanelProvider
             ->favicon(asset('images/logo.png'))
             ->brandLogoHeight('8rem')
             ->databaseNotifications()
+            ->sidebarWidth('15rem')
+            ->unsavedChangesAlerts()
+            ->breadcrumbs(false)
             ->colors([
                 'danger' => Color::Rose,
                 'gray' => Color::Gray,

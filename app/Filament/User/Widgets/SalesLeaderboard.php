@@ -73,6 +73,18 @@ class SalesLeaderboard extends BaseWidget
                             ),
                     Tables\Columns\TextColumn::make('student_count')->label('Jumlah Siswa')->summarize(Sum::make()->label('')),
             ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('type')
+                    ->label('Program')
+                    ->options([
+                        'anbk' => 'ANBK',
+                        'apps' => 'APPS',
+                        'snbt' => 'SNBT',
+                        'tka' => 'TKA',
+                    ])
+                    ->preload()
+                    ->indicator('Program'),
+            ])
             // ->groups([
             //     Group::make('users.name')
             //         ->collapsible()
@@ -81,7 +93,8 @@ class SalesLeaderboard extends BaseWidget
             ->defaultGroup('users.name')
             ->groupingSettingsHidden()
             ->groupsOnly();
-        ;
 
     }
+
+    
 }

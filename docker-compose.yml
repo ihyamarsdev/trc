@@ -1,6 +1,6 @@
 services:
     app:
-        image: ihyamars/trc:1.1.0
+        image: ihyamars/trc:1.2.0
         build:
             context: .
             dockerfile: Dockerfile
@@ -10,7 +10,6 @@ services:
             - .env.production
         ports:
             - "8000:8000"
-            - "2019:2019"
         volumes:
             - app_log_data:/app/storage/logs
             - public_data:/app/storage/app/public
@@ -22,7 +21,7 @@ services:
         container_name: trc-database
         restart: always
         environment:
-            POSTGRES_USER: root
+            POSTGRES_USER: trc
             POSTGRES_PASSWORD: trc123
             POSTGRES_DB: trc
         ports:
@@ -40,9 +39,10 @@ services:
         ports:
             - "7000:7000"
         volumes:
-            - ./servers.json:/pgadmin4/servers.json
+            - admin-config:/pgadmin4/servers.json
 
 volumes:
     app_log_data:
     public_data:
     db_data:
+    admin-config:
