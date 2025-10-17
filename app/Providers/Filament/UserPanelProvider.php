@@ -2,7 +2,6 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\User\Pages\DashboardHome;
 use Filament\Panel;
 use Filament\Widgets;
 use Filament\PanelProvider;
@@ -11,9 +10,11 @@ use Filament\Pages\Dashboard;
 use App\Livewire\DetailProfile;
 use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
+use Illuminate\Support\Facades\URL;
 use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\Facades\Auth;
 use Orion\FilamentGreeter\GreeterPlugin;
+use App\Filament\User\Pages\DashboardHome;
 use Filament\Http\Middleware\Authenticate;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -105,7 +106,7 @@ class UserPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->plugins([
-                 FilamentFullCalendarPlugin::make()
+                FilamentFullCalendarPlugin::make()
                     ->schedulerLicenseKey('')
                     ->selectable()
                     ->timezone(config('app.timezone'))

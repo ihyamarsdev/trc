@@ -1,6 +1,6 @@
 services:
     app:
-        image: ihyamars/trc:1.2.0
+        image: ihyamars/trc:1.4.1
         build:
             context: .
             dockerfile: Dockerfile

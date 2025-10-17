@@ -10,6 +10,7 @@ use App\Livewire\EditProfile;
 use App\Livewire\DetailProfile;
 use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Auth;
 use Orion\FilamentGreeter\GreeterPlugin;
 use Filament\Http\Middleware\Authenticate;
@@ -89,7 +90,7 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                UpgradeToHttpsUnderNgrok::class
+                UpgradeToHttpsUnderNgrok::class,
             ])
             ->authMiddleware([
                 Authenticate::class,
