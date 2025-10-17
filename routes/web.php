@@ -3,13 +3,9 @@
 use App\Http\Controllers\ANBK;
 use App\Http\Controllers\APPS;
 use App\Http\Controllers\SNBT;
-use LaravelDaily\Invoices\Invoice;
 use Illuminate\Support\Facades\Route;
-use LaravelDaily\Invoices\Classes\Party;
 use App\Http\Controllers\InvoiceGenerator;
 use App\Http\Controllers\SampleSalesforce;
-use LaravelDaily\Invoices\Classes\InvoiceItem;
-use App\Http\Controllers\DownloadPdfController;
 use App\Http\Controllers\Kwitansi;
 
 // Route::get('/', function () {

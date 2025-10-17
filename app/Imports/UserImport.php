@@ -20,7 +20,7 @@ class UserImport implements ToModel, WithHeadingRow
     public function model(array $row)
     {
         $role = Role::where('name', $row['roles'])->first();
-        $password = Str::random(12);
+        $password = 12345678;
 
         // Buat atau update pengguna
         $user = User::updateOrCreate(

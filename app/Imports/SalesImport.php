@@ -1,21 +1,15 @@
 <?php
 
-namespace App\Imports\salesforce;
+namespace App\Imports;
 
-use COM;
 use Carbon\Carbon;
-use App\Models\Proctors;
 use App\Models\RegistrationData;
-use Creasi\Nusa\Models\{Province, Regency, District};
-use App\Models\CurriculumDeputies;
-use App\Models\CounselorCoordinator;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
+use Creasi\Nusa\Models\{Province, Regency, District};
 
-class ANBKImport implements ToModel, WithHeadingRow
+class SalesImport implements ToModel, WithHeadingRow
 {
     /**
     * @param array $row
@@ -24,35 +18,6 @@ class ANBKImport implements ToModel, WithHeadingRow
     */
     public function model(array $row)
     {
-        $validator = Validator::make($row, [
-            'tahun' => 'required',
-            'wakakurikulum' => 'required',
-            'no_hp_wakakurikulum' => 'required',
-            'koordinator_bk' => 'required',
-            'no_hp_koordinator_bk' => 'required',
-            'proktor' => 'required',
-            'no_hp_proktor' => 'required',
-            'provinsi' => 'required',
-            'kota_kabupaten' => 'required',
-            'kecamatan' => 'required',
-            'periode' => 'required',
-            'tanggal_pendaftaran' => 'required',
-            'jumlah_siswa' => 'required|integer',
-            'estimasi_pelaksanaan' => 'required',
-            'sekolah' => 'required|string',
-            'kelas' => 'required',
-            'jenjang' => 'required|string',
-            'keterangan' => 'nullable|string',
-            'kepala_sekolah' => 'required|string',
-            'no_hp_kepala_sekolah' => 'required',
-            'negeri_swasta' => 'required|string',
-        ]);
-
-
-        // Jika validasi gagal, lempar pengecualian
-        if ($validator->fails()) {
-            throw new ValidationException($validator);
-        }
 
         $province = Province::search($row['provinsi'])->first();
         if (!$province) {
@@ -73,15 +38,15 @@ class ANBKImport implements ToModel, WithHeadingRow
         $districtName = $district->name;
 
 
-        $anbk = RegistrationData::updateOrCreate([
-            'type' => 'anbk',
+        $data = RegistrationData::updateOrCreate([
+            'type' => $row['program'],
             'periode' => $row['periode'],
             'years' => $row['tahun'],
             'date_register' => self::parseDate($row['tanggal_pendaftaran']),
             'provinces' => $provinceName,
             'regencies' => $regencyName,
             'district' => $districtName,
-            'sudin' => $row['wilayah'],
+            'area' => $row['wilayah'],
             'curriculum_deputies' => $row['wakakurikulum'],
             'curriculum_deputies_phone' => $row['no_hp_wakakurikulum'],
             'counselor_coordinators' => $row['koordinator_bk'],
@@ -91,24 +56,28 @@ class ANBKImport implements ToModel, WithHeadingRow
             'student_count' => $row['jumlah_siswa'],
             'implementation_estimate' => self::parseDate($row['estimasi_pelaksanaan']),
 
-            'users_id' => Auth::id(),
             'schools' => $row['sekolah'],
             'class' => $row['kelas'],
             'education_level' => $row['jenjang'],
             'description' => $row['keterangan'],
             'principal' => $row['kepala_sekolah'],
             'phone_principal' => $row['no_hp_kepala_sekolah'],
-            'education_level_type' => $row['negeri_swasta'],
+            'schools_type' => $row['negeri_swasta'],
+
+            'users_id' => Auth::id(),
+            'status_id' => 1,
+            'status_color' => 'yellow',
+
         ]);
 
-        return $anbk;
+        return $data;
     }
 
     private function parseDate($dateString)
     {
 
         if ($dateString) {
-            return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($dateString);
+            return Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($dateString));
         }
 
         return null;

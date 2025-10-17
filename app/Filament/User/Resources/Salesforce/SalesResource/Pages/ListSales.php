@@ -3,11 +3,11 @@
 namespace App\Filament\User\Resources\Salesforce\SalesResource\Pages;
 
 use Filament\Actions;
+use App\Imports\SalesImport;
 use Filament\Actions\Action;
-use Maatwebsite\Excel\Excel;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Models\RegistrationData;
 use Illuminate\Support\Facades\Log;
-use App\Imports\salesforce\ANBKImport;
 use App\Filament\Imports\SalesImporter;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\FileUpload;
@@ -27,49 +27,49 @@ class ListSales extends ListRecords
         return [
             Actions\CreateAction::make()
                 ->label('Buat'),
-            // Action::make('import')
-            //     ->label('Import')
-            //     ->icon('heroicon-o-arrow-up-tray')
-            //     ->form([
-            //         FileUpload::make('attachment')
-            //     ])
-            //     ->action(function (array $data) {
-            //         $file = public_path('storage/' . $data['attachment']);
+            Action::make('import')
+                ->label('Import')
+                ->icon('heroicon-o-arrow-up-tray')
+                ->form([
+                    FileUpload::make('attachment')
+                ])
+                ->action(function (array $data) {
+                    $file = public_path('storage/' . $data['attachment']);
 
-            //         try {
-            //             Excel::import(new ANBKImport(), $file);
+                    try {
+                        Excel::import(new SalesImport(), $file);
 
-            //             Notification::make()
-            //                 ->title('Berhasil Import File')
-            //                 ->success()
-            //                 ->send();
-            //         } catch (\Throwable $th) {
-            //             Log::error('Error saat mengimpor file: ' . $th->getMessage(), [
-            //                 'file' => $file,
-            //                 'data' => $data,
-            //                 'trace' => $th->getTraceAsString(),
-            //             ]);
+                        Notification::make()
+                            ->title('Berhasil Import File')
+                            ->success()
+                            ->send();
+                    } catch (\Throwable $th) {
+                        Log::error('Error saat mengimpor file: ' . $th->getMessage(), [
+                            'file' => $file,
+                            'data' => $data,
+                            'trace' => $th->getTraceAsString(),
+                        ]);
 
-            //             if (file_exists($file)) {
-            //                 unlink($file);
-            //             }
+                        if (file_exists($file)) {
+                            unlink($file);
+                        }
 
-            //             Notification::make()
-            //                 ->title('Terjadi Error Saat Melakukan Import  File')
-            //                 ->danger()
-            //                 ->send();
-            //         } finally {
-            //             if (file_exists($file)) {
-            //                 unlink($file); // Menghapus file
-            //             }
-            //         }
+                        Notification::make()
+                            ->title('Terjadi Error Saat Melakukan Import File. Error: ' . $th->getMessage())
+                            ->danger()
+                            ->send();
+                    } finally {
+                        if (file_exists($file)) {
+                            unlink($file); // Menghapus file
+                        }
+                    }
 
-            //     })
-            //     ->modalHeading('Import Data')
-            //     ->modalContent(function () {
-            //         return view('components.sample-excel-modal');
-            //     })
-            //     ->openUrlInNewTab()
+                })
+                ->modalHeading('Import')
+                ->modalContent(function () {
+                    return view('components.sample-excel-modal');
+                })
+                ->openUrlInNewTab()
         ];
     }
 }
