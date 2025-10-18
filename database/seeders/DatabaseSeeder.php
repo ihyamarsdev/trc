@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $roleNames = ['sales', 'akademik', 'teknisi', 'finance'];
+        $roleNames = ['sales', 'service', 'finance'];
 
         $user = User::factory()->create([
             'name' => 'admin',

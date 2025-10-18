@@ -90,6 +90,7 @@ class Academic
                                     name: 'status',
                                     titleAttribute: 'name',
                                     modifyQueryUsing: fn (Builder $query) => $query
+                                        ->where('category', '=', 'service')
                                         ->orderBy('order')
                                 )
                             ->searchable()
@@ -527,7 +528,7 @@ class Academic
     public static function getRoles(): array
     {
         return [
-            'akademik','teknisi'
+            'service'
         ];
     }
 }

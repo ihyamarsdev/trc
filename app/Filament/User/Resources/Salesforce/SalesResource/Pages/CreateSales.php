@@ -13,7 +13,7 @@ class CreateSales extends CreateRecord
 {
     protected static string $resource = SalesResource::class;
 
-     protected function getRedirectUrl(): string
+    protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
     }
@@ -23,12 +23,16 @@ class CreateSales extends CreateRecord
         $data['users_id'] = Auth::id();
         // $data['type']     = 'anbk';
 
+        if (empty($data['status_id'])) {
+            $data['status_id'] = 1;
+        }
+
         // monthYear aman dibentuk (jika date_register diisi)
         if (!empty($data['date_register'])) {
             $dt = Carbon::parse($data['date_register']);
             $data['monthYear'] = $dt->translatedFormat('F Y'); // contoh: "September 2025"
         }
-        
+
         return $data;
     }
 

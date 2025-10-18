@@ -83,8 +83,7 @@ class UserResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'finance'  => 'green',
-                        'akademik'   => 'blue',
-                        'teknisi'   => 'blue',
+                        'service'   => 'blue',
                         'sales' => 'yellow',
                         'admin'  => 'indigo',
                     })

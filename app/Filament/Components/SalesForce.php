@@ -22,7 +22,7 @@ class SalesForce
 {
     protected static function meta(Get $get): array
     {
-        $type = $get('type') ?? 'apps';
+        $type = $get('type');
 
         return match ($type) {
             'anbk' => [
@@ -70,12 +70,13 @@ class SalesForce
                         ->maxLength(255),
                 ])->columns(2),
 
-            Section::make(fn (Get $get) => self::meta($get)['nameRegister'])
-                ->description(fn (Get $get) => self::meta($get)['DescriptionRegister'])
+            Section::make()
+                ->description()
                 ->schema([
                     DateTimePicker::make('date_register')
                         ->label('Tanggal Pendaftaran')
                         ->native(false)
+                        ->seconds(false)
                         ->displayFormat('l, jS F Y H:i'),
                     Select::make('provinces')
                         ->label('Provinsi')
@@ -140,24 +141,23 @@ class SalesForce
                         }),
                     TextInput::make('curriculum_deputies')
                         ->label('Wakakurikulum')
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->live(),
                     TextInput::make('curriculum_deputies_phone')
                         ->label('No Handphone Wakakurikulum')
-                        ->telRegex('/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/')
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->live(),
                     TextInput::make('counselor_coordinators')
                         ->label('Koordinator BK')
                         ->maxLength(255),
                     TextInput::make('counselor_coordinators_phone')
                         ->label('No Handphone Koordinator BK')
-                        ->telRegex('/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/')
                         ->maxLength(255),
                     TextInput::make('proctors')
                         ->label('Proktor')
                         ->maxLength(255),
                     TextInput::make('proctors_phone')
                         ->label('No Handphone Proktor')
-                        ->telRegex('/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/')
                         ->maxLength(255),
                     TextInput::make('student_count')
                         ->label('Jumlah Siswa')
@@ -165,7 +165,9 @@ class SalesForce
                     DateTimePicker::make('implementation_estimate')
                         ->label('Estimasi Pelaksanaan')
                         ->native(false)
-                        ->displayFormat('l, jS F Y H:i'),
+                        ->seconds(false)
+                        ->displayFormat('l, jS F Y H:i')
+                        ->live(),
                 ])->columns(2),
 
                 Section::make('Sekolah')
@@ -173,7 +175,8 @@ class SalesForce
                 ->schema([
                     TextInput::make('schools')
                         ->label('Nama Sekolah')
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->live(),
                     TextInput::make('class')
                         ->label('Kelas')
                         ->maxLength(10),
@@ -205,25 +208,46 @@ class SalesForce
                         ->native(false),
                     TextInput::make('principal')
                         ->label('Nama Kepala Sekolah')
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->live(),
                     TextInput::make('principal_phone')
                         ->label('No Handphone Kepala Sekolah')
-                        ->telRegex('/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/')
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->live(),
                 ])->columns(2),
 
                 Section::make('Status')
                     ->description('Isi sesuai dengan status saat ini')
+                    ->visible(function (Get $get) {
+                        $keys = [
+                            'principal',
+                            'principal_phone',
+                            'student_count',
+                            'schools',
+                            'implementation_estimate',
+                            'curriculum_deputies',
+                            'curriculum_deputies_phone',
+                        ];
+
+                        // tampil hanya jika SEMUA kolom di atas terisi (non-blank)
+                        foreach ($keys as $key) {
+                            if (blank($get($key))) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    })
                     ->schema([
                         Select::make('status_id')
                             ->label('Status')
                             ->preload()
-                                ->relationship(
-                                    name: 'status',
-                                    titleAttribute: 'name',
-                                    modifyQueryUsing: fn (Builder $query) => $query
-                                        ->orderBy('order')
-                                )
+                            ->relationship(
+                                name: 'status',
+                                titleAttribute: 'name',
+                                modifyQueryUsing: fn (Builder $query) => $query
+                                    ->where('order', '=', '2')
+                                    ->orderBy('order')
+                            )
                             ->searchable()
                             ->placeholder('Pilih status...')
                             ->columnSpan(1),

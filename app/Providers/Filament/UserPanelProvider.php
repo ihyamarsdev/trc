@@ -65,7 +65,7 @@ class UserPanelProvider extends PanelProvider
             ])
             ->navigationGroups([
                 'Salesforce',
-                'Akademik & Teknisi',
+                'Service',
                 'Finance',
                 'Rekap Datacenter',
                 'Rekap Akademik',

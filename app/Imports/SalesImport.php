@@ -66,7 +66,7 @@ class SalesImport implements ToModel, WithHeadingRow
 
             'users_id' => Auth::id(),
             'status_id' => 1,
-            'status_color' => 'yellow',
+            'status_color' => 'red',
 
         ]);
 

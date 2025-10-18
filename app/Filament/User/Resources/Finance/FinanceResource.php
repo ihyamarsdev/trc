@@ -50,7 +50,8 @@ class FinanceResource extends Resource
             ->striped()
             ->modifyQueryUsing(
                 fn (Builder $query) =>
-                $query->withMax('activity', 'id') // alias: registration_statuses_updated_at_max
+                $query->withMax('activity', 'id')
+                    ->whereRelation('status', 'order', '>=', 7)
                     ->orderByDesc('updated_at')
             )
             ->columns(Finance::columns())

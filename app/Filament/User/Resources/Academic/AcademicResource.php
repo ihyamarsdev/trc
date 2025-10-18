@@ -23,12 +23,12 @@ class AcademicResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
-    protected static ?string $navigationGroup = 'Akademik & Teknisi';
+    protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
+    protected static ?string $navigationGroup = 'Service';
     protected static ?string $title = 'Database';
     protected static ?string $navigationLabel = 'Database';
     protected static ?string $modelLabel = 'database';
-    protected static ?string $slug = 'database-academic';
+    protected static ?string $slug = 'database-service';
     protected static bool $shouldRegisterNavigation = true;
 
     public static function canViewAny(): bool
@@ -51,7 +51,8 @@ class AcademicResource extends Resource
             ->striped()
             ->modifyQueryUsing(
                 fn (Builder $query) =>
-                $query->withMax('activity', 'id') // alias: registration_statuses_updated_at_max
+                $query->withMax('activity', 'id')
+                    ->whereDoesntHave('status', fn ($q) => $q->where('color', 'red'))
                     ->orderByDesc('updated_at')
             )
             ->columns(

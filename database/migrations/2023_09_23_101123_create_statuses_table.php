@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('color')->default('red'); // Warna indikator (yellow, blue, green)
             $table->integer('order')->default(0); // Urutan status dalam alur
             $table->string('icon')->nullable(); // Ikon opsional untuk status
-            $table->string('category')->default('general');  // Status aktif atau tidak
+            $table->string('category')->default('sales');  // Status aktif atau tidak
             $table->timestamps();
         });
 

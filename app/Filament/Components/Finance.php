@@ -92,6 +92,7 @@ class Finance
                                         name: 'status',
                                         titleAttribute: 'name',
                                         modifyQueryUsing: fn (Builder $query) => $query
+                                            ->where('category', '=', 'finance')
                                             ->orderBy('order')
                                     )
                                 ->searchable()
