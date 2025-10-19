@@ -50,7 +50,7 @@ class UserPanelProvider extends PanelProvider
             ->databaseNotifications()
             ->sidebarWidth('15rem')
             ->unsavedChangesAlerts()
-            ->breadcrumbs(false)
+            ->breadcrumbs(true)
             ->colors([
                 'danger' => Color::Rose,
                 'gray' => Color::Gray,
