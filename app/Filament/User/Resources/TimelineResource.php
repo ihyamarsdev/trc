@@ -60,9 +60,9 @@ class TimelineResource extends Resource
     {
         return [
             'index' => Pages\ListTimelines::route('/'),
-            'create' => Pages\CreateTimeline::route('/create'),
+            // 'create' => Pages\CreateTimeline::route('/create'),
             'view' => Pages\ViewTimeline::route('/{record}'),
-            'edit' => Pages\EditTimeline::route('/{record}/edit'),
+            // 'edit' => Pages\EditTimeline::route('/{record}/edit'),
         ];
     }
 }

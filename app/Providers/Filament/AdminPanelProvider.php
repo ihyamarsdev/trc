@@ -44,7 +44,7 @@ class AdminPanelProvider extends PanelProvider
             ->databaseNotifications()
             ->sidebarWidth('15rem')
             ->unsavedChangesAlerts()
-            ->breadcrumbs(true)
+            ->breadcrumbs(false)
             ->colors([
                 'danger' => Color::Rose,
                 'gray' => Color::Gray,
