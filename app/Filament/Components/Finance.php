@@ -159,8 +159,8 @@ class Finance
                                 ->label('Pilih Opsi')
                                 ->options(function (Get $get): array {
                                     return [
-                                        'implementer_' . $get('implementer_count') => 'Jumlah Pelaksanaan',
-                                        'account_' . $get('account_count_created') => 'Jumlah Akun',
+                                        'implementer_' . $get('implementer_count') => 'JUMLAH PELAKSANAAN',
+                                        'account_' . $get('account_count_created') => 'JUMLAH AKUN',
                                     ];
                                 })
                                 ->live(1000)

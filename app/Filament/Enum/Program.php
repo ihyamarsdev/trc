@@ -22,10 +22,10 @@ enum Program: string
     public static function list(): array
     {
         return [
-            'anbk' => self::ANBK->label(),
-            'apps' => self::APPS->label(),
-            'snbt' => self::SNBT->label(),
-            'tka' => self::TKA->label(),
+            'ANBK' => self::ANBK->label(),
+            'APPS' => self::APPS->label(),
+            'SNBT' => self::SNBT->label(),
+            'TKA' => self::TKA->label(),
         ];
     }
     

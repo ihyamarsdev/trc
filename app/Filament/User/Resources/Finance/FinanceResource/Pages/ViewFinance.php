@@ -84,10 +84,12 @@ class ViewFinance extends ViewRecord
                                             ->form([
                                                 TextInput::make('schools')
                                                     ->label('Sekolah')
+                                                    ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
                                                     ->default(fn (RegistrationData $record) => $record->schools)
                                                     ->readOnly(),
                                                 TextInput::make('detail_kwitansi')
                                                     ->label('Guna Pembayaran')
+                                                    ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
                                                     ->helperText('Contoh: 146 Paket Program TRY OUT Ujian Tertulis Berbasis Komputer (UTBK SNBT)'),
                                             ])
                                             ->action(function (RegistrationData $record, array $data) {
@@ -180,6 +182,7 @@ class ViewFinance extends ViewRecord
                                                             ->schema([
                                                                 TextInput::make('schools')
                                                                     ->label('Sekolah')
+                                                                    ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
                                                                     ->default(fn (RegistrationData $record) => $record->schools)
                                                                     ->readOnly(),
                                                                 TextInput::make('number_invoice')
@@ -189,6 +192,7 @@ class ViewFinance extends ViewRecord
                                                                     ->numeric(),
                                                                 TextInput::make('detail_invoice')
                                                                     ->label('Deskripsi')
+                                                                    ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
                                                                     ->helperText('Contoh: Try Out Asesmen Nasional (AKM)'),
                                                             ])->columns(1),
 
@@ -319,6 +323,7 @@ class ViewFinance extends ViewRecord
                                                             ->schema([
                                                                 TextInput::make('schools')
                                                                     ->label('Sekolah')
+                                                                    ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
                                                                     ->default(fn (RegistrationData $record) => $record->schools)
                                                                     ->readOnly(),
                                                                 TextInput::make('number_invoice')

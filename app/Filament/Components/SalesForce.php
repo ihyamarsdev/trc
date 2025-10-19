@@ -7,6 +7,7 @@ use Filament\Tables;
 use App\Models\Status;
 use Filament\Forms\Get;
 use Filament\Infolists;
+use Illuminate\Support\Str;
 use App\Filament\Enum\Jenjang;
 use App\Filament\Enum\Periode;
 use App\Filament\Enum\Program;
@@ -87,12 +88,14 @@ class SalesForce
                         ->options(Province::all()->pluck('name', 'name'))
                         ->searchable()
                         ->reactive()
+                        ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
                         ->live(500),
                     Select::make('regencies')
                         ->label('Kota / Kabupaten')
                         ->preload()
                         ->searchable()
                         ->reactive()
+                        ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
                         ->live(100)
                         ->options(function (Get $get) {
                             $province = Province::where('name', $get('provinces'))->first();
@@ -104,6 +107,7 @@ class SalesForce
                         }),
                     Select::make('area')
                         ->label('Wilayah')
+                        ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
                         ->options(function (Get $get) {
                             $regencies = Regency::where('name', $get('regencies'))->first();
                             $regenciesCode = $regencies ? $regencies->code : null;
@@ -135,6 +139,7 @@ class SalesForce
                         ->searchable()
                         ->reactive()
                         ->live(100)
+                        ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
                         ->options(function (Get $get) {
                             $district = Regency::where('name', $get('regencies'))->first();
                             $regencyCode = $district ? $district ->code : null;
@@ -145,7 +150,8 @@ class SalesForce
                         }),
                     TextInput::make('curriculum_deputies')
                         ->label('Wakakurikulum')
-                        ->maxLength(255)
+                        ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
+                        ->maxLength(50)
                         ->live(),
                     PhoneInput::make('curriculum_deputies_phone')
                         ->label('No Handphone Wakakurikulum')
@@ -153,12 +159,14 @@ class SalesForce
                         ->live(),
                     TextInput::make('counselor_coordinators')
                         ->label('Koordinator BK')
+                        ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
                         ->maxLength(255),
                     PhoneInput::make('counselor_coordinators_phone')
                         ->label('No Handphone Koordinator BK')
                         ->defaultCountry('ID'),
                     TextInput::make('proctors')
                         ->label('Proktor')
+                        ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
                         ->maxLength(255),
                     PhoneInput::make('proctors_phone')
                         ->label('No Handphone Proktor')
@@ -179,6 +187,7 @@ class SalesForce
                 ->schema([
                     TextInput::make('schools')
                         ->label('Nama Sekolah')
+                        ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
                         ->maxLength(255)
                         ->live(),
                     TextInput::make('class')
@@ -198,12 +207,13 @@ class SalesForce
                     select::make('schools_type')
                         ->label('Negeri / Swasta')
                         ->options([
-                            'Negeri' => 'Negeri',
-                            'Swasta' => 'Swasta',
+                            'NEGERI' => 'NEGERI',
+                            'SWASTA' => 'SWASTA',
                         ])
                         ->native(false),
                     TextInput::make('principal')
                         ->label('Nama Kepala Sekolah')
+                        ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
                         ->maxLength(255)
                         ->live(),
                     PhoneInput::make('principal_phone')

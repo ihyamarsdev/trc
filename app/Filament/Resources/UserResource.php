@@ -8,6 +8,7 @@ use Filament\Tables;
 use Filament\Forms\Form;
 use App\Models\Devisions;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Hash;
 use App\Filament\Imports\UserImporter;
@@ -46,7 +47,11 @@ class UserResource extends Resource
                     ->schema([
                         TextInput::make('name')
                             ->required()
-                            ->maxLength(255),
+                            ->extraInputAttributes(['style' => 'text-transform: capitalize'])
+                            ->dehydrateStateUsing(fn ($state) => is_string($state)
+                            ? Str::of($state)->squish()->lower()->title()   // rapikan spasi, lalu Title Case
+                            : $state)
+                            ->maxLength(50),
                         TextInput::make('email')
                             ->unique(ignoreRecord: true)
                             ->email()
