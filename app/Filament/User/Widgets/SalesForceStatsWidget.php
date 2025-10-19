@@ -32,7 +32,10 @@ class SalesForceStatsWidget extends BaseWidget
     {
         return $table
             ->query(
-                RegistrationData::query()
+                RegistrationData::query()->when(!Auth::user()->hasRole(['admin']), function ($query) {
+                    // Assuming you have a 'user_id' field in your 'apps' table
+                    return $query->where('users_id', Auth::id());
+                })
             )
             ->columns([
                 Tables\Columns\TextColumn::make('type')->label('Program'),
