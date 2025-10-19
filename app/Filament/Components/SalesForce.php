@@ -191,7 +191,7 @@ class SalesForce
                     TextInput::make('schools')
                         ->label('Nama Sekolah')
                         ->nullable()
-                        ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
+                        ->dehydrateStateUsing(fn (?string $state): string => Str::upper($state))
                         ->maxLength(255)
                         ->live(),
                     TextInput::make('class')
@@ -218,7 +218,7 @@ class SalesForce
                     TextInput::make('principal')
                         ->label('Nama Kepala Sekolah')
                         ->nullable()
-                        ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
+                        ->dehydrateStateUsing(fn (?string $state): string => Str::upper($state))
                         ->maxLength(255)
                         ->live(),
                     PhoneInput::make('principal_phone')
