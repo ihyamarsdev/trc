@@ -88,14 +88,14 @@ class SalesForce
                         ->options(Province::all()->pluck('name', 'name'))
                         ->searchable()
                         ->reactive()
-                        ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
+                        ->dehydrateStateUsing(fn (?string $state): string => Str::upper($state))
                         ->live(500),
                     Select::make('regencies')
                         ->label('Kota / Kabupaten')
                         ->preload()
                         ->searchable()
                         ->reactive()
-                        ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
+                        ->dehydrateStateUsing(fn (?string $state): string => Str::upper($state))
                         ->live(100)
                         ->options(function (Get $get) {
                             $province = Province::where('name', $get('provinces'))->first();
@@ -107,7 +107,7 @@ class SalesForce
                         }),
                     Select::make('area')
                         ->label('Wilayah')
-                        ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
+                        ->dehydrateStateUsing(fn (?string $state): string => Str::upper($state))
                         ->options(function (Get $get) {
                             $regencies = Regency::where('name', $get('regencies'))->first();
                             $regenciesCode = $regencies ? $regencies->code : null;
@@ -139,7 +139,7 @@ class SalesForce
                         ->searchable()
                         ->reactive()
                         ->live(100)
-                        ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
+                        ->dehydrateStateUsing(fn (?string $state): string => Str::upper($state))
                         ->options(function (Get $get) {
                             $district = Regency::where('name', $get('regencies'))->first();
                             $regencyCode = $district ? $district ->code : null;
@@ -150,7 +150,8 @@ class SalesForce
                         }),
                     TextInput::make('curriculum_deputies')
                         ->label('Wakakurikulum')
-                        ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
+                        ->nullable()
+                        ->dehydrateStateUsing(fn (?string $state): string => Str::upper($state))
                         ->maxLength(50)
                         ->live(),
                     PhoneInput::make('curriculum_deputies_phone')
@@ -159,14 +160,16 @@ class SalesForce
                         ->live(),
                     TextInput::make('counselor_coordinators')
                         ->label('Koordinator BK')
-                        ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
+                        ->nullable()
+                        ->dehydrateStateUsing(fn (?string $state): string => Str::upper($state))
                         ->maxLength(255),
                     PhoneInput::make('counselor_coordinators_phone')
                         ->label('No Handphone Koordinator BK')
                         ->defaultCountry('ID'),
                     TextInput::make('proctors')
                         ->label('Proktor')
-                        ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
+                        ->nullable()
+                        ->dehydrateStateUsing(fn (?string $state): string => Str::upper($state))
                         ->maxLength(255),
                     PhoneInput::make('proctors_phone')
                         ->label('No Handphone Proktor')
@@ -187,6 +190,7 @@ class SalesForce
                 ->schema([
                     TextInput::make('schools')
                         ->label('Nama Sekolah')
+                        ->nullable()
                         ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
                         ->maxLength(255)
                         ->live(),
@@ -213,6 +217,7 @@ class SalesForce
                         ->native(false),
                     TextInput::make('principal')
                         ->label('Nama Kepala Sekolah')
+                        ->nullable()
                         ->dehydrateStateUsing(fn (string $state): string => Str::upper($state))
                         ->maxLength(255)
                         ->live(),
