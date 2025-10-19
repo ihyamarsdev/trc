@@ -9,6 +9,7 @@ use Filament\Tables\Table;
 use App\Models\RegistrationData;
 use Filament\Resources\Resource;
 use App\Filament\Components\Admin;
+use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Enums\ActionsPosition;
@@ -55,6 +56,11 @@ class AdminResource extends Resource
             )
             ->columns(Admin::columns())
             ->filters(Admin::filters())
+            ->filtersTriggerAction(
+                fn (Action $action) => $action
+                    ->button()
+                    ->label('Filter'),
+            )
             ->actions(Admin::actions(), position: ActionsPosition::BeforeColumns)
             ->bulkActions(Admin::bulkActions());
             // ->contentGrid([

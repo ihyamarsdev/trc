@@ -9,12 +9,16 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Infolists;
 use Filament\Forms\Form;
+use App\Filament\Enum\Jenjang;
 use App\Filament\Enum\Periode;
+use App\Filament\Enum\Program;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\{TextColumn};
 use Illuminate\Database\Eloquent\Builder;
+use Ysfkaya\FilamentPhoneInput\Infolists\PhoneEntry;
+use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
 use Creasi\Nusa\Models\{Province, Regency,  District};
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
 use Filament\Forms\Components\{Select, TextInput, Section, DatePicker, Radio};
@@ -90,7 +94,7 @@ class Academic
                                     name: 'status',
                                     titleAttribute: 'name',
                                     modifyQueryUsing: fn (Builder $query) => $query
-                                        ->where('category', '=', 'service')
+                                        ->where('order', '<=', 7)
                                         ->orderBy('order')
                                 )
                             ->searchable()
@@ -197,8 +201,7 @@ class Academic
                         'yellow' => 'yellow',
                         'red'  => 'red',
                     })
-                    ->default('red')
-                    ->toggleable(),
+                    ->default('red'),
             ])->from('md')
 
             ];
@@ -333,22 +336,25 @@ class Academic
                             ->schema([
                                 Infolists\Components\TextEntry::make('principal')
                                     ->label('Kepala Sekolah'),
-                                Infolists\Components\TextEntry::make('principal_phone')
-                                    ->label('No Hp Kepala Sekolah'),
+                                PhoneEntry::make('principal_phone')
+                                    ->label('No Hp Kepala Sekolah')
+                                    ->displayFormat(PhoneInputNumberType::NATIONAL),
                                 Infolists\Components\TextEntry::make('curriculum_deputies')
                                     ->label('Wakakurikulum'),
-                                Infolists\Components\TextEntry::make('curriculum_deputies_phone')
-                                    ->label('No Hp Wakakurikulum'),
+                                PhoneEntry::make('curriculum_deputies_phone')
+                                    ->label('No Hp Wakakurikulum')
+                                    ->displayFormat(PhoneInputNumberType::NATIONAL),
                                 Infolists\Components\TextEntry::make('counselor_coordinators')
                                     ->label('Koordinator BK'),
-                                Infolists\Components\TextEntry::make('counselor_coordinators_phone')
-                                    ->label('No Hp Koordinator BK'),
+                                PhoneEntry::make('counselor_coordinators_phone')
+                                    ->label('No Hp Koordinator BK')
+                                    ->displayFormat(PhoneInputNumberType::NATIONAL),
                                 Infolists\Components\TextEntry::make('proctors')
                                     ->label('Proktor'),
-                                Infolists\Components\TextEntry::make('proctors_phone')
-                                    ->label('No Hp Proktor'),
+                                PhoneEntry::make('proctors_phone')
+                                    ->label('No Hp Proktor')
+                                    ->displayFormat(PhoneInputNumberType::NATIONAL),
                             ]),
-
                         Infolists\Components\Fieldset::make('')
                             ->schema([
                                 Infolists\Components\TextEntry::make('date_register')
@@ -447,16 +453,15 @@ class Academic
             Tables\Filters\SelectFilter::make('periode')
                 ->label('Periode')
                 ->options(Periode::list())
+                ->preload(),
+            Tables\Filters\SelectFilter::make('education_level')
+                ->label('Jenjang')
+                ->options(Jenjang::list())
                 ->preload()
-                ->searchable(),
+                ->indicator('Jenjang'),
             Tables\Filters\SelectFilter::make('type')
                 ->label('Program')
-                ->options([
-                    'anbk' => 'ANBK',
-                    'apps' => 'APPS',
-                    'snbt' => 'SNBT',
-                    'tka' => 'TKA',
-                ])
+                ->options(Program::list())
                 ->preload()
                 ->indicator('Program'),
             Tables\Filters\SelectFilter::make('users_id')
@@ -516,11 +521,7 @@ class Academic
         return [
             Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                    FilamentExportBulkAction::make('Export')
-                    ->withColumns(self::TextColumns())
-                    ->formatStates([
-                        'type' => fn (?Model $record) => strtoupper($record->type),
-                    ])
+
                 ]),
         ];
     }

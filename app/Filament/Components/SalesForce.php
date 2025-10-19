@@ -7,6 +7,7 @@ use Filament\Tables;
 use App\Models\Status;
 use Filament\Forms\Get;
 use Filament\Infolists;
+use App\Filament\Enum\Jenjang;
 use App\Filament\Enum\Periode;
 use App\Filament\Enum\Program;
 use Illuminate\Database\Eloquent\Model;
@@ -14,6 +15,9 @@ use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\{TextColumn};
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\DateTimePicker;
+use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
+use Ysfkaya\FilamentPhoneInput\Infolists\PhoneEntry;
+use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
 use Creasi\Nusa\Models\{Province, Regency, District};
 use Filament\Forms\Components\{Select, TextInput, Section};
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
@@ -143,22 +147,22 @@ class SalesForce
                         ->label('Wakakurikulum')
                         ->maxLength(255)
                         ->live(),
-                    TextInput::make('curriculum_deputies_phone')
+                    PhoneInput::make('curriculum_deputies_phone')
                         ->label('No Handphone Wakakurikulum')
-                        ->maxLength(255)
+                        ->defaultCountry('ID')
                         ->live(),
                     TextInput::make('counselor_coordinators')
                         ->label('Koordinator BK')
                         ->maxLength(255),
-                    TextInput::make('counselor_coordinators_phone')
+                    PhoneInput::make('counselor_coordinators_phone')
                         ->label('No Handphone Koordinator BK')
-                        ->maxLength(255),
+                        ->defaultCountry('ID'),
                     TextInput::make('proctors')
                         ->label('Proktor')
                         ->maxLength(255),
-                    TextInput::make('proctors_phone')
+                    PhoneInput::make('proctors_phone')
                         ->label('No Handphone Proktor')
-                        ->maxLength(255),
+                        ->defaultCountry('ID'),
                     TextInput::make('student_count')
                         ->label('Jumlah Siswa')
                         ->numeric(),
@@ -182,15 +186,7 @@ class SalesForce
                         ->maxLength(10),
                     Select::make('education_level')
                         ->label('Jenjang')
-                        ->options([
-                            'SD' => 'SD',
-                            'MI' => 'MI',
-                            'SMP' => 'SMP',
-                            'MTS' => 'MTS',
-                            'SMA' => 'SMA',
-                            'MA' => 'MA',
-                            'SMK' => 'SMK',
-                        ])
+                        ->options(Jenjang::list())
                         ->native(false),
                     select::make('description')
                         ->label('Keterangan')
@@ -210,9 +206,9 @@ class SalesForce
                         ->label('Nama Kepala Sekolah')
                         ->maxLength(255)
                         ->live(),
-                    TextInput::make('principal_phone')
+                    PhoneInput::make('principal_phone')
                         ->label('No Handphone Kepala Sekolah')
-                        ->maxLength(255)
+                        ->defaultCountry('ID')
                         ->live(),
                 ])->columns(2),
 
@@ -245,7 +241,7 @@ class SalesForce
                                 name: 'status',
                                 titleAttribute: 'name',
                                 modifyQueryUsing: fn (Builder $query) => $query
-                                    ->where('order', '=', '2')
+                                    ->where('order', '<=', 2)
                                     ->orderBy('order')
                             )
                             ->searchable()
@@ -283,66 +279,9 @@ class SalesForce
                         'yellow' => 'yellow',
                         'red'  => 'red',
                     })
-                    ->default('red')
-                    ->toggleable(),
+                    ->default('red'),
             ])->from('md')
 
-            ];
-    }
-
-    public static function TextColumns(): array
-    {
-        return [
-            TextColumn::make('type')
-                ->label('Program'),
-            TextColumn::make('periode')
-                ->label('Periode'),
-            TextColumn::make('years')
-                ->label('Tahun'),
-            TextColumn::make('date_register')
-                ->label('Tanggal Pendaftaran')
-                ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
-            TextColumn::make('provinces')
-                ->label('Provinsi'),
-            TextColumn::make('regencies')
-                ->label('Kota / Kabupaten'),
-            TextColumn::make('area')
-                ->label('Wilayah'),
-            TextColumn::make('district')
-                ->label('Kecamatan'),
-            TextColumn::make('student_count')
-                ->label('Jumlah Siswa'),
-            TextColumn::make('implementation_estimate')
-                ->label('Estimasi Pelaksanaan')
-                ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
-
-            TextColumn::make('curriculum_deputies')
-                ->label('Wakakurikulum'),
-            TextColumn::make('curriculum_deputies_phone')
-                ->label('No Hp Wakakurikulum'),
-            TextColumn::make('counselor_coordinators')
-                ->label('Koordinator BK'),
-            TextColumn::make('counselor_coordinators_phone')
-                ->label('No Hp Koordinator BK'),
-            TextColumn::make('proctors')
-                ->label('Proktor'),
-            TextColumn::make('proctors_phone')
-                ->label('No Hp Proktor'),
-
-            TextColumn::make('schools')
-                ->label('Sekolah'),
-            TextColumn::make('class')
-                ->label('Kelas'),
-            TextColumn::make('education_level')
-                ->label('Jenjang'),
-            TextColumn::make('description')
-                ->label('Keterangan'),
-            TextColumn::make('schools_type')
-                ->label('Negeri / Swasta'),
-            TextColumn::make('principal')
-                ->label('Kepala Sekolah'),
-            TextColumn::make('principal_phone')
-                ->label('No Hp Kepala Sekolah'),
             ];
     }
 
@@ -447,20 +386,24 @@ class SalesForce
                             ->schema([
                                 Infolists\Components\TextEntry::make('principal')
                                     ->label('Kepala Sekolah'),
-                                Infolists\Components\TextEntry::make('principal_phone')
-                                    ->label('No Hp Kepala Sekolah'),
+                                PhoneEntry::make('principal_phone')
+                                    ->label('No Hp Kepala Sekolah')
+                                    ->displayFormat(PhoneInputNumberType::NATIONAL),
                                 Infolists\Components\TextEntry::make('curriculum_deputies')
                                     ->label('Wakakurikulum'),
-                                Infolists\Components\TextEntry::make('curriculum_deputies_phone')
-                                    ->label('No Hp Wakakurikulum'),
+                                PhoneEntry::make('curriculum_deputies_phone')
+                                    ->label('No Hp Wakakurikulum')
+                                    ->displayFormat(PhoneInputNumberType::NATIONAL),
                                 Infolists\Components\TextEntry::make('counselor_coordinators')
                                     ->label('Koordinator BK'),
-                                Infolists\Components\TextEntry::make('counselor_coordinators_phone')
-                                    ->label('No Hp Koordinator BK'),
+                                PhoneEntry::make('counselor_coordinators_phone')
+                                    ->label('No Hp Koordinator BK')
+                                    ->displayFormat(PhoneInputNumberType::NATIONAL),
                                 Infolists\Components\TextEntry::make('proctors')
                                     ->label('Proktor'),
-                                Infolists\Components\TextEntry::make('proctors_phone')
-                                    ->label('No Hp Proktor'),
+                                PhoneEntry::make('proctors_phone')
+                                    ->label('No Hp Proktor')
+                                    ->displayFormat(PhoneInputNumberType::NATIONAL),
                             ]),
 
                         Infolists\Components\Fieldset::make('')
@@ -489,6 +432,11 @@ class SalesForce
                 ->options(Periode::list())
                 ->preload()
                 ->indicator('Periode'),
+            Tables\Filters\SelectFilter::make('education_level')
+                ->label('Jenjang')
+                ->options(Jenjang::list())
+                ->preload()
+                ->indicator('Jenjang'),
             Tables\Filters\SelectFilter::make('latestStatusLog.status.color')
                 ->label('Status Warna')
                 ->options([
@@ -532,11 +480,6 @@ class SalesForce
         return [
             Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                     FilamentExportBulkAction::make('Export')
-                    ->withColumns(self::TextColumns())
-                    ->formatStates([
-                        'type' => fn (?Model $record) => strtoupper($record->type),
-                    ])
                 ]),
         ];
     }

@@ -8,6 +8,8 @@ use App\Models\Status;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Infolists;
+use App\Filament\Enum\Jenjang;
+use App\Filament\Enum\Periode;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\{TextColumn};
@@ -16,6 +18,8 @@ use App\Filament\Exports\AcademicExporter;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Actions\Exports\Enums\ExportFormat;
+use Ysfkaya\FilamentPhoneInput\Infolists\PhoneEntry;
+use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
 use Creasi\Nusa\Models\{Province, Regency, District};
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
 use Filament\Forms\Components\{Select, TextInput, Section, DatePicker, Radio, Fieldset, Group};
@@ -83,7 +87,6 @@ class Finance
     {
         return [
             Section::make('Status')
-                        ->description('Merah = Belum dikerjakan • Kuning = Sales & Akademik')
                         ->schema([
                             Select::make('status_id')
                                 ->label('Status')
@@ -92,7 +95,6 @@ class Finance
                                         name: 'status',
                                         titleAttribute: 'name',
                                         modifyQueryUsing: fn (Builder $query) => $query
-                                            ->where('category', '=', 'finance')
                                             ->orderBy('order')
                                     )
                                 ->searchable()
@@ -340,8 +342,7 @@ class Finance
                         'yellow' => 'yellow',
                         'red'  => 'red',
                     })
-                    ->default('red')
-                    ->toggleable(),
+                    ->default('red'),
             ])->from('md')
 
             ];
@@ -510,22 +511,26 @@ class Finance
 
                         Infolists\Components\Fieldset::make('Bagan')
                             ->schema([
-                                TextEntry::make('principal')
+                                Infolists\Components\TextEntry::make('principal')
                                     ->label('Kepala Sekolah'),
-                                TextEntry::make('principal_phone')
-                                    ->label('No Hp Kepala Sekolah'),
-                                TextEntry::make('curriculum_deputies')
+                                PhoneEntry::make('principal_phone')
+                                    ->label('No Hp Kepala Sekolah')
+                                    ->displayFormat(PhoneInputNumberType::NATIONAL),
+                                Infolists\Components\TextEntry::make('curriculum_deputies')
                                     ->label('Wakakurikulum'),
-                                TextEntry::make('curriculum_deputies_phone')
-                                    ->label('No Hp Wakakurikulum'),
-                                TextEntry::make('counselor_coordinators')
+                                PhoneEntry::make('curriculum_deputies_phone')
+                                    ->label('No Hp Wakakurikulum')
+                                    ->displayFormat(PhoneInputNumberType::NATIONAL),
+                                Infolists\Components\TextEntry::make('counselor_coordinators')
                                     ->label('Koordinator BK'),
-                                TextEntry::make('counselor_coordinators_phone')
-                                    ->label('No Hp Koordinator BK'),
-                                TextEntry::make('proctors')
+                                PhoneEntry::make('counselor_coordinators_phone')
+                                    ->label('No Hp Koordinator BK')
+                                    ->displayFormat(PhoneInputNumberType::NATIONAL),
+                                Infolists\Components\TextEntry::make('proctors')
                                     ->label('Proktor'),
-                                TextEntry::make('proctors_phone')
-                                    ->label('No Hp Proktor'),
+                                PhoneEntry::make('proctors_phone')
+                                    ->label('No Hp Proktor')
+                                    ->displayFormat(PhoneInputNumberType::NATIONAL),
                             ]),
 
                         Infolists\Components\Fieldset::make('')
@@ -839,12 +844,13 @@ class Finance
         return [
             Tables\Filters\SelectFilter::make('periode')
                 ->label('Periode')
-                ->options([
-                    'Januari - Juni' => 'Januari - Juni',
-                    'Juli - Desember' => 'Juli - Desember',
-                ])
+                ->options(Periode::list())
+                ->preload(),
+            Tables\Filters\SelectFilter::make('education_level')
+                ->label('Jenjang')
+                ->options(Jenjang::list())
                 ->preload()
-                ->searchable(),
+                ->indicator('Jenjang'),
             Tables\Filters\SelectFilter::make('users_id')
                 ->label('User')
                 ->options(function () {
@@ -898,11 +904,7 @@ class Finance
         return [
             Tables\Actions\BulkActionGroup::make([
                 Tables\Actions\DeleteBulkAction::make(),
-                FilamentExportBulkAction::make('Export')
-                    ->withColumns(self::exportColumns())
-                    ->formatStates([
-                        'type' => fn (?Model $record) => strtoupper($record->type),
-                    ])
+
                 ]),
         ];
     }

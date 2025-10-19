@@ -8,6 +8,7 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\RegistrationData;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
 use App\Filament\Components\Finance;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
@@ -51,11 +52,17 @@ class FinanceResource extends Resource
             ->modifyQueryUsing(
                 fn (Builder $query) =>
                 $query->withMax('activity', 'id')
+                    ->where('years', now('Asia/Jakarta')->format('Y'))
                     ->whereRelation('status', 'order', '>=', 7)
                     ->orderByDesc('updated_at')
             )
             ->columns(Finance::columns())
             ->filters(Finance::filters())
+            ->filtersTriggerAction(
+                fn (Action $action) => $action
+                    ->button()
+                    ->label('Filter'),
+            )
             ->actions(Finance::actions(), position: ActionsPosition::BeforeColumns)
             ->bulkActions(Finance::bulkActions());
     }

@@ -9,6 +9,7 @@ use Filament\Tables\Table;
 use App\Models\RegistrationData;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 use App\Filament\Components\Academic;
 use Illuminate\Database\Eloquent\Builder;
@@ -52,6 +53,7 @@ class AcademicResource extends Resource
             ->modifyQueryUsing(
                 fn (Builder $query) =>
                 $query->withMax('activity', 'id')
+                    ->where('years', now('Asia/Jakarta')->format('Y'))
                     ->whereDoesntHave('status', fn ($q) => $q->where('color', 'red'))
                     ->orderByDesc('updated_at')
             )
@@ -59,6 +61,11 @@ class AcademicResource extends Resource
                 Academic::columns()
             )
             ->filters(Academic::filters())
+            ->filtersTriggerAction(
+                fn (Action $action) => $action
+                    ->button()
+                    ->label('Filter'),
+            )
             ->actions(Academic::actions(), position: ActionsPosition::BeforeColumns)
             ->bulkActions(Academic::bulkActions());
     }

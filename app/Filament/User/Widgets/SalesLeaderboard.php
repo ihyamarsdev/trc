@@ -5,6 +5,8 @@ namespace App\Filament\User\Widgets;
 use Filament\Tables;
 use Illuminate\Database;
 use Filament\Tables\Table;
+use App\Filament\Enum\Jenjang;
+use App\Filament\Enum\Program;
 use App\Models\RegistrationData;
 use Illuminate\Support\Facades\DB;
 use Filament\Tables\Grouping\Group;
@@ -70,20 +72,20 @@ class SalesLeaderboard extends BaseWidget
                         Summarizer::make()
                             ->label('')
                             ->using(fn (Database\Query\Builder $query) => $query->count('schools'))
-                            ),
+                    ),
                     Tables\Columns\TextColumn::make('student_count')->label('Jumlah Siswa')->summarize(Sum::make()->label('')),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
                     ->label('Program')
-                    ->options([
-                        'anbk' => 'ANBK',
-                        'apps' => 'APPS',
-                        'snbt' => 'SNBT',
-                        'tka' => 'TKA',
-                    ])
+                    ->options(Program::list())
                     ->preload()
                     ->indicator('Program'),
+                Tables\Filters\SelectFilter::make('education_level')
+                    ->label('Jenjang')
+                    ->options(Jenjang::list())
+                    ->preload()
+                    ->indicator('Jenjang'),
             ])
             // ->groups([
             //     Group::make('users.name')
@@ -96,5 +98,5 @@ class SalesLeaderboard extends BaseWidget
 
     }
 
-    
+
 }

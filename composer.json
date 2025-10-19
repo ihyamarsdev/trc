@@ -41,7 +41,8 @@
         "saade/filament-fullcalendar": "^3.0",
         "spatie/laravel-activitylog": "^4.10",
         "spatie/laravel-permission": "^6.9",
-        "yebor974/filament-renew-password": "^2.1"
+        "yebor974/filament-renew-password": "^2.1",
+        "ysfkaya/filament-phone-input": "^3.2"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.2",

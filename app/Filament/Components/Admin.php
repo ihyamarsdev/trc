@@ -2,6 +2,7 @@
 
 namespace App\Filament\Components;
 
+use Carbon\Carbon;
 use Filament\Tables;
 use App\Models\Status;
 use Filament\Forms\Get;
@@ -21,6 +22,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Forms\Components\DateTimePicker;
 use Creasi\Nusa\Models\{Province, Regency, District};
 use Filament\Forms\Components\{Select, TextInput, Section};
+use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
 
 class Admin
 {
@@ -582,8 +584,7 @@ class Admin
                         'yellow' => 'yellow',
                         'red'  => 'red',
                     })
-                    ->default('red')
-                    ->toggleable(),
+                    ->default('red'),
             ])->from('md')
 
             ];
@@ -1034,12 +1035,131 @@ class Admin
         return [
             Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    FilamentExportBulkAction::make('Export')
+                    ->withColumns(self::TextColumns())
+                    ->formatStates([
+                        'type' => fn (?Model $record) => strtoupper($record->type),
+                    ])
                 ]),
         ];
     }
 
     public static function getRoles(): array
     {
-        return ['admin', 'sales'];
+        return ['admin'];
+    }
+
+    public static function TextColumns(): array
+    {
+        return [
+            // --- Sales ---
+            TextColumn::make('type')->label('Program')->searchable()->sortable(),
+            TextColumn::make('periode')->label('Periode')->searchable()->sortable(),
+            TextColumn::make('years')->label('Tahun')->searchable()->sortable(),
+            TextColumn::make('date_register')
+                ->label('Tanggal Pendaftaran')
+                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('l, j F Y H:i') : '-')
+                ->sortable(),
+            TextColumn::make('provinces')->label('Provinsi')->searchable(),
+            TextColumn::make('regencies')->label('Kota / Kabupaten')->searchable(),
+            TextColumn::make('area')->label('Wilayah')->searchable(),
+            TextColumn::make('district')->label('Kecamatan')->searchable(),
+            TextColumn::make('student_count')->label('Jumlah Siswa')->sortable(),
+            TextColumn::make('implementation_estimate')
+                ->label('Estimasi Pelaksanaan')
+                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('l, j F Y H:i') : '-')
+                ->sortable(),
+            TextColumn::make('status_color')->label('Warna Status'),
+
+            TextColumn::make('curriculum_deputies')->label('Wakakur')->searchable(),
+            TextColumn::make('curriculum_deputies_phone')->label('No. HP Wakakur'),
+            TextColumn::make('counselor_coordinators')->label('Koordinator BK')->searchable(),
+            TextColumn::make('counselor_coordinators_phone')->label('No. HP Koordinator BK'),
+            TextColumn::make('proctors')->label('Proktor')->searchable(),
+            TextColumn::make('proctors_phone')->label('No. HP Proktor'),
+
+            TextColumn::make('schools')->label('Sekolah')->searchable(),
+            TextColumn::make('class')->label('Kelas'),
+            TextColumn::make('education_level')->label('Jenjang'),
+            TextColumn::make('description')->label('Keterangan'),
+            TextColumn::make('schools_type')->label('Negeri / Swasta'),
+
+            TextColumn::make('principal')->label('Kepala Sekolah'),
+            TextColumn::make('principal_phone')->label('No. HP Kepala Sekolah'),
+
+            // --- Akademik & Teknisi ---
+            TextColumn::make('group')
+                ->label('Tanggal Group')
+                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('l, j F Y') : '-')
+                ->sortable(),
+            TextColumn::make('bimtek')
+                ->label('Tanggal Bimtek')
+                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('l, j F Y') : '-')
+                ->sortable(),
+            TextColumn::make('account_count_created')->label('Akun Dibuat')->sortable(),
+            TextColumn::make('implementer_count')->label('Jumlah Pelaksana')->sortable(),
+            TextColumn::make('difference')->label('Selisih')->sortable(),
+            TextColumn::make('students_download')->label('Unduhan Siswa'),
+            TextColumn::make('schools_download')->label('Unduhan Sekolah'),
+            TextColumn::make('pm')->label('PM'),
+            TextColumn::make('counselor_consultation_date')
+                ->label('Konsultasi BK')
+                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('l, j F Y') : '-'),
+            TextColumn::make('student_consultation_date')
+                ->label('Konsultasi Siswa')
+                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('l, j F Y') : '-'),
+
+            // --- Finance (utama) ---
+            TextColumn::make('price')->label('Harga'),
+            TextColumn::make('total')->label('Total'),
+            TextColumn::make('net')->label('Netto'),
+            TextColumn::make('total_net')->label('Total Netto'),
+            TextColumn::make('invoice_date')
+                ->label('Tgl Invoice')
+                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('j F Y') : '-')
+                ->sortable(),
+            TextColumn::make('spk')
+                ->label('Tgl SPK')
+                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('j F Y') : '-')
+                ->sortable(),
+            TextColumn::make('payment_date')
+                ->label('Tgl Pembayaran')
+                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('j F Y') : '-')
+                ->sortable(),
+            TextColumn::make('payment_name')->label('Nama Pembayaran'),
+
+            // --- Finance (Mitra) ---
+            TextColumn::make('mitra_difference')->label('Mitra Selisih'),
+            TextColumn::make('mitra_net')->label('Mitra Net'),
+            TextColumn::make('mitra_subtotal')->label('Mitra Subtotal'),
+
+            // --- Finance (SS) ---
+            TextColumn::make('ss_difference')->label('SS Selisih'),
+            TextColumn::make('ss_net')->label('SS Net'),
+            TextColumn::make('ss_subtotal')->label('SS Subtotal'),
+
+            // --- Finance (DLL) ---
+            TextColumn::make('dll_difference')->label('DLL Selisih'),
+            TextColumn::make('dll_net')->label('DLL Net'),
+            TextColumn::make('dll_subtotal')->label('DLL Subtotal'),
+
+            // --- Invoice detail ---
+            TextColumn::make('detail_invoice')->label('Detail Invoice'),
+            TextColumn::make('number_invoice')->label('Nomor Invoice'),
+            TextColumn::make('qty_invoice')->label('Qty Invoice'),
+            TextColumn::make('unit_price')->label('Harga Satuan'),
+            TextColumn::make('amount_invoice')->label('Jumlah Invoice'),
+            TextColumn::make('ppn')->label('PPN'),
+            TextColumn::make('pph')->label('PPH'),
+            TextColumn::make('subtotal_invoice')->label('Subtotal Invoice'),
+            TextColumn::make('total_invoice')->label('Total Invoice'),
+
+            TextColumn::make('detail_kwitansi')->label('Detail Kwitansi'),
+            TextColumn::make('difference_total')->label('Total Selisih'),
+
+            TextColumn::make('subtotal_1')->label('Subtotal 1'),
+            TextColumn::make('subtotal_2')->label('Subtotal 2'),
+            TextColumn::make('student_count_1')->label('Jumlah Siswa 1'),
+        ];
     }
 }

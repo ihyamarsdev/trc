@@ -10,6 +10,7 @@ use Filament\Tables\Table;
 use App\Models\RegistrationData;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 use App\Filament\Components\SalesForce;
 use Illuminate\Database\Eloquent\Builder;
@@ -22,7 +23,6 @@ use App\Filament\User\Resources\SalesResource\RelationManagers;
 
 class SalesResource extends Resource
 {
-    
     protected static ?string $model = RegistrationData::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-presentation-chart-line';
@@ -52,16 +52,19 @@ class SalesResource extends Resource
             ->poll('5s')
             ->searchable()
             ->striped()
-            // ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'anbk')->when(!Auth::user()->hasRole(['admin']), function ($query) {
-            //     // Assuming you have a 'user_id' field in your 'apps' table
-            //     return $query->where('users_id', Auth::id());
-            // })->orderBy('implementation_estimate', 'asc'))
             ->modifyQueryUsing(
                 fn (Builder $query) =>
-                $query->orderBy('implementation_estimate', 'asc')
+                    $query
+                        ->where('years', now('Asia/Jakarta')->format('Y'))
+                        ->orderBy('implementation_estimate', 'asc')
             )
             ->columns(SalesForce::columns())
             ->filters(SalesForce::filters())
+            ->filtersTriggerAction(
+                fn (Action $action) => $action
+                    ->button()
+                    ->label('Filter'),
+            )
             ->actions(SalesForce::actions(), position: ActionsPosition::BeforeColumns)
             ->bulkActions(SalesForce::bulkActions());
     }
