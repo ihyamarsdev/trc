@@ -578,34 +578,34 @@ class Finance
                                 Infolists\Components\IconEntry::make('students_download')
                                     ->label('Download Siswa')
                                     ->icon(fn (string $state): string => match ($state) {
-                                        'ya' => 'heroicon-s-check-circle',
-                                        'tidak' => 'heroicon-s-x-circle',
+                                        'YA' => 'heroicon-s-check-circle',
+                                        'TIDAK' => 'heroicon-s-x-circle',
                                     })
                                     ->color(fn (string $state): string => match ($state) {
-                                        'ya' => 'success',
-                                        'tidak' => 'danger',
+                                        'YA' => 'success',
+                                        'TIDAK' => 'danger',
                                     })
                                     ->placeholder('Tidak Ada Status'),
                                 Infolists\Components\IconEntry::make('schools_download')
                                     ->label('Download Sekolah')
                                     ->icon(fn (string $state): string => match ($state) {
-                                        'ya' => 'heroicon-s-check-circle',
-                                        'tidak' => 'heroicon-s-x-circle',
+                                        'YA' => 'heroicon-s-check-circle',
+                                        'TIDAK' => 'heroicon-s-x-circle',
                                     })
                                     ->color(fn (string $state): string => match ($state) {
-                                        'ya' => 'success',
-                                        'tidak' => 'danger',
+                                        'YA' => 'success',
+                                        'TIDAK' => 'danger',
                                     })
                                     ->placeholder('Tidak Ada Status'),
                                 Infolists\Components\IconEntry::make('pm')
                                     ->label('PM')
                                     ->icon(fn (string $state): string => match ($state) {
-                                        'ya' => 'heroicon-s-check-circle',
-                                        'tidak' => 'heroicon-s-x-circle',
+                                        'YA' => 'heroicon-s-check-circle',
+                                        'TIDAK' => 'heroicon-s-x-circle',
                                     })
                                     ->color(fn (string $state): string => match ($state) {
-                                        'ya' => 'success',
-                                        'tidak' => 'danger',
+                                        'YA' => 'success',
+                                        'TIDAK' => 'danger',
                                     })
                                     ->placeholder('Tidak Ada Status'),
                             ])->columns(3),
