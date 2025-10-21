@@ -13,9 +13,6 @@ class StatusSeeder extends Seeder
      */
     public function run(): void
     {
-        // Clear existing statuses
-        DB::table('statuses')->delete();
-
         // Create statuses
         $statuses = [
             [
