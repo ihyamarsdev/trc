@@ -48,6 +48,7 @@ class UserPanelProvider extends PanelProvider
             ->brandLogoHeight('8rem')
             ->viteTheme('resources/css/filament/user/theme.css')
             ->databaseNotifications()
+            ->databaseNotificationsPolling('2s')
             ->sidebarWidth('15rem')
             ->unsavedChangesAlerts()
             ->breadcrumbs(false)

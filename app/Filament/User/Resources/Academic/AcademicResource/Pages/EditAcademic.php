@@ -2,10 +2,13 @@
 
 namespace App\Filament\User\Resources\Academic\AcademicResource\Pages;
 
+use App\Models\User;
 use Filament\Actions;
+use App\Models\Status;
 use App\Models\RegistrationStatus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use App\Filament\User\Resources\Academic\AcademicResource;
 
@@ -22,6 +25,19 @@ class EditAcademic extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
+        $status = Status::find($data["status_id"]);
+
+        if ($status->order == 10) {
+            $recipients = User::role('service')->get();
+
+            Notification::make()
+                ->title('Data Sekolah ' . $data["schools"] . ' memasuki status ' . $status->name)
+                ->icon('heroicon-o-document-text')
+                ->success()
+                ->sendToDatabase($recipients);
+
+        }
+
         $record = $this->record;
 
         DB::transaction(function () use ($record) {
