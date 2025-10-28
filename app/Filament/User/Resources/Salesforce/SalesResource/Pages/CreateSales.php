@@ -3,9 +3,12 @@
 namespace App\Filament\User\Resources\Salesforce\SalesResource\Pages;
 
 use Carbon\Carbon;
+use App\Models\User;
 use Filament\Actions;
+use App\Models\Status;
 use App\Models\RegistrationStatus;
 use Illuminate\Support\Facades\Auth;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use App\Filament\User\Resources\Salesforce\SalesResource;
 
@@ -21,7 +24,18 @@ class CreateSales extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['users_id'] = Auth::id();
-        // $data['type']     = 'anbk';
+        $status = Status::find($data["status_id"]);
+
+        if ($status->order == 2) {
+            $recipients = User::role('service')->get();
+
+            Notification::make()
+                ->title('Data Sekolah ' . $data["schools"] . ' memasuki status ' . $status->name)
+                ->icon('heroicon-o-document-text')
+                ->success()
+                ->sendToDatabase($recipients);
+
+        }
 
         if (empty($data['status_id'])) {
             $data['status_id'] = 1;
