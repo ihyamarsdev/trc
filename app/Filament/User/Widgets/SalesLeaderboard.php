@@ -25,6 +25,7 @@ class SalesLeaderboard extends BaseWidget
     public function table(Table $table): Table
     {
         return $table
+            ->poll('10s')
             ->query(
                 RegistrationData::query()
                 ->addSelect([
@@ -94,7 +95,6 @@ class SalesLeaderboard extends BaseWidget
             // ])
             ->defaultGroup('users.name')
             ->groupingSettingsHidden()
-            ->live()
             ->groupsOnly();
 
     }
