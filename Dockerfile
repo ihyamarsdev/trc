@@ -1,6 +1,9 @@
 # Gunakan image FrankenPHP resmi berbasis Caddy
 FROM dunglas/frankenphp:1-php8.4.8-alpine
 
+ENV CADDY_GLOBAL_OPTIONS="auto_https off"
+ENV SERVER_NAME=":80"
+
 # Pindah ke direktori kerja
 WORKDIR /app
 
@@ -24,6 +27,4 @@ RUN composer install --no-dev --no-scripts --prefer-dist --optimize-autoloader
 
 RUN php artisan storage:link
 
-EXPOSE 8000
-
-ENTRYPOINT [ "php", "artisan", "octane:frankenphp", "--workers=2", "--max-requests=30", "--port=8000"]
+# ENTRYPOINT [ "php", "artisan", "octane:frankenphp", "--workers=5", "--max-requests=30", "--port=80"]
