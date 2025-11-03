@@ -94,6 +94,7 @@ class SalesLeaderboard extends BaseWidget
             // ])
             ->defaultGroup('users.name')
             ->groupingSettingsHidden()
+            ->live()
             ->groupsOnly();
 
     }
