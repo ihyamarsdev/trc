@@ -38,6 +38,7 @@ class EditSales extends EditRecord
         $date = getDate($input);
         $data["monthYear"] = $date["month"] . " " . $date["year"];
         $status = Status::find($data["status_id"]);
+        $data['status_color'] = $status->color;
 
 
         if ($status->order == 2) {

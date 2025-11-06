@@ -41,6 +41,8 @@ class CreateSales extends CreateRecord
             $data['status_id'] = 1;
         }
 
+        $data['status_color'] = $status->color;
+
         // monthYear aman dibentuk (jika date_register diisi)
         if (!empty($data['date_register'])) {
             $dt = Carbon::parse($data['date_register']);
