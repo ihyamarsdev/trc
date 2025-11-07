@@ -26,7 +26,7 @@ class CreateSales extends CreateRecord
         $data['users_id'] = Auth::id();
 
         if (empty($data['status_id'])) {
-            $data['status_id'] = 1;
+            $data['status_id'] = 28;
         }
 
         $status = Status::find($data["status_id"]);
