@@ -24,6 +24,11 @@ class CreateSales extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['users_id'] = Auth::id();
+
+        if (empty($data['status_id'])) {
+            $data['status_id'] = 1;
+        }
+
         $status = Status::find($data["status_id"]);
 
         if ($status->order == 2) {
@@ -35,10 +40,6 @@ class CreateSales extends CreateRecord
                 ->success()
                 ->sendToDatabase($recipients);
 
-        }
-
-        if (empty($data['status_id'])) {
-            $data['status_id'] = 1;
         }
 
         $data['status_color'] = $status->color;
