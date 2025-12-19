@@ -48,7 +48,7 @@ class CalendarWidget extends FullCalendarWidget
             ->where('implementation_estimate', '<=', $fetchInfo['end'])
             ->when(
                 auth()->user()->hasRole('sales'),
-                fn($query) => $query->where('user_id', auth()->id())
+                fn($query) => $query->where('users_id', auth()->id())
             )
             ->get()
             ->map(function (RegistrationData $event) {

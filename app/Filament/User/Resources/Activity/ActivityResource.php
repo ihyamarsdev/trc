@@ -51,7 +51,7 @@ class ActivityResource extends Resource
                     ->orderByDesc('updated_at')
                     ->when(
                         auth()->user()->hasRole('sales'),
-                        fn(Builder $q) => $q->where('user_id', auth()->id())
+                        fn(Builder $q) => $q->where('users_id', auth()->id())
                     )
             )
             ->columns(Admin::columns())
