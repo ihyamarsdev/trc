@@ -53,15 +53,19 @@ class SalesResource extends Resource
             ->searchable()
             ->striped()
             ->modifyQueryUsing(
-                fn (Builder $query) =>
-                    $query
-                        ->where('years', now('Asia/Jakarta')->format('Y'))
-                        ->orderBy('implementation_estimate', 'asc')
+                fn(Builder $query) =>
+                $query
+                    ->where('years', now('Asia/Jakarta')->format('Y'))
+                    ->when(
+                        auth()->user()->hasRole('sales'),
+                        fn($query) => $query->where('users_id', auth()->id())
+                    )
+                    ->orderBy('implementation_estimate', 'asc')
             )
             ->columns(SalesForce::columns())
             ->filters(SalesForce::filters())
             ->filtersTriggerAction(
-                fn (Action $action) => $action
+                fn(Action $action) => $action
                     ->button()
                     ->label('Filter'),
             )
