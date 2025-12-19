@@ -46,51 +46,55 @@ class ActivityResource extends Resource
             ->searchable()
             ->striped()
             ->modifyQueryUsing(
-                fn (Builder $query) =>
-                $query->withMax('activity', 'id') // alias: registration_statuses_updated_at_max
+                fn(Builder $query) => $query
+                    ->withMax('activity', 'id')
                     ->orderByDesc('updated_at')
+                    ->when(
+                        auth()->user()->hasRole('sales'),
+                        fn(Builder $q) => $q->where('user_id', auth()->id())
+                    )
             )
             ->columns(Admin::columns())
             ->filters([
-                    Tables\Filters\SelectFilter::make('type')
-                        ->label('Program')
-                        ->options(Program::list())
-                        ->preload()
-                        ->indicator('Program'),
-                    Tables\Filters\SelectFilter::make('latestStatusLog.status.color')
-                        ->label('Status Warna')
-                        ->options([
-                            'red'    => 'Merah',
-                            'yellow' => 'Kuning',
-                            'blue'   => 'Biru',
-                            'green'  => 'Hijau',
-                        ])
-                        ->preload()
-                        ->indicator('Status Warna')
-                        ->query(function (Builder $query, array $data) {
-                            if (empty($data['value'])) {
-                                return;
-                            }
+                Tables\Filters\SelectFilter::make('type')
+                    ->label('Program')
+                    ->options(Program::list())
+                    ->preload()
+                    ->indicator('Program'),
+                Tables\Filters\SelectFilter::make('latestStatusLog.status.color')
+                    ->label('Status Warna')
+                    ->options([
+                        'red' => 'Merah',
+                        'yellow' => 'Kuning',
+                        'blue' => 'Biru',
+                        'green' => 'Hijau',
+                    ])
+                    ->preload()
+                    ->indicator('Status Warna')
+                    ->query(function (Builder $query, array $data) {
+                        if (empty($data['value'])) {
+                            return;
+                        }
 
-                            $query->whereHas(
-                                'status',
-                                fn (Builder $q) =>
-                                $q->where('color', $data['value'])
-                            );
-                        }),
+                        $query->whereHas(
+                            'status',
+                            fn(Builder $q) =>
+                            $q->where('color', $data['value'])
+                        );
+                    }),
             ])
             ->actions([
                 Tables\Actions\Action::make('view_activities')
-                            ->label('Progres')
-                            ->icon('heroicon-m-clock')
-                            ->color('purple')
-                            ->url(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record])),
+                    ->label('Progres')
+                    ->icon('heroicon-m-clock')
+                    ->color('purple')
+                    ->url(fn($record) => ActivityResource::getUrl('activities', ['record' => $record])),
 
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
-                        Tables\Actions\BulkActionGroup::make([
-                            Tables\Actions\DeleteBulkAction::make(),
-                        ]),
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
             ]);
     }
 

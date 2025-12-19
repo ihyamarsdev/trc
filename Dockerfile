@@ -26,5 +26,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 RUN composer install --no-dev --no-scripts --prefer-dist --optimize-autoloader
 
 RUN php artisan storage:link
+RUN php artisan config:clear
 
-# ENTRYPOINT [ "php", "artisan", "octane:frankenphp", "--workers=5", "--max-requests=30", "--port=80"]
+ENTRYPOINT [ "php", "artisan", "octane:frankenphp", "--workers=5", "--log-level=debug", "--max-requests=30", "--port=8000"]
+# ENTRYPOINT [ "frankenphp", "run" ]
