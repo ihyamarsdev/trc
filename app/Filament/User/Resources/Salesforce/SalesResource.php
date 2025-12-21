@@ -57,7 +57,6 @@ class SalesResource extends Resource
                 $query
                     ->where('years', now('Asia/Jakarta')->format('Y'))
                     ->when(
-                        auth()->user()->hasRole('sales'),
                         fn($query) => $query->where('users_id', auth()->id())
                     )
                     ->orderBy('implementation_estimate', 'asc')

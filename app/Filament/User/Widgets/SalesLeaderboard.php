@@ -46,35 +46,55 @@ class SalesLeaderboard extends BaseWidget
                         ->selectRaw('COUNT(*)')
                         ->whereColumn('r4.users_id', 'registration_data.users_id')
                         ->where('r4.status_color', 'yellow'),
+
+                    // hitung merah per user (TAMBAHAN)
+                    'red_count' => DB::table('registration_data as r5')
+                        ->selectRaw('COUNT(*)')
+                        ->whereColumn('r5.users_id', 'registration_data.users_id')
+                        ->where('r5.status_color', 'red'),
                 ])
                 ->orderByDesc('green_count')
                 ->orderByDesc('blue_count')
                 ->orderByDesc('yellow_count')
+                ->orderByDesc('red_count')
                 ->orderBy('users_id') // tie-breaker opsional
             )
             ->columns([
                     Tables\Columns\TextColumn::make('users.name')->label('Sales'),
-                    Tables\Columns\TextColumn::make('yellow')->label('Data Kuning')->summarize(
+                    Tables\Columns\TextColumn::make('red')->alignCenter()->label('Data')->summarize(
                         Summarizer::make()
-                        ->label('')
-                        ->using(fn (Database\Query\Builder $query) => $query->where('status_color', '=', 'yellow')->count())
-                    ),
-                    Tables\Columns\TextColumn::make('blue')->label('Data Biru')->summarize(
+                            ->label('')
+                            ->using(fn (Database\Query\Builder $query) => $query->where('status_color', '=', 'red')->count())
+                            ->formatStateUsing(fn ($state) => '<span style="color: red; font-weight: bold;">' .$state. '</span>')
+                            ->html()
+                        ),
+                    Tables\Columns\TextColumn::make('yellow')->alignCenter()->label('Data')->summarize(
                         Summarizer::make()
-                        ->label('')
-                        ->using(fn (Database\Query\Builder $query) => $query->where('status_color', '=', 'blue')->count())
+                            ->label('')
+                            ->using(fn (Database\Query\Builder $query) => $query->where('status_color', '=', 'yellow')->count())
+                            ->formatStateUsing(fn ($state) => '<span style="color: yellow; font-weight: bold;">' .$state. '</span>')
+                            ->html()
                     ),
-                    Tables\Columns\TextColumn::make('green')->label('Data Hijau')->summarize(
+                    Tables\Columns\TextColumn::make('blue')->alignCenter()->label('Data')->summarize(
                         Summarizer::make()
-                        ->label('')
-                        ->using(fn (Database\Query\Builder $query) => $query->where('status_color', '=', 'green')->count())
+                            ->label('')
+                            ->using(fn (Database\Query\Builder $query) => $query->where('status_color', '=', 'blue')->count())
+                            ->formatStateUsing(fn ($state) => '<span style="color: blue; font-weight: bold;">' .$state. '</span>')
+                            ->html()
                     ),
-                    Tables\Columns\TextColumn::make('schools')->label('Jumlah Sekolah')->summarize(
+                    Tables\Columns\TextColumn::make('green')->alignCenter()->label('Data')->summarize(
+                        Summarizer::make()
+                            ->label('')
+                            ->using(fn (Database\Query\Builder $query) => $query->where('status_color', '=', 'green')->count())
+                            ->formatStateUsing(fn ($state) => '<span style="color: green; font-weight: bold;">' .$state. '</span>')
+                            ->html()
+                    ),
+                    Tables\Columns\TextColumn::make('schools')->alignCenter()->label('Jumlah Sekolah')->summarize(
                         Summarizer::make()
                             ->label('')
                             ->using(fn (Database\Query\Builder $query) => $query->count('schools'))
                     ),
-                    Tables\Columns\TextColumn::make('student_count')->label('Jumlah Siswa')->summarize(Sum::make()->label('')),
+                    Tables\Columns\TextColumn::make('student_count')->alignCenter()->label('Jumlah Siswa')->summarize(Sum::make()->label('')),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('type')

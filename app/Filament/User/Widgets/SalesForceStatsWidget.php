@@ -39,12 +39,12 @@ class SalesForceStatsWidget extends BaseWidget
             )
             ->columns([
                 Tables\Columns\TextColumn::make('type')->label('Program'),
-                Tables\Columns\TextColumn::make('schools')->label('Jumlah Sekolah')->summarize(
+                Tables\Columns\TextColumn::make('schools')->label('Jumlah Sekolah')->alignCenter()->summarize(
                     Summarizer::make()
                     ->label('')
                     ->using(fn (Database\Query\Builder $query) => $query->count('schools'))
                 ),
-                Tables\Columns\TextColumn::make('student_count')->label('Jumlah Siswa')->summarize(Sum::make()->label('')),
+                Tables\Columns\TextColumn::make('student_count')->label('Jumlah Siswa')->alignCenter()->summarize(Sum::make()->label('')),
             ])
             ->groups([
                 Group::make('type')
