@@ -79,11 +79,10 @@ class SalesForce
                 ->description()
                 ->schema([
                     DateTimePicker::make("date_register")
-                        ->label("Tanggal Pendaftaran")
+                        ->label(new \Illuminate\Support\HtmlString('<span style="color: #ef4444;">Tanggal Pendaftaran</span>'))
                         ->native(false)
                         ->seconds(false)
-                        ->displayFormat("l, jS F Y H:i")
-                        ->extraInputAttributes(['class' => 'text-danger-600']),
+                        ->displayFormat("l, jS F Y H:i"),
                     Select::make("provinces")
                         ->label("Provinsi")
                         ->options(Province::all()->pluck("name", "name"))
@@ -194,7 +193,7 @@ class SalesForce
                             return [];
                         }),
                     TextInput::make("curriculum_deputies")
-                        ->label("Wakakurikulum")
+                        ->label(new \Illuminate\Support\HtmlString('<span style="color: #ef4444;">Wakakurikulum</span>'))
                         ->nullable()
                         ->dehydrateStateUsing(
                             fn(?string $state): string => Str::upper($state),
@@ -202,7 +201,7 @@ class SalesForce
                         ->maxLength(50)
                         ->live(),
                     PhoneInput::make("curriculum_deputies_phone")
-                        ->label("No Handphone Wakakurikulum")
+                        ->label(new \Illuminate\Support\HtmlString('<span style="color: #ef4444;">No Handphone Wakakurikulum</span>'))
                         ->defaultCountry("ID")
                         ->live(),
                     TextInput::make("counselor_coordinators")
@@ -226,10 +225,10 @@ class SalesForce
                         ->label("No Handphone Proktor")
                         ->defaultCountry("ID"),
                     TextInput::make("student_count")
-                        ->label("Jumlah Siswa")
+                        ->label(new \Illuminate\Support\HtmlString('<span style="color: #ef4444;">Jumlah Siswa</span>'))
                         ->numeric(),
                     DateTimePicker::make("implementation_estimate")
-                        ->label("Estimasi Pelaksanaan")
+                        ->label(new \Illuminate\Support\HtmlString('<span style="color: #ef4444;">Estimasi Pelaksanaan</span>'))
                         ->native(false)
                         ->seconds(false)
                         ->displayFormat("l, jS F Y H:i")
@@ -241,7 +240,7 @@ class SalesForce
                 ->description("Masukkan Detail Data Sekolah")
                 ->schema([
                     TextInput::make("schools")
-                        ->label("Nama Sekolah")
+                        ->label(new \Illuminate\Support\HtmlString('<span style="color: #ef4444;">Nama Sekolah</span>'))
                         ->nullable()
                         ->dehydrateStateUsing(
                             fn(?string $state): string => Str::upper($state),
@@ -268,7 +267,7 @@ class SalesForce
                         ])
                         ->native(false),
                     TextInput::make("principal")
-                        ->label("Nama Kepala Sekolah")
+                        ->label(new \Illuminate\Support\HtmlString('<span style="color: #ef4444;">Nama Kepala Sekolah</span>'))
                         ->nullable()
                         ->dehydrateStateUsing(
                             fn(?string $state): string => Str::upper($state),
@@ -276,7 +275,7 @@ class SalesForce
                         ->maxLength(255)
                         ->live(),
                     PhoneInput::make("principal_phone")
-                        ->label("No Handphone Kepala Sekolah")
+                        ->label(new \Illuminate\Support\HtmlString('<span style="color: #ef4444;">No Handphone Kepala Sekolah</span>'))
                         ->defaultCountry("ID")
                         ->live(),
                 ])
