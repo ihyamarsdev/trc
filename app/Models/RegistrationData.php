@@ -11,6 +11,8 @@ class RegistrationData extends Model
 {
     use HasFactory;
 
+    
+
     protected $fillable = [
         'type',
         'periode',
@@ -128,31 +130,6 @@ class RegistrationData extends Model
     {
         return $this->hasOne(RegistrationStatus::class, 'registration_id')
             ->latestOfMany(); // ambil baris log terakhir (created_at / id terbesar)
-    }
-
-    /** Sinkronkan status_color dari log terakhir */
-    public function syncStatusColorFromLatestLog(): void
-    {
-        // muat relasi jika belum ada
-        $this->loadMissing('latestStatusLog.status');
-
-        $color = $this->latestStatusLog?->status?->color;
-
-        // contoh: kalau status inactive → jadikan gray (opsional)
-        if ($this->latestStatusLog?->status && $this->latestStatusLog->status->is_active === false) {
-            $color = 'gray';
-        }
-
-        // hindari event berulang
-        $this->forceFill(['status_color' => $color])->saveQuietly();
-    }
-
-    protected static function booted(): void
-    {
-        // setiap RegistrationData disimpan, update status_color sesuai log terakhir
-        static::saved(function (self $model) {
-            $model->syncStatusColorFromLatestLog();
-        });
     }
 
 

@@ -22,6 +22,7 @@ use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
 use Creasi\Nusa\Models\{Province, Regency, District};
 use Filament\Forms\Components\{Select, TextInput, Section};
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use Filament\Forms\Set;
 
 class SalesForce
 {
@@ -315,7 +316,16 @@ class SalesForce
                         )
                         ->searchable()
                         ->placeholder("Pilih status...")
-                        ->columnSpan(1),
+                        ->columnSpan(1)
+                        ->live() 
+                        ->afterStateUpdated(function (Set $set, $state) {
+                            if ($state) {
+                                $color = Status::find($state)?->color;
+                                $set('status_color', $color);
+                            } else {
+                                $set('status_color', null);
+                            }
+                        }),
                 ])
                 ->columns(2),
         ];
