@@ -988,6 +988,12 @@ class Admin
     public static function filters(): array
     {
         return [
+            Tables\Filters\SelectFilter::make('users')
+                ->label('Salesforce')
+                ->relationship('users', 'name')
+                ->searchable()
+                ->preload()
+                ->indicator('Salesforce'),
             Tables\Filters\SelectFilter::make('type')
                 ->label('Program')
                 ->options(Program::list())

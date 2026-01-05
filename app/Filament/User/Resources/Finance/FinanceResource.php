@@ -52,7 +52,7 @@ class FinanceResource extends Resource
             ->modifyQueryUsing(
                 fn(Builder $query) =>
                 $query->withMax('activity', 'id')
-                    // ->where('years', now('Asia/Jakarta')->format('Y'))
+                    ->where('years', now('Asia/Jakarta')->format('Y'))
                     ->whereRelation('status', 'order', '>=', 7)
                     ->orderByDesc('updated_at')
             )
