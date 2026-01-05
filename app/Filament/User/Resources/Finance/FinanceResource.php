@@ -50,16 +50,16 @@ class FinanceResource extends Resource
             ->searchable()
             ->striped()
             ->modifyQueryUsing(
-                fn (Builder $query) =>
+                fn(Builder $query) =>
                 $query->withMax('activity', 'id')
-                    ->where('years', now('Asia/Jakarta')->format('Y'))
+                    // ->where('years', now('Asia/Jakarta')->format('Y'))
                     ->whereRelation('status', 'order', '>=', 7)
                     ->orderByDesc('updated_at')
             )
             ->columns(Finance::columns())
             ->filters(Finance::filters())
             ->filtersTriggerAction(
-                fn (Action $action) => $action
+                fn(Action $action) => $action
                     ->button()
                     ->label('Filter'),
             )

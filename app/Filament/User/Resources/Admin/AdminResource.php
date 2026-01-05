@@ -51,7 +51,7 @@ class AdminResource extends Resource
             ->striped()
             ->modifyQueryUsing(
                 fn (Builder $query) =>
-                $query->withMax('activity', 'id') // alias: registration_statuses_updated_at_max
+                $query->withMax('activity', 'id') 
                     ->orderByDesc('updated_at')
             )
             ->columns(Admin::columns())
