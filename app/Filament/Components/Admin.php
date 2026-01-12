@@ -567,6 +567,7 @@ class Admin
                     ->extraAttributes(['class' => 'uppercase']),
                 TextColumn::make('schools')
                     ->label('Sekolah')
+                    ->searchable()
                     ->wrap(),
                 TextColumn::make('periode')
                     ->label('Periode')
