@@ -56,7 +56,7 @@ class Admin
 
     protected static function metaInfo(Model $record): array
     {
-        $type = $record->type ?? 'apps';
+        $type = $record->type;
 
         return match ($type) {
             'anbk' => [
@@ -76,8 +76,8 @@ class Admin
                 'DescriptionRegister' => 'TEST KEMAMPUAN AKADEMIK',
             ],
             default => [
-                'nameRegister' => 'APPS',
-                'DescriptionRegister' => 'ASESMEN PSIKOTES POTENSI SISWA',
+                'nameRegister' => 'NONE',
+                'DescriptionRegister' => 'NONE',
             ],
         };
     }
@@ -96,7 +96,7 @@ class Admin
         }
     }
 
-    public static function schema(): array
+    public static function formSchema(): array
     {
         return [
             Section::make('Program')
@@ -564,19 +564,24 @@ class Admin
             Split::make([
                 TextColumn::make('type')
                     ->label('Program')
+                    ->description('Program', position: 'above')
                     ->extraAttributes(['class' => 'uppercase']),
                 TextColumn::make('schools')
                     ->label('Sekolah')
+                    ->description('Sekolah', position: 'above')
                     ->searchable()
                     ->wrap(),
                 TextColumn::make('periode')
                     ->label('Periode')
+                    ->description('Periode', position: 'above')
                     ->wrap(),
                 TextColumn::make('years')
-                    ->label('Tahun'),
+                    ->label('Tahun')
+                    ->description('Tahun', position: 'above'),
 
                 TextColumn::make('latestStatusLog.status.color')
                     ->label('Status')
+                    ->description('Status', position: 'above')
                     ->badge()
                     ->formatStateUsing(fn($state) => ucfirst($state))
                     ->color(fn(string $state): string => match ($state) {

@@ -18,7 +18,7 @@ use Illuminate\Database;
 
 class SalesForceStatsWidget extends BaseWidget
 {
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
     protected static ?int $sort = 2;
     protected static ?string $title = 'Rekap Program';
     protected static ?string $heading = 'Rekap Program';
@@ -32,24 +32,25 @@ class SalesForceStatsWidget extends BaseWidget
     {
         return $table
             ->query(
-                RegistrationData::query()->when(!Auth::user()->hasRole(['admin','service','finance']), function ($query) {
+                RegistrationData::query()->when(!Auth::user()->hasRole(['admin', 'service', 'finance']), function ($query) {
                     // Assuming you have a 'user_id' field in your 'apps' table
                     return $query->where('users_id', Auth::id());
                 })
             )
             ->columns([
-                Tables\Columns\TextColumn::make('type')->label('Program'),
+                Tables\Columns\TextColumn::make('type')->label('Program')->extraAttributes(["class" => "uppercase"]),
                 Tables\Columns\TextColumn::make('schools')->label('Jumlah Sekolah')->alignCenter()->summarize(
                     Summarizer::make()
-                    ->label('')
-                    ->using(fn (Database\Query\Builder $query) => $query->count('schools'))
+                        ->label('')
+                        ->using(fn(Database\Query\Builder $query) => $query->count('schools'))
                 ),
                 Tables\Columns\TextColumn::make('student_count')->label('Jumlah Siswa')->alignCenter()->summarize(Sum::make()->label('')),
             ])
             ->groups([
                 Group::make('type')
                     ->collapsible()
-                    ->titlePrefixedWithLabel(false),
+                    ->titlePrefixedWithLabel(false)
+                    ->getTitleFromRecordUsing(fn($record): string => strtoupper($record->type)),
             ])
             ->defaultGroup('type')
             ->groupingSettingsHidden()

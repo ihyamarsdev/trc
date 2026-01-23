@@ -2,15 +2,16 @@
 
 namespace App\Filament\User\Resources\Salesforce\SalesResource\Pages;
 
-use Carbon\Carbon;
-use App\Models\User;
-use Filament\Actions;
-use App\Models\Status;
+use App\Filament\User\Resources\Salesforce\SalesResource;
 use App\Models\RegistrationStatus;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Status;
+use App\Models\User;
+use Carbon\Carbon;
+use Filament\Actions;
+use Filament\Notifications\Actions\Action as NotificationAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
-use App\Filament\User\Resources\Salesforce\SalesResource;
+use Illuminate\Support\Facades\Auth;
 
 class CreateSales extends CreateRecord
 {
@@ -21,6 +22,7 @@ class CreateSales extends CreateRecord
         return $this->getResource()::getUrl('index');
     }
 
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['users_id'] = Auth::id();
@@ -29,20 +31,11 @@ class CreateSales extends CreateRecord
             $data['status_id'] = 28;
         }
 
-        $status = Status::find($data["status_id"]);
+        $status = Status::find($data['status_id']);
 
-        if ($status->order == 2) {
-            $recipients = User::role('service')->get();
-
-            Notification::make()
-                ->title('Data Sekolah ' . $data["schools"] . ' memasuki status ' . $status->name)
-                ->icon('heroicon-o-document-text')
-                ->success()
-                ->sendToDatabase($recipients);
-
+        if ($status) {
+            $data['status_color'] = $status->color;
         }
-
-        $data['status_color'] = $status->color;
 
         // monthYear aman dibentuk (jika date_register diisi)
         if (!empty($data['date_register'])) {
@@ -60,18 +53,34 @@ class CreateSales extends CreateRecord
             return;
         }
 
+        $status = Status::find($record->status_id);
+
+        if ($status && $status->order == 2) {
+            $recipients = User::role('service')->get();
+
+            Notification::make()
+                ->title('Data Sekolah ' . $record->schools . ' memasuki status ' . $status->name)
+                ->icon('heroicon-o-document-text')
+                ->success()
+                ->actions([
+                    NotificationAction::make('Lihat')
+                        ->url(SalesResource::getUrl('view', ['record' => $record]))
+                        ->openUrlInNewTab(),
+                ])
+                ->sendToDatabase($recipients);
+        }
+
         // Cek log terakhir (hindari duplikat)
         $last = RegistrationStatus::query()
             ->where('registration_id', $record->id)
             ->latest('id')
             ->first();
 
-        if (! $last || (int) $last->status_id !== (int) $record->status_id) {
+        if (!$last || (int) $last->status_id !== (int) $record->status_id) {
             RegistrationStatus::create([
                 'registration_id' => $record->id,
-                'status_id'       => $record->status_id,
-                'user_id'         => Auth::id(),
-                ''
+                'status_id' => $record->status_id,
+                'user_id' => Auth::id(),
             ]);
         }
     }

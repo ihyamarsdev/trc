@@ -11,7 +11,7 @@ enum Program: string
 
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::ANBK => 'ANBK',
             self::APPS => 'APPS',
             self::SNBT => 'SNBT',
@@ -22,11 +22,11 @@ enum Program: string
     public static function list(): array
     {
         return [
-            'ANBK' => self::ANBK->label(),
-            'APPS' => self::APPS->label(),
-            'SNBT' => self::SNBT->label(),
-            'TKA' => self::TKA->label(),
+            'anbk' => self::ANBK->label(),
+            'apps' => self::APPS->label(),
+            'snbt' => self::SNBT->label(),
+            'tka' => self::TKA->label(),
         ];
     }
-    
+
 }

@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
         $roleNames = ['admin', 'sales', 'akademik', 'teknisi', 'finance'];
 
         $roles = Role::whereIn('name', $roleNames)->get()->values();
-        $totalUsers = 30;
+        $totalUsers = 10;
         $roleCount  = $roles->count();
 
         User::factory($totalUsers)->create()->each(function (User $u, int $idx) use ($roles, $roleCount) {

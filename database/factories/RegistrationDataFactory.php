@@ -66,7 +66,7 @@ class RegistrationDataFactory extends Factory
 
 
             'users_id' => null,
-            'status_id' => 1,
+            'status_id' => \App\Models\Status::inRandomOrder()->first()->id,
         ];
     }
 }

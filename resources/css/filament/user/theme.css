@@ -117,6 +117,8 @@
 .fi-checkbox-input {
     @apply ring-lime-500;
 }
+
+
 @layer utilities {
     /* Hide scrollbar for Chrome, Safari and Opera */
     .no-scrollbar::-webkit-scrollbar {

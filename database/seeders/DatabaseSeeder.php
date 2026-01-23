@@ -16,13 +16,14 @@ class DatabaseSeeder extends Seeder
     {
         $roleNames = ['sales', 'service', 'finance'];
 
-        $user = User::factory()->create([
+        $user = User::firstOrCreate([
+            'email' => 'admin@trc.com'
+        ], [
             'name' => 'admin',
-            'email' => 'admin@trc.com',
             'password' => 'admin123'
         ]);
 
-        $role = Role::create(['name' => 'admin']);
+        $role = Role::firstOrCreate(['name' => 'admin']);
         $user->assignRole($role);
 
         foreach ($roleNames as $name) {
@@ -33,8 +34,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             StatusSeeder::class,
-            // UserSeeder::class,
-            // Registration::class,
+            UserSeeder::class,
+            Registration::class,
         ]);
     }
 }

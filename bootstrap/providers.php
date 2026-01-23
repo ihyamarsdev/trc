@@ -2,6 +2,7 @@
 
 return [
     App\Providers\AppServiceProvider::class,
+    Spatie\Permission\PermissionServiceProvider::class,
     App\Providers\Filament\AcademicPanelProvider::class,
     App\Providers\Filament\AdminPanelProvider::class,
     App\Providers\Filament\DatacenterPanelProvider::class,

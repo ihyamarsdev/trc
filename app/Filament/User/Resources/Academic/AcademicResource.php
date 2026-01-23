@@ -50,11 +50,12 @@ class AcademicResource extends Resource
             ->poll('5s')
             ->searchable()
             ->striped()
+            ->paginated([50, 100, 200])
             ->modifyQueryUsing(
-                fn (Builder $query) =>
+                fn(Builder $query) =>
                 $query->withMax('activity', 'id')
                     ->where('years', now('Asia/Jakarta')->format('Y'))
-                    ->whereDoesntHave('status', fn ($q) => $q->where('color', 'red'))
+                    ->whereRelation('status', fn($q) => $q->whereBetween('order', [2, 10]))
                     ->orderByDesc('updated_at')
             )
             ->columns(
@@ -62,7 +63,7 @@ class AcademicResource extends Resource
             )
             ->filters(Academic::filters())
             ->filtersTriggerAction(
-                fn (Action $action) => $action
+                fn(Action $action) => $action
                     ->button()
                     ->label('Filter'),
             )

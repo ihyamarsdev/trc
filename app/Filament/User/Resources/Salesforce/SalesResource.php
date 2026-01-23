@@ -42,7 +42,19 @@ class SalesResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->schema(SalesForce::schema());
+            ->schema(SalesForce::schema())
+            ->extraAttributes([
+                'onkeydown' => "
+                if (event.key === 'Enter' && event.target.tagName !== 'TEXTAREA') {
+                    event.preventDefault();
+                    let focusables = Array.from(document.querySelectorAll('input, select, button, [contenteditable]'));
+                    let index = focusables.indexOf(event.target);
+                    if (index > -1 && focusables[index + 1]) {
+                        focusables[index + 1].focus();
+                    }
+                }
+            "
+            ]);
     }
 
     public static function table(Table $table): Table
@@ -52,6 +64,7 @@ class SalesResource extends Resource
             ->poll('5s')
             ->searchable()
             ->striped()
+            ->paginated([50, 100, 200])
             ->modifyQueryUsing(
                 fn(Builder $query) =>
                 $query

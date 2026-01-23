@@ -21,6 +21,16 @@ class EditSales extends EditRecord
         return [Actions\DeleteAction::make()];
     }
 
+    protected function getSaveFormAction(): Actions\Action
+    {
+        return Actions\Action::make('save')
+            ->label(__('filament-panels::resources/pages/edit-record.form.actions.save.label'))
+            ->requiresConfirmation()
+            ->modalDescription("Apakah status sudah sesuai? Pastikan kembali status yang Anda pilih sudah benar sebelum menyimpan.")
+            ->modalIconColor('danger')
+            ->action(fn() => $this->save())
+            ->keyBindings(['mod+s']);
+    }
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl("index");

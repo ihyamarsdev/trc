@@ -49,6 +49,7 @@ class FinanceResource extends Resource
             ->poll('5s')
             ->searchable()
             ->striped()
+            ->paginated([50, 100, 200])
             ->modifyQueryUsing(
                 fn(Builder $query) =>
                 $query->withMax('activity', 'id')

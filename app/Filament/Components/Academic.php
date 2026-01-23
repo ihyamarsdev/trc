@@ -55,7 +55,7 @@ class Academic
 
     protected static function metaInfo(Model $record): array
     {
-        $type = $record->type ?? "apps";
+        $type = $record->type;
 
         return match ($type) {
             "anbk" => [
@@ -75,8 +75,8 @@ class Academic
                 "DescriptionRegister" => "TEST KEMAMPUAN AKADEMIK",
             ],
             default => [
-                "nameRegister" => "APPS",
-                "DescriptionRegister" => "ASESMEN PSIKOTES POTENSI SISWA",
+                "nameRegister" => "NONE",
+                "DescriptionRegister" => "NONE",
             ],
         };
     }
@@ -186,13 +186,14 @@ class Academic
             Split::make([
                 TextColumn::make("type")
                     ->label("Program")
+                    ->description('Program', position: 'above')
                     ->extraAttributes(["class" => "uppercase"]),
-                TextColumn::make("schools")->label("Sekolah")->wrap(),
-                TextColumn::make("periode")->label("Periode")->wrap(),
-                TextColumn::make("years")->label("Tahun"),
-
+                TextColumn::make("schools")->label("Sekolah")->description('Sekolah', position: 'above')->searchable()->wrap(),
+                TextColumn::make("periode")->label("Periode")->description('Periode', position: 'above')->wrap(),
+                TextColumn::make("years")->label("Tahun")->description('Tahun', position: 'above'),
                 TextColumn::make("latestStatusLog.status.color")
                     ->label("Status")
+                    ->description('Status', position: 'above')
                     ->badge()
                     ->formatStateUsing(fn($state) => ucfirst($state))
                     ->color(
@@ -263,55 +264,55 @@ class Academic
                     Infolists\Components\Fieldset::make(
                         "Aktifitas Saat ini",
                     )->schema([
-                        Infolists\Components\TextEntry::make("status.name")
-                            ->label("")
-                            ->placeholder("Tidak Ada Status"),
-                        Infolists\Components\IconEntry::make(
-                            "latestStatusLog.status.order",
-                        )
-                            ->label("")
-                            ->icon(function ($state) {
-                                // $state = nilai order (bisa null)
-                                static $iconByOrder;
+                                Infolists\Components\TextEntry::make("status.name")
+                                    ->label("")
+                                    ->placeholder("Tidak Ada Status"),
+                                Infolists\Components\IconEntry::make(
+                                    "latestStatusLog.status.order",
+                                )
+                                    ->label("")
+                                    ->icon(function ($state) {
+                                        // $state = nilai order (bisa null)
+                                        static $iconByOrder;
 
-                                if ($iconByOrder === null) {
-                                    // Ambil sekali: [order => icon]
-                                    $iconByOrder = Status::query()
-                                        ->pluck("icon", "order") // pastikan kolom 'icon' ada
-                                        ->all();
-                                }
+                                        if ($iconByOrder === null) {
+                                            // Ambil sekali: [order => icon]
+                                            $iconByOrder = Status::query()
+                                                ->pluck("icon", "order") // pastikan kolom 'icon' ada
+                                                ->all();
+                                        }
 
-                                $order = (int) $state;
-                                return $iconByOrder[$order] ??
-                                    "heroicon-m-clock";
-                            })
-                            ->color(function ($state) {
-                                static $colorByOrder;
+                                        $order = (int) $state;
+                                        return $iconByOrder[$order] ??
+                                            "heroicon-m-clock";
+                                    })
+                                    ->color(function ($state) {
+                                        static $colorByOrder;
 
-                                if ($colorByOrder === null) {
-                                    // Ambil sekali: [order => color_dari_DB]
-                                    $colorByOrder = Status::query()
-                                        ->pluck("color", "order")
-                                        ->all();
-                                }
+                                        if ($colorByOrder === null) {
+                                            // Ambil sekali: [order => color_dari_DB]
+                                            $colorByOrder = Status::query()
+                                                ->pluck("color", "order")
+                                                ->all();
+                                        }
 
-                                $order = (int) $state;
-                                $raw = strtolower(
-                                    (string) ($colorByOrder[$order] ?? ""),
-                                );
+                                        $order = (int) $state;
+                                        $raw = strtolower(
+                                            (string) ($colorByOrder[$order] ?? ""),
+                                        );
 
-                                // Map warna DB -> warna Filament
-                                return match ($raw) {
-                                    "green" => "green",
-                                    "blue" => "blue",
-                                    "yellow" => "yellow",
-                                    "red" => "red",
-                                    default => "gray",
-                                };
-                            })
-                            ->placeholder("Tidak Ada Status")
-                            ->size("lg"),
-                    ]),
+                                        // Map warna DB -> warna Filament
+                                        return match ($raw) {
+                                            "green" => "green",
+                                            "blue" => "blue",
+                                            "yellow" => "yellow",
+                                            "red" => "red",
+                                            default => "gray",
+                                        };
+                                    })
+                                    ->placeholder("Tidak Ada Status")
+                                    ->size("lg"),
+                            ]),
                 ])
                 ->columns(2),
 
@@ -438,16 +439,16 @@ class Academic
                                 ->label("Download Siswa")
                                 ->icon(
                                     fn(string $state): string => match (
-                                        $state
-                                    ) {
+                                    $state
+                                ) {
                                         "YA" => "heroicon-s-check-circle",
                                         "TIDAK" => "heroicon-s-x-circle",
                                     },
                                 )
                                 ->color(
                                     fn(string $state): string => match (
-                                        $state
-                                    ) {
+                                    $state
+                                ) {
                                         "YA" => "success",
                                         "TIDAK" => "danger",
                                     },
@@ -459,16 +460,16 @@ class Academic
                                 ->label("Download Sekolah")
                                 ->icon(
                                     fn(string $state): string => match (
-                                        $state
-                                    ) {
+                                    $state
+                                ) {
                                         "YA" => "heroicon-s-check-circle",
                                         "TIDAK" => "heroicon-s-x-circle",
                                     },
                                 )
                                 ->color(
                                     fn(string $state): string => match (
-                                        $state
-                                    ) {
+                                    $state
+                                ) {
                                         "YA" => "success",
                                         "TIDAK" => "danger",
                                     },
@@ -478,16 +479,16 @@ class Academic
                                 ->label("PM")
                                 ->icon(
                                     fn(string $state): string => match (
-                                        $state
-                                    ) {
+                                    $state
+                                ) {
                                         "YA" => "heroicon-s-check-circle",
                                         "TIDAK" => "heroicon-s-x-circle",
                                     },
                                 )
                                 ->color(
                                     fn(string $state): string => match (
-                                        $state
-                                    ) {
+                                    $state
+                                ) {
                                         "YA" => "success",
                                         "TIDAK" => "danger",
                                     },

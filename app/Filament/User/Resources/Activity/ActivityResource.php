@@ -15,6 +15,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Actions\Action;
 use App\Filament\User\Resources\Activity\ActivityResource\Pages;
 use App\Filament\User\Resources\RegistrationDataResource\RelationManagers;
 
@@ -50,7 +51,7 @@ class ActivityResource extends Resource
                     ->withMax('activity', 'id')
                     ->orderByDesc('updated_at')
                     ->when(
-                        auth()->user()->hasRole('sales'),
+                        auth()->user()->hasRole('sales') && !auth()->user()->hasRole('admin'),
                         fn(Builder $q) => $q->where('users_id', auth()->id())
                     )
             )
@@ -83,6 +84,11 @@ class ActivityResource extends Resource
                         );
                     }),
             ])
+            ->filtersTriggerAction(
+                fn(Action $action) => $action
+                    ->button()
+                    ->label('Filter'),
+            )
             ->actions([
                 Tables\Actions\Action::make('view_activities')
                     ->label('Progres')

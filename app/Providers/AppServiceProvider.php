@@ -14,6 +14,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        // $this->app->register(Spatie\Permission\PermissionServiceProvider::class);
+        // $this->app->register(Maatwebsite\Excel\ExcelServiceProvider::class);
+        // $this->app->register(Barryvdh\DomPDF\ServiceProvider::class);
+        // $this->app->register(Barryvdh\Snappy\ServiceProvider::class);
+        // $this->app->register(HayderHatem\FilamentExcelImport\FilamentExcelImportServiceProvider::class);
+
         if ($this->app->environment('APP_ENV') == 'local') {
             $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
         }

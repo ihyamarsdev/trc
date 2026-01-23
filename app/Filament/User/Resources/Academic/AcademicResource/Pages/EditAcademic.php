@@ -9,6 +9,7 @@ use App\Models\RegistrationStatus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
+use Filament\Notifications\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use App\Filament\User\Resources\Academic\AcademicResource;
 
@@ -20,20 +21,48 @@ class EditAcademic extends EditRecord
     {
         return [
             Actions\DeleteAction::make(),
+
         ];
+    }
+
+    // protected function getSaveFormAction(): Actions\Action
+    // {
+    //     return parent::getSaveFormAction()
+    //         ->requiresConfirmation() // Memunculkan modal konfirmasi
+    //         ->modalHeading('Konfirmasi Perubahan')
+    //         ->modalDescription('Apakah status sudah sesuai? Pastikan kembali status yang Anda pilih sudah benar sebelum menyimpan.')
+    //         ->modalSubmitActionLabel('Ya, Simpan Data')
+    //         ->modalCancelActionLabel('Tidak, Kembali ke Form');
+    // }
+
+    protected function getSaveFormAction(): Actions\Action
+    {
+        return Actions\Action::make('save')
+            ->label(__('filament-panels::resources/pages/edit-record.form.actions.save.label'))
+            ->requiresConfirmation()
+            ->modalDescription("Apakah status sudah sesuai? Pastikan kembali status yang Anda pilih sudah benar sebelum menyimpan.")
+            ->modalIconColor('danger')
+            ->action(fn() => $this->save())
+            ->keyBindings(['mod+s']);
     }
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
+        $record = $this->record;
         $status = Status::find($data["status_id"]);
 
         if ($status->order == 10) {
             $recipients = User::role('service')->get();
 
             Notification::make()
-                ->title('Data Sekolah ' . $data["schools"] . ' memasuki status ' . $status->name)
+                ->title('Data Sekolah ' . $record->schools . ' memasuki status ' . $status->name)
                 ->icon('heroicon-o-document-text')
                 ->success()
+                ->actions([
+                    Action::make('Lihat')
+                        ->url(AcademicResource::getUrl('view', ['record' => $record]))
+                        ->openUrlInNewTab(),
+                ])
                 ->sendToDatabase($recipients);
 
         }
@@ -53,11 +82,11 @@ class EditAcademic extends EditRecord
                 ->first();
 
             // --- SIMPLE: bandingkan berdasar angka status_id (sesuai permintaanmu) ---
-            if (! $last) {
+            if (!$last) {
                 RegistrationStatus::create([
                     'registration_id' => $record->id,
-                    'status_id'       => $currentStatusId,
-                    'user_id'         => Auth::id(),
+                    'status_id' => $currentStatusId,
+                    'user_id' => Auth::id(),
                 ]);
                 return;
             }
@@ -71,8 +100,8 @@ class EditAcademic extends EditRecord
                 // naik -> catat log baru
                 RegistrationStatus::create([
                     'registration_id' => $record->id,
-                    'status_id'       => $currentStatusId,
-                    'user_id'         => Auth::id(),
+                    'status_id' => $currentStatusId,
+                    'user_id' => Auth::id(),
                 ]);
                 return;
             }
@@ -88,11 +117,11 @@ class EditAcademic extends EditRecord
             }
 
             // setelah rollback, jika belum persis sama dan ingin set posisinya ke current, tambahkan log current:
-            if (! $last || (int) $last->status_id < $currentStatusId) {
+            if (!$last || (int) $last->status_id < $currentStatusId) {
                 RegistrationStatus::create([
                     'registration_id' => $record->id,
-                    'status_id'       => $currentStatusId,
-                    'user_id'         => Auth::id(),
+                    'status_id' => $currentStatusId,
+                    'user_id' => Auth::id(),
                 ]);
             }
 

@@ -317,7 +317,7 @@ class SalesForce
                         ->searchable()
                         ->placeholder("Pilih status...")
                         ->columnSpan(1)
-                        ->live() 
+                        ->live()
                         ->afterStateUpdated(function (Set $set, $state) {
                             if ($state) {
                                 $color = Status::find($state)?->color;
@@ -335,15 +335,17 @@ class SalesForce
     {
         return [
             Split::make([
+
                 TextColumn::make("type")
                     ->label("Program")
+                    ->description('Program', position: 'above')
                     ->extraAttributes(["class" => "uppercase"]),
-                TextColumn::make("schools")->label("Sekolah")->wrap(),
-                TextColumn::make("periode")->label("Periode")->wrap(),
-                TextColumn::make("years")->label("Tahun"),
-
+                TextColumn::make("schools")->label("Sekolah")->description('Sekolah', position: 'above')->wrap(),
+                TextColumn::make("periode")->label("Periode")->description('Periode', position: 'above')->wrap(),
+                TextColumn::make("years")->label("Tahun")->description('Tahun', position: 'above'),
                 TextColumn::make("latestStatusLog.status.color")
                     ->label("Status")
+                    ->description('Status', position: 'above')
                     ->badge()
                     ->formatStateUsing(fn($state) => ucfirst($state))
                     ->color(

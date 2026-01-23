@@ -39,7 +39,7 @@ class AdminResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->schema(Admin::schema());
+            ->schema(Admin::formSchema());
     }
 
     public static function table(Table $table): Table
@@ -49,25 +49,22 @@ class AdminResource extends Resource
             ->poll('5s')
             ->searchable()
             ->striped()
+            ->paginated([50, 100, 200])
+            ->extremePaginationLinks()
             ->modifyQueryUsing(
-                fn (Builder $query) =>
-                $query->withMax('activity', 'id') 
+                fn(Builder $query) =>
+                $query->withMax('activity', 'id')
                     ->orderByDesc('updated_at')
             )
             ->columns(Admin::columns())
             ->filters(Admin::filters())
             ->filtersTriggerAction(
-                fn (Action $action) => $action
+                fn(Action $action) => $action
                     ->button()
                     ->label('Filter'),
             )
             ->actions(Admin::actions(), position: ActionsPosition::BeforeColumns)
             ->bulkActions(Admin::bulkActions());
-            // ->contentGrid([
-            //     'md' => 1,
-            //     'xl' => 3,
-            //     '2xl' => 5,
-            // ]);
     }
 
     public static function getRelations(): array

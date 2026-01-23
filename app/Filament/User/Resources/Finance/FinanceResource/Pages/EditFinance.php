@@ -21,12 +21,23 @@ class EditFinance extends EditRecord
         ];
     }
 
+    protected function getSaveFormAction(): Actions\Action
+    {
+        return Actions\Action::make('save')
+            ->label(__('filament-panels::resources/pages/edit-record.form.actions.save.label'))
+            ->requiresConfirmation()
+            ->modalDescription("Apakah status sudah sesuai? Pastikan kembali status yang Anda pilih sudah benar sebelum menyimpan.")
+            ->modalIconColor('danger')
+            ->action(fn() => $this->save())
+            ->keyBindings(['mod+s']);
+    }
+
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('view', ['record' => $this->record]);
     }
 
-     protected function mutateFormDataBeforeSave(array $data): array
+    protected function mutateFormDataBeforeSave(array $data): array
     {
         $record = $this->record;
 
@@ -43,11 +54,11 @@ class EditFinance extends EditRecord
                 ->first();
 
             // --- SIMPLE: bandingkan berdasar angka status_id (sesuai permintaanmu) ---
-            if (! $last) {
+            if (!$last) {
                 RegistrationStatus::create([
                     'registration_id' => $record->id,
-                    'status_id'       => $currentStatusId,
-                    'user_id'         => Auth::id(),
+                    'status_id' => $currentStatusId,
+                    'user_id' => Auth::id(),
                 ]);
                 return;
             }
@@ -61,8 +72,8 @@ class EditFinance extends EditRecord
                 // naik -> catat log baru
                 RegistrationStatus::create([
                     'registration_id' => $record->id,
-                    'status_id'       => $currentStatusId,
-                    'user_id'         => Auth::id(),
+                    'status_id' => $currentStatusId,
+                    'user_id' => Auth::id(),
                 ]);
                 return;
             }
@@ -78,11 +89,11 @@ class EditFinance extends EditRecord
             }
 
             // setelah rollback, jika belum persis sama dan ingin set posisinya ke current, tambahkan log current:
-            if (! $last || (int) $last->status_id < $currentStatusId) {
+            if (!$last || (int) $last->status_id < $currentStatusId) {
                 RegistrationStatus::create([
                     'registration_id' => $record->id,
-                    'status_id'       => $currentStatusId,
-                    'user_id'         => Auth::id(),
+                    'status_id' => $currentStatusId,
+                    'user_id' => Auth::id(),
                 ]);
             }
 

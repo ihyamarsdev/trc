@@ -167,7 +167,7 @@ class Finance
                                     "total_net",
                                     abs(
                                         (float) $get("implementer_count") *
-                                            (float) $get("net_2"),
+                                        (float) $get("net_2"),
                                     ),
                                 );
                             }),
@@ -190,11 +190,7 @@ class Finance
                             })
                             ->live(1000)
                             ->reactive()
-                            ->afterStateUpdated(function (
-                                Get $get,
-                                Set $set,
-                                $state,
-                            ) {
+                            ->afterStateUpdated(function (Get $get, Set $set, $state, ) {
                                 preg_match("/\d+/", $state, $matches);
                                 $count = (float) ($matches[0] ?? 0);
 
@@ -230,14 +226,11 @@ class Finance
                                 ->label("Selisih Siswa TRC")
                                 ->numeric()
                                 ->live(debounce: 1000)
-                                ->afterStateUpdated(function (
-                                    Get $get,
-                                    Set $set,
-                                ) {
+                                ->afterStateUpdated(function (Get $get, Set $set, ) {
                                     $set(
                                         "subtotal_1",
                                         (float) $get("student_count_1") *
-                                            (float) $get("net"),
+                                        (float) $get("net"),
                                     );
                                 }),
                             TextInput::make("net")
@@ -250,14 +243,11 @@ class Finance
                                     precision: 0,
                                 )
                                 ->numeric()
-                                ->afterStateUpdated(function (
-                                    Get $get,
-                                    Set $set,
-                                ) {
+                                ->afterStateUpdated(function (Get $get, Set $set, ) {
                                     $set(
                                         "subtotal_1",
                                         (float) $get("student_count_1") *
-                                            (float) $get("net"),
+                                        (float) $get("net"),
                                     );
                                 }),
                             TextInput::make("subtotal_1")
@@ -280,14 +270,11 @@ class Finance
                                 ->label("Selisih Siswa Sekolah")
                                 ->numeric()
                                 ->live(debounce: 1000)
-                                ->afterStateUpdated(function (
-                                    Get $get,
-                                    Set $set,
-                                ) {
+                                ->afterStateUpdated(function (Get $get, Set $set, ) {
                                     $set(
                                         "mitra_subtotal",
                                         (float) $get("mitra_difference") *
-                                            (float) $get("mitra_net"),
+                                        (float) $get("mitra_net"),
                                     );
                                 }),
                             TextInput::make("mitra_net")
@@ -300,14 +287,11 @@ class Finance
                                     precision: 0,
                                 )
                                 ->numeric()
-                                ->afterStateUpdated(function (
-                                    Get $get,
-                                    Set $set,
-                                ) {
+                                ->afterStateUpdated(function (Get $get, Set $set, ) {
                                     $set(
                                         "mitra_subtotal",
                                         (float) $get("mitra_difference") *
-                                            (float) $get("mitra_net"),
+                                        (float) $get("mitra_net"),
                                     );
                                 }),
                             TextInput::make("mitra_subtotal")
@@ -325,14 +309,11 @@ class Finance
                                 ->label("SS")
                                 ->numeric()
                                 ->live(debounce: 1000)
-                                ->afterStateUpdated(function (
-                                    Get $get,
-                                    Set $set,
-                                ) {
+                                ->afterStateUpdated(function (Get $get, Set $set, ) {
                                     $set(
                                         "ss_subtotal",
                                         (float) $get("ss_difference") *
-                                            (float) $get("ss_net"),
+                                        (float) $get("ss_net"),
                                     );
                                 })
                                 ->readOnly(),
@@ -346,14 +327,11 @@ class Finance
                                     precision: 0,
                                 )
                                 ->numeric()
-                                ->afterStateUpdated(function (
-                                    Get $get,
-                                    Set $set,
-                                ) {
+                                ->afterStateUpdated(function (Get $get, Set $set, ) {
                                     $set(
                                         "ss_subtotal",
                                         (float) $get("ss_difference") *
-                                            (float) $get("ss_net"),
+                                        (float) $get("ss_net"),
                                     );
                                 }),
                             TextInput::make("ss_subtotal")
@@ -371,14 +349,11 @@ class Finance
                                 ->label("Lain-lain")
                                 ->numeric()
                                 ->live(debounce: 1000)
-                                ->afterStateUpdated(function (
-                                    Get $get,
-                                    Set $set,
-                                ) {
+                                ->afterStateUpdated(function (Get $get, Set $set, ) {
                                     $set(
                                         "dll_subtotal",
                                         (float) $get("dll_difference") *
-                                            (float) $get("dll_net"),
+                                        (float) $get("dll_net"),
                                     );
                                 }),
                             TextInput::make("dll_net")
@@ -391,14 +366,11 @@ class Finance
                                     precision: 0,
                                 )
                                 ->numeric()
-                                ->afterStateUpdated(function (
-                                    Get $get,
-                                    Set $set,
-                                ) {
+                                ->afterStateUpdated(function (Get $get, Set $set, ) {
                                     $set(
                                         "subtotal_1",
                                         (float) $get("student_count_1") *
-                                            (float) $get("net"),
+                                        (float) $get("net"),
                                     );
                                 }),
                             TextInput::make("dll_subtotal")
@@ -446,13 +418,15 @@ class Finance
             Split::make([
                 TextColumn::make("type")
                     ->label("Program")
+                    ->description('Program', position: 'above')
                     ->extraAttributes(["class" => "uppercase"]),
-                TextColumn::make("schools")->label("Sekolah")->wrap(),
-                TextColumn::make("periode")->label("Periode")->wrap(),
-                TextColumn::make("years")->label("Tahun"),
+                TextColumn::make("schools")->label("Sekolah")->description('Sekolah', position: 'above')->wrap(),
+                TextColumn::make("periode")->label("Periode")->description('Periode', position: 'above')->wrap(),
+                TextColumn::make("years")->label("Tahun")->description('Tahun', position: 'above'),
 
                 TextColumn::make("latestStatusLog.status.color")
                     ->label("Status")
+                    ->description('Status', position: 'above')
                     ->badge()
                     ->formatStateUsing(fn($state) => ucfirst($state))
                     ->color(
@@ -535,55 +509,55 @@ class Finance
                     Infolists\Components\Fieldset::make(
                         "Aktifitas Saat ini",
                     )->schema([
-                        Infolists\Components\TextEntry::make(
-                            "status.name",
-                        )->label(""),
-                        Infolists\Components\IconEntry::make(
-                            "latestStatusLog.status.order",
-                        )
-                            ->label("")
-                            ->icon(function ($state) {
-                                // $state = nilai order (bisa null)
-                                static $iconByOrder;
+                                Infolists\Components\TextEntry::make(
+                                    "status.name",
+                                )->label(""),
+                                Infolists\Components\IconEntry::make(
+                                    "latestStatusLog.status.order",
+                                )
+                                    ->label("")
+                                    ->icon(function ($state) {
+                                        // $state = nilai order (bisa null)
+                                        static $iconByOrder;
 
-                                if ($iconByOrder === null) {
-                                    // Ambil sekali: [order => icon]
-                                    $iconByOrder = Status::query()
-                                        ->pluck("icon", "order") // pastikan kolom 'icon' ada
-                                        ->all();
-                                }
+                                        if ($iconByOrder === null) {
+                                            // Ambil sekali: [order => icon]
+                                            $iconByOrder = Status::query()
+                                                ->pluck("icon", "order") // pastikan kolom 'icon' ada
+                                                ->all();
+                                        }
 
-                                $order = (int) $state;
-                                return $iconByOrder[$order] ??
-                                    "heroicon-m-clock";
-                            })
-                            ->color(function ($state) {
-                                static $colorByOrder;
+                                        $order = (int) $state;
+                                        return $iconByOrder[$order] ??
+                                            "heroicon-m-clock";
+                                    })
+                                    ->color(function ($state) {
+                                        static $colorByOrder;
 
-                                if ($colorByOrder === null) {
-                                    // Ambil sekali: [order => color_dari_DB]
-                                    $colorByOrder = Status::query()
-                                        ->pluck("color", "order")
-                                        ->all();
-                                }
+                                        if ($colorByOrder === null) {
+                                            // Ambil sekali: [order => color_dari_DB]
+                                            $colorByOrder = Status::query()
+                                                ->pluck("color", "order")
+                                                ->all();
+                                        }
 
-                                $order = (int) $state;
-                                $raw = strtolower(
-                                    (string) ($colorByOrder[$order] ?? ""),
-                                );
+                                        $order = (int) $state;
+                                        $raw = strtolower(
+                                            (string) ($colorByOrder[$order] ?? ""),
+                                        );
 
-                                // Map warna DB -> warna Filament
-                                return match ($raw) {
-                                    "green" => "green",
-                                    "blue" => "blue",
-                                    "yellow" => "yellow",
-                                    "red" => "red",
-                                    default => "gray",
-                                };
-                            })
-                            ->default("red")
-                            ->size("lg"),
-                    ]),
+                                        // Map warna DB -> warna Filament
+                                        return match ($raw) {
+                                            "green" => "green",
+                                            "blue" => "blue",
+                                            "yellow" => "yellow",
+                                            "red" => "red",
+                                            default => "gray",
+                                        };
+                                    })
+                                    ->default("red")
+                                    ->size("lg"),
+                            ]),
                 ])
                 ->columns(2),
             Infolists\Components\Section::make("Salesforce")
@@ -703,16 +677,16 @@ class Finance
                                 ->label("Download Siswa")
                                 ->icon(
                                     fn(string $state): string => match (
-                                        $state
-                                    ) {
+                                    $state
+                                ) {
                                         "YA" => "heroicon-s-check-circle",
                                         "TIDAK" => "heroicon-s-x-circle",
                                     },
                                 )
                                 ->color(
                                     fn(string $state): string => match (
-                                        $state
-                                    ) {
+                                    $state
+                                ) {
                                         "YA" => "success",
                                         "TIDAK" => "danger",
                                     },
@@ -724,16 +698,16 @@ class Finance
                                 ->label("Download Sekolah")
                                 ->icon(
                                     fn(string $state): string => match (
-                                        $state
-                                    ) {
+                                    $state
+                                ) {
                                         "YA" => "heroicon-s-check-circle",
                                         "TIDAK" => "heroicon-s-x-circle",
                                     },
                                 )
                                 ->color(
                                     fn(string $state): string => match (
-                                        $state
-                                    ) {
+                                    $state
+                                ) {
                                         "YA" => "success",
                                         "TIDAK" => "danger",
                                     },
@@ -743,16 +717,16 @@ class Finance
                                 ->label("PM")
                                 ->icon(
                                     fn(string $state): string => match (
-                                        $state
-                                    ) {
+                                    $state
+                                ) {
                                         "YA" => "heroicon-s-check-circle",
                                         "TIDAK" => "heroicon-s-x-circle",
                                     },
                                 )
                                 ->color(
                                     fn(string $state): string => match (
-                                        $state
-                                    ) {
+                                    $state
+                                ) {
                                         "YA" => "success",
                                         "TIDAK" => "danger",
                                     },
@@ -784,10 +758,10 @@ class Finance
                     Infolists\Components\Fieldset::make(
                         "Opsi Jumlah Akun / Jumlah Pelaksanaan",
                     )->schema([
-                        TextEntry::make("option_price")
-                            ->label("")
-                            ->placeholder("Belum di Pilih"),
-                    ]),
+                                TextEntry::make("option_price")
+                                    ->label("")
+                                    ->placeholder("Belum di Pilih"),
+                            ]),
 
                     Infolists\Components\Fieldset::make("Nominal")
                         ->schema([
@@ -965,8 +939,8 @@ class Finance
                                         is_numeric($state) &&
                                         (float) $state > 0 &&
                                         (float) $state < 1
-                                            ? (float) $state * 100
-                                            : (float) $state;
+                                        ? (float) $state * 100
+                                        : (float) $state;
 
                                     // Rapikan trailing .00
                                     $str = rtrim(
@@ -989,8 +963,8 @@ class Finance
                                         is_numeric($state) &&
                                         (float) $state > 0 &&
                                         (float) $state < 1
-                                            ? (float) $state * 100
-                                            : (float) $state;
+                                        ? (float) $state * 100
+                                        : (float) $state;
 
                                     // Rapikan trailing .00
                                     $str = rtrim(

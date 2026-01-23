@@ -39,7 +39,7 @@ return new class () extends Migration {
             $table->dateTime('implementation_estimate')->nullable();
             $table->string('status_color')->default('red')->nullable();
 
-            ## Akademik dan Teknisi
+            ## Service
             $table->date('group')->nullable();
             $table->date('bimtek')->nullable();
             $table->integer('account_count_created')->nullable();

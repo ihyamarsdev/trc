@@ -11,7 +11,7 @@ class RegistrationData extends Model
 {
     use HasFactory;
 
-    
+
 
     protected $fillable = [
         'type',
@@ -102,6 +102,7 @@ class RegistrationData extends Model
         'invoice_date' => 'datetime',
         'spk' => 'datetime',
         'payment_date' => 'datetime',
+        'group' => 'datetime',
     ];
 
     /**
@@ -123,7 +124,7 @@ class RegistrationData extends Model
     public function activity()
     {
         return $this->hasMany(RegistrationStatus::class, 'registration_id')
-            ->with(['status:id,name,description,color,category','user:id,name']);
+            ->with(['status:id,name,description,color,category', 'user:id,name']);
     }
 
     public function latestStatusLog()

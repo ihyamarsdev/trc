@@ -2,41 +2,40 @@
 
 namespace App\Imports;
 
-use Carbon\Carbon;
 use App\Models\RegistrationData;
+use Carbon\Carbon;
+use Creasi\Nusa\Models\District;
+use Creasi\Nusa\Models\Province;
+use Creasi\Nusa\Models\Regency;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Creasi\Nusa\Models\{Province, Regency, District};
 
 class SalesImport implements ToModel, WithHeadingRow
 {
     /**
-    * @param array $row
-    *
-    * @return \Illuminate\Database\Eloquent\Model|null
-    */
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
     public function model(array $row)
     {
 
         $province = Province::search($row['provinsi'])->first();
-        if (!$province) {
-            throw new \Exception("Provinsi tidak ditemukan: " . $row['provinsi']);
+        if (! $province) {
+            throw new \Exception('Provinsi tidak ditemukan: '.$row['provinsi']);
         }
         $provinceName = $province->name;
 
         $regency = Regency::search($row['kota_kabupaten'])->first();
-        if (!$regency) {
-            throw new \Exception("Kota / Kabupaten tidak ditemukan: " . $row['kota_kabupaten']);
+        if (! $regency) {
+            throw new \Exception('Kota / Kabupaten tidak ditemukan: '.$row['kota_kabupaten']);
         }
         $regencyName = $regency->name;
 
         $district = District::search($row['kecamatan'])->first();
-        if (!$district) {
-            throw new \Exception("Kecamatan tidak ditemukan: " . $row['kecamatan']);
+        if (! $district) {
+            throw new \Exception('Kecamatan tidak ditemukan: '.$row['kecamatan']);
         }
         $districtName = $district->name;
-
 
         $data = RegistrationData::updateOrCreate([
             'type' => $row['program'],
@@ -75,9 +74,12 @@ class SalesImport implements ToModel, WithHeadingRow
 
     private function parseDate($dateString)
     {
-
         if ($dateString) {
-            return Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($dateString));
+            if (is_numeric($dateString)) {
+                return Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($dateString));
+            } else {
+                return Carbon::parse($dateString);
+            }
         }
 
         return null;

@@ -8,6 +8,7 @@ use Saade\FilamentFullCalendar\Actions;
 use Saade\FilamentFullCalendar\Data\EventData;
 use App\Filament\User\Resources\TimelineResource;
 use Saade\FilamentFullCalendar\Widgets\FullCalendarWidget;
+use Illuminate\Database\Eloquent\Builder;
 
 class CalendarWidget extends FullCalendarWidget
 {
@@ -46,9 +47,12 @@ class CalendarWidget extends FullCalendarWidget
         return RegistrationData::query()
             ->where('implementation_estimate', '>=', $fetchInfo['start'])
             ->where('implementation_estimate', '<=', $fetchInfo['end'])
-            ->when(
-                auth()->user()->hasRole('sales'),
-                fn($query) => $query->where('users_id', auth()->id())
+            ->unless(
+                auth()->user()->hasRole('admin'), // Selama BUKAN admin...
+                fn(Builder $q) => $q->when(
+                    auth()->user()->hasRole('sales'), // ...dan jika dia sales
+                    fn($subQ) => $subQ->where('users_id', auth()->id())
+                )
             )
             ->get()
             ->map(function (RegistrationData $event) {
