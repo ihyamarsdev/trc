@@ -2,22 +2,20 @@
 
 namespace App\Filament\User\Resources\Activity\ActivityResource\Pages;
 
-use App\Models\Status;
-use Illuminate\Support\Str;
-use Filament\Infolists\Infolist;
+use App\Filament\User\Resources\Activity\ActivityResource;
 use App\Models\RegistrationStatus;
+use App\Models\Status;
+use Filament\Infolists\Infolist;
+use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\HtmlString;
-use JaOcero\ActivityTimeline\Enums\IconAnimation;
+use Illuminate\Support\Str;
 use JaOcero\ActivityTimeline\Components\ActivityDate;
-use JaOcero\ActivityTimeline\Components\ActivityIcon;
-use JaOcero\ActivityTimeline\Components\ActivityTitle;
-use JaOcero\ActivityTimeline\Components\ActivitySection;
-use JaOcero\ActivityTimeline\Pages\ActivityTimelinePage;
-use App\Filament\User\Resources\Activity\ActivityResource;
-use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use JaOcero\ActivityTimeline\Components\ActivityDescription;
+use JaOcero\ActivityTimeline\Components\ActivityIcon;
+use JaOcero\ActivityTimeline\Components\ActivitySection;
+use JaOcero\ActivityTimeline\Components\ActivityTitle;
+use JaOcero\ActivityTimeline\Enums\IconAnimation;
 
 class ViewActivities extends Page
 {
@@ -27,14 +25,13 @@ class ViewActivities extends Page
 
     protected static string $view = 'filament.user.resources.registration-data-resource.pages.view-color-activities';
 
-    public function mount(int | string $record): void
+    public function mount(int|string $record): void
     {
         $this->record = $this->resolveRecord($record);
     }
 
     public function activityTimelineInfolist(Infolist $infolist): Infolist
     {
-
 
         $logs = RegistrationStatus::query()
             ->where('registration_id', $this->record->id)
@@ -89,24 +86,25 @@ class ViewActivities extends Page
 
         // Build state timeline
         $categoryBySlug = [];
-        $colorBySlug    = [];
-        $activities     = [];
+        $colorBySlug = [];
+        $activities = [];
 
         foreach ($logs as $s) {
-            $slug  = Str::slug($s->status->name);
+            $slug = Str::slug($s->status->name);
             // $color = $toFilamentColor($s->status->color);
 
-            $title = "Status: <span class='font-semibold'>".e($s->status->name)."</span>";
-            $desc  = $s->status->description ? e($s->status->description) : '—';
+            $title = "Status: <span class='font-semibold'>".e($s->status->name).'</span>';
+            $desc = $s->status->description ? e($s->status->description) : '—';
+            $date = $s->created_at->translatedFormat('l, d/m/Y H:i');
 
             $activities[] = [
-                'title'       => $title,
+                'title' => $title,
                 'description' => $desc,
-                'status'      => $slug,
-                'updated_at'  => $s->created_at,
+                'status' => $slug,
+                'updated_at' => $date,
             ];
 
-            $colorBySlug[$slug]    = $s->status->color;
+            $colorBySlug[$slug] = $s->status->color;
             $iconBySlug[$slug] = $s->status->icon;
         }
 
@@ -126,7 +124,6 @@ class ViewActivities extends Page
                             ->allowHtml(),
 
                         ActivityDate::make('updated_at')
-                            ->date('d M Y H:i', 'Asia/Jakarta')
                             ->placeholder('No date is set.'),
 
                         ActivityIcon::make('status')
@@ -142,7 +139,4 @@ class ViewActivities extends Page
                     ->headingVisible(true),
             ]);
     }
-
-
-
 }

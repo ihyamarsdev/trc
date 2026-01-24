@@ -2,33 +2,34 @@
 
 namespace App\Filament\User\Resources\Activity;
 
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use App\Filament\Enum\Program;
-use App\Models\RegistrationData;
-use Filament\Infolists\Infolist;
-use Filament\Resources\Resource;
 use App\Filament\Components\Admin;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Enums\ActionsPosition;
-use Filament\Tables\Actions\Action;
+use App\Filament\Enum\Program;
 use App\Filament\User\Resources\Activity\ActivityResource\Pages;
-use App\Filament\User\Resources\RegistrationDataResource\RelationManagers;
+use App\Models\RegistrationData;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ActivityResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-arrow-trending-up';
+
     protected static ?string $title = 'Activity';
+
     protected static ?string $navigationLabel = 'Activity';
+
     protected static ?string $modelLabel = 'Activity';
+
     protected static ?string $slug = 'activity';
+
     protected static bool $shouldRegisterNavigation = true;
+
     protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
@@ -47,12 +48,12 @@ class ActivityResource extends Resource
             ->searchable()
             ->striped()
             ->modifyQueryUsing(
-                fn(Builder $query) => $query
+                fn (Builder $query) => $query
                     ->withMax('activity', 'id')
                     ->orderByDesc('updated_at')
                     ->when(
-                        auth()->user()->hasRole('sales') && !auth()->user()->hasRole('admin'),
-                        fn(Builder $q) => $q->where('users_id', auth()->id())
+                        auth()->user()->hasRole('sales') && ! auth()->user()->hasRole('admin'),
+                        fn (Builder $q) => $q->where('users_id', auth()->id())
                     )
             )
             ->columns(Admin::columns())
@@ -79,23 +80,18 @@ class ActivityResource extends Resource
 
                         $query->whereHas(
                             'status',
-                            fn(Builder $q) =>
-                            $q->where('color', $data['value'])
+                            fn (Builder $q) => $q->where('color', $data['value'])
                         );
                     }),
             ])
             ->filtersTriggerAction(
-                fn(Action $action) => $action
+                fn (Action $action) => $action
                     ->button()
                     ->label('Filter'),
             )
+            ->recordUrl(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record]))
             ->actions([
-                Tables\Actions\Action::make('view_activities')
-                    ->label('Progres')
-                    ->icon('heroicon-m-clock')
-                    ->color('purple')
-                    ->url(fn($record) => ActivityResource::getUrl('activities', ['record' => $record])),
-
+                //
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -104,15 +100,12 @@ class ActivityResource extends Resource
             ]);
     }
 
-
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-
-
 
     public static function getPages(): array
     {
