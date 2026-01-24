@@ -639,8 +639,8 @@ class Finance
                     ]),
                 ]),
 
-            Infolists\Components\Section::make("Academic")
-                ->description("Detail Data Academik")
+            Infolists\Components\Section::make("Service")
+                ->description("Detail Data Service")
                 ->schema([
                     Infolists\Components\Fieldset::make("")->schema([
                         Infolists\Components\TextEntry::make("group")

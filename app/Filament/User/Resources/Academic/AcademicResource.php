@@ -67,7 +67,8 @@ class AcademicResource extends Resource
                     ->button()
                     ->label('Filter'),
             )
-            ->actions(Academic::actions(), position: ActionsPosition::BeforeColumns)
+            ->recordAction('view')
+            ->actions([])
             ->bulkActions(Academic::bulkActions());
     }
 

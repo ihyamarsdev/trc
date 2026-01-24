@@ -316,8 +316,8 @@ class Academic
                 ])
                 ->columns(2),
 
-            Infolists\Components\Section::make("Sales")
-                ->description("Detail data dari Sales")
+            Infolists\Components\Section::make("Salesforce")
+                ->description("Detail data dari Salesforce")
                 ->schema([
                     Infolists\Components\Fieldset::make("Periode")->schema([
                         Infolists\Components\TextEntry::make("periode")->label(
@@ -401,8 +401,8 @@ class Academic
                             ->dateTime("l, jS F Y H:i"),
                     ]),
                 ]),
-            Infolists\Components\Section::make("Academic")
-                ->description("Detail Data Academik")
+            Infolists\Components\Section::make("Service")
+                ->description("Detail Data Service")
                 ->schema([
                     Infolists\Components\Fieldset::make("")->schema([
                         Infolists\Components\TextEntry::make("group")

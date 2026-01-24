@@ -2,14 +2,15 @@
 
 namespace App\Filament\User\Resources\Academic\Monitoring;
 
+use App\Filament\Components\Academic;
 use App\Filament\User\Resources\Academic\Monitoring\RekapitulasiServiceResource\Pages;
 use App\Models\RegistrationData;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
-use App\Filament\Components\Academic;
 
 class RekapitulasiServiceResource extends Resource
 {
@@ -36,52 +37,55 @@ class RekapitulasiServiceResource extends Resource
                 TextColumn::make('row_number')
                     ->label('No')
                     ->alignCenter()
-                    ->getStateUsing(fn($rowLoop) => $rowLoop->iteration),
+                    ->getStateUsing(fn ($rowLoop) => $rowLoop->iteration),
                 TextColumn::make('schools')
                     ->label('Schools')
                     ->searchable(),
                 IconColumn::make('group')
                     ->label('GRUP')
                     ->alignCenter()
-                    ->icon(fn($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 3 ? 'heroicon-s-check' : 'heroicon-s-x-mark')
-                    ->color(fn($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 3 ? 'success' : 'danger')
+                    ->icon(fn ($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 3 ? 'heroicon-s-check' : 'heroicon-s-x-mark')
+                    ->color(fn ($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 3 ? 'success' : 'danger')
                     ->default(false),
                 IconColumn::make('bimtek')
                     ->label('BIMTEK')
                     ->alignCenter()
-                    ->icon(fn($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 4 ? 'heroicon-s-check' : 'heroicon-s-x-mark')
-                    ->color(fn($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 4 ? 'success' : 'danger')
+                    ->icon(fn ($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 4 ? 'heroicon-s-check' : 'heroicon-s-x-mark')
+                    ->color(fn ($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 4 ? 'success' : 'danger')
                     ->default(false),
                 IconColumn::make('account_count_created')
                     ->label('AKUN')
                     ->alignCenter()
-                    ->icon(fn($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 6 ? 'heroicon-s-check' : 'heroicon-s-x-mark')
-                    ->color(fn($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 6 ? 'success' : 'danger')
+                    ->icon(fn ($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 6 ? 'heroicon-s-check' : 'heroicon-s-x-mark')
+                    ->color(fn ($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 6 ? 'success' : 'danger')
                     ->default(false),
                 IconColumn::make('implementer_count')
                     ->label('EVENT')
                     ->alignCenter()
-                    ->icon(fn($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 7 ? 'heroicon-s-check' : 'heroicon-s-x-mark')
-                    ->color(fn($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 7 ? 'success' : 'danger')
+                    ->icon(fn ($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 7 ? 'heroicon-s-check' : 'heroicon-s-x-mark')
+                    ->color(fn ($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 7 ? 'success' : 'danger')
                     ->default(false),
                 IconColumn::make('students_download')
                     ->label('DOWNLOAD')
                     ->alignCenter()
-                    ->icon(fn($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 9 ? 'heroicon-s-check' : 'heroicon-s-x-mark')
-                    ->color(fn($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 9 ? 'success' : 'danger')
+                    ->icon(fn ($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 9 ? 'heroicon-s-check' : 'heroicon-s-x-mark')
+                    ->color(fn ($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 9 ? 'success' : 'danger')
                     ->default(false),
                 IconColumn::make('schools_download')
                     ->label('PM')
                     ->alignCenter()
-                    ->icon(fn($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 10 ? 'heroicon-s-check' : 'heroicon-s-x-mark')
-                    ->color(fn($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 10 ? 'success' : 'danger')
+                    ->icon(fn ($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 10 ? 'heroicon-s-check' : 'heroicon-s-x-mark')
+                    ->color(fn ($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 10 ? 'success' : 'danger')
                     ->default(false),
             ])
             ->defaultSort('updated_at', 'desc')
             ->filters([
                 //
             ])
-            ->actions([])
+            ->recordAction('view')
+            ->actions([
+                // Tables\Actions\EditAction::make(),
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([]);
     }
 
@@ -96,6 +100,7 @@ class RekapitulasiServiceResource extends Resource
     {
         return [
             'index' => Pages\ListRekapitulasiServices::route('/'),
+            'view' => Pages\ViewRekapitulasiService::route('/{record}'),
         ];
     }
 }

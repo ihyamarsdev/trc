@@ -65,6 +65,7 @@ class SalesResource extends Resource
             ->searchable()
             ->striped()
             ->paginated([50, 100, 200])
+            ->recordAction('view')
             ->modifyQueryUsing(
                 fn(Builder $query) =>
                 $query
@@ -81,7 +82,7 @@ class SalesResource extends Resource
                     ->button()
                     ->label('Filter'),
             )
-            ->actions(SalesForce::actions(), position: ActionsPosition::BeforeColumns)
+            ->actions([])
             ->bulkActions(SalesForce::bulkActions());
     }
 
