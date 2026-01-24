@@ -64,7 +64,8 @@ class FinanceResource extends Resource
                     ->button()
                     ->label('Filter'),
             )
-            ->actions(Finance::actions(), position: ActionsPosition::BeforeColumns)
+            ->recordAction('view')
+            ->actions([])
             ->bulkActions(Finance::bulkActions());
     }
 

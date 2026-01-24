@@ -320,85 +320,77 @@ class Academic
                 ->description("Detail data dari Salesforce")
                 ->schema([
                     Infolists\Components\Fieldset::make("Periode")->schema([
-                        Infolists\Components\TextEntry::make("periode")->label(
-                            "Periode",
-                        ),
-                        Infolists\Components\TextEntry::make("years")->label(
-                            "Tahun",
-                        ),
+                        Infolists\Components\TextEntry::make("periode")->label("Periode")->placeholder("Tidak Ada Periode"),
+                        Infolists\Components\TextEntry::make("years")->label("Tahun")->placeholder("Tidak Ada Tahun"),
                     ]),
 
                     Infolists\Components\Fieldset::make("Salesforce")->schema([
-                        Infolists\Components\TextEntry::make(
-                            "users.name",
-                        )->label("User"),
+                        Infolists\Components\TextEntry::make("users.name")->label("User")->placeholder("Tidak Ada User"),
                     ]),
 
                     Infolists\Components\Fieldset::make("Sekolah")->schema([
-                        Infolists\Components\TextEntry::make("schools")->label(
-                            "Sekolah",
-                        ),
-                        Infolists\Components\TextEntry::make("class")->label(
-                            "Kelas",
-                        ),
-                        Infolists\Components\TextEntry::make(
-                            "education_level",
-                        )->label("Jenjang"),
-                        Infolists\Components\TextEntry::make(
-                            "description",
-                        )->label("Keterangan"),
+                        Infolists\Components\TextEntry::make("schools")->label("Sekolah")->placeholder("Tidak Ada Sekolah"),
+                        Infolists\Components\TextEntry::make("class")->label("Kelas")->placeholder("Tidak Ada Kelas"),
+                        Infolists\Components\TextEntry::make("education_level")->label("Jenjang")->placeholder("Tidak Ada Jenjang"),
+                        Infolists\Components\TextEntry::make("description")->label("Keterangan")->placeholder("Tidak Ada Keterangan"),
                         Infolists\Components\TextEntry::make(
                             "schools_type",
-                        )->label("Negeri / Swasta"),
+                        )->label("Negeri / Swasta")->placeholder("Tidak Ada Jenjang"),
                         Infolists\Components\TextEntry::make(
                             "student_count",
-                        )->label("Jumlah Siswa"),
+                        )->label("Jumlah Siswa")->placeholder("Tidak Ada Jumlah Siswa"),
                         Infolists\Components\TextEntry::make(
                             "provinces",
-                        )->label("Provinsi"),
+                        )->label("Provinsi")->placeholder("Tidak Ada Provinsi"),
                         Infolists\Components\TextEntry::make(
                             "regencies",
-                        )->label("Kota / Kabupaten"),
+                        )->label("Kota / Kabupaten")->placeholder("Tidak Ada Kota / Kabupaten"),
                         Infolists\Components\TextEntry::make("area")
                             ->label("Wilayah")
-                            ->default("-"),
+                            ->placeholder("Tidak Ada Wilayah"),
                     ]),
 
                     Infolists\Components\Fieldset::make("Bagan")->schema([
                         Infolists\Components\TextEntry::make(
                             "principal",
-                        )->label("Kepala Sekolah"),
+                        )->label("Kepala Sekolah")->placeholder("Tidak Ada Kepala Sekolah"),
                         PhoneEntry::make("principal_phone")
                             ->label("No Hp Kepala Sekolah")
-                            ->displayFormat(PhoneInputNumberType::NATIONAL),
+                            ->displayFormat(PhoneInputNumberType::NATIONAL)
+                            ->placeholder("Tidak Ada No Hp Kepala Sekolah"),
                         Infolists\Components\TextEntry::make(
                             "curriculum_deputies",
-                        )->label("Wakakurikulum"),
+                        )->label("Wakakurikulum")->placeholder("Tidak Ada Wakakurikulum"),
                         PhoneEntry::make("curriculum_deputies_phone")
                             ->label("No Hp Wakakurikulum")
-                            ->displayFormat(PhoneInputNumberType::NATIONAL),
+                            ->displayFormat(PhoneInputNumberType::NATIONAL)
+                            ->placeholder("Tidak Ada No Hp Wakakurikulum"),
                         Infolists\Components\TextEntry::make(
                             "counselor_coordinators",
-                        )->label("Koordinator BK"),
+                        )->label("Koordinator BK")->placeholder("Tidak Ada Koordinator BK"),
                         PhoneEntry::make("counselor_coordinators_phone")
                             ->label("No Hp Koordinator BK")
-                            ->displayFormat(PhoneInputNumberType::NATIONAL),
+                            ->displayFormat(PhoneInputNumberType::NATIONAL)
+                            ->placeholder("Tidak Ada No Hp Koordinator BK"),
                         Infolists\Components\TextEntry::make("proctors")->label(
                             "Proktor",
-                        ),
+                        )->placeholder("Tidak Ada Proktor"),
                         PhoneEntry::make("proctors_phone")
                             ->label("No Hp Proktor")
-                            ->displayFormat(PhoneInputNumberType::NATIONAL),
+                            ->displayFormat(PhoneInputNumberType::NATIONAL)
+                            ->placeholder("Tidak Ada No Hp Proktor"),
                     ]),
                     Infolists\Components\Fieldset::make("")->schema([
                         Infolists\Components\TextEntry::make("date_register")
                             ->label("Tanggal Pendaftaran")
-                            ->dateTime("l, jS F Y H:i"),
+                            ->dateTime("l, jS F Y H:i")
+                            ->placeholder("Tidak Ada Tanggal Pendaftaran"),
                         Infolists\Components\TextEntry::make(
                             "implementation_estimate",
                         )
                             ->label("Estimasi Pelaksanaan")
-                            ->dateTime("l, jS F Y H:i"),
+                            ->dateTime("l, jS F Y H:i")
+                            ->placeholder("Tidak Ada Estimasi Pelaksanaan"),
                     ]),
                 ]),
             Infolists\Components\Section::make("Service")

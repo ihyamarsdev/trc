@@ -5,6 +5,7 @@ namespace App\Filament\User\Resources\Academic\Monitoring;
 use App\Filament\Components\Academic;
 use App\Filament\User\Resources\Academic\Monitoring\RekapitulasiServiceResource\Pages;
 use App\Models\RegistrationData;
+use Carbon\Carbon;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -77,6 +78,10 @@ class RekapitulasiServiceResource extends Resource
                     ->icon(fn ($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 10 ? 'heroicon-s-check' : 'heroicon-s-x-mark')
                     ->color(fn ($record) => ($record->latestStatusLog?->status?->order ?? 0) >= 10 ? 'success' : 'danger')
                     ->default(false),
+                TextColumn::make('updated_at')
+                    ->label('Terakhir Diupdate')
+                    ->alignCenter()
+                    ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, d/m/Y H:i')),
             ])
             ->defaultSort('updated_at', 'desc')
             ->filters([

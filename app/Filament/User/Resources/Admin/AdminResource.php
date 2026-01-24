@@ -63,7 +63,8 @@ class AdminResource extends Resource
                     ->button()
                     ->label('Filter'),
             )
-            ->actions(Admin::actions(), position: ActionsPosition::BeforeColumns)
+            ->recordAction('view')
+            ->actions([])
             ->bulkActions(Admin::bulkActions());
     }
 
