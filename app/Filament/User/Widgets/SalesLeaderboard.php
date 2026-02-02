@@ -69,28 +69,28 @@ class SalesLeaderboard extends BaseWidget
                     Summarizer::make()
                         ->label('')
                         ->using(fn(Database\Query\Builder $query) => $query->where('status_color', '=', 'red')->count())
-                        ->formatStateUsing(fn($state) => '<span style="color: #cc0000; -webkit-text-stroke: 0.5px #cc0000;">' . $state . '</span>')
+                        ->formatStateUsing(fn($state) => '<span class="status-red" style="--light: #cc0000; --dark: #ff6b6b; color: var(--light); font-weight: 600;">' . $state . '</span>')
                         ->html()
                 ),
                 Tables\Columns\TextColumn::make('yellow')->alignCenter()->label('Data')->summarize(
                     Summarizer::make()
                         ->label('')
                         ->using(fn(Database\Query\Builder $query) => $query->where('status_color', '=', 'yellow')->count())
-                        ->formatStateUsing(fn($state) => '<span style="color: #cc9900; -webkit-text-stroke: 0.5px #cc9900;">' . $state . '</span>')
+                        ->formatStateUsing(fn($state) => '<span class="status-yellow" style="--light: #cc9900; --dark: #ffd93d; color: var(--light); font-weight: 600;">' . $state . '</span>')
                         ->html()
                 ),
                 Tables\Columns\TextColumn::make('blue')->alignCenter()->label('Data')->summarize(
                     Summarizer::make()
                         ->label('')
                         ->using(fn(Database\Query\Builder $query) => $query->where('status_color', '=', 'blue')->count())
-                        ->formatStateUsing(fn($state) => '<span style="color: #000099; -webkit-text-stroke: 0.5px #000099;">' . $state . '</span>')
+                        ->formatStateUsing(fn($state) => '<span class="status-blue" style="--light: #000099; --dark: #6bb3ff; color: var(--light); font-weight: 600;">' . $state . '</span>')
                         ->html()
                 ),
                 Tables\Columns\TextColumn::make('green')->alignCenter()->label('Data')->summarize(
                     Summarizer::make()
                         ->label('')
                         ->using(fn(Database\Query\Builder $query) => $query->where('status_color', '=', 'green')->count())
-                        ->formatStateUsing(fn($state) => '<span style="color: #004400; -webkit-text-stroke: 0.5px #004400;">' . $state . '</span>')
+                        ->formatStateUsing(fn($state) => '<span class="status-green" style="--light: #004400; --dark: #6bff6b; color: var(--light); font-weight: 600;">' . $state . '</span>')
                         ->html()
                 ),
                 Tables\Columns\TextColumn::make('schools')->alignCenter()->label('Jumlah Sekolah')->summarize(

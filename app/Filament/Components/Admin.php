@@ -1010,7 +1010,7 @@ class Admin
                 ->options(Periode::list())
                 ->preload()
                 ->indicator('Periode'),
-            Tables\Filters\SelectFilter::make('latestStatusLog.status.color')
+            Tables\Filters\SelectFilter::make('status_color')
                 ->label('Status Warna')
                 ->options([
                     'red' => 'Merah',

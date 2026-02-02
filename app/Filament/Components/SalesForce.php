@@ -532,7 +532,7 @@ class SalesForce
                 ->options(Jenjang::list())
                 ->preload()
                 ->indicator("Jenjang"),
-            Tables\Filters\SelectFilter::make("latestStatusLog.status.color")
+            Tables\Filters\SelectFilter::make("status_color")
                 ->label("Status Warna")
                 ->options([
                     "red" => "Merah",

@@ -1013,11 +1013,9 @@ class Finance
                 })
                 ->preload()
                 ->indicator("user"),
-            Tables\Filters\SelectFilter::make("latestStatusLog.status.color")
+            Tables\Filters\SelectFilter::make("status_color")
                 ->label("Status Warna")
                 ->options([
-                    "red" => "Merah",
-                    "yellow" => "Kuning",
                     "blue" => "Biru",
                     "green" => "Hijau",
                 ])
