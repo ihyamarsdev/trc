@@ -14,6 +14,7 @@ use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\Summarizers\Count;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Filament\Tables\Columns\Summarizers\Summarizer;
+use App\Filament\Enum\Jenjang;
 use Illuminate\Database;
 
 class SalesForceStatsWidget extends BaseWidget
@@ -45,6 +46,25 @@ class SalesForceStatsWidget extends BaseWidget
                         ->using(fn(Database\Query\Builder $query) => $query->count('schools'))
                 ),
                 Tables\Columns\TextColumn::make('student_count')->label('Jumlah Siswa')->alignCenter()->summarize(Sum::make()->label('')),
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('education_level')
+                    ->label('Jenjang')
+                    ->options(Jenjang::list())
+                    ->preload()
+                    ->indicator('Jenjang'),
+                Tables\Filters\SelectFilter::make('years')
+                    ->label('Tahun')
+                    ->options(function () {
+                        // Mengambil daftar tahun unik yang benar-benar ada di database
+                        return RegistrationData::query() // Ganti Sales dengan nama Model Anda
+                            ->whereNotNull('years')
+                            ->distinct()
+                            ->orderBy('years', 'desc')
+                            ->pluck('years', 'years')
+                            ->toArray();
+                    })
+                    ->searchable()
             ])
             ->groups([
                 Group::make('type')
