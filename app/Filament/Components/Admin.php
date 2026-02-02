@@ -23,6 +23,7 @@ use Filament\Forms\Components\DateTimePicker;
 use Creasi\Nusa\Models\{Province, Regency, District};
 use Filament\Forms\Components\{Select, TextInput, Section};
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use App\Models\RegistrationData;
 
 class Admin
 {
@@ -1031,6 +1032,19 @@ class Admin
                         $q->where('color', $data['value'])
                     );
                 }),
+            Tables\Filters\SelectFilter::make('years')
+                ->label('Tahun')
+                ->options(function () {
+                    // Mengambil daftar tahun unik yang benar-benar ada di database
+                    return RegistrationData::query() // Ganti Sales dengan nama Model Anda
+                        ->whereNotNull('years')
+                        ->distinct()
+                        ->orderBy('years', 'desc')
+                        ->pluck('years', 'years')
+                        ->toArray();
+                })
+                ->searchable()
+                ->preload(),
         ];
     }
 
