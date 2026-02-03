@@ -40,6 +40,7 @@ class RegistrationData extends Model
         'proctors',
         'proctors_phone',
         'status_color',
+        'notes',
 
         'group',
         'bimtek',

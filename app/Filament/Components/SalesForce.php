@@ -20,7 +20,7 @@ use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 use Ysfkaya\FilamentPhoneInput\Infolists\PhoneEntry;
 use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
 use Creasi\Nusa\Models\{Province, Regency, District};
-use Filament\Forms\Components\{Select, TextInput, Section};
+use Filament\Forms\Components\{Select, TextInput, Section, Textarea};
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
 use Filament\Forms\Set;
 
@@ -234,6 +234,9 @@ class SalesForce
                         ->seconds(false)
                         ->displayFormat("l, jS F Y H:i")
                         ->live(),
+                    Textarea::make("notes")
+                        ->label("Catatan")
+                        ->autosize(),
                 ])
                 ->columns(2),
 
