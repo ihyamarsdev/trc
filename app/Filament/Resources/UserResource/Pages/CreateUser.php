@@ -5,9 +5,10 @@ namespace App\Filament\Resources\UserResource\Pages;
 use Filament\Actions;
 use Illuminate\Support\Str;
 use App\Notifications\NewAccount;
+use Illuminate\Database\Eloquent\Model;
 use App\Filament\Resources\UserResource;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class CreateUser extends CreateRecord
 {
@@ -22,8 +23,8 @@ class CreateUser extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $this->password = Str::password(12); // generate a default password with length of 12 caracters
-        $data['password'] = bcrypt($this->password);
+        $this->password = '12345678'; // generate a default password with length of 12 caracters
+        $data['password'] = $this->password;
         $data['force_renew_password'] = true; // to force user to renew password on next login
 
         return $data;

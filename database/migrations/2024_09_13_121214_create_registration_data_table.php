@@ -14,7 +14,7 @@ return new class () extends Migration {
             $table->id();
 
             ## Sales
-            $table->enum('type', ['apps','anbk','snbt']);
+            $table->string('type');
             $table->string('periode')->nullable();
             $table->string('years')->nullable();
             $table->dateTime('date_register')->nullable();
@@ -37,9 +37,9 @@ return new class () extends Migration {
             $table->string('principal')->nullable();
             $table->string('principal_phone')->nullable();
             $table->dateTime('implementation_estimate')->nullable();
-            $table->string('status_color')->default('red');
+            $table->string('status_color')->default('red')->nullable();
 
-            ## Akademik dan Teknisi
+            ## Service
             $table->date('group')->nullable();
             $table->date('bimtek')->nullable();
             $table->integer('account_count_created')->nullable();
@@ -83,8 +83,8 @@ return new class () extends Migration {
             $table->string('qty_invoice')->nullable();
             $table->string('unit_price')->nullable();
             $table->string('amount_invoice')->nullable();
-            $table->string('tax_rate')->nullable();
-            $table->string('sales_tsx')->nullable();
+            $table->string('ppn')->nullable();
+            $table->string('pph')->nullable();
             $table->string('other')->nullable();
             $table->string('subtotal_invoice')->nullable();
             $table->string('total_invoice')->nullable();
@@ -101,7 +101,7 @@ return new class () extends Migration {
 
 
             $table->foreignId('users_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
-            $table->foreignId('status_id')->nullable()->after('cb,')->constrained('statuses');
+            $table->foreignId('status_id')->constrained('statuses')->nullable();
             $table->timestamps();
         });
     }

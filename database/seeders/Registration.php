@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Seeder;
 use App\Models\RegistrationData;
+use App\Models\RegistrationStatus;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class Registration extends Seeder
@@ -15,18 +16,34 @@ class Registration extends Seeder
      */
     public function run(): void
     {
-         // Pastikan ada user untuk foreign key
-        if (User::count() === 0) {
-            User::factory()->count(5)->create();
+        // Pastikan ada minimal 10 user untuk foreign key
+        $currentUserCount = User::count();
+        if ($currentUserCount < 10) {
+            User::factory()->count(10 - $currentUserCount)->create();
         }
 
-         // Ambil semua user id yg mau dipakai (mis. exclude admin jika perlu)
-        $userIds = User::where('email', '!=', 'admin@trc.com')->pluck('id')->all();
-        // atau kalau mau termasuk admin: $userIds = User::pluck('id')->all();
+        // Ambil 10 user pertama (exclude admin jika ada)
+        $userIds = User::where('email', '!=', 'admin@trc.com')->take(10)->pluck('id')->all();
 
-        // Seed registration_data 100 baris, setiap baris users_id diacak dari $userIds
-        RegistrationData::factory(3)->state(fn () => [
-            'users_id' => Arr::random($userIds),
-        ])->create();
+        // Jika masih kurang dari 10, ambil semua user
+        if (count($userIds) < 10) {
+            $userIds = User::take(10)->pluck('id')->all();
+        }
+
+        // Seed registration_data 200 baris untuk 10 user (20 baris per user)
+        foreach ($userIds as $userId) {
+            $registrations = RegistrationData::factory(20)->state(fn () => [
+                'users_id' => $userId,
+            ])->create();
+
+            // Buat RegistrationStatus untuk setiap registration
+            foreach ($registrations as $registration) {
+                RegistrationStatus::create([
+                    'registration_id' => $registration->id,
+                    'status_id' => $registration->status_id,
+                    'user_id' => $userId, // user yang membuat registration
+                ]);
+            }
+        }
     }
 }

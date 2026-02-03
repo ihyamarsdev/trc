@@ -26,7 +26,7 @@ class FinanceExporter extends Exporter
                 ->label('Program'),
             ExportColumn::make('periode')
                 ->label('Periode'),
-            ExportColumn::make('school_years.name')
+            ExportColumn::make('years')
                 ->label('Tahun Ajaran'),
             ExportColumn::make('date_register')
                 ->label('Tanggal Pendaftaran')
@@ -37,7 +37,7 @@ class FinanceExporter extends Exporter
                 ->label('Provinsi'),
             ExportColumn::make('regencies')
                 ->label('Kota / Kabupaten'),
-            ExportColumn::make('sudin')
+            ExportColumn::make('area')
                 ->label('Daerah Tambahan'),
             ExportColumn::make('schools')
                 ->label('Sekolah'),
@@ -47,13 +47,13 @@ class FinanceExporter extends Exporter
                 ->label('Kepala Sekolah'),
             ExportColumn::make('phone_principal')
                 ->label('No Hp Kepala Sekolah'),
-            ExportColumn::make('education_level_type')
+            ExportColumn::make('schools_type')
                 ->label('Negeri / Swasta'),
-            ExportColumn::make('curriculum_deputies.name')
+            ExportColumn::make('curriculum_deputies')
                 ->label('Wakakurikulum'),
-            ExportColumn::make('counselor_coordinators.name')
+            ExportColumn::make('counselor_coordinators')
                 ->label('Koordinator Konseling'),
-            ExportColumn::make('proctors.name')
+            ExportColumn::make('proctors')
                 ->label('Pembimbing'),
             ExportColumn::make('student_count')
                 ->label('Jumlah Siswa'),

@@ -21,6 +21,8 @@ class DashboardHome extends Page
 
     protected static ?string $title = 'Home';
 
+    protected static ?string $slug = 'dashboard';
+
     protected function getHeaderWidgets(): array
     {
         return [

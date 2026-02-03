@@ -23,11 +23,11 @@ class RegistrationDataFactory extends Factory
     {
         $faker = $this->faker;
 
-        $types = ['apps','anbk','snbt'];
+        $types = ['apps','anbk','snbt','tka'];
         $periodes = ['Januari - Juni', 'Juli - Desember'];
         $schoolTypes = ['Negeri','Swasta'];
         $eduLevels = ['SD','SMP','SMA','SMK','MTS','MA'];
-        $statusColors = ['red','yellow','blue','green'];
+        $statusColors = ['red','yellow','blue'];
         $description = ['ABK', 'Non ABK'];
 
         // angka & hitungan finansial sederhana
@@ -63,10 +63,10 @@ class RegistrationDataFactory extends Factory
             'principal' => $faker->name(),
             'principal_phone' => $faker->phoneNumber(),
             'implementation_estimate' => $implementEst,
-            'status_color' => $faker->randomElement($statusColors),
 
 
             'users_id' => null,
+            'status_id' => \App\Models\Status::inRandomOrder()->first()->id,
         ];
     }
 }

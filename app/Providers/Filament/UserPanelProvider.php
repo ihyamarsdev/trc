@@ -2,7 +2,6 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\User\Pages\DashboardHome;
 use Filament\Panel;
 use Filament\Widgets;
 use Filament\PanelProvider;
@@ -11,9 +10,11 @@ use Filament\Pages\Dashboard;
 use App\Livewire\DetailProfile;
 use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
+use Illuminate\Support\Facades\URL;
 use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\Facades\Auth;
 use Orion\FilamentGreeter\GreeterPlugin;
+use App\Filament\User\Pages\DashboardHome;
 use Filament\Http\Middleware\Authenticate;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -47,6 +48,10 @@ class UserPanelProvider extends PanelProvider
             ->brandLogoHeight('8rem')
             ->viteTheme('resources/css/filament/user/theme.css')
             ->databaseNotifications()
+            ->databaseNotificationsPolling('2s')
+            ->sidebarWidth('15rem')
+            ->unsavedChangesAlerts()
+            ->breadcrumbs(false)
             ->colors([
                 'danger' => Color::Rose,
                 'gray' => Color::Gray,
@@ -60,11 +65,9 @@ class UserPanelProvider extends PanelProvider
                 'red' => Color::Red,
             ])
             ->navigationGroups([
-                'Activity',
-                'Program Salesforce',
-                'Program Datacenter',
-                'Program Akademik',
-                'Program Finance',
+                'Salesforce',
+                'Service',
+                'Finance',
                 'Rekap Datacenter',
                 'Rekap Akademik',
                 'Rekap Finance',
@@ -104,10 +107,9 @@ class UserPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->plugins([
-                 FilamentFullCalendarPlugin::make()
+                FilamentFullCalendarPlugin::make()
                     ->schedulerLicenseKey('')
                     ->selectable()
-                    ->editable()
                     ->timezone(config('app.timezone'))
                     ->locale(config('app.locale'))
                     ->plugins(['dayGrid', 'timeGrid'])

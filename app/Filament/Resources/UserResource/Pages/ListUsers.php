@@ -21,8 +21,8 @@ class ListUsers extends ListRecords
             \EightyNine\ExcelImport\ExcelImportAction::make()
                 ->sampleExcel(
                     sampleData: [
-                        ['name' => 'John Doe', 'email' => 'john@doe.com', 'roles' => 'admin'],
-                        ['name' => 'Marry Jane', 'email' => 'marry@doe.com', 'roles' => 'user'],
+                        ['name' => 'uya', 'email' => 'uya@gmail.com', 'roles' => 'admin'],
+                        ['name' => 'ade', 'email' => 'ade@gmail.com', 'roles' => 'sales'],
                     ],
                     fileName: 'user_sample.csv',
                     sampleButtonLabel: 'Download Sample',

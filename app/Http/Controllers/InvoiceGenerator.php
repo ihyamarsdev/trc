@@ -6,6 +6,7 @@ use NumberFormatter;
 use Illuminate\Http\Request;
 use App\Models\RegistrationData;
 use LaravelDaily\Invoices\Invoice;
+use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
 use LaravelDaily\Invoices\Classes\Buyer;
 use PhpOffice\PhpWord\TemplateProcessor;
@@ -13,7 +14,7 @@ use LaravelDaily\Invoices\Classes\InvoiceItem;
 
 class InvoiceGenerator extends Controller
 {
-    public function rasyidu_invoice(RegistrationData $record)
+    public function rasyidu(RegistrationData $record)
     {
         $pph = $record->tax_rate;
         $ppn = $record->sales_tsx;
@@ -46,7 +47,7 @@ class InvoiceGenerator extends Controller
 
         $doc_name = 'INVOICE RASYIDUU ANBK ' . $record->schools . '.docx';
 
-        $recipient = auth()->user;
+        $recipient = Auth::user();
 
         $recipient->notify(
             Notification::make()
@@ -61,7 +62,7 @@ class InvoiceGenerator extends Controller
         return response()->download(public_path($doc_name))->deleteFileAfterSend(true);
     }
 
-    public function edunesia_invoice(RegistrationData $record)
+    public function edunesia(RegistrationData $record)
     {
         $pph = $record->tax_rate;
         $ppn = $record->sales_tsx;
@@ -95,7 +96,7 @@ class InvoiceGenerator extends Controller
         $doc_name = 'INVOICE EDUNESIA ANBK ' . $record->schools . '.docx';
 
 
-        $recipient = auth()->user;
+        $recipient = Auth::user();
 
         $recipient->notify(
             Notification::make()

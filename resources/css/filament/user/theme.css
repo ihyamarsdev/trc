@@ -117,6 +117,8 @@
 .fi-checkbox-input {
     @apply ring-lime-500;
 }
+
+
 @layer utilities {
     /* Hide scrollbar for Chrome, Safari and Opera */
     .no-scrollbar::-webkit-scrollbar {
@@ -127,4 +129,30 @@
         -ms-overflow-style: none; /* IE and Edge */
         scrollbar-width: none; /* Firefox */
     }
+}
+
+/* Leaderboard Status Colors - Dark mode support */
+.status-red {
+    color: #cc0000 !important;
+}
+.dark .status-red {
+    color: #ff6b6b !important;
+}
+.status-yellow {
+    color: #cc9900 !important;
+}
+.dark .status-yellow {
+    color: #ffd93d !important;
+}
+.status-blue {
+    color: #000099 !important;
+}
+.dark .status-blue {
+    color: #6bb3ff !important;
+}
+.status-green {
+    color: #004400 !important;
+}
+.dark .status-green {
+    color: #6bff6b !important;
 }

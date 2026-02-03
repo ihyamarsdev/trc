@@ -11,6 +11,8 @@ class RegistrationData extends Model
 {
     use HasFactory;
 
+
+
     protected $fillable = [
         'type',
         'periode',
@@ -55,8 +57,8 @@ class RegistrationData extends Model
         'net',
         'total_net',
         'invoice_date',
-        'spk_sent',
-        'payment',
+        'spk',
+        'payment_name',
         'payment_date',
         'monthYear',
         'net_2',
@@ -98,8 +100,9 @@ class RegistrationData extends Model
         'counselor_consultation_date' => 'datetime',
         'student_consultation_date' => 'datetime',
         'invoice_date' => 'datetime',
-        'spk_sent' => 'datetime',
+        'spk' => 'datetime',
         'payment_date' => 'datetime',
+        'group' => 'datetime',
     ];
 
     /**
@@ -121,7 +124,7 @@ class RegistrationData extends Model
     public function activity()
     {
         return $this->hasMany(RegistrationStatus::class, 'registration_id')
-            ->with(['status:id,name,description,color,category','user:id,name']);
+            ->with(['status:id,name,description,color,category', 'user:id,name']);
     }
 
     public function latestStatusLog()

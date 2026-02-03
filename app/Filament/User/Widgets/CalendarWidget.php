@@ -2,48 +2,70 @@
 
 namespace App\Filament\User\Widgets;
 
+use Filament\Actions\Action;
 use App\Models\RegistrationData;
-use Illuminate\Database\Eloquent\Model;
-use App\Filament\Resources\AcademicResource;
+use Saade\FilamentFullCalendar\Actions;
 use Saade\FilamentFullCalendar\Data\EventData;
+use App\Filament\User\Resources\TimelineResource;
 use Saade\FilamentFullCalendar\Widgets\FullCalendarWidget;
-use App\Filament\User\Resources\Academic\ANBK\AnbkAcademicResource;
-use App\Filament\User\Resources\Academic\APPS\AppsAcademicResource;
-use App\Filament\User\Resources\Academic\SNBT\SnbtAcademicResource;
+use Illuminate\Database\Eloquent\Builder;
 
 class CalendarWidget extends FullCalendarWidget
 {
     // protected static string $view = 'filament.user.widgets.calendar-widget';
+    // public Model | string | null $model = RegistrationData::class;
+
+
+    public function config(): array
+    {
+        return [
+            'firstDay' => 1,
+            'headerToolbar' => [
+                'left' => 'title',
+                'center' => '',
+                'right' => 'prevYear,nextYear',
+            ],
+            'footerToolbar' => [
+                'left' => 'prev,next',
+                'center' => 'today',
+                'right' => 'dayGridMonth,dayGridWeek,dayGridDay',
+            ],
+            'titleFormat' => [
+                ''
+            ]
+        ];
+    }
+
+    protected function viewAction(): Action
+    {
+        return Actions\ViewAction::make();
+    }
 
     public function fetchEvents(array $fetchInfo): array
     {
 
         return RegistrationData::query()
-        ->where('date_register', '>=', $fetchInfo['start'])
-        ->where('implementation_estimate', '<=', $fetchInfo['end'])
-        ->get()
-        ->map(function (RegistrationData $event) {
-            // Petakan program -> Resource class
-            $resourceMap = [
-                'ANBK' => AnbkAcademicResource::class,
-                'APPS' => AppsAcademicResource::class,
-                'SNBT' => SnbtAcademicResource::class,
-            ];
+            ->where('implementation_estimate', '>=', $fetchInfo['start'])
+            ->where('implementation_estimate', '<=', $fetchInfo['end'])
+            ->unless(
+                auth()->user()->hasRole('admin'), // Selama BUKAN admin...
+                fn(Builder $q) => $q->when(
+                    auth()->user()->hasRole('sales'), // ...dan jika dia sales
+                    fn($subQ) => $subQ->where('users_id', auth()->id())
+                )
+            )
+            ->get()
+            ->map(function (RegistrationData $event) {
 
-            $program = strtoupper($event->type ?? ''); // ganti 'program' jika nama kolom berbeda
-            $resourceClass = $resourceMap[$program] ?? null;
+                return EventData::make()
+                    ->id($event->id)
+                    ->title($event->schools)
+                    ->start($event->implementation_estimate)
+                    ->end($event->implementation_estimate)
+                    ->url(url: TimelineResource::getUrl(name: 'view', parameters: ['record' => $event]));
 
-            $url = $resourceClass
-                ? $resourceClass::getUrl(name: 'view', parameters: ['record' => $event])
-                : null; // fallback: bisa diarahkan ke halaman umum bila perlu
 
-            return EventData::make()
-                ->id($event->id)
-                ->title($event->schools)
-                ->start($event->implementation_estimate)
-                ->end($event->implementation_estimate)
-                ->url(url: $url, shouldOpenUrlInNewTab: true);
-        })
-        ->toArray();
+            })
+            ->toArray();
     }
 }
