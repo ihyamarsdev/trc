@@ -67,12 +67,17 @@ class EditAcademic extends EditRecord
 
         }
 
+        if ($status) {
+            $data['status_color'] = $status->color;
+        }
+
         $record = $this->record;
 
         DB::transaction(function () use ($record) {
             if (empty($record->status_id)) {
                 return;
             }
+
 
             $currentStatusId = (int) $record->status_id;
 

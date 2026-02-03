@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Filament\Resources\Pages\EditRecord;
 use App\Filament\User\Resources\Finance\FinanceResource;
+use App\Models\Status;
 
 class EditFinance extends EditRecord
 {
@@ -40,6 +41,11 @@ class EditFinance extends EditRecord
     protected function mutateFormDataBeforeSave(array $data): array
     {
         $record = $this->record;
+        $status = Status::find($data["status_id"]);
+
+        if ($status) {
+            $data['status_color'] = $status->color;
+        }
 
         DB::transaction(function () use ($record) {
             if (empty($record->status_id)) {
