@@ -11,6 +11,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Table;
+use Filament\Tables;
 use Illuminate\Support\Facades\Auth;
 
 class RekapitulasiServiceResource extends Resource
