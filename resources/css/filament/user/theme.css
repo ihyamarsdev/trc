@@ -131,28 +131,60 @@
     }
 }
 
-/* Leaderboard Status Colors - Dark mode support */
+/* Leaderboard Status Colors - Light/Dark mode support */
+/* Light mode colors (darker for readability) */
 .status-red {
     color: #cc0000 !important;
-}
-.dark .status-red {
-    color: #ff6b6b !important;
 }
 .status-yellow {
     color: #cc9900 !important;
 }
-.dark .status-yellow {
-    color: #ffd93d !important;
-}
 .status-blue {
     color: #000099 !important;
-}
-.dark .status-blue {
-    color: #6bb3ff !important;
 }
 .status-green {
     color: #004400 !important;
 }
+
+/* Dark mode colors (lighter/brighter) */
+.dark .status-red {
+    color: #ff6b6b !important;
+}
+.dark .status-yellow {
+    color: #ffd93d !important;
+}
+.dark .status-blue {
+    color: #6bb3ff !important;
+}
 .dark .status-green {
     color: #6bff6b !important;
+}
+
+/* Widget-specific status dot styling */
+.status-dot {
+    transition: background-color 0.2s ease;
+}
+
+/* Summary card responsive colors */
+.summary-card {
+    transition: all 0.3s ease;
+}
+
+.summary-icon {
+    transition: background-color 0.2s ease;
+}
+
+.summary-icon-color {
+    transition: color 0.2s ease;
+}
+
+/* Filter badge styling */
+.filter-badge {
+    transition: all 0.2s ease;
+}
+
+/* Table header/footer responsive styling */
+.table-header th,
+.table-footer td {
+    transition: color 0.2s ease, background-color 0.2s ease;
 }
