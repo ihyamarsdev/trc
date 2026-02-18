@@ -85,7 +85,48 @@ class RekapitulasiServiceResource extends Resource
             ])
             ->defaultSort('updated_at', 'desc')
             ->filters([
-                //
+                //   Tables\Filters\SelectFilter::make("periode")
+                    ->label("Periode")
+                    ->options(Periode::list())
+                    ->preload(),
+                Tables\Filters\SelectFilter::make("education_level")
+                    ->label("Jenjang")
+                    ->options(Jenjang::list())
+                    ->preload()
+                    ->indicator("Jenjang"),
+                Tables\Filters\SelectFilter::make("type")
+                    ->label("Program")
+                    ->options(Program::list())
+                    ->preload()
+                    ->indicator("Program"),
+                Tables\Filters\SelectFilter::make("users_id")
+                    ->label("User")
+                    ->options(function () {
+                        return \App\Models\User::all()
+                            ->pluck("name", "id")
+                            ->toArray();
+                    })
+                    ->preload()
+                    ->indicator("user"),
+                Tables\Filters\SelectFilter::make("status_color")
+                    ->label("Status Warna")
+                    ->options([
+                        "yellow" => "Kuning",
+                        "blue" => "Biru",
+                        "green" => "Hijau",
+                    ])
+                    ->preload()
+                    ->indicator("Status Warna")
+                    ->query(function (Builder $query, array $data) {
+                        if (empty($data["value"])) {
+                            return;
+                        }
+
+                        $query->whereHas(
+                            "status",
+                            fn(Builder $q) => $q->where("color", $data["value"]),
+                        );
+                    }),
             ])
             ->recordAction('view')
             ->actions([
