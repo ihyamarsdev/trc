@@ -80,7 +80,11 @@ class SalesForce
                 ->description()
                 ->schema([
                     DateTimePicker::make("date_register")
-                        ->label(new \Illuminate\Support\HtmlString('<span style="color: #ef4444;">Tanggal Pendaftaran</span>'))
+                        ->label(
+                            new \Illuminate\Support\HtmlString(
+                                '<span style="color: #ef4444;">Tanggal Pendaftaran</span>',
+                            ),
+                        )
                         ->native(false)
                         ->seconds(false)
                         ->displayFormat("l, jS F Y H:i"),
@@ -194,7 +198,11 @@ class SalesForce
                             return [];
                         }),
                     TextInput::make("curriculum_deputies")
-                        ->label(new \Illuminate\Support\HtmlString('<span style="color: #ef4444;">Wakakurikulum</span>'))
+                        ->label(
+                            new \Illuminate\Support\HtmlString(
+                                '<span style="color: #ef4444;">Wakakurikulum</span>',
+                            ),
+                        )
                         ->nullable()
                         ->dehydrateStateUsing(
                             fn(?string $state): string => Str::upper($state),
@@ -202,7 +210,11 @@ class SalesForce
                         ->maxLength(50)
                         ->live(),
                     PhoneInput::make("curriculum_deputies_phone")
-                        ->label(new \Illuminate\Support\HtmlString('<span style="color: #ef4444;">No Handphone Wakakurikulum</span>'))
+                        ->label(
+                            new \Illuminate\Support\HtmlString(
+                                '<span style="color: #ef4444;">No Handphone Wakakurikulum</span>',
+                            ),
+                        )
                         ->defaultCountry("ID")
                         ->live(),
                     TextInput::make("counselor_coordinators")
@@ -226,17 +238,23 @@ class SalesForce
                         ->label("No Handphone Proktor")
                         ->defaultCountry("ID"),
                     TextInput::make("student_count")
-                        ->label(new \Illuminate\Support\HtmlString('<span style="color: #ef4444;">Jumlah Siswa</span>'))
+                        ->label(
+                            new \Illuminate\Support\HtmlString(
+                                '<span style="color: #ef4444;">Jumlah Siswa</span>',
+                            ),
+                        )
                         ->numeric(),
                     DateTimePicker::make("implementation_estimate")
-                        ->label(new \Illuminate\Support\HtmlString('<span style="color: #ef4444;">Estimasi Pelaksanaan</span>'))
+                        ->label(
+                            new \Illuminate\Support\HtmlString(
+                                '<span style="color: #ef4444;">Estimasi Pelaksanaan</span>',
+                            ),
+                        )
                         ->native(false)
                         ->seconds(false)
                         ->displayFormat("l, jS F Y H:i")
                         ->live(),
-                    Textarea::make("notes")
-                        ->label("Catatan")
-                        ->autosize(),
+                    Textarea::make("notes")->label("Catatan")->autosize(),
                 ])
                 ->columns(2),
 
@@ -244,7 +262,11 @@ class SalesForce
                 ->description("Masukkan Detail Data Sekolah")
                 ->schema([
                     TextInput::make("schools")
-                        ->label(new \Illuminate\Support\HtmlString('<span style="color: #ef4444;">Nama Sekolah</span>'))
+                        ->label(
+                            new \Illuminate\Support\HtmlString(
+                                '<span style="color: #ef4444;">Nama Sekolah</span>',
+                            ),
+                        )
                         ->nullable()
                         ->dehydrateStateUsing(
                             fn(?string $state): string => Str::upper($state),
@@ -271,7 +293,11 @@ class SalesForce
                         ])
                         ->native(false),
                     TextInput::make("principal")
-                        ->label(new \Illuminate\Support\HtmlString('<span style="color: #ef4444;">Nama Kepala Sekolah</span>'))
+                        ->label(
+                            new \Illuminate\Support\HtmlString(
+                                '<span style="color: #ef4444;">Nama Kepala Sekolah</span>',
+                            ),
+                        )
                         ->nullable()
                         ->dehydrateStateUsing(
                             fn(?string $state): string => Str::upper($state),
@@ -279,7 +305,11 @@ class SalesForce
                         ->maxLength(255)
                         ->live(),
                     PhoneInput::make("principal_phone")
-                        ->label(new \Illuminate\Support\HtmlString('<span style="color: #ef4444;">No Handphone Kepala Sekolah</span>'))
+                        ->label(
+                            new \Illuminate\Support\HtmlString(
+                                '<span style="color: #ef4444;">No Handphone Kepala Sekolah</span>',
+                            ),
+                        )
                         ->defaultCountry("ID")
                         ->live(),
                 ])
@@ -324,9 +354,9 @@ class SalesForce
                         ->afterStateUpdated(function (Set $set, $state) {
                             if ($state) {
                                 $color = Status::find($state)?->color;
-                                $set('status_color', $color);
+                                $set("status_color", $color);
                             } else {
-                                $set('status_color', null);
+                                $set("status_color", null);
                             }
                         }),
                 ])
@@ -338,17 +368,25 @@ class SalesForce
     {
         return [
             Split::make([
-
                 TextColumn::make("type")
                     ->label("Program")
-                    ->description('Program', position: 'above')
+                    ->description("Program", position: "above")
                     ->extraAttributes(["class" => "uppercase"]),
-                TextColumn::make("schools")->label("Sekolah")->description('Sekolah', position: 'above')->wrap(),
-                TextColumn::make("periode")->label("Periode")->description('Periode', position: 'above')->wrap(),
-                TextColumn::make("years")->label("Tahun")->description('Tahun', position: 'above'),
+                TextColumn::make("schools")
+                    ->label("Sekolah")
+                    ->description("Sekolah", position: "above")
+                    ->wrap()
+                    ->searchable(),
+                TextColumn::make("periode")
+                    ->label("Periode")
+                    ->description("Periode", position: "above")
+                    ->wrap(),
+                TextColumn::make("years")
+                    ->label("Tahun")
+                    ->description("Tahun", position: "above"),
                 TextColumn::make("latestStatusLog.status.color")
                     ->label("Status")
-                    ->description('Status', position: 'above')
+                    ->description("Status", position: "above")
                     ->badge()
                     ->formatStateUsing(fn($state) => ucfirst($state))
                     ->color(
@@ -373,55 +411,55 @@ class SalesForce
                     Infolists\Components\Fieldset::make(
                         "Kondisi Saat ini",
                     )->schema([
-                                Infolists\Components\TextEntry::make(
-                                    "status.name",
-                                )->label(""),
-                                Infolists\Components\IconEntry::make(
-                                    "latestStatusLog.status.order",
-                                )
-                                    ->label("")
-                                    ->icon(function ($state) {
-                                        // $state = nilai order (bisa null)
-                                        static $iconByOrder;
+                        Infolists\Components\TextEntry::make(
+                            "status.name",
+                        )->label(""),
+                        Infolists\Components\IconEntry::make(
+                            "latestStatusLog.status.order",
+                        )
+                            ->label("")
+                            ->icon(function ($state) {
+                                // $state = nilai order (bisa null)
+                                static $iconByOrder;
 
-                                        if ($iconByOrder === null) {
-                                            // Ambil sekali: [order => icon]
-                                            $iconByOrder = Status::query()
-                                                ->pluck("icon", "order") // pastikan kolom 'icon' ada
-                                                ->all();
-                                        }
+                                if ($iconByOrder === null) {
+                                    // Ambil sekali: [order => icon]
+                                    $iconByOrder = Status::query()
+                                        ->pluck("icon", "order") // pastikan kolom 'icon' ada
+                                        ->all();
+                                }
 
-                                        $order = (int) $state;
-                                        return $iconByOrder[$order] ??
-                                            "heroicon-m-clock";
-                                    })
-                                    ->color(function ($state) {
-                                        static $colorByOrder;
+                                $order = (int) $state;
+                                return $iconByOrder[$order] ??
+                                    "heroicon-m-clock";
+                            })
+                            ->color(function ($state) {
+                                static $colorByOrder;
 
-                                        if ($colorByOrder === null) {
-                                            // Ambil sekali: [order => color_dari_DB]
-                                            $colorByOrder = Status::query()
-                                                ->pluck("color", "order")
-                                                ->all();
-                                        }
+                                if ($colorByOrder === null) {
+                                    // Ambil sekali: [order => color_dari_DB]
+                                    $colorByOrder = Status::query()
+                                        ->pluck("color", "order")
+                                        ->all();
+                                }
 
-                                        $order = (int) $state;
-                                        $raw = strtolower(
-                                            (string) ($colorByOrder[$order] ?? ""),
-                                        );
+                                $order = (int) $state;
+                                $raw = strtolower(
+                                    (string) ($colorByOrder[$order] ?? ""),
+                                );
 
-                                        // Map warna DB -> warna Filament
-                                        return match ($raw) {
-                                            "green" => "green",
-                                            "blue" => "blue",
-                                            "yellow" => "yellow",
-                                            "red" => "red",
-                                            default => "gray",
-                                        };
-                                    })
-                                    ->default("red")
-                                    ->size("lg"),
-                            ]),
+                                // Map warna DB -> warna Filament
+                                return match ($raw) {
+                                    "green" => "green",
+                                    "blue" => "blue",
+                                    "yellow" => "yellow",
+                                    "red" => "red",
+                                    default => "gray",
+                                };
+                            })
+                            ->default("red")
+                            ->size("lg"),
+                    ]),
                 ])
                 ->columns(2),
 
