@@ -24,13 +24,13 @@
 
             {{-- Filter Dropdown --}}
             <div x-data="{ open: false }" class="relative">
-                <button @click="open = !open" 
+                <button @click="open = !open"
                     class="relative inline-flex items-center justify-center gap-1.5 rounded-xl py-2 px-4 text-sm font-medium transition-all duration-200 outline-none focus:-translate-y-0.5 active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
                     :class="$hasActiveFilters ? 'bg-gradient-to-r from-gray-600 to-gray-500 dark:from-[#0096d2] dark:to-[#0082a0] text-white shadow-lg' : 'bg-gray-100 dark:bg-[#002a35]/80 text-gray-700 dark:text-[#bae6fd] border border-gray-300 dark:border-[#0096d2]/30 hover:border-gray-400 dark:hover:border-[#0096d2] hover:bg-gray-200 dark:hover:bg-[#0096d2]/20'">
-                    
+
                     <x-heroicon-m-funnel class="w-4 h-4" />
                     <span>Filter</span>
-                    
+
                     @if($hasActiveFilters)
                         <span class="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-amber-600 dark:bg-[#a0c80a] text-white dark:text-[#001a22] text-xs font-bold">
                             {{ ($this->education_level ? 1 : 0) + ($this->years ? 1 : 0) }}
@@ -39,7 +39,7 @@
                 </button>
 
                 {{-- Dropdown Panel --}}
-                <div x-show="open" @click.outside="open = false" 
+                <div x-show="open" @click.outside="open = false"
                     x-transition:enter="transition ease-out duration-150"
                     x-transition:enter-start="opacity-0 scale-95 translate-y-2"
                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
@@ -155,13 +155,13 @@
             MAIN CONTENT: Chart & Details
             ======================================== --}}
         <div class="flex flex-col lg:flex-row gap-6" wire:key="chart-container-{{ $chartId }}" wire:ignore.self>
-            
+
             {{-- ========================================
                 ENHANCED PIE CHART
                 ======================================== --}}
             <div class="w-full lg:w-5/12">
                 <div class="relative flex flex-col items-center justify-center p-6 rounded-2xl transition-all duration-300 bg-gray-50 dark:bg-gradient-to-br dark:from-[#000a0e] dark:to-[#00141a] border border-gray-200 dark:border-[#0096d2]/20 shadow-xl dark:shadow-2xl dark:shadow-black">
-                    
+
                     @if(count($chartData['labels']) > 0)
                         {{-- Chart Container --}}
                         <div class="relative" style="width: 280px; height: 280px;">
@@ -187,10 +187,10 @@
                                         if (this.chart) {
                                             this.chart.destroy();
                                         }
-                                        
+
                                         const chartData = {{ Js::from($chartData) }};
                                         const totalStudents = {{ $totalStudents }};
-                                        
+
                                         this.chart = new Chart(ctx, {
                                             type: 'pie',
                                             data: {
@@ -248,13 +248,13 @@
                                     }
                                 }"></canvas>
                             </div>
-                            
+
                             {{-- Center Label for Total --}}
                             <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
                                 <!-- Center label removed per user request -->
                             </div>
                         </div>
-                        
+
                         {{-- Chart Legend Below --}}
                         <div class="mt-4 grid grid-cols-2 gap-2 w-full">
                             @foreach($chartData['details'] as $index => $detail)
@@ -263,7 +263,7 @@
                                         <span class="w-3 h-3 rounded-full flex-shrink-0 shadow-sm status-dot" style="background-color: {{ $detail['color_dark'] }}; box-shadow: 0 0 8px {{ $detail['color_dark'] }}66;"></span>
                                         <div class="min-w-0 flex-1">
                                             <p class="text-xs font-semibold truncate text-gray-900 dark:text-[#f0f9ff]">{{ $detail['label'] }}</p>
-                                            <p class="text-xs text-gray-600 dark:text-[#7dd3fc]">{{ $detail['percentage'] }}%</p>
+                                            <p class="text-xs text-gray-600 dark:text-white">{{ $detail['percentage'] }}%</p>
                                         </div>
                                     </div>
                                 @endif
@@ -287,13 +287,13 @@
                 ======================================== --}}
             <div class="w-full lg:w-7/12">
                 <div class="rounded-2xl overflow-hidden bg-gray-50 dark:bg-gradient-to-br dark:from-[#000a0e] dark:to-[#00141a] border border-gray-200 dark:border-[#0096d2]/20 shadow-xl dark:shadow-2xl dark:shadow-black">
-                    
+
                     {{-- Table Header --}}
                     <div class="px-5 py-4 border-b border-gray-200 dark:border-[#0096d2]/20">
                         <h4 class="text-sm font-bold text-gray-900 dark:text-[#f0f9ff]">Detail Per Program</h4>
                         <p class="text-xs text-gray-600 dark:text-[#7dd3fc]">Breakdown jumlah sekolah dan siswa</p>
                     </div>
-                    
+
                     {{-- Table Content --}}
                     <div class="overflow-x-auto">
                         <table class="w-full">
@@ -332,7 +332,7 @@
                                                 <div class="flex-1 h-2 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 min-width: 60px;">
                                                     <div class="h-full rounded-full transition-all duration-500" style="width: {{ $detail['percentage'] }}%; background-color: {{ $detail['color_dark'] }};"></div>
                                                 </div>
-                                                <span class="text-xs font-bold w-12 text-right" style="color: {{ $detail['color_light'] }};">{{ $detail['percentage'] }}%</span>
+                                                <span class="text-xs font-bold w-12 text-right !text-black dark:!text-white">{{ $detail['percentage'] }}%</span>
                                             </div>
                                         </td>
                                     </tr>
