@@ -26,6 +26,7 @@
         "jaocero/activity-timeline": "^1.2.12",
         "joaopaulolndev/filament-edit-profile": "^1.0",
         "laravel/framework": "^11.9",
+        "laravel/nightwatch": "^1.22",
         "laravel/octane": "^2.6",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10",
