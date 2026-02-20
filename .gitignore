@@ -24,3 +24,12 @@ yarn-error.log
 frankenphp
 frankenphp-worker.php
 /database/mysql-database
+
+# AI/MCP Configuration
+.gemini/
+.mcp.json
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+boost.json
+opencode.json
