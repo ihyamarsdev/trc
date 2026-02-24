@@ -53,22 +53,26 @@ class SalesLeaderboard extends BaseWidget
             })->count();
         };
 
+        /** @var \Illuminate\Database\Eloquent\Builder $leaderboardQuery */
+        $leaderboardQuery = RegistrationData::query();
+
+        $leaderboardQuery->addSelect([
+            'green_count' => $colorCountSubquery('green'),
+            'blue_count' => $colorCountSubquery('blue'),
+            'yellow_count' => $colorCountSubquery('yellow'),
+            'red_count' => $colorCountSubquery('red'),
+        ]);
+
+        $leaderboardQuery
+            ->orderByDesc('green_count')
+            ->orderByDesc('blue_count')
+            ->orderByDesc('yellow_count')
+            ->orderByDesc('red_count')
+            ->orderBy('users_id'); // tie-breaker opsional
+
         return $table
             ->poll('10s')
-            ->query(
-                RegistrationData::query()
-                    ->addSelect([
-                        'green_count' => $colorCountSubquery('green'),
-                        'blue_count' => $colorCountSubquery('blue'),
-                        'yellow_count' => $colorCountSubquery('yellow'),
-                        'red_count' => $colorCountSubquery('red'),
-                    ])
-                    ->orderByDesc('green_count')
-                    ->orderByDesc('blue_count')
-                    ->orderByDesc('yellow_count')
-                    ->orderByDesc('red_count')
-                    ->orderBy('users_id') // tie-breaker opsional
-            )
+            ->query($leaderboardQuery)
             ->columns([
                 Tables\Columns\TextColumn::make('users.name')->label('Sales'),
                 Tables\Columns\TextColumn::make('red')->alignCenter()->label('Data')->summarize(

@@ -42,7 +42,7 @@ class ListSales extends ListRecords
                     FileUpload::make('attachment'),
                 ])
                 ->action(function (array $data) {
-                    $file = public_path('storage/'.$data['attachment']);
+                    $file = public_path('storage/' . $data['attachment']);
 
                     try {
                         Excel::import(new SalesImport, $file);
@@ -52,7 +52,7 @@ class ListSales extends ListRecords
                             ->success()
                             ->send();
                     } catch (\Throwable $th) {
-                        Log::error('Error saat mengimpor file: '.$th->getMessage(), [
+                        Log::error('Error saat mengimpor file: ' . $th->getMessage(), [
                             'file' => $file,
                             'data' => $data,
                             'trace' => $th->getTraceAsString(),
@@ -62,8 +62,15 @@ class ListSales extends ListRecords
                             unlink($file);
                         }
 
+                        $errorMessage = $th->getMessage();
+                        if ($th instanceof \Illuminate\Database\QueryException) {
+                            $errorMessage = 'Terjadi permasalahan terhadap struktur data atau database. Pastikan pengisian format Anda sudah tepat sesuai template.';
+                        }
+
                         Notification::make()
-                            ->title('Terjadi Error Saat Melakukan Import File. Error: '.$th->getMessage())
+                            ->title('Gagal Melakukan Import')
+                            ->body($errorMessage)
+                            ->persistent()
                             ->danger()
                             ->send();
                     } finally {

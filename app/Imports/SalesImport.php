@@ -18,22 +18,26 @@ class SalesImport implements ToModel, WithHeadingRow
      */
     public function model(array $row)
     {
+        // Lewati baris yang kosong (biasanya terjadi karena format validasi Excel terbaca sebagai baris)
+        if (empty($row['provinsi']) && empty($row['kota_kabupaten']) && empty($row['kecamatan'])) {
+            return null;
+        }
 
         $province = Province::search($row['provinsi'])->first();
-        if (! $province) {
-            throw new \Exception('Provinsi tidak ditemukan: '.$row['provinsi']);
+        if (!$province) {
+            throw new \Exception('Provinsi tidak ditemukan: ' . $row['provinsi']);
         }
         $provinceName = $province->name;
 
         $regency = Regency::search($row['kota_kabupaten'])->first();
-        if (! $regency) {
-            throw new \Exception('Kota / Kabupaten tidak ditemukan: '.$row['kota_kabupaten']);
+        if (!$regency) {
+            throw new \Exception('Kota / Kabupaten tidak ditemukan: ' . $row['kota_kabupaten']);
         }
         $regencyName = $regency->name;
 
         $district = District::search($row['kecamatan'])->first();
-        if (! $district) {
-            throw new \Exception('Kecamatan tidak ditemukan: '.$row['kecamatan']);
+        if (!$district) {
+            throw new \Exception('Kecamatan tidak ditemukan: ' . $row['kecamatan']);
         }
         $districtName = $district->name;
 
@@ -60,11 +64,11 @@ class SalesImport implements ToModel, WithHeadingRow
             'education_level' => $row['jenjang'],
             'description' => $row['keterangan'],
             'principal' => $row['kepala_sekolah'],
-            'phone_principal' => $row['no_hp_kepala_sekolah'],
+            'principal_phone' => $row['no_hp_kepala_sekolah'],
             'schools_type' => $row['negeri_swasta'],
 
             'users_id' => Auth::id(),
-            'status_id' => 1,
+            'status_id' => \App\Models\Status::where('color', 'red')->value('id') ?? \App\Models\Status::first()?->id ?? 1,
             'status_color' => 'red',
 
         ]);
