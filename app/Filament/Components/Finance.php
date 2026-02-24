@@ -421,7 +421,7 @@ class Finance
                     ->description('Program', position: 'above')
                     ->extraAttributes(["class" => "uppercase"]),
                 TextColumn::make("schools")->label("Sekolah")->description('Sekolah', position: 'above')->wrap(),
-                TextColumn::make("periode")->label("Periode")->description('Periode', position: 'above')->wrap(),
+                TextColumn::make("periode")->label("Periode")->description('Periode', position: 'above')->extraAttributes(["class" => "uppercase"])->wrap(),
                 TextColumn::make("years")->label("Tahun")->description('Tahun', position: 'above'),
 
                 TextColumn::make("latestStatusLog.status.color")

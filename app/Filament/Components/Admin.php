@@ -575,6 +575,7 @@ class Admin
                 TextColumn::make('periode')
                     ->label('Periode')
                     ->description('Periode', position: 'above')
+                    ->extraAttributes(["class" => "uppercase"])
                     ->wrap(),
                 TextColumn::make('years')
                     ->label('Tahun')
