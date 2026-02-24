@@ -85,8 +85,8 @@ class SalesImport implements ToModel, WithHeadingRow
             'schools_type' => $row['negeri_swasta'],
 
             'users_id' => Auth::id(),
-            'status_id' => $statusRecord?->id ?? 28,
-            'status_color' => $statusRecord?->color ?? 'red',
+            'status_id' => $statusRecord?->id,
+            'status_color' => $statusRecord?->color,
 
         ]);
 
