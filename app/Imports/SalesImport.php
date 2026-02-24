@@ -85,10 +85,27 @@ class SalesImport implements ToModel, WithHeadingRow
             'schools_type' => $row['negeri_swasta'],
 
             'users_id' => Auth::id(),
-            'status_id' => $statusRecord?->id ?? 1,
+            'status_id' => $statusRecord?->id ?? 28,
             'status_color' => $statusRecord?->color ?? 'red',
 
         ]);
+
+        // Dapatkan Status Log terakhir untuk record ini
+        $latestStatus = \App\Models\RegistrationStatus::where('registration_id', $data->id)
+            ->latest('id')
+            ->first();
+
+        // Jika belum ada log sama sekali (data baru) ATAU statusnya berubah dari log terakhir
+        $computedStatusId = $statusRecord?->id ?? 1;
+
+        if (!$latestStatus || $latestStatus->status_id != $computedStatusId) {
+            \App\Models\RegistrationStatus::create([
+                'registration_id' => $data->id,
+                'status_id' => $computedStatusId,
+                'users_id' => Auth::id(),
+                'notes' => 'Di-import dari sistem',
+            ]);
+        }
 
         return $data;
     }
