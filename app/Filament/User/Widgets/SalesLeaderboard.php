@@ -28,34 +28,40 @@ class SalesLeaderboard extends BaseWidget
 
     public function table(Table $table): Table
     {
+        $colorCountSubquery = function (string $color) {
+            return DB::table('registration_data as r2')
+                ->selectRaw('COUNT(*)')
+                ->whereColumn('r2.users_id', 'registration_data.users_id')
+                ->whereExists(function ($query) use ($color) {
+                    $query->select(DB::raw(1))
+                        ->from('registration_statuses')
+                        ->join('statuses', 'statuses.id', '=', 'registration_statuses.status_id')
+                        ->whereColumn('registration_statuses.registration_id', 'r2.id')
+                        ->whereRaw('registration_statuses.id = (SELECT MAX(id) FROM registration_statuses WHERE registration_id = r2.id)')
+                        ->where('statuses.color', $color);
+                });
+        };
+
+        $summarizerCondition = function (Database\Query\Builder $query, string $color) {
+            return $query->whereExists(function ($subQuery) use ($color) {
+                $subQuery->select(DB::raw(1))
+                    ->from('registration_statuses')
+                    ->join('statuses', 'statuses.id', '=', 'registration_statuses.status_id')
+                    ->whereColumn('registration_statuses.registration_id', 'registration_data.id')
+                    ->whereRaw('registration_statuses.id = (SELECT MAX(id) FROM registration_statuses WHERE registration_id = registration_data.id)')
+                    ->where('statuses.color', $color);
+            })->count();
+        };
+
         return $table
             ->poll('10s')
             ->query(
                 RegistrationData::query()
                     ->addSelect([
-                        // hitung hijau per user
-                        'green_count' => DB::table('registration_data as r2')
-                            ->selectRaw('COUNT(*)')
-                            ->whereColumn('r2.users_id', 'registration_data.users_id')
-                            ->where('r2.status_color', 'green'),
-
-                        // hitung biru per user
-                        'blue_count' => DB::table('registration_data as r3')
-                            ->selectRaw('COUNT(*)')
-                            ->whereColumn('r3.users_id', 'registration_data.users_id')
-                            ->where('r3.status_color', 'blue'),
-
-                        // hitung kuning per user
-                        'yellow_count' => DB::table('registration_data as r4')
-                            ->selectRaw('COUNT(*)')
-                            ->whereColumn('r4.users_id', 'registration_data.users_id')
-                            ->where('r4.status_color', 'yellow'),
-
-                        // hitung merah per user (TAMBAHAN)
-                        'red_count' => DB::table('registration_data as r5')
-                            ->selectRaw('COUNT(*)')
-                            ->whereColumn('r5.users_id', 'registration_data.users_id')
-                            ->where('r5.status_color', 'red'),
+                        'green_count' => $colorCountSubquery('green'),
+                        'blue_count' => $colorCountSubquery('blue'),
+                        'yellow_count' => $colorCountSubquery('yellow'),
+                        'red_count' => $colorCountSubquery('red'),
                     ])
                     ->orderByDesc('green_count')
                     ->orderByDesc('blue_count')
@@ -68,28 +74,28 @@ class SalesLeaderboard extends BaseWidget
                 Tables\Columns\TextColumn::make('red')->alignCenter()->label('Data')->summarize(
                     Summarizer::make()
                         ->label('')
-                        ->using(fn(Database\Query\Builder $query) => $query->where('status_color', '=', 'red')->count())
+                        ->using(fn(Database\Query\Builder $query) => $summarizerCondition($query, 'red'))
                         ->formatStateUsing(fn($state) => '<span class="status-red" style="--light: #cc0000; --dark: #ff6b6b; color: var(--light); font-weight: 600;">' . $state . '</span>')
                         ->html()
                 ),
                 Tables\Columns\TextColumn::make('yellow')->alignCenter()->label('Data')->summarize(
                     Summarizer::make()
                         ->label('')
-                        ->using(fn(Database\Query\Builder $query) => $query->where('status_color', '=', 'yellow')->count())
+                        ->using(fn(Database\Query\Builder $query) => $summarizerCondition($query, 'yellow'))
                         ->formatStateUsing(fn($state) => '<span class="status-yellow" style="--light: #cc9900; --dark: #ffd93d; color: var(--light); font-weight: 600;">' . $state . '</span>')
                         ->html()
                 ),
                 Tables\Columns\TextColumn::make('blue')->alignCenter()->label('Data')->summarize(
                     Summarizer::make()
                         ->label('')
-                        ->using(fn(Database\Query\Builder $query) => $query->where('status_color', '=', 'blue')->count())
+                        ->using(fn(Database\Query\Builder $query) => $summarizerCondition($query, 'blue'))
                         ->formatStateUsing(fn($state) => '<span class="status-blue" style="--light: #000099; --dark: #6bb3ff; color: var(--light); font-weight: 600;">' . $state . '</span>')
                         ->html()
                 ),
                 Tables\Columns\TextColumn::make('green')->alignCenter()->label('Data')->summarize(
                     Summarizer::make()
                         ->label('')
-                        ->using(fn(Database\Query\Builder $query) => $query->where('status_color', '=', 'green')->count())
+                        ->using(fn(Database\Query\Builder $query) => $summarizerCondition($query, 'green'))
                         ->formatStateUsing(fn($state) => '<span class="status-green" style="--light: #004400; --dark: #6bff6b; color: var(--light); font-weight: 600;">' . $state . '</span>')
                         ->html()
                 ),
