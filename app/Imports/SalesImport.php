@@ -41,6 +41,23 @@ class SalesImport implements ToModel, WithHeadingRow
         }
         $districtName = $district->name;
 
+        // Tentukan apakah memenuhi syarat "Wajib" (Red label) dari SalesForce schema
+        $requiredFieldsFilled =
+            !empty($row['tanggal_pendaftaran']) &&
+            !empty($row['jumlah_siswa']) &&
+            !empty($row['estimasi_pelaksanaan']) &&
+            !empty($row['sekolah']) &&
+            !empty($row['kepala_sekolah']) &&
+            !empty($row['no_hp_kepala_sekolah']) &&
+            !empty($row['wakakurikulum']) &&
+            !empty($row['no_hp_wakakurikulum']);
+
+        // Jika semua terisi, status order = 2. Jika tidak, order = 1.
+        $targetOrder = $requiredFieldsFilled ? 2 : 1;
+
+        $statusRecord = \App\Models\Status::where('order', $targetOrder)->first()
+            ?? \App\Models\Status::first();
+
         $data = RegistrationData::updateOrCreate([
             'type' => $row['program'],
             'periode' => $row['periode'],
@@ -68,8 +85,8 @@ class SalesImport implements ToModel, WithHeadingRow
             'schools_type' => $row['negeri_swasta'],
 
             'users_id' => Auth::id(),
-            'status_id' => \App\Models\Status::where('color', 'red')->value('id') ?? \App\Models\Status::first()?->id ?? 1,
-            'status_color' => 'red',
+            'status_id' => $statusRecord?->id ?? 1,
+            'status_color' => $statusRecord?->color ?? 'red',
 
         ]);
 
