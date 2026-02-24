@@ -102,7 +102,7 @@ class SalesImport implements ToModel, WithHeadingRow
             \App\Models\RegistrationStatus::create([
                 'registration_id' => $data->id,
                 'status_id' => $computedStatusId,
-                'users_id' => Auth::id(),
+                'user_id' => Auth::id(),
                 'notes' => 'Di-import dari sistem',
             ]);
         }
