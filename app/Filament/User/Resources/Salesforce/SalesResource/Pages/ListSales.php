@@ -25,15 +25,11 @@ class ListSales extends ListRecords
             Actions\CreateAction::make()
                 ->label('Buat')
                 ->after(function ($record) {
-                    Notification::make()
+                    \Filament\Notifications\Notification::make()
                         ->title('Data berhasil dibuat')
                         ->success()
-                        ->actions([
-                            Action::make('Lihat')
-                                ->url(SalesResource::getUrl('view', ['record' => $record]))
-                                ->openUrlInNewTab(),
-                        ])
                         ->send();
+
                 }),
             Action::make('import')
                 ->label('Import')

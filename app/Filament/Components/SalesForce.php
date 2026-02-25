@@ -412,55 +412,55 @@ class SalesForce
                     Infolists\Components\Fieldset::make(
                         "Kondisi Saat ini",
                     )->schema([
-                        Infolists\Components\TextEntry::make(
-                            "status.name",
-                        )->label(""),
-                        Infolists\Components\IconEntry::make(
-                            "latestStatusLog.status.order",
-                        )
-                            ->label("")
-                            ->icon(function ($state) {
-                                // $state = nilai order (bisa null)
-                                static $iconByOrder;
+                                Infolists\Components\TextEntry::make(
+                                    "status.name",
+                                )->label(""),
+                                Infolists\Components\IconEntry::make(
+                                    "latestStatusLog.status.order",
+                                )
+                                    ->label("")
+                                    ->icon(function ($state) {
+                                        // $state = nilai order (bisa null)
+                                        static $iconByOrder;
 
-                                if ($iconByOrder === null) {
-                                    // Ambil sekali: [order => icon]
-                                    $iconByOrder = Status::query()
-                                        ->pluck("icon", "order") // pastikan kolom 'icon' ada
-                                        ->all();
-                                }
+                                        if ($iconByOrder === null) {
+                                            // Ambil sekali: [order => icon]
+                                            $iconByOrder = Status::query()
+                                                ->pluck("icon", "order") // pastikan kolom 'icon' ada
+                                                ->all();
+                                        }
 
-                                $order = (int) $state;
-                                return $iconByOrder[$order] ??
-                                    "heroicon-m-clock";
-                            })
-                            ->color(function ($state) {
-                                static $colorByOrder;
+                                        $order = (int) $state;
+                                        return $iconByOrder[$order] ??
+                                            "heroicon-m-clock";
+                                    })
+                                    ->color(function ($state) {
+                                        static $colorByOrder;
 
-                                if ($colorByOrder === null) {
-                                    // Ambil sekali: [order => color_dari_DB]
-                                    $colorByOrder = Status::query()
-                                        ->pluck("color", "order")
-                                        ->all();
-                                }
+                                        if ($colorByOrder === null) {
+                                            // Ambil sekali: [order => color_dari_DB]
+                                            $colorByOrder = Status::query()
+                                                ->pluck("color", "order")
+                                                ->all();
+                                        }
 
-                                $order = (int) $state;
-                                $raw = strtolower(
-                                    (string) ($colorByOrder[$order] ?? ""),
-                                );
+                                        $order = (int) $state;
+                                        $raw = strtolower(
+                                            (string) ($colorByOrder[$order] ?? ""),
+                                        );
 
-                                // Map warna DB -> warna Filament
-                                return match ($raw) {
-                                    "green" => "green",
-                                    "blue" => "blue",
-                                    "yellow" => "yellow",
-                                    "red" => "red",
-                                    default => "gray",
-                                };
-                            })
-                            ->default("red")
-                            ->size("lg"),
-                    ]),
+                                        // Map warna DB -> warna Filament
+                                        return match ($raw) {
+                                            "green" => "green",
+                                            "blue" => "blue",
+                                            "yellow" => "yellow",
+                                            "red" => "red",
+                                            default => "gray",
+                                        };
+                                    })
+                                    ->default("red")
+                                    ->size("lg"),
+                            ]),
                 ])
                 ->columns(2),
 
@@ -542,7 +542,7 @@ class SalesForce
                             ->displayFormat(PhoneInputNumberType::NATIONAL),
                     ]),
 
-                    Infolists\Components\Fieldset::make("")->schema([
+                    Infolists\Components\Fieldset::make("Tanggal")->schema([
                         Infolists\Components\TextEntry::make("date_register")
                             ->label("Tanggal Pendaftaran")
                             ->dateTime("l, jS F Y H:i"),

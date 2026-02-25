@@ -28,7 +28,6 @@ class EditSales extends EditRecord
             ->requiresConfirmation()
             ->modalDescription("Apakah status sudah sesuai? Pastikan kembali status yang Anda pilih sudah benar sebelum menyimpan.")
             ->modalIconColor('danger')
-            ->action(fn() => $this->save())
             ->keyBindings(['mod+s']);
     }
     protected function getRedirectUrl(): string
@@ -52,7 +51,9 @@ class EditSales extends EditRecord
 
 
         if ($status->order == 2) {
-            $recipients = User::role('service')->get();
+            $recipients = User::whereHas('roles', function ($q) {
+                $q->where('name', 'service');
+            })->get();
 
             Notification::make()
                 ->title('Data Sekolah ' . $data["schools"] . ' memasuki status ' . $status->name)

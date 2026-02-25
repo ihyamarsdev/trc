@@ -23,18 +23,27 @@ class SalesImport implements ToModel, WithHeadingRow
             return null;
         }
 
+        if (empty($row['provinsi'])) {
+            throw new \Exception('Kolom Provinsi kosong pada baris data Excel.');
+        }
         $province = Province::search($row['provinsi'])->first();
         if (!$province) {
             throw new \Exception('Provinsi tidak ditemukan: ' . $row['provinsi']);
         }
         $provinceName = $province->name;
 
+        if (empty($row['kota_kabupaten'])) {
+            throw new \Exception('Kolom Kota / Kabupaten kosong pada baris data Excel.');
+        }
         $regency = Regency::search($row['kota_kabupaten'])->first();
         if (!$regency) {
             throw new \Exception('Kota / Kabupaten tidak ditemukan: ' . $row['kota_kabupaten']);
         }
         $regencyName = $regency->name;
 
+        if (empty($row['kecamatan'])) {
+            throw new \Exception('Kolom Kecamatan kosong pada baris data Excel.');
+        }
         $district = District::search($row['kecamatan'])->first();
         if (!$district) {
             throw new \Exception('Kecamatan tidak ditemukan: ' . $row['kecamatan']);
@@ -116,7 +125,8 @@ class SalesImport implements ToModel, WithHeadingRow
             if (is_numeric($dateString)) {
                 return Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($dateString));
             } else {
-                return Carbon::parse($dateString);
+                $translatedDate = Carbon::translateTimeString($dateString, 'id', 'en');
+                return Carbon::parse($translatedDate);
             }
         }
 
