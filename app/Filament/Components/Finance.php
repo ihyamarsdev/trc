@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\{TextColumn};
 use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Exports\AcademicExporter;
+use App\Filament\Exports\ServiceExporter;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Actions\Exports\Enums\ExportFormat;

@@ -35,9 +35,9 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasShield
     public function canAccessPanel(Panel $panel): bool
     {
         if ($panel->getId() === 'admin') {
-            return $this->hasRole(['super_admin', 'admin']);
+            return $this->hasRole(['admin']);
         } elseif ($panel->getId() === 'user') {
-            return $this->hasRole(['super_admin', 'admin', 'sales', 'service', 'finance', 'akademik', 'teknisi']);
+            return $this->hasRole(['admin', 'sales', 'service', 'finance', 'akademik', 'teknisi']);
         }
 
         return false;
@@ -47,13 +47,15 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasShield
     {
         return [
             'Admin',
-            'Academic',
+            'Service',
             'Activity',
             'Finance',
             'Sales',
             'Timeline',
             'RekapitulasiService',
             'AllProgramFinance',
+            'Role',
+            'Permission',
         ];
     }
 

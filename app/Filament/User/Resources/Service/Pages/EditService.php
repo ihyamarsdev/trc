@@ -1,22 +1,23 @@
 <?php
 
-namespace App\Filament\User\Resources\Academic\Pages;
+namespace App\Filament\User\Resources\Service\Pages;
 
-use App\Filament\User\Resources\Academic\AcademicResource;
+use App\Filament\User\Resources\Service\ServiceResource;
 use App\Models\RegistrationStatus;
 use App\Models\Status;
 use App\Models\User;
 use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class EditAcademic extends EditRecord
+class EditService extends EditRecord
 {
-    protected static string $resource = AcademicResource::class;
+    protected static string $resource = ServiceResource::class;
 
     protected function getHeaderActions(): array
     {
@@ -25,16 +26,6 @@ class EditAcademic extends EditRecord
 
         ];
     }
-
-    // protected function getSaveFormAction(): Actions\Action
-    // {
-    //     return parent::getSaveFormAction()
-    //         ->requiresConfirmation() // Memunculkan modal konfirmasi
-    //         ->modalHeading('Konfirmasi Perubahan')
-    //         ->modalDescription('Apakah status sudah sesuai? Pastikan kembali status yang Anda pilih sudah benar sebelum menyimpan.')
-    //         ->modalSubmitActionLabel('Ya, Simpan Data')
-    //         ->modalCancelActionLabel('Tidak, Kembali ke Form');
-    // }
 
     protected function getSaveFormAction(): Action
     {
@@ -61,7 +52,7 @@ class EditAcademic extends EditRecord
                 ->success()
                 ->actions([
                     Action::make('Lihat')
-                        ->url(AcademicResource::getUrl('view', ['record' => $record]))
+                        ->url(ServiceResource::getUrl('view', ['record' => $record]))
                         ->openUrlInNewTab(),
                 ])
                 ->sendToDatabase($recipients);

@@ -78,7 +78,7 @@
 }
 
 .fi-body {
-    @apply bg-sky-900;
+    @apply bg-sky-900 dark:bg-black;
 }
 
 /* =====================

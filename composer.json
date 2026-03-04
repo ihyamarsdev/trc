@@ -29,6 +29,7 @@
         "laravel/octane": "^2.6",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10",
+        "livewire/blaze": "^1.0",
         "livewire/livewire": "^3.5",
         "maatwebsite/excel": "^3.1",
         "nasution/terbilang": "^0.1.0",

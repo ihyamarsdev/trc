@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\User\Resources\Academic\Infolists;
+namespace App\Filament\User\Resources\Service\Infolists;
 
 use App\Models\Status;
 use Filament\Infolists\Components\IconEntry;
@@ -11,7 +11,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Enums\IconSize;
 use Illuminate\Database\Eloquent\Model;
 
-class AcademicInfolist
+class ServiceInfolist
 {
     public static function configure(Schema $schema, Model $record): Schema
     {
@@ -127,7 +127,7 @@ class AcademicInfolist
                                     ->label('Bimtek')
                                     ->dateTime('l, jS F Y')
                                     ->placeholder('Belum Terjadwal')
-                                    ->icon('heroicon-o-academic-cap'),
+                                    ->icon('heroicon-o-service-cap'),
                             ])
                             ->columns(2),
                         Fieldset::make('Progress Akun')

@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Filament\User\Resources\Academic\Tables;
+namespace App\Filament\User\Resources\Service\Tables;
 
-use App\Filament\User\Resources\Academic\Forms\AcademicForm;
+use App\Filament\User\Resources\Service\Forms\ServiceForm;
 use Filament\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-class AcademicTable
+class ServiceTable
 {
     public static function configure(Table $table): Table
     {
@@ -23,8 +23,8 @@ class AcademicTable
                     ->whereRelation('status', fn ($q) => $q->whereBetween('order', [2, 10]))
                     ->orderByDesc('updated_at')
             )
-            ->columns(AcademicForm::columns())
-            ->filters(AcademicForm::filters())
+            ->columns(ServiceForm::columns())
+            ->filters(ServiceForm::filters())
             ->filtersTriggerAction(
                 fn (Action $action) => $action
                     ->button()
@@ -32,6 +32,6 @@ class AcademicTable
             )
             ->recordAction('view')
             ->recordActions([])
-            ->toolbarActions(AcademicForm::bulkActions());
+            ->toolbarActions(ServiceForm::bulkActions());
     }
 }

@@ -25,6 +25,10 @@ class DatabaseSeeder extends Seeder
 
         $role = Role::firstOrCreate(['name' => 'admin']);
         $user->assignRole($role);
+        
+        // Berikan semua permissions yang ada di database ke role admin
+        $role->givePermissionTo(\Spatie\Permission\Models\Permission::all());
+
 
         foreach ($roleNames as $name) {
             Role::firstOrCreate(
@@ -36,6 +40,7 @@ class DatabaseSeeder extends Seeder
             StatusSeeder::class,
             UserSeeder::class,
             Registration::class,
+            ShieldSeeder::class,
         ]);
     }
 }

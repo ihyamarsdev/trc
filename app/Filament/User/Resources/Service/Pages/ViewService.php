@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Filament\User\Resources\Academic\Pages;
+namespace App\Filament\User\Resources\Service\Pages;
 
-use App\Filament\User\Resources\Academic\AcademicResource;
-use App\Filament\User\Resources\Academic\Infolists\AcademicInfolist;
+use App\Filament\User\Resources\Service\ServiceResource;
+use App\Filament\User\Resources\Service\Infolists\ServiceInfolist;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Schema;
 
-class ViewAcademic extends ViewRecord
+class ViewService extends ViewRecord
 {
-    protected static string $resource = AcademicResource::class;
+    protected static string $resource = ServiceResource::class;
 
     protected function getHeaderActions(): array
     {
@@ -23,6 +23,6 @@ class ViewAcademic extends ViewRecord
 
     public function infolist(Schema $schema): Schema
     {
-        return AcademicInfolist::configure($schema, $this->record);
+        return ServiceInfolist::configure($schema, $this->record);
     }
 }

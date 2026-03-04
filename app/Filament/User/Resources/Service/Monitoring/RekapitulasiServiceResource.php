@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Filament\User\Resources\Academic\Monitoring;
+namespace App\Filament\User\Resources\Service\Monitoring;
 
 use App\Filament\Enum\Jenjang;
 use App\Filament\Enum\Periode;
 use App\Filament\Enum\Program;
-use App\Filament\User\Resources\Academic\Monitoring\Pages\ListRekapitulasiServices;
-use App\Filament\User\Resources\Academic\Monitoring\Pages\ViewRekapitulasiService;
+use App\Filament\User\Resources\Service\Monitoring\Pages\ListRekapitulasiServices;
+use App\Filament\User\Resources\Service\Monitoring\Pages\ViewRekapitulasiService;
 use App\Models\RegistrationData;
 use App\Models\User;
 use Carbon\Carbon;

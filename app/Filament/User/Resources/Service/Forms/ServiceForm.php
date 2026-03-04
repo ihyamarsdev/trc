@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\User\Resources\Academic\Forms;
+namespace App\Filament\User\Resources\Service\Forms;
 
 use App\Filament\Enum\Jenjang;
 use App\Filament\Enum\Periode;
@@ -31,7 +31,7 @@ use Illuminate\Database\Eloquent\Model;
 use Ysfkaya\FilamentPhoneInput\Infolists\PhoneEntry;
 use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
 
-class AcademicForm
+class ServiceForm
 {
     protected static function meta(Get $get): array
     {

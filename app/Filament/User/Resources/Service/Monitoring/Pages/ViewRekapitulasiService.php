@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\User\Resources\Academic\Monitoring\Pages;
+namespace App\Filament\User\Resources\Service\Monitoring\Pages;
 
-use App\Filament\User\Resources\Academic\Infolists\AcademicInfolist;
-use App\Filament\User\Resources\Academic\Monitoring\RekapitulasiServiceResource;
+use App\Filament\User\Resources\Service\Infolists\ServiceInfolist;
+use App\Filament\User\Resources\Service\Monitoring\RekapitulasiServiceResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Schema;
@@ -21,6 +21,6 @@ class ViewRekapitulasiService extends ViewRecord
 
     public function infolist(Schema $schema): Schema
     {
-        return AcademicInfolist::configure($schema, $this->record);
+        return ServiceInfolist::configure($schema, $this->record);
     }
 }

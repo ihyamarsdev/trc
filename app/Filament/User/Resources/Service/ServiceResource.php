@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Filament\User\Resources\Academic;
+namespace App\Filament\User\Resources\Service;
 
-use App\Filament\User\Resources\Academic\Forms\AcademicForm;
-use App\Filament\User\Resources\Academic\Pages\CreateAcademic;
-use App\Filament\User\Resources\Academic\Pages\EditAcademic;
-use App\Filament\User\Resources\Academic\Pages\ListAcademics;
-use App\Filament\User\Resources\Academic\Pages\ViewAcademic;
-use App\Filament\User\Resources\Academic\Tables\AcademicTable;
+use App\Filament\User\Resources\Service\Forms\ServiceForm;
+use App\Filament\User\Resources\Service\Pages\CreateService;
+use App\Filament\User\Resources\Service\Pages\EditService;
+use App\Filament\User\Resources\Service\Pages\ListServices;
+use App\Filament\User\Resources\Service\Pages\ViewService;
+use App\Filament\User\Resources\Service\Tables\ServiceTable;
 use App\Models\RegistrationData;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
-class AcademicResource extends Resource
+class ServiceResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
@@ -25,7 +25,7 @@ class AcademicResource extends Resource
 
     protected static ?string $navigationLabel = 'Database';
 
-    protected static ?string $modelLabel = 'Academic Database';
+    protected static ?string $modelLabel = 'Service Database';
 
     protected static ?string $slug = 'database-service';
 
@@ -33,13 +33,13 @@ class AcademicResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return auth()->user()?->can('ViewAny:AcademicResource') ?? false;
+        return auth()->user()?->can('ViewAny:ServiceResource') ?? false;
     }
 
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->components(AcademicForm::configure())
+            ->components(ServiceForm::configure())
             ->extraAttributes([
                 'onkeydown' => "
                 if (event.key === 'Enter' && event.target.tagName !== 'TEXTAREA') {
@@ -56,7 +56,7 @@ class AcademicResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return AcademicTable::configure($table);
+        return ServiceTable::configure($table);
     }
 
     public static function getRelations(): array
@@ -69,10 +69,10 @@ class AcademicResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListAcademics::route('/'),
-            'create' => CreateAcademic::route('/create'),
-            'view' => ViewAcademic::route('/{record}'),
-            'edit' => EditAcademic::route('/{record}/edit'),
+            'index' => ListServices::route('/'),
+            'create' => CreateService::route('/create'),
+            'view' => ViewService::route('/{record}'),
+            'edit' => EditService::route('/{record}/edit'),
         ];
     }
 }

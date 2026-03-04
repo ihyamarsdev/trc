@@ -3,7 +3,7 @@
 namespace App\Filament\Exports;
 
 use Carbon\Carbon;
-use App\Models\Academic;
+use App\Models\Service;
 use App\Models\RegistrationData;
 use Filament\Actions\Exports\Exporter;
 use OpenSpout\Common\Entity\Style\Color;
@@ -13,7 +13,7 @@ use Filament\Actions\Exports\Models\Export;
 use OpenSpout\Common\Entity\Style\CellAlignment;
 use OpenSpout\Common\Entity\Style\CellVerticalAlignment;
 
-class AcademicExporter extends Exporter
+class ServiceExporter extends Exporter
 {
     protected static ?string $model = RegistrationData::class;
 
@@ -84,7 +84,7 @@ class AcademicExporter extends Exporter
 
     public static function getCompletedNotificationBody(Export $export): string
     {
-        $body = 'Your academic export has completed and ' . number_format($export->successful_rows) . ' ' . str('row')->plural($export->successful_rows) . ' exported.';
+        $body = 'Your service export has completed and ' . number_format($export->successful_rows) . ' ' . str('row')->plural($export->successful_rows) . ' exported.';
 
         if ($failedRowsCount = $export->getFailedRowsCount()) {
             $body .= ' ' . number_format($failedRowsCount) . ' ' . str('row')->plural($failedRowsCount) . ' failed to export.';

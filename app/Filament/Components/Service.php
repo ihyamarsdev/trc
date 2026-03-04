@@ -23,7 +23,7 @@ use Creasi\Nusa\Models\{Province, Regency, District};
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
 use Filament\Forms\Components\{Select, TextInput, Section, DatePicker, Radio};
 
-class Academic
+class Service
 {
     protected static function meta(Get $get): array
     {

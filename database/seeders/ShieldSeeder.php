@@ -22,7 +22,6 @@ class ShieldSeeder extends Seeder
 
             // Create roles
             $roles = [
-                'super_admin',
                 'admin',
                 'sales',
                 'finance',
@@ -41,13 +40,15 @@ class ShieldSeeder extends Seeder
             // Create permissions for resources
             $resources = [
                 'AdminResource',
-                'AcademicResource',
+                'ServiceResource',
                 'ActivityResource',
                 'FinanceResource',
                 'SalesResource',
                 'TimelineResource',
                 'RekapitulasiServiceResource',
                 'AllProgramFinanceResource',
+                'RoleResource',
+                'UserResource',
             ];
 
             $permissions = ['viewAny', 'view', 'create', 'update', 'delete', 'restore', 'forceDelete'];
@@ -55,27 +56,18 @@ class ShieldSeeder extends Seeder
             foreach ($resources as $resource) {
                 foreach ($permissions as $permission) {
                     Permission::firstOrCreate([
-                        'name' => $resource.'_'.$permission,
+                        'name' => ucfirst($permission).':'.$resource,
                         'guard_name' => $guard,
                     ]);
                 }
             }
 
             // Assign permissions to roles
-            $superAdminRole = Role::where('name', 'super_admin')->where('guard_name', $guard)->first();
-            if ($superAdminRole) {
-                $superAdminRole->givePermissionTo(
-                    Permission::where('guard_name', $guard)->get()
-                );
-            }
-
             // Admin role
             $adminRole = Role::where('name', 'admin')->where('guard_name', $guard)->first();
             if ($adminRole) {
                 $adminRole->givePermissionTo(
-                    Permission::where('guard_name', $guard)
-                        ->where('name', 'not like', '%forceDelete%')
-                        ->get()
+                    Permission::where('guard_name', $guard)->get()
                 );
             }
 
@@ -83,8 +75,8 @@ class ShieldSeeder extends Seeder
             $salesRole = Role::where('name', 'sales')->where('guard_name', $guard)->first();
             if ($salesRole) {
                 $salesPermissions = [
-                    'SalesResource_viewAny', 'SalesResource_view',
-                    'TimelineResource_viewAny', 'TimelineResource_view', 'TimelineResource_create', 'TimelineResource_update',
+                    'ViewAny:SalesResource', 'View:SalesResource',
+                    'ViewAny:TimelineResource', 'View:TimelineResource', 'Create:TimelineResource', 'Update:TimelineResource',
                 ];
                 $salesRole->givePermissionTo(
                     Permission::whereIn('name', $salesPermissions)->get()
@@ -95,9 +87,9 @@ class ShieldSeeder extends Seeder
             $financeRole = Role::where('name', 'finance')->where('guard_name', $guard)->first();
             if ($financeRole) {
                 $financePermissions = [
-                    'FinanceResource_viewAny', 'FinanceResource_view',
-                    'RekapitulasiServiceResource_viewAny', 'RekapitulasiServiceResource_view',
-                    'AllProgramFinanceResource_viewAny', 'AllProgramFinanceResource_view',
+                    'ViewAny:FinanceResource', 'View:FinanceResource',
+                    'ViewAny:RekapitulasiServiceResource', 'View:RekapitulasiServiceResource',
+                    'ViewAny:AllProgramFinanceResource', 'View:AllProgramFinanceResource',
                 ];
                 $financeRole->givePermissionTo(
                     Permission::whereIn('name', $financePermissions)->get()
@@ -108,9 +100,9 @@ class ShieldSeeder extends Seeder
             $akademikRole = Role::where('name', 'akademik')->where('guard_name', $guard)->first();
             if ($akademikRole) {
                 $akademikPermissions = [
-                    'AcademicResource_viewAny', 'AcademicResource_view', 'AcademicResource_create', 'AcademicResource_update',
-                    'ActivityResource_viewAny', 'ActivityResource_view',
-                    'RekapitulasiServiceResource_viewAny', 'RekapitulasiServiceResource_view',
+                    'ViewAny:ServiceResource', 'View:ServiceResource', 'Create:ServiceResource', 'Update:ServiceResource',
+                    'ViewAny:ActivityResource', 'View:ActivityResource',
+                    'ViewAny:RekapitulasiServiceResource', 'View:RekapitulasiServiceResource',
                 ];
                 $akademikRole->givePermissionTo(
                     Permission::whereIn('name', $akademikPermissions)->get()
@@ -121,9 +113,9 @@ class ShieldSeeder extends Seeder
             $serviceRole = Role::where('name', 'service')->where('guard_name', $guard)->first();
             if ($serviceRole) {
                 $servicePermissions = [
-                    'AdminResource_viewAny', 'AdminResource_view',
-                    'AcademicResource_viewAny', 'AcademicResource_view',
-                    'FinanceResource_viewAny', 'FinanceResource_view',
+                    'ViewAny:AdminResource', 'View:AdminResource',
+                    'ViewAny:ServiceResource', 'View:ServiceResource',
+                    'ViewAny:FinanceResource', 'View:FinanceResource',
                 ];
                 $serviceRole->givePermissionTo(
                     Permission::whereIn('name', $servicePermissions)->get()
@@ -134,8 +126,8 @@ class ShieldSeeder extends Seeder
             $teknisiRole = Role::where('name', 'teknisi')->where('guard_name', $guard)->first();
             if ($teknisiRole) {
                 $teknisiPermissions = [
-                    'AcademicResource_viewAny', 'AcademicResource_view',
-                    'ActivityResource_viewAny', 'ActivityResource_view', 'ActivityResource_create', 'ActivityResource_update',
+                    'ViewAny:ServiceResource', 'View:ServiceResource',
+                    'ViewAny:ActivityResource', 'View:ActivityResource', 'Create:ActivityResource', 'Update:ActivityResource',
                 ];
                 $teknisiRole->givePermissionTo(
                     Permission::whereIn('name', $teknisiPermissions)->get()
