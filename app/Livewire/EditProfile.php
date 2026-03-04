@@ -2,27 +2,28 @@
 
 namespace App\Livewire;
 
-use Filament\Forms;
-use Livewire\Component;
-use Filament\Forms\Form;
-use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Auth;
-use Filament\Support\Exceptions\Halt;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Contracts\HasForms;
-use Illuminate\Support\Facades\Storage;
-use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Support\Exceptions\Halt;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Storage;
 use Joaopaulolndev\FilamentEditProfile\Concerns\HasSort;
 use Joaopaulolndev\FilamentEditProfile\Concerns\HasUser;
+use Livewire\Component;
 
-class EditProfile extends Component implements HasForms
+class EditProfile extends Component implements HasActions, HasForms
 {
-    use InteractsWithForms;
     use HasSort;
     use HasUser;
+    use InteractsWithActions;
+    use InteractsWithForms;
 
     protected string $view = 'filament-edit-profile::livewire.edit-profile-form';
 
@@ -41,31 +42,31 @@ class EditProfile extends Component implements HasForms
         $this->form->fill($this->user->only(config('filament-edit-profile.avatar_column', 'avatar_url'), 'name', 'email'));
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make(__('filament-edit-profile::default.profile_information'))
-                ->aside()
-                ->description(__('filament-edit-profile::default.profile_information_description'))
-                ->schema([
-                    FileUpload::make('avatar_url')
-                        ->label(__('filament-edit-profile::default.avatar'))
-                        ->avatar()
-                        ->imageEditor()
-                        ->disk(config('filament-edit-profile.disk', 'public'))
-                        ->visibility(config('filament-edit-profile.visibility', 'public'))
-                        ->directory('avatars')
-                        ->rules('mimes:jpeg,png|max:1024'),
-                    TextInput::make('name')
-                        ->label(__('filament-edit-profile::default.name'))
-                        ->required(),
-                    TextInput::make('email')
-                        ->label(__('filament-edit-profile::default.email'))
-                        ->email()
-                        ->required()
-                        ->unique($this->userClass, ignorable: $this->user),
-                ]),
+                    ->aside()
+                    ->description(__('filament-edit-profile::default.profile_information_description'))
+                    ->schema([
+                        FileUpload::make('avatar_url')
+                            ->label(__('filament-edit-profile::default.avatar'))
+                            ->avatar()
+                            ->imageEditor()
+                            ->disk(config('filament-edit-profile.disk', 'public'))
+                            ->visibility(config('filament-edit-profile.visibility', 'public'))
+                            ->directory('avatars')
+                            ->rules('mimes:jpeg,png|max:1024'),
+                        TextInput::make('name')
+                            ->label(__('filament-edit-profile::default.name'))
+                            ->required(),
+                        TextInput::make('email')
+                            ->label(__('filament-edit-profile::default.email'))
+                            ->email()
+                            ->required()
+                            ->unique($this->userClass, ignorable: $this->user),
+                    ]),
             ])
             ->statePath('data');
     }

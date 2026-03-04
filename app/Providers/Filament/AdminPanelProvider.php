@@ -2,30 +2,29 @@
 
 namespace App\Providers\Filament;
 
-use Filament\Pages;
-use Filament\Panel;
-use Filament\Widgets;
-use Filament\PanelProvider;
-use App\Livewire\EditProfile;
-use App\Livewire\DetailProfile;
-use Filament\Navigation\MenuItem;
-use Filament\Support\Colors\Color;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Auth;
-use Orion\FilamentGreeter\GreeterPlugin;
-use Filament\Http\Middleware\Authenticate;
-use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Cookie\Middleware\EncryptCookies;
 use App\Http\Middleware\UpgradeToHttpsUnderNgrok;
-use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\Session\Middleware\AuthenticateSession;
-use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Livewire\DetailProfile;
+use App\Livewire\EditProfile;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Filament\Navigation\MenuItem;
+use Filament\Pages\Dashboard;
+use Filament\Panel;
+use Filament\PanelProvider;
+use Filament\Support\Colors\Color;
+use FilipFonal\FilamentLogManager\FilamentLogManager;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\AuthenticateSession;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
+use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -38,9 +37,8 @@ class AdminPanelProvider extends PanelProvider
             ->passwordReset()
             ->login()
             ->font('Poppins')
-            ->brandLogo(asset('images/logo.png'))
+            ->brandLogo(fn () => view('filament.admin.logo'))
             ->favicon(asset('images/logo.png'))
-            ->brandLogoHeight('8rem')
             ->databaseNotifications()
             ->sidebarWidth('15rem')
             ->unsavedChangesAlerts()
@@ -65,15 +63,20 @@ class AdminPanelProvider extends PanelProvider
                 'Management Sekolah',
                 'Settings',
             ])
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
-            ->pages([
-                Pages\Dashboard::class,
-            ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
-            ->widgets([
-
-            ])
+            ->discoverResources(
+                in: app_path('Filament/Resources'),
+                for: 'App\\Filament\\Resources',
+            )
+            ->discoverPages(
+                in: app_path('Filament/Pages'),
+                for: 'App\\Filament\\Pages',
+            )
+            ->pages([Dashboard::class])
+            ->discoverWidgets(
+                in: app_path('Filament/Widgets'),
+                for: 'App\\Filament\\Widgets',
+            )
+            ->widgets([])
             ->userMenuItems([
                 'profile' => MenuItem::make()
                     ->label(fn () => Auth::user()->name)
@@ -92,11 +95,10 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
                 UpgradeToHttpsUnderNgrok::class,
             ])
-            ->authMiddleware([
-                Authenticate::class,
-            ])
+            ->authMiddleware([Authenticate::class])
             ->plugins([
-                \FilipFonal\FilamentLogManager\FilamentLogManager::make(),
+                FilamentShieldPlugin::make(),
+                FilamentLogManager::make(),
                 FilamentEditProfilePlugin::make()
                     ->slug('my-profile')
                     ->setTitle('My Profile')
@@ -117,13 +119,6 @@ class AdminPanelProvider extends PanelProvider
                         EditProfile::class,
                         DetailProfile::class,
                     ]),
-                GreeterPlugin::make()
-                    ->message('Selamat Datang,')
-                    ->name(text: fn () => Auth::user()->name)
-                    ->title('Satu-satunya cara untuk melakukan pekerjaan hebat yaitu dengan mencintai apa yang sedang kamu lakukan.')
-                    ->avatar(size: 'w-16 h-16', enabled: true)
-                    ->sort(-1)
-                    ->columnSpan('full'),
             ]);
     }
 }

@@ -1,9 +1,18 @@
 services:
     app:
-        image: ihyamars/trc:1.4.1
+        image: ihyamars/trc
         build:
             context: .
             dockerfile: Dockerfile
+            # Build args untuk flexibilitas environment
+            args:
+                APP_ENV: production
+                APP_DEBUG: "false"
+            # BuildKit optimizations
+            cache_from:
+                - ihyamars/trc:latest
+            # Gunakan target production
+            target: production
         container_name: trc-app
         restart: always
         env_file:
@@ -14,7 +23,34 @@ services:
             - app_log_data:/app/storage/logs
             - public_data:/app/storage/app/public
         depends_on:
-            - database
+            database:
+                condition: service_started
+        # Healthcheck untuk container orchestration
+        healthcheck:
+            test:
+                [
+                    "CMD-SHELL",
+                    "wget --quiet --tries=1 --spider http://localhost:8000/health || exit 1",
+                ]
+            interval: 30s
+            timeout: 5s
+            retries: 3
+            start_period: 10s
+        # Resource limits untuk mencegah container consume semua resources
+        deploy:
+            resources:
+                limits:
+                    cpus: "2"
+                    memory: 2G
+                reservations:
+                    cpus: "0.5"
+                    memory: 512M
+        # Logging configuration
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "10m"
+                max-file: "3"
 
     database:
         image: postgres:15-alpine3.22
@@ -28,6 +64,24 @@ services:
             - "5432:5432"
         volumes:
             - db_data:/var/lib/postgresql/data
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U trc"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        deploy:
+            resources:
+                limits:
+                    cpus: "1"
+                    memory: 1G
+                reservations:
+                    cpus: "0.25"
+                    memory: 256M
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "10m"
+                max-file: "3"
 
     database-admin:
         image: elestio/pgadmin:latest
@@ -40,6 +94,11 @@ services:
             - "7000:7000"
         volumes:
             - admin-config:/pgadmin4/servers.json
+        deploy:
+            resources:
+                limits:
+                    cpus: "0.5"
+                    memory: 512M
 
 volumes:
     app_log_data:

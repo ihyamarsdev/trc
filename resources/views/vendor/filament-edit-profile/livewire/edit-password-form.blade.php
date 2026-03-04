@@ -1,4 +1,4 @@
-<x-filament-panels::form wire:submit="updatePassword">
+<form wire:submit="updatePassword" class="fi-sc-form">
     {{ $this->form }}
 
     <div class="fi-form-actions">
@@ -8,4 +8,4 @@
             </x-filament::button>
         </div>
     </div>
-</x-filament-panels::form>
+</form>

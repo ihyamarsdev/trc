@@ -2,15 +2,19 @@
 
 namespace App\Filament\User\Resources\Activity;
 
-use App\Filament\Components\Admin;
 use App\Filament\Enum\Program;
-use App\Filament\User\Resources\Activity\ActivityResource\Pages;
+use App\Filament\User\Resources\Activity\Pages\ListActivity;
+use App\Filament\User\Resources\Activity\Pages\ViewActivities;
 use App\Models\RegistrationData;
-use Filament\Forms\Form;
+use Carbon\Carbon;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Enums\ActionsPosition;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\RecordActionsPosition;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -18,7 +22,7 @@ class ActivityResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-arrow-trending-up';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-arrow-trending-up';
 
     protected static ?string $title = 'Activity';
 
@@ -32,10 +36,15 @@ class ActivityResource extends Resource
 
     protected static ?int $navigationSort = 4;
 
-    public static function form(Form $form): Form
+    public static function canViewAny(): bool
     {
-        return $form
-            ->schema([
+        return auth()->user()?->can('ViewAny:ActivityResource') ?? false;
+    }
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
                 //
             ]);
     }
@@ -48,22 +57,56 @@ class ActivityResource extends Resource
             ->searchable()
             ->striped()
             ->modifyQueryUsing(
-                fn (Builder $query) => $query
+                fn(Builder $query) => $query
                     ->withMax('activity', 'id')
                     ->orderByDesc('updated_at')
                     ->when(
-                        auth()->user()->hasRole('sales') && ! auth()->user()->hasRole('admin'),
-                        fn (Builder $q) => $q->where('users_id', auth()->id())
+                        auth()->user()->hasRole('sales') && !auth()->user()->hasRole('admin'),
+                        fn(Builder $q) => $q->where('users_id', auth()->id())
                     )
             )
-            ->columns(Admin::columns())
+            ->columns([
+                TextColumn::make('schools')
+                    ->label('Sekolah')
+                    ->searchable()
+                    ->wrap()
+                    ->sortable(),
+                TextColumn::make('type')
+                    ->label('Program')
+                    ->badge()
+                    ->extraAttributes(['class' => 'uppercase']),
+                TextColumn::make('periode')
+                    ->label('Periode')
+                    ->badge()
+                    ->extraAttributes(['class' => 'uppercase']),
+                TextColumn::make('latestStatusLog.status.name')
+                    ->label('Status')
+                    ->badge()
+                    ->color(
+                        fn($record) => match ($record->latestStatusLog?->status?->color) {
+                            'green' => 'success',
+                            'blue' => 'blue',
+                            'yellow' => 'warning',
+                            'red' => 'danger',
+                            default => 'gray',
+                        }
+                    )
+                    ->placeholder('Belum Ada Status'),
+                TextColumn::make('updated_at')
+                    ->label('Terakhir Update')
+                    ->alignCenter()
+                    ->formatStateUsing(
+                        fn($state) => Carbon::parse($state)->translatedFormat('l, d/m/Y H:i'),
+                    )
+                    ->sortable(),
+            ])
             ->filters([
-                Tables\Filters\SelectFilter::make('type')
+                SelectFilter::make('type')
                     ->label('Program')
                     ->options(Program::list())
                     ->preload()
                     ->indicator('Program'),
-                Tables\Filters\SelectFilter::make('latestStatusLog.status.color')
+                SelectFilter::make('latestStatusLog.status.color')
                     ->label('Status Warna')
                     ->options([
                         'red' => 'Merah',
@@ -80,22 +123,22 @@ class ActivityResource extends Resource
 
                         $query->whereHas(
                             'status',
-                            fn (Builder $q) => $q->where('color', $data['value'])
+                            fn(Builder $q) => $q->where('color', $data['value'])
                         );
                     }),
             ])
             ->filtersTriggerAction(
-                fn (Action $action) => $action
+                fn(Action $action) => $action
                     ->button()
                     ->label('Filter'),
             )
-            ->recordUrl(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record]))
-            ->actions([
+            ->recordUrl(fn($record) => ActivityResource::getUrl('activities', ['record' => $record]))
+            ->recordActions([
                 //
-            ], position: ActionsPosition::BeforeColumns)
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ], position: RecordActionsPosition::BeforeColumns)
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -110,8 +153,8 @@ class ActivityResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListActivity::route('/'),
-            'activities' => Pages\ViewActivities::route('{record}/activities'),
+            'index' => ListActivity::route('/'),
+            'activities' => ViewActivities::route('{record}/activities'),
         ];
     }
 }

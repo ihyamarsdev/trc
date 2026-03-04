@@ -2,45 +2,46 @@
 
 namespace App\Filament\User\Resources\Finance\Monitoring;
 
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Forms\Form;
-use Illuminate\Database;
-use Filament\Tables\Table;
+use App\Filament\User\Resources\Finance\Monitoring\Pages\ListAllProgramFinances;
 use App\Models\RegistrationData;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Resources\Resource;
-use App\Models\AllProgramFinance;
-use Filament\Tables\Grouping\Group;
-use App\Filament\Components\Finance;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Columns\Summarizers\Count;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\Summarizers\Summarizer;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\User\Resources\AllProgramFinanceResource\RelationManagers;
-use App\Filament\User\Resources\Finance\Monitoring\AllProgramFinanceResource\Pages;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Grouping\Group;
+use Filament\Tables\Table;
+use Illuminate\Database;
 
 class AllProgramFinanceResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
+
     protected static ?string $title = 'Rekap All Program';
-    protected static ?string $navigationGroup = 'Rekap Finance';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Rekap Finance';
+
     protected static ?string $navigationLabel = 'All Program';
+
     protected static ?string $modelLabel = 'Rekap All Program';
+
     protected static ?string $slug = 'rekap-all-program-finance';
+
     protected static bool $shouldRegisterNavigation = false;
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole(Finance::getRoles());
+        return auth()->user()?->can('ViewAny:AllProgramFinanceResource') ?? false;
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 //
             ]);
     }
@@ -49,16 +50,16 @@ class AllProgramFinanceResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('monthYear')
+                TextColumn::make('monthYear')
                     ->label('Bulan'),
-                Tables\Columns\TextColumn::make('schools')
+                TextColumn::make('schools')
                     ->label('Jumlah Sekolah')
                     ->summarize(
                         Summarizer::make()
                             ->label('')
                             ->using(fn (Database\Query\Builder $query) => $query->count('schools'))
                     ),
-                Tables\Columns\TextColumn::make('payment')
+                TextColumn::make('payment')
                     ->label('Jumlah Terbayarkan')
                     ->summarize(
                         Summarizer::make()
@@ -67,7 +68,7 @@ class AllProgramFinanceResource extends Resource
                     ),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('periode')
+                SelectFilter::make('periode')
                     ->label('Periode')
                     ->options([
                         'Januari - Juni' => 'Januari - Juni',
@@ -76,11 +77,11 @@ class AllProgramFinanceResource extends Resource
                     ->preload()
                     ->indicator('Periode'),
             ])
-            ->actions([
+            ->recordActions([
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->groups([
@@ -103,7 +104,7 @@ class AllProgramFinanceResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAllProgramFinances::route('/'),
+            'index' => ListAllProgramFinances::route('/'),
         ];
     }
 }

@@ -1,7 +1,102 @@
-.env
-.env.example
-.env.production
+# =============================================================================
+# .dockerignore - File yang diabaikan saat Docker build
+# Mengurangi ukuran context build dan memperceat proses build
+# =============================================================================
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Dependencies (di-install via composer di container)
 /vendor
-/test
 /node_modules
-/bootstrap/cache/*
+
+# Laravel development files
+/tests
+/phpunit.xml
+/.phpunit.result.cache
+/pest.php
+
+# Documentation
+README.md
+CHANGELOG.md
+LICENSE.md
+/docs
+/plan
+/.idea
+
+# IDE & Editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment & Config
+.env
+.env.*
+!.env.example
+/.fleet
+/.vscode
+
+# Laravel specific
+/storage/*.key
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/bootstrap/cache/services.php
+/bootstrap/cache/config.php
+
+# Build artifacts
+/hot
+/npm-debug.log
+/yarn-error.log
+/package-lock.json
+/yarn.lock
+composer.phar
+
+# Deployment & CI/CD
+/.github
+/.gitlab-ci.yml
+/.travis.yml
+/azure-pipelines.yml
+/docker-compose.yml
+/docker-compose.*.yml
+/Makefile
+/deploy.sh
+
+# Docker files (tidak perlu di-copy ke dalam image)
+/Dockerfile
+/.dockerignore
+/docker
+
+# Backup & Temporary files
+*.bak
+*.backup
+*.tmp
+*.temp
+~*
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Coverage & Analysis
+/coverage
+/.phpunit.cache
+.phpunit.result.cache
+
+# Memcached & Socket files
+*.sock
+
+# Local development
+/.vagrant
+/homestead.yaml
+/homestead.json
+/.env.backup
+
+# Sail specific (karena kita pakai FrankenPHP)
+/vendor/bin/sail

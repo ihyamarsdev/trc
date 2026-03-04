@@ -2,35 +2,31 @@
 
 namespace App\Providers\Filament;
 
-use Filament\Panel;
-use Filament\Widgets;
-use Filament\PanelProvider;
-use App\Livewire\EditProfile;
-use Filament\Pages\Dashboard;
-use App\Livewire\DetailProfile;
-use Filament\Navigation\MenuItem;
-use Filament\Support\Colors\Color;
-use Illuminate\Support\Facades\URL;
-use Filament\Support\Enums\MaxWidth;
-use Illuminate\Support\Facades\Auth;
-use Orion\FilamentGreeter\GreeterPlugin;
 use App\Filament\User\Pages\DashboardHome;
-use Filament\Http\Middleware\Authenticate;
-use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Cookie\Middleware\EncryptCookies;
-use App\Http\Middleware\UpgradeToHttpsUnderNgrok;
 use App\Filament\User\Widgets\SalesForceStatsWidget;
+use App\Http\Middleware\UpgradeToHttpsUnderNgrok;
+use App\Livewire\DetailProfile;
+use App\Livewire\EditProfile;
+use Filament\Http\Middleware\Authenticate;
+use Filament\Http\Middleware\DisableBladeIconComponents;
+use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
+use Filament\Pages\Dashboard;
+use Filament\Panel;
+use Filament\PanelProvider;
+use Filament\Support\Colors\Color;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Filament\Http\Middleware\DisableBladeIconComponents;
-use Yebor974\Filament\RenewPassword\RenewPasswordPlugin;
-use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
-use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
 use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
+use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
+use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
+use Yebor974\Filament\RenewPassword\RenewPasswordPlugin;
 
 class UserPanelProvider extends PanelProvider
 {
@@ -41,11 +37,10 @@ class UserPanelProvider extends PanelProvider
             ->path('')
             ->login()
             ->passwordReset()
-            ->maxContentWidth(MaxWidth::Full)
+            ->maxContentWidth('Full')
             ->font('Poppins')
-            ->brandLogo(asset('images/logo.png'))
+            ->brandLogo(fn () => view('filament.user.logo'))
             ->favicon(asset('images/logo.png'))
-            ->brandLogoHeight('8rem')
             ->viteTheme('resources/css/filament/user/theme.css')
             ->databaseNotifications()
             ->databaseNotificationsPolling('2s')
@@ -72,10 +67,16 @@ class UserPanelProvider extends PanelProvider
                 'Rekap Akademik',
                 'Rekap Finance',
                 'Data Kuning',
-                'Data Biru'
+                'Data Biru',
             ])
-            ->discoverResources(in: app_path('Filament/User/Resources'), for: 'App\\Filament\\User\\Resources')
-            ->discoverPages(in: app_path('Filament/User/Pages'), for: 'App\\Filament\\User\\Pages')
+            ->discoverResources(
+                in: app_path('Filament/User/Resources'),
+                for: 'App\\Filament\\User\\Resources',
+            )
+            ->discoverPages(
+                in: app_path('Filament/User/Pages'),
+                for: 'App\\Filament\\User\\Pages',
+            )
             ->pages([
                 // Dashboard::class,
                 DashboardHome::class,
@@ -87,10 +88,11 @@ class UserPanelProvider extends PanelProvider
                     ->icon('heroicon-m-user-circle')
                     ->sort(1),
             ])
-            ->discoverWidgets(in: app_path('Filament/User/Widgets'), for: 'App\\Filament\\User\\Widgets')
-            ->widgets([
-                SalesForceStatsWidget::class,
-            ])
+            ->discoverWidgets(
+                in: app_path('Filament/User/Widgets'),
+                for: 'App\\Filament\\User\\Widgets',
+            )
+            ->widgets([SalesForceStatsWidget::class])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -103,9 +105,7 @@ class UserPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
                 UpgradeToHttpsUnderNgrok::class,
             ])
-            ->authMiddleware([
-                Authenticate::class,
-            ])
+            ->authMiddleware([Authenticate::class])
             ->plugins([
                 FilamentFullCalendarPlugin::make()
                     ->schedulerLicenseKey('')
@@ -134,16 +134,9 @@ class UserPanelProvider extends PanelProvider
                         EditProfile::class,
                         DetailProfile::class,
                     ]),
-                GreeterPlugin::make()
-                    ->message('Selamat Datang,')
-                    ->name(text: fn () => Auth::user()->name)
-                    ->title('BIG DREAM TRC : 1 JUTA SISWA / TAHUN, 100% BISA!!!')
-                    ->avatar(size: 'w-16 h-16', enabled: true)
-                    ->sort(-1)
-                    ->columnSpan('full'),
-                (new RenewPasswordPlugin())
+                new RenewPasswordPlugin()
                     ->forceRenewPassword()
-                    ->timestampColumn()
+                    ->timestampColumn(),
             ]);
     }
 }

@@ -81,7 +81,7 @@ class Academic
         };
     }
 
-    public static function formSchema(): array
+    public static function form(): array
     {
         return [
             Section::make("Status")

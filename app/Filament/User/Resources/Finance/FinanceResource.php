@@ -2,44 +2,44 @@
 
 namespace App\Filament\User\Resources\Finance;
 
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
+use App\Filament\User\Resources\Finance\Pages\CreateFinance;
+use App\Filament\User\Resources\Finance\Pages\EditFinance;
+use App\Filament\User\Resources\Finance\Pages\ListFinances;
+use App\Filament\User\Resources\Finance\Pages\ViewFinance;
 use App\Models\RegistrationData;
+use Filament\Actions\Action;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use App\Filament\Components\Finance;
-use Illuminate\Support\Facades\Auth;
+use Filament\Schemas\Schema;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Exports\AcademicExporter;
-use Filament\Tables\Enums\ActionsPosition;
-use Filament\Actions\Exports\Enums\ExportFormat;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\User\Resources\Finance\FinanceResource\Pages;
-use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
-use App\Filament\User\Resources\FinanceResource\RelationManagers;
 
 class FinanceResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
-    protected static ?string $navigationIcon = 'heroicon-m-credit-card';
-    protected static ?string $navigationGroup = 'Finance';
+
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-m-credit-card';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Finance';
+
     protected static ?string $title = 'Database';
+
     protected static ?string $navigationLabel = 'Database';
-    protected static ?string $modelLabel = 'database';
+
+    protected static ?string $modelLabel = 'Finance Database';
+
     protected static ?string $slug = 'database-finance';
+
     protected static bool $shouldRegisterNavigation = true;
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole(Finance::getRoles());
+        return auth()->user()?->can('ViewAny:FinanceResource') ?? false;
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema(Finance::formSchema());
+        return $schema
+            ->components(\App\Filament\User\Resources\Finance\Forms\FinanceForm::schema());
     }
 
     public static function table(Table $table): Table
@@ -51,22 +51,21 @@ class FinanceResource extends Resource
             ->striped()
             ->paginated([50, 100, 200])
             ->modifyQueryUsing(
-                fn(Builder $query) =>
-                $query->withMax('activity', 'id')
+                fn(Builder $query) => $query->withMax('activity', 'id')
                     ->where('years', now('Asia/Jakarta')->format('Y'))
                     ->whereRelation('status', 'order', '>=', 7)
                     ->orderByDesc('updated_at')
             )
-            ->columns(Finance::columns())
-            ->filters(Finance::filters())
+            ->columns(\App\Filament\User\Resources\Finance\Tables\FinanceTable::columns())
+            ->filters([])
             ->filtersTriggerAction(
                 fn(Action $action) => $action
                     ->button()
                     ->label('Filter'),
             )
             ->recordAction('view')
-            ->actions([])
-            ->bulkActions(Finance::bulkActions());
+            ->recordActions([])
+            ->toolbarActions([]);
     }
 
     public static function getRelations(): array
@@ -79,10 +78,10 @@ class FinanceResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListFinances::route('/'),
-            'create' => Pages\CreateFinance::route('/create'),
-            'view' => Pages\ViewFinance::route('/{record}'),
-            'edit' => Pages\EditFinance::route('/{record}/edit'),
+            'index' => ListFinances::route('/'),
+            'create' => CreateFinance::route('/create'),
+            'view' => ViewFinance::route('/{record}'),
+            'edit' => EditFinance::route('/{record}/edit'),
         ];
     }
 }

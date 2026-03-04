@@ -2,44 +2,47 @@
 
 namespace App\Filament\User\Resources\Admin;
 
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
+use App\Filament\User\Resources\Admin\Pages\CreateAdmin;
+use App\Filament\User\Resources\Admin\Pages\EditAdmin;
+use App\Filament\User\Resources\Admin\Pages\ListAdmins;
+use App\Filament\User\Resources\Admin\Pages\ViewAdmin;
 use App\Models\RegistrationData;
+use BezhanSalleh\FilamentShield\Traits\HasShieldFormComponents;
+use Filament\Actions\Action;
 use Filament\Resources\Resource;
-use App\Filament\Components\Admin;
-use Filament\Tables\Actions\Action;
-use Illuminate\Support\Facades\Auth;
+use Filament\Schemas\Schema;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Enums\ActionsPosition;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\User\Resources\AdminResource\Pages;
-use App\Filament\User\Resources\AdminResource\RelationManagers;
-use App\Filament\User\Resources\Admin\AdminResource\Pages\{ListAdmins, CreateAdmin, EditAdmin, ViewAdmin};
 
 class AdminResource extends Resource
 {
+    use HasShieldFormComponents;
+
     protected static ?string $model = RegistrationData::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-building-library';
-    protected static ?string $title = 'Admin Database';
-    protected static ?string $navigationLabel = 'Database';
-    protected static ?string $modelLabel = 'Database';
-    protected static ?string $slug = 'admin-database';
-    protected static bool $shouldRegisterNavigation = true;
-    protected static ?int $navigationSort = 3;
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-building-library';
 
+    protected static ?string $title = 'Admin Database';
+
+    protected static ?string $navigationLabel = 'Database';
+
+    protected static ?string $modelLabel = 'Admin Database';
+
+    protected static ?string $slug = 'admin-database';
+
+    protected static bool $shouldRegisterNavigation = true;
+
+    protected static ?int $navigationSort = 3;
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole(['admin']);
+        return auth()->user()?->can('ViewAny:AdminResource') ?? false;
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema(Admin::formSchema());
+        return $schema
+            ->components(\App\Filament\User\Resources\Admin\Forms\AdminForm::schema());
     }
 
     public static function table(Table $table): Table
@@ -52,20 +55,19 @@ class AdminResource extends Resource
             ->paginated([50, 100, 200])
             ->extremePaginationLinks()
             ->modifyQueryUsing(
-                fn(Builder $query) =>
-                $query->withMax('activity', 'id')
+                fn(Builder $query) => $query->withMax('activity', 'id')
                     ->orderByDesc('updated_at')
             )
-            ->columns(Admin::columns())
-            ->filters(Admin::filters())
+            ->columns(\App\Filament\User\Resources\Admin\Tables\AdminTable::columns())
+            ->filters([])
             ->filtersTriggerAction(
                 fn(Action $action) => $action
                     ->button()
                     ->label('Filter'),
             )
             ->recordAction('view')
-            ->actions([])
-            ->bulkActions(Admin::bulkActions());
+            ->recordActions([])
+            ->toolbarActions([]);
     }
 
     public static function getRelations(): array

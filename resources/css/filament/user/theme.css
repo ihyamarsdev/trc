@@ -1,85 +1,113 @@
-@import "/vendor/filament/filament/resources/css/theme.css";
+@import "../../../../vendor/filament/filament/resources/css/theme.css";
 
-@config 'tailwind.config.js';
+@source '../../../../app/Filament/User/**/*';
+@source '../../../../resources/views/filament/user/**/*';
+@source '../../../../vendor/lara-zeus/activity-timeline/resources/views/**/*.blade.php';
+
+@utility no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+/* =====================
+   SIDEBAR
+   ===================== */
 
 .fi-sidebar-header {
-    @apply justify-center h-52 dark:bg-gray-950 bg-sky-900 ring-0;
+    @apply justify-start h-52 dark:bg-gray-950 bg-sky-900 ring-0;
 }
+
+/* Logo styling - positioned top left with padding */
+.fi-sidebar-header img {
+    @apply w-auto object-contain;
+}
+
+.fi-sidebar {
+    @apply bg-sky-900 dark:bg-gray-950;
+}
+
+/* Sidebar nav scrollbar */
+.fi-sidebar-nav {
+    @apply mt-30 no-scrollbar bg-sky-900 dark:bg-gray-950;
+}
+
+/* Individual sidebar item button */
+.fi-sidebar-item-btn {
+    @apply bg-sky-900 hover:bg-sky-800 hover:text-lime-500 dark:bg-gray-950;
+}
+
+/* Active nav item - Filament v4 uses .fi-active class */
+.fi-sidebar-item-btn.fi-active {
+    @apply bg-sky-700 text-lime-400 ring-1 ring-lime-500 dark:bg-gray-800;
+}
+
+/* Sidebar label color */
+.fi-sidebar-item-label {
+    @apply text-white;
+}
+
+/* Icon color */
+.fi-sidebar-item-icon {
+    @apply text-lime-500;
+}
+
+/* Group label */
+.fi-sidebar-group-label {
+    @apply text-white;
+}
+
+/* =====================
+   TOPBAR
+   ===================== */
+
+/* Filament v4: fi-topbar-ctn is outer wrapper, fi-topbar is inner nav */
+/*.fi-topbar-ctn {
+    @apply h-24;
+}*/
 
 .fi-topbar {
-    @apply h-24;
+    @apply bg-sky-900 ring-0 dark:bg-gray-950 shadow-none;
 }
 
-.fi-sidebar-nav {
-    @apply no-scrollbar;
-}
-
+/* Main content container background */
 .fi {
     @apply no-scrollbar bg-sky-950;
 }
 
 .fi-body {
-    @apply bg-sky-900;
+    @apply bg-sky-900 dark:bg-black;
 }
 
-.fi-sidebar-item-active {
-    @apply rounded-lg ring-lime-500 ring-1;
-}
-
-.fi-sidebar-item-label {
-    @apply text-white;
-}
-
-.fi-sidebar-item-button {
-    @apply bg-sky-900 hover:bg-sky-800 hover:text-lime-500 dark:bg-gray-950;
-}
+/* =====================
+   HEADER
+   ===================== */
 
 .fi-header-heading {
     @apply font-bold text-white;
-}
-
-.fi-topbar nav {
-    @apply bg-sky-900 ring-0 dark:bg-gray-950;
-}
-
-.fi-sidebar-item-icon {
-    @apply text-lime-500;
-}
-
-.fi-sidebar-group-label {
-    @apply text-white;
 }
 
 .fi-breadcrumbs-item-label {
     @apply text-white;
 }
 
+/* =====================
+   BUTTONS
+   ===================== */
+
 .fi-btn {
     @apply bg-lime-500 hover:bg-lime-700;
-}
-
-.fi-fieldset {
-    @apply border-lime-500;
-}
-
-.fi-dropdown-list-item-icon {
-    @apply text-lime-500;
-}
-
-/* .fi-section {
-    @apply ring-lime-500 ring-2;
-} */
-
-.fi-radio-input {
-    @apply ring-lime-500 ring-1;
 }
 
 .fi-btn-label {
     @apply text-white;
 }
 
-.fi-section {
-    @apply ring-0;
+.fi-btn-icon {
+    @apply text-white;
 }
 
 .fi-ac-btn-action {
@@ -90,82 +118,84 @@
     @apply hover:bg-lime-700;
 }
 
-.fi-btn-icon {
-    @apply text-white;
+/* =====================
+   FORM ELEMENTS
+   ===================== */
+
+.fi-fieldset {
+    @apply border-lime-500;
 }
 
-.fi-btn-label {
-    @apply text-white;
+.fi-dropdown-list-item-icon {
+    @apply text-lime-500;
 }
 
-/* .fi-section-header-heading {
-    @apply text-white;
-}
-
-.fi-section-header-description {
-    @apply text-white;
-} */
-
-.fi-section-header {
-    @apply px-5 py-5 bg-white rounded-lg dark:bg-gray-900;
-}
-
-.fi-sidebar-nav {
-    @apply bg-sky-900 dark:bg-gray-950;
+.fi-radio-input {
+    @apply ring-lime-500 ring-1;
 }
 
 .fi-checkbox-input {
     @apply ring-lime-500;
 }
 
+/* =====================
+   SECTION / CARD
+   ===================== */
 
-@layer utilities {
-    /* Hide scrollbar for Chrome, Safari and Opera */
-    .no-scrollbar::-webkit-scrollbar {
-        display: none;
-    }
-    /* Hide scrollbar for IE, Edge and Firefox */
-    .no-scrollbar {
-        -ms-overflow-style: none; /* IE and Edge */
-        scrollbar-width: none; /* Firefox */
-    }
+.fi-section {
+    @apply ring-0;
 }
 
-/* Leaderboard Status Colors - Light/Dark mode support */
-/* Light mode colors (darker for readability) */
+.fi-section-header {
+    @apply px-5 py-5 bg-white rounded-lg dark:bg-gray-900;
+}
+
+/* =====================
+   LEADERBOARD STATUS COLORS
+   ===================== */
+
+/* Light mode (darker for readability) */
 .status-red {
     color: #cc0000 !important;
 }
+
 .status-yellow {
     color: #cc9900 !important;
 }
+
 .status-blue {
     color: #000099 !important;
 }
+
 .status-green {
     color: #004400 !important;
 }
 
-/* Dark mode colors (lighter/brighter) */
+/* Dark mode (brighter) */
 .dark .status-red {
     color: #ff6b6b !important;
 }
+
 .dark .status-yellow {
     color: #ffd93d !important;
 }
+
 .dark .status-blue {
     color: #6bb3ff !important;
 }
+
 .dark .status-green {
     color: #6bff6b !important;
 }
 
-/* Widget-specific status dot styling */
+/* =====================
+   WIDGET MISC
+   ===================== */
+
 .status-dot {
     transition: background-color 0.2s ease;
 }
 
-/* Summary card responsive colors */
 .summary-card {
     transition: all 0.3s ease;
 }
@@ -178,13 +208,13 @@
     transition: color 0.2s ease;
 }
 
-/* Filter badge styling */
 .filter-badge {
     transition: all 0.2s ease;
 }
 
-/* Table header/footer responsive styling */
 .table-header th,
 .table-footer td {
-    transition: color 0.2s ease, background-color 0.2s ease;
+    transition:
+        color 0.2s ease,
+        background-color 0.2s ease;
 }

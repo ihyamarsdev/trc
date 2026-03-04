@@ -2,47 +2,50 @@
 
 namespace App\Filament\User\Resources\Salesforce;
 
-use Filament\Forms;
-use Filament\Tables;
-use App\Models\Sales;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
+use App\Filament\User\Resources\Salesforce\Forms\SalesForm;
+use App\Filament\User\Resources\Salesforce\Infolists\SalesInfolist;
+use App\Filament\User\Resources\Salesforce\Pages\CreateSales;
+use App\Filament\User\Resources\Salesforce\Pages\EditSales;
+use App\Filament\User\Resources\Salesforce\Pages\ListSales;
+use App\Filament\User\Resources\Salesforce\Pages\ViewSales;
+use App\Filament\User\Resources\Salesforce\Tables\SalesTable;
 use App\Models\RegistrationData;
-use Filament\Infolists\Infolist;
+use BezhanSalleh\FilamentShield\Traits\HasShieldFormComponents;
+use Filament\Actions\Action;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Illuminate\Support\Facades\Auth;
-use App\Filament\Components\SalesForce;
+use Filament\Schemas\Schema;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Enums\ActionsPosition;
-use App\Filament\Exports\SalesforceExporter;
-use Filament\Actions\Exports\Enums\ExportFormat;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\User\Resources\Salesforce\SalesResource\Pages;
-use App\Filament\User\Resources\SalesResource\RelationManagers;
 
 class SalesResource extends Resource
 {
+    use HasShieldFormComponents;
+
     protected static ?string $model = RegistrationData::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-presentation-chart-line';
-    protected static ?string $navigationGroup = 'Salesforce';
-    protected static ?string $title = 'Database';
-    protected static ?string $navigationLabel = 'Database';
-    protected static ?string $modelLabel = 'database';
-    protected static ?string $slug = 'database-salesforce';
-    protected static bool $shouldRegisterNavigation = true;
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-presentation-chart-line';
 
+    protected static string|\UnitEnum|null $navigationGroup = 'Salesforce';
+
+    protected static ?string $title = 'Database';
+
+    protected static ?string $navigationLabel = 'Database';
+
+    protected static ?string $modelLabel = 'Sales';
+
+    protected static ?string $slug = 'database-salesforce';
+
+    protected static bool $shouldRegisterNavigation = true;
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole(Salesforce::getRoles());
+        return auth()->user()?->can('ViewAny:SalesResource') ?? false;
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema(SalesForce::schema())
+        return $schema
+            ->components(SalesForm::schema())
             ->extraAttributes([
                 'onkeydown' => "
                 if (event.key === 'Enter' && event.target.tagName !== 'TEXTAREA') {
@@ -53,7 +56,7 @@ class SalesResource extends Resource
                         focusables[index + 1].focus();
                     }
                 }
-            "
+            ",
             ]);
     }
 
@@ -67,31 +70,28 @@ class SalesResource extends Resource
             ->paginated([50, 100, 200])
             ->recordAction('view')
             ->modifyQueryUsing(
-                fn(Builder $query) =>
-                $query
+                fn (Builder $query) => $query
                     ->where('years', now('Asia/Jakarta')->format('Y'))
                     ->when(
-                        fn($query) => $query->where('users_id', auth()->id())
+                        fn ($query) => $query->where('users_id', auth()->id())
                     )
                     ->orderBy('implementation_estimate', 'asc')
             )
-            ->columns(SalesForce::columns())
-            ->filters(SalesForce::filters())
+            ->columns(SalesTable::columns())
+            ->filters(SalesTable::filters())
             ->filtersTriggerAction(
-                fn(Action $action) => $action
+                fn (Action $action) => $action
                     ->button()
                     ->label('Filter'),
             )
-            ->actions([])
-            ->bulkActions(SalesForce::bulkActions());
+            ->recordActions([])
+            ->toolbarActions(SalesTable::bulkActions());
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist
-            ->schema(SalesForce::infolist());
+        return SalesInfolist::configure($schema, auth()->user());
     }
-
 
     public static function getRelations(): array
     {
@@ -103,10 +103,10 @@ class SalesResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSales::route('/'),
-            'create' => Pages\CreateSales::route('/create'),
-            'view' => Pages\ViewSales::route('/{record}'),
-            'edit' => Pages\EditSales::route('/{record}/edit'),
+            'index' => ListSales::route('/'),
+            'create' => CreateSales::route('/create'),
+            'view' => ViewSales::route('/{record}'),
+            'edit' => EditSales::route('/{record}/edit'),
         ];
     }
 }

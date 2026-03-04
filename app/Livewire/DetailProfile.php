@@ -2,23 +2,29 @@
 
 namespace App\Livewire;
 
-use Filament\Forms;
-use Livewire\Component;
-use Filament\Forms\Form;
-use Illuminate\Contracts\View\View;
-use Filament\Support\Exceptions\Halt;
-use Filament\Forms\Components\Section;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
-use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Support\Exceptions\Halt;
+use Illuminate\Contracts\View\View;
 use Joaopaulolndev\FilamentEditProfile\Concerns\HasSort;
 use Joaopaulolndev\FilamentEditProfile\Concerns\HasUser;
+use Livewire\Component;
 
-class DetailProfile extends Component implements HasForms
+class DetailProfile extends Component implements HasActions, HasForms
 {
-    use InteractsWithForms;
     use HasSort;
     use HasUser;
+    use InteractsWithActions;
+    use InteractsWithForms;
 
     public $userClass;
 
@@ -35,26 +41,26 @@ class DetailProfile extends Component implements HasForms
         $this->form->fill($this->user->only('address', 'number_phone', 'date_joined', 'gender'));
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make('Detail Profile')
                     ->aside()
                     ->description('Perbarui Informasi Detail Anda.')
                     ->schema([
-                        Forms\Components\Textarea::make('address')
+                        Textarea::make('address')
                             ->label('Alamat')
                             ->required()
                             ->maxLength(255),
-                        Forms\Components\TextInput::make('number_phone')
+                        TextInput::make('number_phone')
                             ->label('No Handphone')
                             ->required()
                             ->maxLength(255),
-                        Forms\Components\DatePicker::make('date_joined')
+                        DatePicker::make('date_joined')
                             ->label('Tanggal Bergabung')
                             ->hidden($this->user->hasRole(['datacenter', 'academic', 'finance'])),
-                        Forms\Components\Radio::make('gender')
+                        Radio::make('gender')
                             ->label('Jenis Kelamin')
                             ->hidden($this->user->hasRole(['datacenter', 'academic', 'finance']))
                             ->options([
