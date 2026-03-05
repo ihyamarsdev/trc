@@ -17,18 +17,17 @@ class DatabaseSeeder extends Seeder
         $roleNames = ['sales', 'service', 'finance'];
 
         $user = User::firstOrCreate([
-            'email' => 'admin@trc.com'
+            'email' => 'admin@trc.com',
         ], [
             'name' => 'admin',
-            'password' => 'admin123'
+            'password' => 'admin123',
         ]);
 
         $role = Role::firstOrCreate(['name' => 'admin']);
         $user->assignRole($role);
-        
+
         // Berikan semua permissions yang ada di database ke role admin
         $role->givePermissionTo(\Spatie\Permission\Models\Permission::all());
-
 
         foreach ($roleNames as $name) {
             Role::firstOrCreate(
@@ -41,6 +40,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             Registration::class,
             ShieldSeeder::class,
+            AdminGrantAllPermissionsSeeder::class,
         ]);
     }
 }
