@@ -3,7 +3,6 @@
 namespace App\Filament\User\Resources\Service\Tables;
 
 use App\Filament\User\Resources\Service\Forms\ServiceForm;
-use Filament\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -25,11 +24,6 @@ class ServiceTable
             )
             ->columns(ServiceForm::columns())
             ->filters(ServiceForm::filters())
-            ->filtersTriggerAction(
-                fn (Action $action) => $action
-                    ->button()
-                    ->label('Filter'),
-            )
             ->recordAction('view')
             ->recordActions([])
             ->toolbarActions(ServiceForm::bulkActions());

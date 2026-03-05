@@ -6,10 +6,15 @@ use App\Filament\User\Resources\Admin\AdminResource;
 use App\Models\RegistrationStatus;
 use Carbon\Carbon;
 use Filament\Resources\Pages\CreateRecord;
+use Filament\Support\Enums\Width;
 use Illuminate\Support\Facades\Auth;
 
 class CreateAdmin extends CreateRecord
 {
+    protected Width|string|null $maxWidth = Width::Full;
+
+    protected Width|string|null $maxContentWidth = Width::Full;
+
     protected static string $resource = AdminResource::class;
 
     protected function getRedirectUrl(): string

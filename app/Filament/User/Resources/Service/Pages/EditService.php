@@ -6,17 +6,20 @@ use App\Filament\User\Resources\Service\ServiceResource;
 use App\Models\RegistrationStatus;
 use App\Models\Status;
 use App\Models\User;
-use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Enums\Width;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class EditService extends EditRecord
 {
+    protected Width|string|null $maxWidth = Width::Full;
+
+    protected Width|string|null $maxContentWidth = Width::Full;
+
     protected static string $resource = ServiceResource::class;
 
     protected function getHeaderActions(): array

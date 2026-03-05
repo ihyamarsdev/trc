@@ -7,11 +7,16 @@ namespace App\Filament\Resources\Roles\Pages;
 use App\Filament\Resources\Roles\RoleResource;
 use BezhanSalleh\FilamentShield\Support\Utils;
 use Filament\Resources\Pages\CreateRecord;
+use Filament\Support\Enums\Width;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 class CreateRole extends CreateRecord
 {
+    protected Width|string|null $maxWidth = Width::Full;
+
+    protected Width|string|null $maxContentWidth = Width::Full;
+
     public Collection $permissions;
 
     protected static string $resource = RoleResource::class;

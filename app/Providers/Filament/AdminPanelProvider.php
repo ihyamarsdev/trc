@@ -15,6 +15,8 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use FilipFonal\FilamentLogManager\FilamentLogManager;
+use Hammadzafar05\MobileBottomNav\MobileBottomNav;
+use Hammadzafar05\MobileBottomNav\MobileBottomNavItem;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -118,6 +120,23 @@ class AdminPanelProvider extends PanelProvider
                     ->customProfileComponents([
                         EditProfile::class,
                         DetailProfile::class,
+                    ]),
+                MobileBottomNav::make()
+                    ->items([
+                        MobileBottomNavItem::make('Admin Database')
+                            ->icon('heroicon-o-building-library')
+                            ->url('/admin/admin-database')
+                            ->isActive(fn () => request()->is('admin/admin-database*')),
+
+                        MobileBottomNavItem::make('Users')
+                            ->icon('heroicon-o-user-group')
+                            ->url('/admin/users')
+                            ->isActive(fn () => request()->is('admin/users*')),
+
+                        MobileBottomNavItem::make('Roles')
+                            ->icon('heroicon-o-shield-check')
+                            ->url('/admin/shield/roles')
+                            ->isActive(fn () => request()->is('admin/shield/roles*')),
                     ]),
             ]);
     }

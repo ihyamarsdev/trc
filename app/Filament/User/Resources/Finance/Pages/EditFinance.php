@@ -9,11 +9,16 @@ use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Enums\Width;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class EditFinance extends EditRecord
 {
+    protected Width|string|null $maxWidth = Width::Full;
+
+    protected Width|string|null $maxContentWidth = Width::Full;
+
     protected static string $resource = FinanceResource::class;
 
     protected function getHeaderActions(): array

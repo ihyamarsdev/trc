@@ -230,6 +230,23 @@ class AdminInfolist
                             ->schema([
                                 TextEntry::make('option_price')
                                     ->label('Opsi Harga')
+                                    ->badge()
+                                    ->formatStateUsing(function (?string $state): string {
+                                        if (! is_string($state) || $state === '') {
+                                            return '-';
+                                        }
+
+                                        preg_match('/_(\d+)$/', $state, $matches);
+                                        $count = $matches[1] ?? null;
+
+                                        $label = match (true) {
+                                            str_starts_with($state, 'implementer_') => 'JUMLAH PELAKSANAAN',
+                                            str_starts_with($state, 'account_') => 'JUMLAH AKUN',
+                                            default => strtoupper(str_replace('_', ' ', $state)),
+                                        };
+
+                                        return $count ? "{$label} ({$count})" : $label;
+                                    })
                                     ->placeholder('-'),
                                 TextEntry::make('total')
                                     ->label('Total')
@@ -259,15 +276,62 @@ class AdminInfolist
                                     ->label('Metode Pembayaran')
                                     ->badge()
                                     ->placeholder('-'),
+                                IconEntry::make('payment_date')
+                                    ->label('Status Pembayaran')
+                                    ->boolean(fn ($state) => filled($state))
+                                    ->trueIcon('heroicon-o-check-circle')
+                                    ->falseIcon('heroicon-o-clock')
+                                    ->trueColor('success')
+                                    ->falseColor('warning'),
                             ])
                             ->columns(2),
+                        Fieldset::make('Mitra')
+                            ->schema([
+                                TextEntry::make('mitra_difference')
+                                    ->label('Selisih Siswa Sekolah')
+                                    ->numeric()
+                                    ->placeholder('0'),
+                                TextEntry::make('mitra_net')
+                                    ->label('Satuan Mitra')
+                                    ->money('IDR')
+                                    ->placeholder('Rp 0'),
+                                TextEntry::make('mitra_subtotal')
+                                    ->label('Subtotal Mitra')
+                                    ->money('IDR')
+                                    ->placeholder('Rp 0'),
+                                TextEntry::make('ss_difference')
+                                    ->label('SS')
+                                    ->numeric()
+                                    ->placeholder('0'),
+                                TextEntry::make('ss_net')
+                                    ->label('Satuan SS')
+                                    ->money('IDR')
+                                    ->placeholder('Rp 0'),
+                                TextEntry::make('ss_subtotal')
+                                    ->label('Subtotal SS')
+                                    ->money('IDR')
+                                    ->placeholder('Rp 0'),
+                                TextEntry::make('dll_difference')
+                                    ->label('DLL')
+                                    ->numeric()
+                                    ->placeholder('0'),
+                                TextEntry::make('dll_net')
+                                    ->label('Satuan DLL')
+                                    ->money('IDR')
+                                    ->placeholder('Rp 0'),
+                                TextEntry::make('dll_subtotal')
+                                    ->label('Subtotal DLL')
+                                    ->money('IDR')
+                                    ->placeholder('Rp 0'),
+                            ])
+                            ->columns(3),
                     ])
                     ->columns(2)
                     ->collapsible(),
 
                 // Salesforce Info
-                Section::make('Salesforce')
-                    ->description('Data dari Salesforce')
+                Section::make('Sales')
+                    ->description('Detail data sales dan relasi sekolah')
                     ->schema([
                         Fieldset::make('Info Sales')
                             ->schema([
@@ -278,6 +342,14 @@ class AdminInfolist
                                     ->label('Tanggal Pendaftaran')
                                     ->dateTime('l, jS F Y H:i')
                                     ->placeholder('Tidak Ada Data'),
+                                TextEntry::make('implementation_estimate')
+                                    ->label('Estimasi Pelaksanaan')
+                                    ->dateTime('l, jS F Y H:i')
+                                    ->placeholder('Tidak Ada Data'),
+                                TextEntry::make('notes')
+                                    ->label('Catatan')
+                                    ->markdown()
+                                    ->placeholder('-'),
                             ])
                             ->columns(2),
                         Fieldset::make('Kontak Sekolah')
@@ -293,6 +365,20 @@ class AdminInfolist
                                     ->label('Wakakurikulum')
                                     ->placeholder('Tidak Ada Data'),
                                 TextEntry::make('curriculum_deputies_phone')
+                                    ->label('No. HP')
+                                    ->placeholder('Tidak Ada Data')
+                                    ->icon('heroicon-o-phone'),
+                                TextEntry::make('counselor_coordinators')
+                                    ->label('Koordinator BK')
+                                    ->placeholder('Tidak Ada Data'),
+                                TextEntry::make('counselor_coordinators_phone')
+                                    ->label('No. HP')
+                                    ->placeholder('Tidak Ada Data')
+                                    ->icon('heroicon-o-phone'),
+                                TextEntry::make('proctors')
+                                    ->label('Proktor')
+                                    ->placeholder('Tidak Ada Data'),
+                                TextEntry::make('proctors_phone')
                                     ->label('No. HP')
                                     ->placeholder('Tidak Ada Data')
                                     ->icon('heroicon-o-phone'),

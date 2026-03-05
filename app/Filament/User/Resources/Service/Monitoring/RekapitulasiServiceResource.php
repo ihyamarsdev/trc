@@ -230,7 +230,11 @@ class RekapitulasiServiceResource extends Resource
                 ],
                 position: RecordActionsPosition::BeforeColumns,
             )
-            ->toolbarActions([]);
+            ->toolbarActions([
+                \Filament\Actions\BulkActionGroup::make([
+                    \Filament\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
     }
 
     public static function getRelations(): array

@@ -7,7 +7,6 @@ use App\Filament\User\Resources\Finance\Pages\EditFinance;
 use App\Filament\User\Resources\Finance\Pages\ListFinances;
 use App\Filament\User\Resources\Finance\Pages\ViewFinance;
 use App\Models\RegistrationData;
-use Filament\Actions\Action;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
@@ -51,21 +50,20 @@ class FinanceResource extends Resource
             ->striped()
             ->paginated([50, 100, 200])
             ->modifyQueryUsing(
-                fn(Builder $query) => $query->withMax('activity', 'id')
+                fn (Builder $query) => $query->withMax('activity', 'id')
                     ->where('years', now('Asia/Jakarta')->format('Y'))
                     ->whereRelation('status', 'order', '>=', 7)
                     ->orderByDesc('updated_at')
             )
             ->columns(\App\Filament\User\Resources\Finance\Tables\FinanceTable::columns())
             ->filters([])
-            ->filtersTriggerAction(
-                fn(Action $action) => $action
-                    ->button()
-                    ->label('Filter'),
-            )
             ->recordAction('view')
             ->recordActions([])
-            ->toolbarActions([]);
+            ->toolbarActions([
+                \Filament\Actions\BulkActionGroup::make([
+                    \Filament\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
     }
 
     public static function getRelations(): array

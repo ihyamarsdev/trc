@@ -75,6 +75,14 @@ class ListSales extends ListRecords
                     }
 
                 })
+                ->extraModalFooterActions([
+                    Action::make('downloadSample')
+                        ->label('Download Sample')
+                        ->color('info')
+                        ->action(function () {
+                            return Excel::download(new \App\Filament\Components\SampleExcel, 'sample_import_sales.xlsx');
+                        }),
+                ])
                 ->modalHeading('Import')
                 ->modalContent(function () {
                     return view('components.sample-excel-modal');

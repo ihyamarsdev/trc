@@ -11,7 +11,6 @@ use App\Filament\User\Resources\Salesforce\Pages\ViewSales;
 use App\Filament\User\Resources\Salesforce\Tables\SalesTable;
 use App\Models\RegistrationData;
 use BezhanSalleh\FilamentShield\Traits\HasShieldFormComponents;
-use Filament\Actions\Action;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
@@ -79,11 +78,6 @@ class SalesResource extends Resource
             )
             ->columns(SalesTable::columns())
             ->filters(SalesTable::filters())
-            ->filtersTriggerAction(
-                fn (Action $action) => $action
-                    ->button()
-                    ->label('Filter'),
-            )
             ->recordActions([])
             ->toolbarActions(SalesTable::bulkActions());
     }

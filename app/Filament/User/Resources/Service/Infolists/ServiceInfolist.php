@@ -46,7 +46,7 @@ class ServiceInfolist
 
                                         return match ($raw) {
                                             'green' => 'success',
-                                            'blue' => 'info',
+                                            'blue' => 'blue',
                                             'yellow' => 'warning',
                                             'red' => 'danger',
                                             default => 'gray',
@@ -54,8 +54,7 @@ class ServiceInfolist
                                     })
                                     ->size(IconSize::Large)
                                     ->placeholder('Tidak Ada Status'),
-                            ])
-                            ->columns(1),
+                            ]),
                     ])
                     ->columns(2)
                     ->collapsible(),
@@ -108,6 +107,24 @@ class ServiceInfolist
                                     ->placeholder('-'),
                             ])
                             ->columns(3),
+                        Fieldset::make('Informasi User')
+                            ->schema([
+                                TextEntry::make('users.name')
+                                    ->label('Sales')
+                                    ->placeholder('Tidak Ada User'),
+                            ])
+                            ->columns(1),
+                        Fieldset::make('Kontak Sekolah')
+                            ->schema([
+                                TextEntry::make('principal')
+                                    ->label('Kepala Sekolah')
+                                    ->placeholder('Tidak Ada Data'),
+                                TextEntry::make('principal_phone')
+                                    ->label('No. HP')
+                                    ->placeholder('Tidak Ada Data')
+                                    ->icon('heroicon-o-phone'),
+                            ])
+                            ->columns(2),
                     ])
                     ->columns(2)
                     ->collapsible(),
@@ -127,7 +144,7 @@ class ServiceInfolist
                                     ->label('Bimtek')
                                     ->dateTime('l, jS F Y')
                                     ->placeholder('Belum Terjadwal')
-                                    ->icon('heroicon-o-service-cap'),
+                                    ->icon('heroicon-o-academic-cap'),
                             ])
                             ->columns(2),
                         Fieldset::make('Progress Akun')
@@ -142,13 +159,13 @@ class ServiceInfolist
                                     ->label('Pelaksanaan')
                                     ->numeric()
                                     ->badge()
-                                    ->color('info')
+                                    ->color('warning')
                                     ->placeholder('0'),
                                 TextEntry::make('difference')
                                     ->label('Selisih')
                                     ->numeric()
                                     ->badge()
-                                    ->color('warning')
+                                    ->color('danger')
                                     ->placeholder('0'),
                             ])
                             ->columns(3),
@@ -198,36 +215,6 @@ class ServiceInfolist
                     ->columns(2)
                     ->collapsible(),
 
-                // Salesforce Info
-                Section::make('Salesforce')
-                    ->description('Data dari Salesforce')
-                    ->schema([
-                        Fieldset::make('User & Program')
-                            ->schema([
-                                TextEntry::make('users.name')
-                                    ->label('Sales')
-                                    ->placeholder('Tidak Ada User'),
-                                TextEntry::make('type')
-                                    ->label('Program')
-                                    ->badge()
-                                    ->color('primary')
-                                    ->placeholder('Tidak Ada Program'),
-                            ])
-                            ->columns(2),
-                        Fieldset::make('Kontak Sekolah')
-                            ->schema([
-                                TextEntry::make('principal')
-                                    ->label('Kepala Sekolah')
-                                    ->placeholder('Tidak Ada Data'),
-                                TextEntry::make('principal_phone')
-                                    ->label('No. HP')
-                                    ->placeholder('Tidak Ada Data')
-                                    ->icon('heroicon-o-phone'),
-                            ])
-                            ->columns(2),
-                    ])
-                    ->columns(2)
-                    ->collapsible(),
             ])
             ->columns(1);
     }

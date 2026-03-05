@@ -8,8 +8,8 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Illuminate\Database\Eloquent\Model;
 use Filament\Support\Enums\IconSize;
+use Illuminate\Database\Eloquent\Model;
 
 class FinanceInfolist
 {
@@ -29,7 +29,7 @@ class FinanceInfolist
                                 TextEntry::make('status.name')
                                     ->label('Status')
                                     ->badge()
-                                    ->color(fn($state) => $record->latestStatusLog?->status?->color ?? 'gray'),
+                                    ->color(fn ($state) => $record->latestStatusLog?->status?->color ?? 'gray'),
                                 IconEntry::make('latestStatusLog.status.order')
                                     ->label('Icon Status')
                                     ->icon(function ($state) {
@@ -70,7 +70,7 @@ class FinanceInfolist
                             ]),
                     ])
                     ->collapsible()
-                    ->columns(1),
+                    ->columns(2),
 
                 // Program Info
                 Section::make($meta['name'])
@@ -99,6 +99,48 @@ class FinanceInfolist
                                     ->placeholder('0'),
                             ])
                             ->columns(2),
+                        Fieldset::make('Detail Sales')
+                            ->schema([
+                                TextEntry::make('users.name')
+                                    ->label('Nama Sales')
+                                    ->badge()
+                                    ->color('primary')
+                                    ->placeholder('Tidak Ada Sales'),
+                                TextEntry::make('principal')
+                                    ->label('Kepala Sekolah')
+                                    ->placeholder('Tidak Ada Data'),
+                                TextEntry::make('principal_phone')
+                                    ->label('No. HP Kepala Sekolah')
+                                    ->placeholder('Tidak Ada Data')
+                                    ->icon('heroicon-o-phone'),
+                            ])
+                            ->columns(3),
+                        Fieldset::make('Detail Service')
+                            ->schema([
+                                TextEntry::make('group')
+                                    ->label('Jadwal Grup')
+                                    ->dateTime('l, jS F Y')
+                                    ->placeholder('Belum Terjadwal')
+                                    ->icon('heroicon-o-calendar'),
+                                TextEntry::make('bimtek')
+                                    ->label('Jadwal Bimtek')
+                                    ->dateTime('l, jS F Y')
+                                    ->placeholder('Belum Terjadwal')
+                                    ->icon('heroicon-o-academic-cap'),
+                                TextEntry::make('account_count_created')
+                                    ->label('Akun Dibuat')
+                                    ->numeric()
+                                    ->badge()
+                                    ->color('success')
+                                    ->placeholder('0'),
+                                TextEntry::make('implementer_count')
+                                    ->label('Pelaksanaan')
+                                    ->numeric()
+                                    ->badge()
+                                    ->color('info')
+                                    ->placeholder('0'),
+                            ])
+                            ->columns(2),
                     ])
                     ->collapsible(),
 
@@ -122,6 +164,23 @@ class FinanceInfolist
                             ->schema([
                                 TextEntry::make('option_price')
                                     ->label('Opsi Harga')
+                                    ->badge()
+                                    ->formatStateUsing(function (?string $state): string {
+                                        if (! is_string($state) || $state === '') {
+                                            return '-';
+                                        }
+
+                                        preg_match('/_(\d+)$/', $state, $matches);
+                                        $count = $matches[1] ?? null;
+
+                                        $label = match (true) {
+                                            str_starts_with($state, 'implementer_') => 'JUMLAH PELAKSANAAN',
+                                            str_starts_with($state, 'account_') => 'JUMLAH AKUN',
+                                            default => strtoupper(str_replace('_', ' ', $state)),
+                                        };
+
+                                        return $count ? "{$label} ({$count})" : $label;
+                                    })
                                     ->placeholder('-'),
                                 TextEntry::make('total')
                                     ->label('Total Dana')
@@ -129,6 +188,46 @@ class FinanceInfolist
                                     ->placeholder('Rp 0'),
                                 TextEntry::make('total_net')
                                     ->label('Total Net')
+                                    ->money('IDR')
+                                    ->placeholder('Rp 0'),
+                            ])
+                            ->columns(3),
+                        Fieldset::make('Mitra')
+                            ->schema([
+                                TextEntry::make('mitra_difference')
+                                    ->label('Selisih Siswa Sekolah')
+                                    ->numeric()
+                                    ->placeholder('0'),
+                                TextEntry::make('mitra_net')
+                                    ->label('Satuan Mitra')
+                                    ->money('IDR')
+                                    ->placeholder('Rp 0'),
+                                TextEntry::make('mitra_subtotal')
+                                    ->label('Subtotal Mitra')
+                                    ->money('IDR')
+                                    ->placeholder('Rp 0'),
+                                TextEntry::make('ss_difference')
+                                    ->label('SS')
+                                    ->numeric()
+                                    ->placeholder('0'),
+                                TextEntry::make('ss_net')
+                                    ->label('Satuan SS')
+                                    ->money('IDR')
+                                    ->placeholder('Rp 0'),
+                                TextEntry::make('ss_subtotal')
+                                    ->label('Subtotal SS')
+                                    ->money('IDR')
+                                    ->placeholder('Rp 0'),
+                                TextEntry::make('dll_difference')
+                                    ->label('DLL')
+                                    ->numeric()
+                                    ->placeholder('0'),
+                                TextEntry::make('dll_net')
+                                    ->label('Satuan DLL')
+                                    ->money('IDR')
+                                    ->placeholder('Rp 0'),
+                                TextEntry::make('dll_subtotal')
+                                    ->label('Subtotal DLL')
                                     ->money('IDR')
                                     ->placeholder('Rp 0'),
                             ])
@@ -157,49 +256,6 @@ class FinanceInfolist
                                     ->placeholder('-'),
                             ])
                             ->columns(2),
-                    ])
-                    ->collapsible(),
-
-                // Service Progress
-                Section::make('Progress Service')
-                    ->description('Status pelaksanaan service')
-                    ->schema([
-                        Fieldset::make('Jadwal')
-                            ->schema([
-                                TextEntry::make('group')
-                                    ->label('Grup')
-                                    ->dateTime('l, jS F Y')
-                                    ->placeholder('Belum Terjadwal')
-                                    ->icon('heroicon-o-calendar'),
-                                TextEntry::make('bimtek')
-                                    ->label('Bimtek')
-                                    ->dateTime('l, jS F Y')
-                                    ->placeholder('Belum Terjadwal')
-                                    ->icon('heroicon-o-academic-cap'),
-                            ])
-                            ->columns(2),
-                        Fieldset::make('Progress Akun')
-                            ->schema([
-                                TextEntry::make('account_count_created')
-                                    ->label('Akun Dibuat')
-                                    ->numeric()
-                                    ->badge()
-                                    ->color('success')
-                                    ->placeholder('0'),
-                                TextEntry::make('implementer_count')
-                                    ->label('Pelaksanaan')
-                                    ->numeric()
-                                    ->badge()
-                                    ->color('info')
-                                    ->placeholder('0'),
-                                TextEntry::make('difference')
-                                    ->label('Selisih')
-                                    ->numeric()
-                                    ->badge()
-                                    ->color('warning')
-                                    ->placeholder('0'),
-                            ])
-                            ->columns(3),
                     ])
                     ->collapsible(),
             ])

@@ -7,7 +7,6 @@ use App\Filament\User\Resources\Activity\Pages\ListActivity;
 use App\Filament\User\Resources\Activity\Pages\ViewActivities;
 use App\Models\RegistrationData;
 use Carbon\Carbon;
-use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Resources\Resource;
@@ -57,12 +56,12 @@ class ActivityResource extends Resource
             ->searchable()
             ->striped()
             ->modifyQueryUsing(
-                fn(Builder $query) => $query
+                fn (Builder $query) => $query
                     ->withMax('activity', 'id')
                     ->orderByDesc('updated_at')
                     ->when(
-                        auth()->user()->hasRole('sales') && !auth()->user()->hasRole('admin'),
-                        fn(Builder $q) => $q->where('users_id', auth()->id())
+                        auth()->user()->hasRole('sales') && ! auth()->user()->hasRole('admin'),
+                        fn (Builder $q) => $q->where('users_id', auth()->id())
                     )
             )
             ->columns([
@@ -83,7 +82,7 @@ class ActivityResource extends Resource
                     ->label('Status')
                     ->badge()
                     ->color(
-                        fn($record) => match ($record->latestStatusLog?->status?->color) {
+                        fn ($record) => match ($record->latestStatusLog?->status?->color) {
                             'green' => 'success',
                             'blue' => 'blue',
                             'yellow' => 'warning',
@@ -96,7 +95,7 @@ class ActivityResource extends Resource
                     ->label('Terakhir Update')
                     ->alignCenter()
                     ->formatStateUsing(
-                        fn($state) => Carbon::parse($state)->translatedFormat('l, d/m/Y H:i'),
+                        fn ($state) => Carbon::parse($state)->translatedFormat('l, d/m/Y H:i'),
                     )
                     ->sortable(),
             ])
@@ -123,16 +122,11 @@ class ActivityResource extends Resource
 
                         $query->whereHas(
                             'status',
-                            fn(Builder $q) => $q->where('color', $data['value'])
+                            fn (Builder $q) => $q->where('color', $data['value'])
                         );
                     }),
             ])
-            ->filtersTriggerAction(
-                fn(Action $action) => $action
-                    ->button()
-                    ->label('Filter'),
-            )
-            ->recordUrl(fn($record) => ActivityResource::getUrl('activities', ['record' => $record]))
+            ->recordUrl(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record]))
             ->recordActions([
                 //
             ], position: RecordActionsPosition::BeforeColumns)

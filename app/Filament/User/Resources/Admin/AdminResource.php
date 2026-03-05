@@ -6,9 +6,9 @@ use App\Filament\User\Resources\Admin\Pages\CreateAdmin;
 use App\Filament\User\Resources\Admin\Pages\EditAdmin;
 use App\Filament\User\Resources\Admin\Pages\ListAdmins;
 use App\Filament\User\Resources\Admin\Pages\ViewAdmin;
+use App\Filament\User\Resources\Admin\Tables\AdminTable;
 use App\Models\RegistrationData;
 use BezhanSalleh\FilamentShield\Traits\HasShieldFormComponents;
-use Filament\Actions\Action;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
@@ -55,19 +55,18 @@ class AdminResource extends Resource
             ->paginated([50, 100, 200])
             ->extremePaginationLinks()
             ->modifyQueryUsing(
-                fn(Builder $query) => $query->withMax('activity', 'id')
+                fn (Builder $query) => $query->withMax('activity', 'id')
                     ->orderByDesc('updated_at')
             )
-            ->columns(\App\Filament\User\Resources\Admin\Tables\AdminTable::columns())
-            ->filters([])
-            ->filtersTriggerAction(
-                fn(Action $action) => $action
-                    ->button()
-                    ->label('Filter'),
-            )
+            ->columns(AdminTable::columns())
+            ->filters(AdminTable::filters())
             ->recordAction('view')
             ->recordActions([])
-            ->toolbarActions([]);
+            ->toolbarActions([
+                \Filament\Actions\BulkActionGroup::make([
+                    \Filament\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
     }
 
     public static function getRelations(): array

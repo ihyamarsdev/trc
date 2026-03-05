@@ -10,10 +10,15 @@ use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
+use Filament\Support\Enums\Width;
 use Illuminate\Support\Facades\Auth;
 
 class CreateSales extends CreateRecord
 {
+    protected Width|string|null $maxWidth = Width::Full;
+
+    protected Width|string|null $maxContentWidth = Width::Full;
+
     protected static string $resource = SalesResource::class;
 
     protected function getRedirectUrl(): string

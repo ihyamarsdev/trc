@@ -35,6 +35,11 @@ class CalendarWidget extends FullCalendarWidget
         ];
     }
 
+    protected function headerActions(): array
+    {
+        return [];
+    }
+
     protected function viewAction(): Action
     {
         return ViewAction::make();

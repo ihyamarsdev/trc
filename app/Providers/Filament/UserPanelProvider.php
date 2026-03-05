@@ -15,6 +15,8 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Hammadzafar05\MobileBottomNav\MobileBottomNav;
+use Hammadzafar05\MobileBottomNav\MobileBottomNavItem;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -137,6 +139,34 @@ class UserPanelProvider extends PanelProvider
                 new RenewPasswordPlugin()
                     ->forceRenewPassword()
                     ->timestampColumn(),
+                MobileBottomNav::make()
+                    ->moreButton(false)
+                    ->items([
+                        MobileBottomNavItem::make('Service')
+                            ->icon('heroicon-o-wrench-screwdriver')
+                            ->url('/database-service')
+                            ->isActive(fn () => request()->is('database-service*')),
+
+                        MobileBottomNavItem::make('Salesforce')
+                            ->icon('heroicon-o-presentation-chart-line')
+                            ->url('/database-salesforce')
+                            ->isActive(fn () => request()->is('database-salesforce*')),
+
+                        MobileBottomNavItem::make('Finance')
+                            ->icon('heroicon-m-credit-card')
+                            ->url('/database-finance')
+                            ->isActive(fn () => request()->is('database-finance*')),
+
+                        MobileBottomNavItem::make('Activity')
+                            ->icon('heroicon-o-arrow-trending-up')
+                            ->url('/activity')
+                            ->isActive(fn () => request()->is('activity*')),
+
+                        MobileBottomNavItem::make('Timeline')
+                            ->icon('heroicon-o-clock')
+                            ->url('/timeline')
+                            ->isActive(fn () => request()->is('timeline*')),
+                    ]),
             ]);
     }
 }

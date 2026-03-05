@@ -22,6 +22,7 @@
         "filament/notifications": "^4.0",
         "filament/widgets": "^4.0",
         "filipfonal/filament-log-manager": "^3.0",
+        "hammadzafar05/mobile-bottom-nav": "^1.0",
         "joaopaulolndev/filament-edit-profile": "^2.0",
         "lara-zeus/activity-timeline": "^5.0",
         "laravel/framework": "^12.0",

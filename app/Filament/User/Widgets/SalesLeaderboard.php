@@ -71,7 +71,7 @@ class SalesLeaderboard extends BaseWidget
             ->orderBy('users_id'); // tie-breaker opsional
 
         return $table
-            ->poll('10s')
+            ->deferLoading()
             ->query($leaderboardQuery)
             ->columns([
                 TextColumn::make('users.name')->label('Sales'),

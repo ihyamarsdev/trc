@@ -2,34 +2,27 @@
 
 namespace App\Filament\Resources\Users;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\EditAction;
-use Filament\Actions\Action;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
-use Filament\Forms;
+use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Models\User;
-use Filament\Tables;
-use App\Models\Devisions;
-use Filament\Tables\Table;
-use Illuminate\Support\Str;
-use Filament\Resources\Resource;
-use Illuminate\Support\Facades\Hash;
-use App\Filament\Imports\UserImporter;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Actions\ImportAction;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Forms\Components\{TextInput, DateTimePicker, Select};
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Spatie\Permission\Models\Role;
+use Filament\Tables\Table;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UserResource extends Resource
 {
@@ -43,33 +36,41 @@ class UserResource extends Resource
 
     protected static ?string $navigationLabel = 'User';
 
-
-
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Section::make('User')
-                    ->description('Membuat User')
+                Section::make('Manajemen User')
+                    ->description('Data akun dan hak akses user')
                     ->schema([
-                        TextInput::make('name')
-                            ->required()
-                            ->extraInputAttributes(['style' => 'text-transform: capitalize'])
-                            ->dehydrateStateUsing(fn($state) => is_string($state)
-                                ? Str::of($state)->squish()->lower()->title()   // rapikan spasi, lalu Title Case
-                                : $state)
-                            ->maxLength(50),
-                        TextInput::make('email')
-                            ->unique(ignoreRecord: true)
-                            ->email()
-                            ->required()
-                            ->maxLength(255),
-                        Select::make('roles')
-                            ->relationship('roles', 'name')
-                            ->multiple()
-                            ->preload()
-                            ->searchable()
-                    ])->columns(2),
+                        Section::make('Data Akun')
+                            ->schema([
+                                TextInput::make('name')
+                                    ->required()
+                                    ->extraInputAttributes(['style' => 'text-transform: capitalize'])
+                                    ->dehydrateStateUsing(fn ($state) => is_string($state)
+                                        ? Str::of($state)->squish()->lower()->title()
+                                        : $state)
+                                    ->maxLength(50),
+                                TextInput::make('email')
+                                    ->unique(ignoreRecord: true)
+                                    ->email()
+                                    ->required()
+                                    ->maxLength(255),
+                            ])
+                            ->columns(2)
+                            ->columnSpanFull(),
+                        Section::make('Hak Akses')
+                            ->schema([
+                                Select::make('roles')
+                                    ->relationship('roles', 'name')
+                                    ->multiple()
+                                    ->preload()
+                                    ->searchable(),
+                            ])
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(['lg' => 12]),
             ]);
     }
 
@@ -93,7 +94,7 @@ class UserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('roles.name')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'super_admin' => 'danger',
                         'admin' => 'warning',
                         'finance' => 'success',
@@ -140,7 +141,7 @@ class UserResource extends Resource
                                 ->password()
                                 ->required()
                                 ->same('new_password')
-                                ->dehydrated(fn($state) => !is_null($state)),
+                                ->dehydrated(fn ($state) => ! is_null($state)),
                         ])
                         ->requiresConfirmation(),
                 ]),
