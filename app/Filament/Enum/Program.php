@@ -19,6 +19,16 @@ enum Program: string
         };
     }
 
+    public function description(): string
+    {
+        return match ($this) {
+            self::ANBK => 'ASESMEN NASIONAL BERBASIS KOMPUTER',
+            self::APPS => 'ASESMEN PSIKOTES POTENSI SISWA',
+            self::SNBT => 'SELEKSI NASIONAL BERDASARKAN TES',
+            self::TKA => 'TEST KEMAMPUAN AKADEMIK',
+        };
+    }
+
     public static function list(): array
     {
         return [
@@ -29,4 +39,27 @@ enum Program: string
         ];
     }
 
+    public static function meta(?string $value, bool $allowNone = false): array
+    {
+        $program = self::tryFrom(strtolower((string) $value));
+
+        if ($program instanceof self) {
+            return [
+                'nameRegister' => $program->label(),
+                'DescriptionRegister' => $program->description(),
+            ];
+        }
+
+        if ($allowNone) {
+            return [
+                'nameRegister' => 'NONE',
+                'DescriptionRegister' => 'NONE',
+            ];
+        }
+
+        return [
+            'nameRegister' => self::APPS->label(),
+            'DescriptionRegister' => self::APPS->description(),
+        ];
+    }
 }

@@ -22,30 +22,7 @@ class AdminForm
 {
     protected static function meta(Get $get): array
     {
-        $type = $get('type') ?? 'apps';
-
-        return match ($type) {
-            'anbk' => [
-                'nameRegister' => 'ANBK',
-                'DescriptionRegister' => 'ASESMEN NASIONAL BERBASIS KOMPUTER',
-            ],
-            'apps' => [
-                'nameRegister' => 'APPS',
-                'DescriptionRegister' => 'ASESMEN PSIKOTES POTENSI SISWA',
-            ],
-            'snbt' => [
-                'nameRegister' => 'SNBT',
-                'DescriptionRegister' => 'SELEKSI NASIONAL BERDASARKAN TES',
-            ],
-            'tka' => [
-                'nameRegister' => 'TKA',
-                'DescriptionRegister' => 'TEST KEMAMPUAN AKADEMIK',
-            ],
-            default => [
-                'nameRegister' => 'APPS',
-                'DescriptionRegister' => 'ASESMEN PSIKOTES POTENSI SISWA',
-            ],
-        };
+        return Program::meta($get('type'));
     }
 
     public static function getDifference(Get $get, Set $set): void

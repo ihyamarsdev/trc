@@ -2,139 +2,86 @@
 
 namespace App\Filament\Components;
 
-use Carbon\Carbon;
-use Filament\Tables;
+use App\Filament\Enum\Jenjang;
+use App\Filament\Enum\Periode;
+use App\Filament\Enum\Program;
 use App\Models\Status;
+use Carbon\Carbon;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Fieldset;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Infolists;
-use App\Filament\Enum\Jenjang;
-use App\Filament\Enum\Periode;
-use Illuminate\Database\Eloquent\Model;
-use Filament\Tables\Columns\Layout\Split;
-use Filament\Tables\Columns\{TextColumn};
-use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Exports\ServiceExporter;
-use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Actions\Exports\Enums\ExportFormat;
+use Filament\Tables;
+use Filament\Tables\Columns\Layout\Split;
+use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Ysfkaya\FilamentPhoneInput\Infolists\PhoneEntry;
 use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
-use Creasi\Nusa\Models\{Province, Regency, District};
-use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
-use Filament\Forms\Components\{
-    Select,
-    TextInput,
-    Section,
-    DatePicker,
-    Radio,
-    Fieldset,
-    Group,
-};
 
 class Finance
 {
     protected static function meta(Get $get): array
     {
-        $type = $get("type") ?? "apps";
-
-        return match ($type) {
-            "anbk" => [
-                "nameRegister" => "ANBK",
-                "DescriptionRegister" => "ASESMEN NASIONAL BERBASIS KOMPUTER",
-            ],
-            "apps" => [
-                "nameRegister" => "APPS",
-                "DescriptionRegister" => "ASESMEN PSIKOTES POTENSI SISWA",
-            ],
-            "snbt" => [
-                "nameRegister" => "SNBT",
-                "DescriptionRegister" => "SELEKSI NASIONAL BERDASARKAN TES",
-            ],
-            "tka" => [
-                "nameRegister" => "TKA",
-                "DescriptionRegister" => "TEST KEMAMPUAN AKADEMIK",
-            ],
-            default => [
-                "nameRegister" => "APPS",
-                "DescriptionRegister" => "ASESMEN PSIKOTES POTENSI SISWA",
-            ],
-        };
+        return Program::meta($get('type'));
     }
 
     protected static function metaInfo(Model $record): array
     {
-        $type = $record->type ?? "apps";
-
-        return match ($type) {
-            "anbk" => [
-                "nameRegister" => "ANBK",
-                "DescriptionRegister" => "ASESMEN NASIONAL BERBASIS KOMPUTER",
-            ],
-            "apps" => [
-                "nameRegister" => "APPS",
-                "DescriptionRegister" => "ASESMEN PSIKOTES POTENSI SISWA",
-            ],
-            "snbt" => [
-                "nameRegister" => "SNBT",
-                "DescriptionRegister" => "SELEKSI NASIONAL BERDASARKAN TES",
-            ],
-            "tka" => [
-                "nameRegister" => "TKA",
-                "DescriptionRegister" => "TEST KEMAMPUAN AKADEMIK",
-            ],
-            default => [
-                "nameRegister" => "APPS",
-                "DescriptionRegister" => "ASESMEN PSIKOTES POTENSI SISWA",
-            ],
-        };
+        return Program::meta($record->type);
     }
 
     public static function form(): array
     {
         return [
-            Section::make("Status")
+            Section::make('Status')
                 ->schema([
-                    Select::make("status_id")
-                        ->label("Status")
+                    Select::make('status_id')
+                        ->label('Status')
                         ->preload()
                         ->relationship(
-                            name: "status",
-                            titleAttribute: "name",
-                            modifyQueryUsing: fn(Builder $query) => $query
-                                ->where("order", ">", 9)
-                                ->orderBy("order"),
+                            name: 'status',
+                            titleAttribute: 'name',
+                            modifyQueryUsing: fn (Builder $query) => $query
+                                ->where('order', '>', 9)
+                                ->orderBy('order'),
                         )
                         ->searchable()
-                        ->placeholder("Pilih status...")
+                        ->placeholder('Pilih status...')
                         ->columnSpan(1),
                 ])
                 ->columns(2),
             Section::make()
                 ->description()
                 ->schema([
-                    Fieldset::make("")->schema([
-                        TextInput::make("account_count_created")
-                            ->label("Jumlah Akun Dibuat")
+                    Fieldset::make('')->schema([
+                        TextInput::make('account_count_created')
+                            ->label('Jumlah Akun Dibuat')
                             ->disabled(),
-                        TextInput::make("implementer_count")
-                            ->label("Jumlah Pelaksanaan")
+                        TextInput::make('implementer_count')
+                            ->label('Jumlah Pelaksanaan')
                             ->disabled(),
                     ]),
 
-                    Fieldset::make("Nominal")->schema([
-                        TextInput::make("price")
-                            ->label("Harga SPJ")
-                            ->prefix("Rp")
+                    Fieldset::make('Nominal')->schema([
+                        TextInput::make('price')
+                            ->label('Harga SPJ')
+                            ->prefix('Rp')
                             ->live(1000)
                             ->reactive()
                             ->currencyMask(
-                                thousandSeparator: ",",
-                                decimalSeparator: ".",
+                                thousandSeparator: ',',
+                                decimalSeparator: '.',
                                 precision: 0,
                             )
                             ->afterStateUpdated(function (Get $get, Set $set) {
-                                $price = (float) $get("price");
+                                $price = (float) $get('price');
                                 $net = 0;
 
                                 if ($price >= 0 && $price <= 100000) {
@@ -147,115 +94,115 @@ class Finance
                                     $net = 100000;
                                 }
 
-                                $set("net", $net);
-                                $set("mitra_net", $net);
-                                $set("ss_net", $net);
-                                $set("dll_net", $net);
+                                $set('net', $net);
+                                $set('mitra_net', $net);
+                                $set('ss_net', $net);
+                                $set('dll_net', $net);
                             }),
-                        TextInput::make("net_2")
-                            ->label("Harga NET")
-                            ->prefix("Rp")
+                        TextInput::make('net_2')
+                            ->label('Harga NET')
+                            ->prefix('Rp')
                             ->live(1000)
                             ->reactive()
                             ->currencyMask(
-                                thousandSeparator: ",",
-                                decimalSeparator: ".",
+                                thousandSeparator: ',',
+                                decimalSeparator: '.',
                                 precision: 0,
                             )
                             ->afterStateUpdated(function (Get $get, Set $set) {
                                 $set(
-                                    "total_net",
+                                    'total_net',
                                     abs(
-                                        (float) $get("implementer_count") *
-                                        (float) $get("net_2"),
+                                        (float) $get('implementer_count') *
+                                        (float) $get('net_2'),
                                     ),
                                 );
                             }),
                     ]),
 
-                    Fieldset::make("Opsi")->schema([
-                        Radio::make("option_price")
-                            ->label("Pilih Opsi")
+                    Fieldset::make('Opsi')->schema([
+                        Radio::make('option_price')
+                            ->label('Pilih Opsi')
                             ->options(function (Get $get): array {
                                 return [
-                                    "implementer_" .
+                                    'implementer_'.
                                     $get(
-                                        "implementer_count",
-                                    ) => "JUMLAH PELAKSANAAN",
-                                    "account_" .
+                                        'implementer_count',
+                                    ) => 'JUMLAH PELAKSANAAN',
+                                    'account_'.
                                     $get(
-                                        "account_count_created",
-                                    ) => "JUMLAH AKUN",
+                                        'account_count_created',
+                                    ) => 'JUMLAH AKUN',
                                 ];
                             })
                             ->live(1000)
                             ->reactive()
-                            ->afterStateUpdated(function (Get $get, Set $set, $state, ) {
+                            ->afterStateUpdated(function (Get $get, Set $set, $state) {
                                 preg_match("/\d+/", $state, $matches);
                                 $count = (float) ($matches[0] ?? 0);
 
-                                $set("total", (float) $get("price") * $count);
+                                $set('total', (float) $get('price') * $count);
                             }),
                     ]),
 
-                    Fieldset::make("Total")->schema([
-                        TextInput::make("total")
-                            ->label("Total Dana Sesuai SPJ")
-                            ->prefix("Rp")
+                    Fieldset::make('Total')->schema([
+                        TextInput::make('total')
+                            ->label('Total Dana Sesuai SPJ')
+                            ->prefix('Rp')
                             ->currencyMask(
-                                thousandSeparator: ",",
-                                decimalSeparator: ".",
+                                thousandSeparator: ',',
+                                decimalSeparator: '.',
                                 precision: 0,
                             )
                             ->readOnly(),
-                        TextInput::make("total_net")
-                            ->label("Total Net")
-                            ->prefix("Rp")
+                        TextInput::make('total_net')
+                            ->label('Total Net')
+                            ->prefix('Rp')
                             ->currencyMask(
-                                thousandSeparator: ",",
-                                decimalSeparator: ".",
+                                thousandSeparator: ',',
+                                decimalSeparator: '.',
                                 precision: 0,
                             )
                             ->readOnly(),
                     ]),
 
-                    Fieldset::make("")
-                        ->label("TRC")
+                    Fieldset::make('')
+                        ->label('TRC')
                         ->schema([
-                            TextInput::make("student_count_1")
-                                ->label("Selisih Siswa TRC")
+                            TextInput::make('student_count_1')
+                                ->label('Selisih Siswa TRC')
                                 ->numeric()
                                 ->live(debounce: 1000)
-                                ->afterStateUpdated(function (Get $get, Set $set, ) {
+                                ->afterStateUpdated(function (Get $get, Set $set) {
                                     $set(
-                                        "subtotal_1",
-                                        (float) $get("student_count_1") *
-                                        (float) $get("net"),
+                                        'subtotal_1',
+                                        (float) $get('student_count_1') *
+                                        (float) $get('net'),
                                     );
                                 }),
-                            TextInput::make("net")
-                                ->label("Satuan")
+                            TextInput::make('net')
+                                ->label('Satuan')
                                 ->live(debounce: 1000)
-                                ->prefix("Rp")
+                                ->prefix('Rp')
                                 ->currencyMask(
-                                    thousandSeparator: ",",
-                                    decimalSeparator: ".",
+                                    thousandSeparator: ',',
+                                    decimalSeparator: '.',
                                     precision: 0,
                                 )
                                 ->numeric()
-                                ->afterStateUpdated(function (Get $get, Set $set, ) {
+                                ->afterStateUpdated(function (Get $get, Set $set) {
                                     $set(
-                                        "subtotal_1",
-                                        (float) $get("student_count_1") *
-                                        (float) $get("net"),
+                                        'subtotal_1',
+                                        (float) $get('student_count_1') *
+                                        (float) $get('net'),
                                     );
                                 }),
-                            TextInput::make("subtotal_1")
-                                ->label("Subtotal")
-                                ->prefix("Rp")
+                            TextInput::make('subtotal_1')
+                                ->label('Subtotal')
+                                ->prefix('Rp')
                                 ->currencyMask(
-                                    thousandSeparator: ",",
-                                    decimalSeparator: ".",
+                                    thousandSeparator: ',',
+                                    decimalSeparator: '.',
                                     precision: 0,
                                 )
                                 ->numeric()
@@ -263,122 +210,122 @@ class Finance
                         ])
                         ->columns(3),
 
-                    Fieldset::make("")
-                        ->label("MITRA")
+                    Fieldset::make('')
+                        ->label('MITRA')
                         ->schema([
-                            TextInput::make("mitra_difference")
-                                ->label("Selisih Siswa Sekolah")
+                            TextInput::make('mitra_difference')
+                                ->label('Selisih Siswa Sekolah')
                                 ->numeric()
                                 ->live(debounce: 1000)
-                                ->afterStateUpdated(function (Get $get, Set $set, ) {
+                                ->afterStateUpdated(function (Get $get, Set $set) {
                                     $set(
-                                        "mitra_subtotal",
-                                        (float) $get("mitra_difference") *
-                                        (float) $get("mitra_net"),
+                                        'mitra_subtotal',
+                                        (float) $get('mitra_difference') *
+                                        (float) $get('mitra_net'),
                                     );
                                 }),
-                            TextInput::make("mitra_net")
-                                ->label("Satuan")
+                            TextInput::make('mitra_net')
+                                ->label('Satuan')
                                 ->live(debounce: 1000)
-                                ->prefix("Rp")
+                                ->prefix('Rp')
                                 ->currencyMask(
-                                    thousandSeparator: ",",
-                                    decimalSeparator: ".",
+                                    thousandSeparator: ',',
+                                    decimalSeparator: '.',
                                     precision: 0,
                                 )
                                 ->numeric()
-                                ->afterStateUpdated(function (Get $get, Set $set, ) {
+                                ->afterStateUpdated(function (Get $get, Set $set) {
                                     $set(
-                                        "mitra_subtotal",
-                                        (float) $get("mitra_difference") *
-                                        (float) $get("mitra_net"),
+                                        'mitra_subtotal',
+                                        (float) $get('mitra_difference') *
+                                        (float) $get('mitra_net'),
                                     );
                                 }),
-                            TextInput::make("mitra_subtotal")
-                                ->label("Subtotal")
-                                ->prefix("Rp")
+                            TextInput::make('mitra_subtotal')
+                                ->label('Subtotal')
+                                ->prefix('Rp')
                                 ->currencyMask(
-                                    thousandSeparator: ",",
-                                    decimalSeparator: ".",
+                                    thousandSeparator: ',',
+                                    decimalSeparator: '.',
                                     precision: 0,
                                 )
                                 ->numeric()
                                 ->readOnly(),
 
-                            TextInput::make("ss_difference")
-                                ->label("SS")
+                            TextInput::make('ss_difference')
+                                ->label('SS')
                                 ->numeric()
                                 ->live(debounce: 1000)
-                                ->afterStateUpdated(function (Get $get, Set $set, ) {
+                                ->afterStateUpdated(function (Get $get, Set $set) {
                                     $set(
-                                        "ss_subtotal",
-                                        (float) $get("ss_difference") *
-                                        (float) $get("ss_net"),
+                                        'ss_subtotal',
+                                        (float) $get('ss_difference') *
+                                        (float) $get('ss_net'),
                                     );
                                 })
                                 ->readOnly(),
-                            TextInput::make("ss_net")
-                                ->label("Satuan")
+                            TextInput::make('ss_net')
+                                ->label('Satuan')
                                 ->live(debounce: 1000)
-                                ->prefix("Rp")
+                                ->prefix('Rp')
                                 ->currencyMask(
-                                    thousandSeparator: ",",
-                                    decimalSeparator: ".",
+                                    thousandSeparator: ',',
+                                    decimalSeparator: '.',
                                     precision: 0,
                                 )
                                 ->numeric()
-                                ->afterStateUpdated(function (Get $get, Set $set, ) {
+                                ->afterStateUpdated(function (Get $get, Set $set) {
                                     $set(
-                                        "ss_subtotal",
-                                        (float) $get("ss_difference") *
-                                        (float) $get("ss_net"),
+                                        'ss_subtotal',
+                                        (float) $get('ss_difference') *
+                                        (float) $get('ss_net'),
                                     );
                                 }),
-                            TextInput::make("ss_subtotal")
-                                ->label("Subtotal")
-                                ->prefix("Rp")
+                            TextInput::make('ss_subtotal')
+                                ->label('Subtotal')
+                                ->prefix('Rp')
                                 ->currencyMask(
-                                    thousandSeparator: ",",
-                                    decimalSeparator: ".",
+                                    thousandSeparator: ',',
+                                    decimalSeparator: '.',
                                     precision: 0,
                                 )
                                 ->numeric()
                                 ->readOnly(),
 
-                            TextInput::make("dll_difference")
-                                ->label("Lain-lain")
+                            TextInput::make('dll_difference')
+                                ->label('Lain-lain')
                                 ->numeric()
                                 ->live(debounce: 1000)
-                                ->afterStateUpdated(function (Get $get, Set $set, ) {
+                                ->afterStateUpdated(function (Get $get, Set $set) {
                                     $set(
-                                        "dll_subtotal",
-                                        (float) $get("dll_difference") *
-                                        (float) $get("dll_net"),
+                                        'dll_subtotal',
+                                        (float) $get('dll_difference') *
+                                        (float) $get('dll_net'),
                                     );
                                 }),
-                            TextInput::make("dll_net")
-                                ->label("Satuan")
+                            TextInput::make('dll_net')
+                                ->label('Satuan')
                                 ->live(debounce: 1000)
-                                ->prefix("Rp")
+                                ->prefix('Rp')
                                 ->currencyMask(
-                                    thousandSeparator: ",",
-                                    decimalSeparator: ".",
+                                    thousandSeparator: ',',
+                                    decimalSeparator: '.',
                                     precision: 0,
                                 )
                                 ->numeric()
-                                ->afterStateUpdated(function (Get $get, Set $set, ) {
+                                ->afterStateUpdated(function (Get $get, Set $set) {
                                     $set(
-                                        "subtotal_1",
-                                        (float) $get("student_count_1") *
-                                        (float) $get("net"),
+                                        'subtotal_1',
+                                        (float) $get('student_count_1') *
+                                        (float) $get('net'),
                                     );
                                 }),
-                            TextInput::make("dll_subtotal")
-                                ->label("Subtotal")
-                                ->prefix("Rp")
+                            TextInput::make('dll_subtotal')
+                                ->label('Subtotal')
+                                ->prefix('Rp')
                                 ->currencyMask(
-                                    thousandSeparator: ",",
-                                    decimalSeparator: ".",
+                                    thousandSeparator: ',',
+                                    decimalSeparator: '.',
                                     precision: 0,
                                 )
                                 ->numeric()
@@ -386,25 +333,25 @@ class Finance
                         ])
                         ->columns(3),
 
-                    Fieldset::make("")->schema([
-                        DatePicker::make("invoice_date")
-                            ->label("Invoice")
+                    Fieldset::make('')->schema([
+                        DatePicker::make('invoice_date')
+                            ->label('Invoice')
                             ->native(false)
-                            ->displayFormat("l, jS F Y"),
-                        DatePicker::make("payment_date")
-                            ->label("Jadwal Pembayaran")
+                            ->displayFormat('l, jS F Y'),
+                        DatePicker::make('payment_date')
+                            ->label('Jadwal Pembayaran')
                             ->native(false)
-                            ->displayFormat("l, jS F Y"),
-                        DatePicker::make("spk")
-                            ->label("Jadwal SPK")
+                            ->displayFormat('l, jS F Y'),
+                        DatePicker::make('spk')
+                            ->label('Jadwal SPK')
                             ->native(false)
-                            ->displayFormat("l, jS F Y"),
-                        Select::make("payment_name")
-                            ->label("Pembayaran Via")
+                            ->displayFormat('l, jS F Y'),
+                        Select::make('payment_name')
+                            ->label('Pembayaran Via')
                             ->options([
-                                "SIPLAH" => "SIPLAH",
-                                "SI/TF" => "SI / TF",
-                                "CASH" => "CASH",
+                                'SIPLAH' => 'SIPLAH',
+                                'SI/TF' => 'SI / TF',
+                                'CASH' => 'CASH',
                             ]),
                     ]),
                 ])
@@ -416,83 +363,83 @@ class Finance
     {
         return [
             Split::make([
-                TextColumn::make("type")
-                    ->label("Program")
+                TextColumn::make('type')
+                    ->label('Program')
                     ->description('Program', position: 'above')
-                    ->extraAttributes(["class" => "uppercase"]),
-                TextColumn::make("schools")->label("Sekolah")->description('Sekolah', position: 'above')->wrap(),
-                TextColumn::make("periode")->label("Periode")->description('Periode', position: 'above')->extraAttributes(["class" => "uppercase"])->wrap(),
-                TextColumn::make("years")->label("Tahun")->description('Tahun', position: 'above'),
+                    ->extraAttributes(['class' => 'uppercase']),
+                TextColumn::make('schools')->label('Sekolah')->description('Sekolah', position: 'above')->wrap(),
+                TextColumn::make('periode')->label('Periode')->description('Periode', position: 'above')->extraAttributes(['class' => 'uppercase'])->wrap(),
+                TextColumn::make('years')->label('Tahun')->description('Tahun', position: 'above'),
 
-                TextColumn::make("latestStatusLog.status.color")
-                    ->label("Status")
+                TextColumn::make('latestStatusLog.status.color')
+                    ->label('Status')
                     ->description('Status', position: 'above')
                     ->badge()
-                    ->formatStateUsing(fn($state) => ucfirst($state))
+                    ->formatStateUsing(fn ($state) => ucfirst($state))
                     ->color(
-                        fn(string $state): string => match ($state) {
-                            "green" => "green",
-                            "blue" => "blue",
-                            "yellow" => "yellow",
-                            "red" => "red",
+                        fn (string $state): string => match ($state) {
+                            'green' => 'green',
+                            'blue' => 'blue',
+                            'yellow' => 'yellow',
+                            'red' => 'red',
                         },
                     )
-                    ->default("red"),
-            ])->from("md"),
+                    ->default('red'),
+            ])->from('md'),
         ];
     }
 
     public static function exportColumns(): array
     {
         return [
-            //Finance
-            TextColumn::make("price")->label("Harga SPJ")->prefix("Rp."),
-            TextColumn::make("net_2")->label("Harga NET")->prefix("Rp."),
-            TextColumn::make("total")
-                ->label("Total Dana Sesuai SPJ")
-                ->prefix("Rp."),
-            TextColumn::make("total_net")->label("Total Net")->prefix("Rp."),
+            // Finance
+            TextColumn::make('price')->label('Harga SPJ')->prefix('Rp.'),
+            TextColumn::make('net_2')->label('Harga NET')->prefix('Rp.'),
+            TextColumn::make('total')
+                ->label('Total Dana Sesuai SPJ')
+                ->prefix('Rp.'),
+            TextColumn::make('total_net')->label('Total Net')->prefix('Rp.'),
 
-            TextColumn::make("student_count_1")->label("Selisih Siswa TRC"),
-            TextColumn::make("net")->label("Satuan")->prefix("Rp."),
-            TextColumn::make("subtotal_1")->label("Subtotal")->prefix("Rp."),
+            TextColumn::make('student_count_1')->label('Selisih Siswa TRC'),
+            TextColumn::make('net')->label('Satuan')->prefix('Rp.'),
+            TextColumn::make('subtotal_1')->label('Subtotal')->prefix('Rp.'),
 
-            TextColumn::make("mitra_difference")->label("elisih Siswa Sekolah"),
-            TextColumn::make("net")->label("Satuan")->prefix("Rp."),
-            TextColumn::make("mitra_subtotal")
-                ->label("Subtotal")
-                ->prefix("Rp."),
+            TextColumn::make('mitra_difference')->label('elisih Siswa Sekolah'),
+            TextColumn::make('net')->label('Satuan')->prefix('Rp.'),
+            TextColumn::make('mitra_subtotal')
+                ->label('Subtotal')
+                ->prefix('Rp.'),
 
-            TextColumn::make("ss_difference")->label("SS"),
-            TextColumn::make("ss_net")->label("Satuan")->prefix("Rp."),
-            TextColumn::make("ss_subtotal")->label("Subtotal")->prefix("Rp."),
+            TextColumn::make('ss_difference')->label('SS'),
+            TextColumn::make('ss_net')->label('Satuan')->prefix('Rp.'),
+            TextColumn::make('ss_subtotal')->label('Subtotal')->prefix('Rp.'),
 
-            TextColumn::make("dll_difference")->label("Lain-lain"),
-            TextColumn::make("dll_net")->label("Satuan")->prefix("Rp."),
-            TextColumn::make("dll_subtotal")->label("Subtotal")->prefix("Rp."),
+            TextColumn::make('dll_difference')->label('Lain-lain'),
+            TextColumn::make('dll_net')->label('Satuan')->prefix('Rp.'),
+            TextColumn::make('dll_subtotal')->label('Subtotal')->prefix('Rp.'),
 
-            TextColumn::make("invoice_date")
-                ->label("Tanggal Invoice")
+            TextColumn::make('invoice_date')
+                ->label('Tanggal Invoice')
                 ->formatStateUsing(
-                    fn($state) => Carbon::parse($state)->translatedFormat(
-                        "l, jS F Y",
+                    fn ($state) => Carbon::parse($state)->translatedFormat(
+                        'l, jS F Y',
                     ),
                 ),
-            TextColumn::make("spk")
-                ->label("SPK Terkirim")
+            TextColumn::make('spk')
+                ->label('SPK Terkirim')
                 ->formatStateUsing(
-                    fn($state) => Carbon::parse($state)->translatedFormat(
-                        "l, jS F Y",
+                    fn ($state) => Carbon::parse($state)->translatedFormat(
+                        'l, jS F Y',
                     ),
                 ),
-            TextColumn::make("payment_date")
-                ->label("Tanggal Pembayaran")
+            TextColumn::make('payment_date')
+                ->label('Tanggal Pembayaran')
                 ->formatStateUsing(
-                    fn($state) => Carbon::parse($state)->translatedFormat(
-                        "l, jS F Y",
+                    fn ($state) => Carbon::parse($state)->translatedFormat(
+                        'l, jS F Y',
                     ),
                 ),
-            TextColumn::make("payment_name")->label("Pembayaran"),
+            TextColumn::make('payment_name')->label('Pembayaran'),
         ];
     }
 
@@ -500,442 +447,443 @@ class Finance
     {
         return [
             Infolists\Components\Section::make(
-                fn() => self::metaInfo($record)["nameRegister"],
+                fn () => self::metaInfo($record)['nameRegister'],
             )
                 ->description(
-                    fn() => self::metaInfo($record)["DescriptionRegister"],
+                    fn () => self::metaInfo($record)['DescriptionRegister'],
                 )
                 ->schema([
                     Infolists\Components\Fieldset::make(
-                        "Aktifitas Saat ini",
+                        'Aktifitas Saat ini',
                     )->schema([
-                                Infolists\Components\TextEntry::make(
-                                    "status.name",
-                                )->label(""),
-                                Infolists\Components\IconEntry::make(
-                                    "latestStatusLog.status.order",
-                                )
-                                    ->label("")
-                                    ->icon(function ($state) {
-                                        // $state = nilai order (bisa null)
-                                        static $iconByOrder;
+                        Infolists\Components\TextEntry::make(
+                            'status.name',
+                        )->label(''),
+                        Infolists\Components\IconEntry::make(
+                            'latestStatusLog.status.order',
+                        )
+                            ->label('')
+                            ->icon(function ($state) {
+                                // $state = nilai order (bisa null)
+                                static $iconByOrder;
 
-                                        if ($iconByOrder === null) {
-                                            // Ambil sekali: [order => icon]
-                                            $iconByOrder = Status::query()
-                                                ->pluck("icon", "order") // pastikan kolom 'icon' ada
-                                                ->all();
-                                        }
+                                if ($iconByOrder === null) {
+                                    // Ambil sekali: [order => icon]
+                                    $iconByOrder = Status::query()
+                                        ->pluck('icon', 'order') // pastikan kolom 'icon' ada
+                                        ->all();
+                                }
 
-                                        $order = (int) $state;
-                                        return $iconByOrder[$order] ??
-                                            "heroicon-m-clock";
-                                    })
-                                    ->color(function ($state) {
-                                        static $colorByOrder;
+                                $order = (int) $state;
 
-                                        if ($colorByOrder === null) {
-                                            // Ambil sekali: [order => color_dari_DB]
-                                            $colorByOrder = Status::query()
-                                                ->pluck("color", "order")
-                                                ->all();
-                                        }
+                                return $iconByOrder[$order] ??
+                                    'heroicon-m-clock';
+                            })
+                            ->color(function ($state) {
+                                static $colorByOrder;
 
-                                        $order = (int) $state;
-                                        $raw = strtolower(
-                                            (string) ($colorByOrder[$order] ?? ""),
-                                        );
+                                if ($colorByOrder === null) {
+                                    // Ambil sekali: [order => color_dari_DB]
+                                    $colorByOrder = Status::query()
+                                        ->pluck('color', 'order')
+                                        ->all();
+                                }
 
-                                        // Map warna DB -> warna Filament
-                                        return match ($raw) {
-                                            "green" => "green",
-                                            "blue" => "blue",
-                                            "yellow" => "yellow",
-                                            "red" => "red",
-                                            default => "gray",
-                                        };
-                                    })
-                                    ->default("red")
-                                    ->size("lg"),
-                            ]),
+                                $order = (int) $state;
+                                $raw = strtolower(
+                                    (string) ($colorByOrder[$order] ?? ''),
+                                );
+
+                                // Map warna DB -> warna Filament
+                                return match ($raw) {
+                                    'green' => 'green',
+                                    'blue' => 'blue',
+                                    'yellow' => 'yellow',
+                                    'red' => 'red',
+                                    default => 'gray',
+                                };
+                            })
+                            ->default('red')
+                            ->size('lg'),
+                    ]),
                 ])
                 ->columns(2),
-            Infolists\Components\Section::make("Salesforce")
-                ->description("Detail data dari Salesforce")
+            Infolists\Components\Section::make('Salesforce')
+                ->description('Detail data dari Salesforce')
                 ->schema([
-                    Infolists\Components\Fieldset::make("Periode")->schema([
-                        TextEntry::make("periode")->label("Periode")->placeholder("Tidak Ada Periode"),
-                        TextEntry::make("years")->label("Tahun Ajaran")->placeholder("Tidak Ada Tahun Ajaran"),
+                    Infolists\Components\Fieldset::make('Periode')->schema([
+                        TextEntry::make('periode')->label('Periode')->placeholder('Tidak Ada Periode'),
+                        TextEntry::make('years')->label('Tahun Ajaran')->placeholder('Tidak Ada Tahun Ajaran'),
                     ]),
 
-                    Infolists\Components\Fieldset::make("Salesforce")->schema([
-                        TextEntry::make("users.name")->label("User"),
+                    Infolists\Components\Fieldset::make('Salesforce')->schema([
+                        TextEntry::make('users.name')->label('User'),
                     ]),
 
-                    Infolists\Components\Fieldset::make("Sekolah")->schema([
-                        Infolists\Components\TextEntry::make("schools")->label(
-                            "Sekolah",
-                        )->placeholder("Tidak Ada Sekolah"),
-                        Infolists\Components\TextEntry::make("class")->label(
-                            "Kelas",
-                        )->placeholder("Tidak Ada Kelas"),
+                    Infolists\Components\Fieldset::make('Sekolah')->schema([
+                        Infolists\Components\TextEntry::make('schools')->label(
+                            'Sekolah',
+                        )->placeholder('Tidak Ada Sekolah'),
+                        Infolists\Components\TextEntry::make('class')->label(
+                            'Kelas',
+                        )->placeholder('Tidak Ada Kelas'),
                         Infolists\Components\TextEntry::make(
-                            "education_level",
-                        )->label("Jenjang")->placeholder("Tidak Ada Jenjang"),
+                            'education_level',
+                        )->label('Jenjang')->placeholder('Tidak Ada Jenjang'),
                         Infolists\Components\TextEntry::make(
-                            "description",
-                        )->label("Keterangan")->placeholder("Tidak Ada Keterangan"),
+                            'description',
+                        )->label('Keterangan')->placeholder('Tidak Ada Keterangan'),
                         Infolists\Components\TextEntry::make(
-                            "schools_type",
-                        )->label("Negeri / Swasta")->placeholder("Tidak Ada Negeri / Swasta"),
+                            'schools_type',
+                        )->label('Negeri / Swasta')->placeholder('Tidak Ada Negeri / Swasta'),
                         Infolists\Components\TextEntry::make(
-                            "student_count",
-                        )->label("Jumlah Siswa")->placeholder("Tidak Ada Jumlah Siswa"),
+                            'student_count',
+                        )->label('Jumlah Siswa')->placeholder('Tidak Ada Jumlah Siswa'),
                         Infolists\Components\TextEntry::make(
-                            "provinces",
-                        )->label("Provinsi")->placeholder("Tidak Ada Provinsi"),
+                            'provinces',
+                        )->label('Provinsi')->placeholder('Tidak Ada Provinsi'),
                         Infolists\Components\TextEntry::make(
-                            "regencies",
-                        )->label("Kota / Kabupaten")->placeholder("Tidak Ada Kota / Kabupaten"),
-                        Infolists\Components\TextEntry::make("area")
-                            ->label("Wilayah")
-                            ->placeholder("Tidak Ada Wilayah"),
+                            'regencies',
+                        )->label('Kota / Kabupaten')->placeholder('Tidak Ada Kota / Kabupaten'),
+                        Infolists\Components\TextEntry::make('area')
+                            ->label('Wilayah')
+                            ->placeholder('Tidak Ada Wilayah'),
                     ]),
 
-                    Infolists\Components\Fieldset::make("Bagan")->schema([
+                    Infolists\Components\Fieldset::make('Bagan')->schema([
                         Infolists\Components\TextEntry::make(
-                            "principal",
-                        )->label("Kepala Sekolah")->placeholder("Tidak Ada Kepala Sekolah"),
-                        PhoneEntry::make("principal_phone")
-                            ->label("No Hp Kepala Sekolah")
+                            'principal',
+                        )->label('Kepala Sekolah')->placeholder('Tidak Ada Kepala Sekolah'),
+                        PhoneEntry::make('principal_phone')
+                            ->label('No Hp Kepala Sekolah')
                             ->displayFormat(PhoneInputNumberType::NATIONAL)
-                            ->placeholder("Tidak Ada No Hp Kepala Sekolah"),
+                            ->placeholder('Tidak Ada No Hp Kepala Sekolah'),
                         Infolists\Components\TextEntry::make(
-                            "curriculum_deputies",
-                        )->label("Wakakurikulum")->placeholder("Tidak Ada Wakakurikulum"),
-                        PhoneEntry::make("curriculum_deputies_phone")
-                            ->label("No Hp Wakakurikulum")
+                            'curriculum_deputies',
+                        )->label('Wakakurikulum')->placeholder('Tidak Ada Wakakurikulum'),
+                        PhoneEntry::make('curriculum_deputies_phone')
+                            ->label('No Hp Wakakurikulum')
                             ->displayFormat(PhoneInputNumberType::NATIONAL)
-                            ->placeholder("Tidak Ada No Hp Wakakurikulum"),
+                            ->placeholder('Tidak Ada No Hp Wakakurikulum'),
                         Infolists\Components\TextEntry::make(
-                            "counselor_coordinators",
-                        )->label("Koordinator BK")->placeholder("Tidak Ada Koordinator BK"),
-                        PhoneEntry::make("counselor_coordinators_phone")
-                            ->label("No Hp Koordinator BK")
+                            'counselor_coordinators',
+                        )->label('Koordinator BK')->placeholder('Tidak Ada Koordinator BK'),
+                        PhoneEntry::make('counselor_coordinators_phone')
+                            ->label('No Hp Koordinator BK')
                             ->displayFormat(PhoneInputNumberType::NATIONAL)
-                            ->placeholder("Tidak Ada No Hp Koordinator BK"),
-                        Infolists\Components\TextEntry::make("proctors")->label(
-                            "Proktor",
-                        )->placeholder("Tidak Ada Proktor"),
-                        PhoneEntry::make("proctors_phone")
-                            ->label("No Hp Proktor")
+                            ->placeholder('Tidak Ada No Hp Koordinator BK'),
+                        Infolists\Components\TextEntry::make('proctors')->label(
+                            'Proktor',
+                        )->placeholder('Tidak Ada Proktor'),
+                        PhoneEntry::make('proctors_phone')
+                            ->label('No Hp Proktor')
                             ->displayFormat(PhoneInputNumberType::NATIONAL)
-                            ->placeholder("Tidak Ada No Hp Proktor"),
+                            ->placeholder('Tidak Ada No Hp Proktor'),
                     ]),
 
-                    Infolists\Components\Fieldset::make("")->schema([
-                        TextEntry::make("date_register")
-                            ->label("Tanggal Pendaftaran")
-                            ->dateTime("l, jS F Y"),
-                        TextEntry::make("implementation_estimate")
-                            ->label("Estimasi Pelaksanaan")
-                            ->dateTime("l, jS F Y"),
+                    Infolists\Components\Fieldset::make('')->schema([
+                        TextEntry::make('date_register')
+                            ->label('Tanggal Pendaftaran')
+                            ->dateTime('l, jS F Y'),
+                        TextEntry::make('implementation_estimate')
+                            ->label('Estimasi Pelaksanaan')
+                            ->dateTime('l, jS F Y'),
                     ]),
                 ]),
 
-            Infolists\Components\Section::make("Service")
-                ->description("Detail Data Service")
+            Infolists\Components\Section::make('Service')
+                ->description('Detail Data Service')
                 ->schema([
-                    Infolists\Components\Fieldset::make("")->schema([
-                        Infolists\Components\TextEntry::make("group")
-                            ->label("Grup")
-                            ->dateTime("l, jS F Y")
-                            ->placeholder("Belum Terjadwal"),
-                        Infolists\Components\TextEntry::make("bimtek")
-                            ->label("Bimtek")
-                            ->dateTime("l, jS F Y")
-                            ->placeholder("Belum Terjadwal"),
+                    Infolists\Components\Fieldset::make('')->schema([
+                        Infolists\Components\TextEntry::make('group')
+                            ->label('Grup')
+                            ->dateTime('l, jS F Y')
+                            ->placeholder('Belum Terjadwal'),
+                        Infolists\Components\TextEntry::make('bimtek')
+                            ->label('Bimtek')
+                            ->dateTime('l, jS F Y')
+                            ->placeholder('Belum Terjadwal'),
                     ]),
 
-                    Infolists\Components\Fieldset::make("")->schema([
+                    Infolists\Components\Fieldset::make('')->schema([
                         Infolists\Components\TextEntry::make(
-                            "account_count_created",
+                            'account_count_created',
                         )
-                            ->label("Akun Dibuat")
-                            ->placeholder("Belum Terbuat"),
+                            ->label('Akun Dibuat')
+                            ->placeholder('Belum Terbuat'),
                         Infolists\Components\TextEntry::make(
-                            "implementer_count",
+                            'implementer_count',
                         )
-                            ->label("Pelaksanaan")
-                            ->placeholder("Belum terbuat"),
-                        Infolists\Components\TextEntry::make("difference")
-                            ->label("Selisih")
-                            ->placeholder("Belum terbuat"),
+                            ->label('Pelaksanaan')
+                            ->placeholder('Belum terbuat'),
+                        Infolists\Components\TextEntry::make('difference')
+                            ->label('Selisih')
+                            ->placeholder('Belum terbuat'),
                     ]),
 
-                    Infolists\Components\Fieldset::make("Konsultasi")
+                    Infolists\Components\Fieldset::make('Konsultasi')
                         ->schema([
                             Infolists\Components\IconEntry::make(
-                                "students_download",
+                                'students_download',
                             )
-                                ->label("Download Siswa")
+                                ->label('Download Siswa')
                                 ->icon(
-                                    fn(string $state): string => match (
-                                    $state
-                                ) {
-                                        "YA" => "heroicon-s-check-circle",
-                                        "TIDAK" => "heroicon-s-x-circle",
+                                    fn (string $state): string => match (
+                                        $state
+                                    ) {
+                                        'YA' => 'heroicon-s-check-circle',
+                                        'TIDAK' => 'heroicon-s-x-circle',
                                     },
                                 )
                                 ->color(
-                                    fn(string $state): string => match (
-                                    $state
-                                ) {
-                                        "YA" => "success",
-                                        "TIDAK" => "danger",
+                                    fn (string $state): string => match (
+                                        $state
+                                    ) {
+                                        'YA' => 'success',
+                                        'TIDAK' => 'danger',
                                     },
                                 )
-                                ->placeholder("Tidak Ada Status"),
+                                ->placeholder('Tidak Ada Status'),
                             Infolists\Components\IconEntry::make(
-                                "schools_download",
+                                'schools_download',
                             )
-                                ->label("Download Sekolah")
+                                ->label('Download Sekolah')
                                 ->icon(
-                                    fn(string $state): string => match (
-                                    $state
-                                ) {
-                                        "YA" => "heroicon-s-check-circle",
-                                        "TIDAK" => "heroicon-s-x-circle",
+                                    fn (string $state): string => match (
+                                        $state
+                                    ) {
+                                        'YA' => 'heroicon-s-check-circle',
+                                        'TIDAK' => 'heroicon-s-x-circle',
                                     },
                                 )
                                 ->color(
-                                    fn(string $state): string => match (
-                                    $state
-                                ) {
-                                        "YA" => "success",
-                                        "TIDAK" => "danger",
+                                    fn (string $state): string => match (
+                                        $state
+                                    ) {
+                                        'YA' => 'success',
+                                        'TIDAK' => 'danger',
                                     },
                                 )
-                                ->placeholder("Tidak Ada Status"),
-                            Infolists\Components\IconEntry::make("pm")
-                                ->label("PM")
+                                ->placeholder('Tidak Ada Status'),
+                            Infolists\Components\IconEntry::make('pm')
+                                ->label('PM')
                                 ->icon(
-                                    fn(string $state): string => match (
-                                    $state
-                                ) {
-                                        "YA" => "heroicon-s-check-circle",
-                                        "TIDAK" => "heroicon-s-x-circle",
+                                    fn (string $state): string => match (
+                                        $state
+                                    ) {
+                                        'YA' => 'heroicon-s-check-circle',
+                                        'TIDAK' => 'heroicon-s-x-circle',
                                     },
                                 )
                                 ->color(
-                                    fn(string $state): string => match (
-                                    $state
-                                ) {
-                                        "YA" => "success",
-                                        "TIDAK" => "danger",
+                                    fn (string $state): string => match (
+                                        $state
+                                    ) {
+                                        'YA' => 'success',
+                                        'TIDAK' => 'danger',
                                     },
                                 )
-                                ->placeholder("Tidak Ada Status"),
+                                ->placeholder('Tidak Ada Status'),
                         ])
                         ->columns(3),
 
-                    Infolists\Components\Fieldset::make("")->schema([
+                    Infolists\Components\Fieldset::make('')->schema([
                         Infolists\Components\TextEntry::make(
-                            "counselor_consultation_date",
+                            'counselor_consultation_date',
                         )
-                            ->label("Konsul BK")
-                            ->dateTime("l, jS F Y")
-                            ->placeholder("Belum Terjadwal"),
+                            ->label('Konsul BK')
+                            ->dateTime('l, jS F Y')
+                            ->placeholder('Belum Terjadwal'),
                         Infolists\Components\TextEntry::make(
-                            "student_consultation_date",
+                            'student_consultation_date',
                         )
-                            ->label("Konsul Siswa")
-                            ->dateTime("l, jS F Y")
-                            ->placeholder("Belum Terjadwal"),
+                            ->label('Konsul Siswa')
+                            ->dateTime('l, jS F Y')
+                            ->placeholder('Belum Terjadwal'),
                     ]),
                 ])
                 ->columns(2),
 
-            Infolists\Components\Section::make("Finance")
-                ->description("Detail Data Finance")
+            Infolists\Components\Section::make('Finance')
+                ->description('Detail Data Finance')
                 ->schema([
                     Infolists\Components\Fieldset::make(
-                        "Opsi Jumlah Akun / Jumlah Pelaksanaan",
+                        'Opsi Jumlah Akun / Jumlah Pelaksanaan',
                     )->schema([
-                                TextEntry::make("option_price")
-                                    ->label("")
-                                    ->placeholder("Belum di Pilih"),
-                            ]),
+                        TextEntry::make('option_price')
+                            ->label('')
+                            ->placeholder('Belum di Pilih'),
+                    ]),
 
-                    Infolists\Components\Fieldset::make("Nominal")
+                    Infolists\Components\Fieldset::make('Nominal')
                         ->schema([
-                            TextEntry::make("price")
-                                ->label("Harga SPJ")
-                                ->money("IDR")
-                                ->placeholder("Belum Terisi"),
-                            TextEntry::make("net_2")
-                                ->label("Harga Net")
-                                ->money("IDR")
-                                ->placeholder("Belum Terisi"),
+                            TextEntry::make('price')
+                                ->label('Harga SPJ')
+                                ->money('IDR')
+                                ->placeholder('Belum Terisi'),
+                            TextEntry::make('net_2')
+                                ->label('Harga Net')
+                                ->money('IDR')
+                                ->placeholder('Belum Terisi'),
                         ])
                         ->columns(3),
 
-                    Infolists\Components\Fieldset::make("")
-                        ->label("TRC")
+                    Infolists\Components\Fieldset::make('')
+                        ->label('TRC')
                         ->schema([
-                            TextEntry::make("student_count_1")
-                                ->label("Selisih Siswa TRC")
-                                ->placeholder("Belum Terisi"),
-                            TextEntry::make("net")
-                                ->label("Satuan")
-                                ->money("IDR")
-                                ->placeholder("Belum Terisi"),
-                            TextEntry::make("subtotal_1")
-                                ->label("Sub Total")
-                                ->money("IDR")
-                                ->placeholder("Belum Terisi"),
+                            TextEntry::make('student_count_1')
+                                ->label('Selisih Siswa TRC')
+                                ->placeholder('Belum Terisi'),
+                            TextEntry::make('net')
+                                ->label('Satuan')
+                                ->money('IDR')
+                                ->placeholder('Belum Terisi'),
+                            TextEntry::make('subtotal_1')
+                                ->label('Sub Total')
+                                ->money('IDR')
+                                ->placeholder('Belum Terisi'),
                         ])
                         ->columns(3),
 
-                    Infolists\Components\Fieldset::make("")
-                        ->label("MITRA")
+                    Infolists\Components\Fieldset::make('')
+                        ->label('MITRA')
                         ->schema([
-                            TextEntry::make("mitra_difference")
-                                ->label("Selisih Siswa Sekolah")
-                                ->placeholder("Belum Terisi"),
-                            TextEntry::make("mitra_net")
-                                ->label("Satuan")
-                                ->money("IDR")
-                                ->placeholder("Belum Terisi"),
-                            TextEntry::make("mitra_subtotal")
-                                ->label("Sub Total")
-                                ->money("IDR")
-                                ->placeholder("Belum Terisi"),
+                            TextEntry::make('mitra_difference')
+                                ->label('Selisih Siswa Sekolah')
+                                ->placeholder('Belum Terisi'),
+                            TextEntry::make('mitra_net')
+                                ->label('Satuan')
+                                ->money('IDR')
+                                ->placeholder('Belum Terisi'),
+                            TextEntry::make('mitra_subtotal')
+                                ->label('Sub Total')
+                                ->money('IDR')
+                                ->placeholder('Belum Terisi'),
 
-                            TextEntry::make("implementer_count")
-                                ->label("SS")
-                                ->placeholder("Belum Terisi"),
-                            TextEntry::make("ss_net")
-                                ->label("Satuan")
-                                ->money("IDR")
-                                ->placeholder("Belum Terisi"),
-                            TextEntry::make("ss_subtotal")
-                                ->label("Sub Total")
-                                ->money("IDR")
-                                ->placeholder("Belum Terisi"),
+                            TextEntry::make('implementer_count')
+                                ->label('SS')
+                                ->placeholder('Belum Terisi'),
+                            TextEntry::make('ss_net')
+                                ->label('Satuan')
+                                ->money('IDR')
+                                ->placeholder('Belum Terisi'),
+                            TextEntry::make('ss_subtotal')
+                                ->label('Sub Total')
+                                ->money('IDR')
+                                ->placeholder('Belum Terisi'),
 
-                            TextEntry::make("dll_difference")
-                                ->label("SS")
-                                ->placeholder("Belum Terisi"),
-                            TextEntry::make("dll_net")
-                                ->label("Satuan")
-                                ->money("IDR")
-                                ->placeholder("Belum Terisi"),
-                            TextEntry::make("dll_subtotal")
-                                ->label("Sub Total")
-                                ->money("IDR")
-                                ->placeholder("Belum Terisi"),
+                            TextEntry::make('dll_difference')
+                                ->label('SS')
+                                ->placeholder('Belum Terisi'),
+                            TextEntry::make('dll_net')
+                                ->label('Satuan')
+                                ->money('IDR')
+                                ->placeholder('Belum Terisi'),
+                            TextEntry::make('dll_subtotal')
+                                ->label('Sub Total')
+                                ->money('IDR')
+                                ->placeholder('Belum Terisi'),
                         ])
                         ->columns(3),
 
-                    Infolists\Components\Fieldset::make("")
-                        ->label("Total")
+                    Infolists\Components\Fieldset::make('')
+                        ->label('Total')
                         ->schema([
-                            TextEntry::make("total")
-                                ->label("Total Dana Sesuai SPJ")
-                                ->money("IDR")
-                                ->placeholder("Belum Terisi"),
-                            TextEntry::make("total_net")
-                                ->label("Total Net")
-                                ->money("IDR")
-                                ->placeholder("Belum Terisi"),
+                            TextEntry::make('total')
+                                ->label('Total Dana Sesuai SPJ')
+                                ->money('IDR')
+                                ->placeholder('Belum Terisi'),
+                            TextEntry::make('total_net')
+                                ->label('Total Net')
+                                ->money('IDR')
+                                ->placeholder('Belum Terisi'),
                         ])
                         ->columns(3),
 
-                    Infolists\Components\Fieldset::make("")
-                        ->label("Tanggal")
+                    Infolists\Components\Fieldset::make('')
+                        ->label('Tanggal')
                         ->schema([
-                            TextEntry::make("invoice_date")
-                                ->label("Invoice")
-                                ->dateTime("l, jS F Y")
-                                ->placeholder("Belum Terjadwal"),
-                            TextEntry::make("payment_date")
-                                ->label("Pembayaran")
-                                ->dateTime("l, jS F Y")
-                                ->placeholder("Belum Terjadwal"),
-                            TextEntry::make("spk")
-                                ->label("SPK di Kirim")
-                                ->dateTime("l, jS F Y")
-                                ->placeholder("Belum Terjadwal"),
-                            TextEntry::make("payment_name")
-                                ->label("Pembayaran Via")
-                                ->placeholder("Belum Terisi"),
+                            TextEntry::make('invoice_date')
+                                ->label('Invoice')
+                                ->dateTime('l, jS F Y')
+                                ->placeholder('Belum Terjadwal'),
+                            TextEntry::make('payment_date')
+                                ->label('Pembayaran')
+                                ->dateTime('l, jS F Y')
+                                ->placeholder('Belum Terjadwal'),
+                            TextEntry::make('spk')
+                                ->label('SPK di Kirim')
+                                ->dateTime('l, jS F Y')
+                                ->placeholder('Belum Terjadwal'),
+                            TextEntry::make('payment_name')
+                                ->label('Pembayaran Via')
+                                ->placeholder('Belum Terisi'),
                         ]),
                 ])
                 ->columns(3),
 
-            Infolists\Components\Section::make("Kwitansi")
-                ->description("Lakukan Edit untuk merubah Kwitansi")
+            Infolists\Components\Section::make('Kwitansi')
+                ->description('Lakukan Edit untuk merubah Kwitansi')
                 ->schema([
-                    Infolists\Components\Fieldset::make("")
-                        ->label("Detail Kwitansi")
+                    Infolists\Components\Fieldset::make('')
+                        ->label('Detail Kwitansi')
                         ->schema([
-                            TextEntry::make("schools")
-                                ->label("Telah Terima Dari")
-                                ->placeholder("Belum Terisi"),
-                            TextEntry::make("total")
-                                ->label("Uang Sejumlah")
-                                ->money("IDR")
-                                ->placeholder("Belum Terisi"),
-                            TextEntry::make("detail_kwitansi")
-                                ->label("Guna Pembayaran")
-                                ->placeholder("Belum Terisi"),
+                            TextEntry::make('schools')
+                                ->label('Telah Terima Dari')
+                                ->placeholder('Belum Terisi'),
+                            TextEntry::make('total')
+                                ->label('Uang Sejumlah')
+                                ->money('IDR')
+                                ->placeholder('Belum Terisi'),
+                            TextEntry::make('detail_kwitansi')
+                                ->label('Guna Pembayaran')
+                                ->placeholder('Belum Terisi'),
                         ])
                         ->columns(1),
                 ]),
 
-            Infolists\Components\Section::make("Invoice")
-                ->description("Lakukan Edit untuk merubah Invoice")
+            Infolists\Components\Section::make('Invoice')
+                ->description('Lakukan Edit untuk merubah Invoice')
                 ->schema([
-                    Infolists\Components\Fieldset::make("")
-                        ->label("Detail Invoice")
+                    Infolists\Components\Fieldset::make('')
+                        ->label('Detail Invoice')
                         ->schema([
-                            TextEntry::make("schools")
-                                ->label("Bill To")
-                                ->placeholder("Belum Terisi"),
-                            TextEntry::make("number_invoice")
-                                ->label("Nomor Invoice")
-                                ->placeholder("Belum Terisi"),
-                            TextEntry::make("detail_invoice")
-                                ->label("Deskripsi")
-                                ->placeholder("Belum Terisi"),
+                            TextEntry::make('schools')
+                                ->label('Bill To')
+                                ->placeholder('Belum Terisi'),
+                            TextEntry::make('number_invoice')
+                                ->label('Nomor Invoice')
+                                ->placeholder('Belum Terisi'),
+                            TextEntry::make('detail_invoice')
+                                ->label('Deskripsi')
+                                ->placeholder('Belum Terisi'),
                         ])
                         ->columns(1),
 
-                    Infolists\Components\Fieldset::make("")
+                    Infolists\Components\Fieldset::make('')
                         ->schema([
-                            TextEntry::make("qty_invoice")
-                                ->label("Kuantitas")
-                                ->placeholder("Belum Terisi"),
-                            TextEntry::make("unit_price")
-                                ->label("Harga Per Unit")
-                                ->money("IDR")
-                                ->placeholder("Belum Terisi"),
-                            TextEntry::make("amount_invoice")
-                                ->label("Jumlah")
-                                ->money("IDR")
-                                ->placeholder("Belum Terisi"),
-                            TextEntry::make("subtotal_invoice")
-                                ->label("Sub Total")
-                                ->money("IDR")
-                                ->placeholder("Belum Terisi"),
+                            TextEntry::make('qty_invoice')
+                                ->label('Kuantitas')
+                                ->placeholder('Belum Terisi'),
+                            TextEntry::make('unit_price')
+                                ->label('Harga Per Unit')
+                                ->money('IDR')
+                                ->placeholder('Belum Terisi'),
+                            TextEntry::make('amount_invoice')
+                                ->label('Jumlah')
+                                ->money('IDR')
+                                ->placeholder('Belum Terisi'),
+                            TextEntry::make('subtotal_invoice')
+                                ->label('Sub Total')
+                                ->money('IDR')
+                                ->placeholder('Belum Terisi'),
                         ])
                         ->columns(2),
 
-                    Infolists\Components\Fieldset::make("")
+                    Infolists\Components\Fieldset::make('')
                         ->schema([
-                            TextEntry::make("pph")
-                                ->label("PPH 23")
+                            TextEntry::make('pph')
+                                ->label('PPH 23')
                                 ->formatStateUsing(function ($state) {
                                     // Kalau disimpan 2 (artinya 2%), tampilkan "2%"
                                     // Kalau disimpan 0.02 (decimal), ubah ke persen:
@@ -949,17 +897,17 @@ class Finance
                                     // Rapikan trailing .00
                                     $str = rtrim(
                                         rtrim(
-                                            number_format($value, 2, ".", ""),
-                                            "0",
+                                            number_format($value, 2, '.', ''),
+                                            '0',
                                         ),
-                                        ".",
+                                        '.',
                                     );
 
-                                    return $str . "%";
+                                    return $str.'%';
                                 })
-                                ->placeholder("Belum Terisi"),
-                            TextEntry::make("ppn")
-                                ->label("PPN")
+                                ->placeholder('Belum Terisi'),
+                            TextEntry::make('ppn')
+                                ->label('PPN')
                                 ->formatStateUsing(function ($state) {
                                     // Kalau disimpan 2 (artinya 2%), tampilkan "2%"
                                     // Kalau disimpan 0.02 (decimal), ubah ke persen:
@@ -973,19 +921,19 @@ class Finance
                                     // Rapikan trailing .00
                                     $str = rtrim(
                                         rtrim(
-                                            number_format($value, 2, ".", ""),
-                                            "0",
+                                            number_format($value, 2, '.', ''),
+                                            '0',
                                         ),
-                                        ".",
+                                        '.',
                                     );
 
-                                    return $str . "%";
+                                    return $str.'%';
                                 })
-                                ->placeholder("Belum Terisi"),
-                            TextEntry::make("total_invoice")
-                                ->label("Total")
-                                ->money("IDR")
-                                ->placeholder("Belum Terisi"),
+                                ->placeholder('Belum Terisi'),
+                            TextEntry::make('total_invoice')
+                                ->label('Total')
+                                ->money('IDR')
+                                ->placeholder('Belum Terisi'),
                         ])
                         ->columns(2),
                 ]),
@@ -995,55 +943,55 @@ class Finance
     public static function filters(): array
     {
         return [
-            Tables\Filters\SelectFilter::make("periode")
-                ->label("Periode")
+            Tables\Filters\SelectFilter::make('periode')
+                ->label('Periode')
                 ->options(Periode::list())
                 ->preload(),
-            Tables\Filters\SelectFilter::make("education_level")
-                ->label("Jenjang")
+            Tables\Filters\SelectFilter::make('education_level')
+                ->label('Jenjang')
                 ->options(Jenjang::list())
                 ->preload()
-                ->indicator("Jenjang"),
-            Tables\Filters\SelectFilter::make("users_id")
-                ->label("User")
+                ->indicator('Jenjang'),
+            Tables\Filters\SelectFilter::make('users_id')
+                ->label('User')
                 ->options(function () {
                     return \App\Models\User::all()
-                        ->pluck("name", "id")
+                        ->pluck('name', 'id')
                         ->toArray();
                 })
                 ->preload()
-                ->indicator("user"),
-            Tables\Filters\SelectFilter::make("status_color")
-                ->label("Status Warna")
+                ->indicator('user'),
+            Tables\Filters\SelectFilter::make('status_color')
+                ->label('Status Warna')
                 ->options([
-                    "blue" => "Biru",
-                    "green" => "Hijau",
+                    'blue' => 'Biru',
+                    'green' => 'Hijau',
                 ])
                 ->preload()
-                ->indicator("Status Warna")
+                ->indicator('Status Warna')
                 ->query(function (Builder $query, array $data) {
-                    if (empty($data["value"])) {
+                    if (empty($data['value'])) {
                         return;
                     }
 
                     $query->whereHas(
-                        "status",
-                        fn(Builder $q) => $q->where("color", $data["value"]),
+                        'status',
+                        fn (Builder $q) => $q->where('color', $data['value']),
                     );
                 }),
-            Tables\Filters\TernaryFilter::make("payment_date")
-                ->label("Status Pembayaran Sekolah")
-                ->placeholder("Semua Sekolah")
-                ->trueLabel("Sudah Bayar")
-                ->falseLabel("Belum Bayar")
+            Tables\Filters\TernaryFilter::make('payment_date')
+                ->label('Status Pembayaran Sekolah')
+                ->placeholder('Semua Sekolah')
+                ->trueLabel('Sudah Bayar')
+                ->falseLabel('Belum Bayar')
                 ->queries(
-                    true: fn(Builder $query) => $query->whereNotNull(
-                        "payment_date",
+                    true: fn (Builder $query) => $query->whereNotNull(
+                        'payment_date',
                     ),
-                    false: fn(Builder $query) => $query->whereNull(
-                        "payment_date",
+                    false: fn (Builder $query) => $query->whereNull(
+                        'payment_date',
                     ),
-                    blank: fn(Builder $query) => $query,
+                    blank: fn (Builder $query) => $query,
                 ),
         ];
     }
@@ -1064,6 +1012,6 @@ class Finance
 
     public static function getRoles(): array
     {
-        return ["finance"];
+        return ['finance'];
     }
 }
