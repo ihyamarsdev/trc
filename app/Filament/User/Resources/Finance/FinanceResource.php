@@ -6,6 +6,7 @@ use App\Filament\User\Resources\Finance\Pages\CreateFinance;
 use App\Filament\User\Resources\Finance\Pages\EditFinance;
 use App\Filament\User\Resources\Finance\Pages\ListFinances;
 use App\Filament\User\Resources\Finance\Pages\ViewFinance;
+use App\Filament\User\Resources\Finance\Tables\FinanceTable;
 use App\Models\RegistrationData;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -55,7 +56,7 @@ class FinanceResource extends Resource
                     ->whereRelation('status', 'order', '>=', 7)
                     ->orderByDesc('updated_at')
             )
-            ->columns(\App\Filament\User\Resources\Finance\Tables\FinanceTable::columns())
+            ->columns(FinanceTable::columns())
             ->filters([])
             ->recordAction('view')
             ->recordActions([])

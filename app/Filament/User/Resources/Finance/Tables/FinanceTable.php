@@ -11,43 +11,36 @@ class FinanceTable
     {
         return [
             Split::make([
-                \Filament\Tables\Columns\Layout\Stack::make([
-                    TextColumn::make('schools')
-                        ->label('Sekolah')
-                        ->weight(\Filament\Support\Enums\FontWeight::Bold)
-                        ->searchable()
-                        ->wrap(),
-                    TextColumn::make('type')
-                        ->label('Program')
-                        ->icon('heroicon-m-academic-cap')
-                        ->extraAttributes(['class' => 'uppercase text-gray-500']),
-                ])->space(1),
-
-                \Filament\Tables\Columns\Layout\Stack::make([
-                    TextColumn::make('periode')
-                        ->label('Periode')
-                        ->icon('heroicon-m-calendar-days')
-                        ->extraAttributes(['class' => 'uppercase']),
-                    TextColumn::make('years')
-                        ->label('Tahun')
-                        ->icon('heroicon-m-clock'),
-                ])->space(1),
-
-                \Filament\Tables\Columns\Layout\Stack::make([
-                    TextColumn::make('latestStatusLog.status.name')
-                        ->label('Status')
-                        ->badge()
-                        ->color(
-                            fn ($record) => match ($record->latestStatusLog?->status?->color) {
-                                'green' => 'success',
-                                'blue' => 'info',
-                                'yellow' => 'warning',
-                                'red' => 'danger',
-                                default => 'gray',
-                            }
-                        )
-                        ->placeholder('Belum Ada Status'),
-                ])->space(1)->alignment(\Filament\Support\Enums\Alignment::End),
+                TextColumn::make('type')
+                    ->label('Program')
+                    ->description('Program', position: 'above')
+                    ->extraAttributes(['class' => 'uppercase']),
+                TextColumn::make('schools')
+                    ->label('Sekolah')
+                    ->description('Sekolah', position: 'above')
+                    ->searchable()
+                    ->wrap(),
+                TextColumn::make('periode')
+                    ->label('Periode')
+                    ->description('Periode', position: 'above')
+                    ->extraAttributes(['class' => 'uppercase'])
+                    ->wrap(),
+                TextColumn::make('years')
+                    ->label('Tahun')
+                    ->description('Tahun', position: 'above'),
+                TextColumn::make('latestStatusLog.status.name')
+                    ->label('Status')
+                    ->badge()
+                    ->color(
+                        fn ($record) => match ($record->latestStatusLog?->status?->color) {
+                            'green' => 'success',
+                            'blue' => 'blue',
+                            'yellow' => 'warning',
+                            'red' => 'danger',
+                            default => 'gray',
+                        }
+                    )
+                    ->placeholder('Belum Ada Status'),
             ])->from('md'),
         ];
     }
