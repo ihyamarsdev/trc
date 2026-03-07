@@ -122,6 +122,7 @@ class AdminPanelProvider extends PanelProvider
                         DetailProfile::class,
                     ]),
                 MobileBottomNav::make()
+                    ->moreButton(false)
                     ->items([
                         MobileBottomNavItem::make('Admin Database')
                             ->icon('heroicon-o-building-library')

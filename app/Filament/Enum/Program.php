@@ -29,6 +29,9 @@ enum Program: string
         };
     }
 
+    /**
+     * @return array<string, string>
+     */
     public static function list(): array
     {
         return [
@@ -39,6 +42,9 @@ enum Program: string
         ];
     }
 
+    /**
+     * @return array<string, string>
+     */
     public static function meta(?string $value, bool $allowNone = false): array
     {
         $program = self::tryFrom(strtolower((string) $value));

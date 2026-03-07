@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "55f11bc0d0ea95957ec46b8ae9332a99",
+    "content-hash": "816449bf1995f01e00eff58e5d2699a4",
     "packages": [
         {
             "name": "akaunting/laravel-money",
@@ -9235,16 +9235,16 @@
         },
         {
             "name": "symfony/console",
-            "version": "v7.4.6",
+            "version": "v7.4.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "6d643a93b47398599124022eb24d97c153c12f27"
+                "reference": "e1e6770440fb9c9b0cf725f81d1361ad1835329d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/6d643a93b47398599124022eb24d97c153c12f27",
-                "reference": "6d643a93b47398599124022eb24d97c153c12f27",
+                "url": "https://api.github.com/repos/symfony/console/zipball/e1e6770440fb9c9b0cf725f81d1361ad1835329d",
+                "reference": "e1e6770440fb9c9b0cf725f81d1361ad1835329d",
                 "shasum": ""
             },
             "require": {
@@ -9309,7 +9309,7 @@
                 "terminal"
             ],
             "support": {
-                "source": "https://github.com/symfony/console/tree/v7.4.6"
+                "source": "https://github.com/symfony/console/tree/v7.4.7"
             },
             "funding": [
                 {
@@ -9329,7 +9329,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-02-25T17:02:47+00:00"
+            "time": "2026-03-06T14:06:20+00:00"
         },
         {
             "name": "symfony/css-selector",
@@ -12585,16 +12585,16 @@
         },
         {
             "name": "filament/upgrade",
-            "version": "v4.8.0",
+            "version": "v5.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filamentphp/upgrade.git",
-                "reference": "bc3a18e869fe60c2f9ba62011331e4835e4d9ab2"
+                "reference": "d4cff61b0d060fc03c459a4c29b29127352b7d40"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filamentphp/upgrade/zipball/bc3a18e869fe60c2f9ba62011331e4835e4d9ab2",
-                "reference": "bc3a18e869fe60c2f9ba62011331e4835e4d9ab2",
+                "url": "https://api.github.com/repos/filamentphp/upgrade/zipball/d4cff61b0d060fc03c459a4c29b29127352b7d40",
+                "reference": "d4cff61b0d060fc03c459a4c29b29127352b7d40",
                 "shasum": ""
             },
             "require": {
@@ -12603,16 +12603,9 @@
                 "rector/rector": "^2.0"
             },
             "bin": [
-                "bin/filament-v4"
+                "bin/filament-v5"
             ],
             "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Filament\\Upgrade\\UpgradeServiceProvider"
-                    ]
-                }
-            },
             "autoload": {
                 "psr-4": {
                     "Filament\\Upgrade\\": "src"
@@ -12622,13 +12615,13 @@
             "license": [
                 "MIT"
             ],
-            "description": "Upgrade Filament v3 code to Filament v4.",
+            "description": "Upgrade Filament v4 code to Filament v5.",
             "homepage": "https://github.com/filamentphp/filament",
             "support": {
                 "issues": "https://github.com/filamentphp/filament/issues",
                 "source": "https://github.com/filamentphp/filament"
             },
-            "time": "2026-02-20T12:25:06+00:00"
+            "time": "2026-02-20T12:59:54+00:00"
         },
         {
             "name": "hamcrest/hamcrest-php",

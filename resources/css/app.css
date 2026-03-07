@@ -1,5 +1,3 @@
 @import "../../vendor/alperenersoy/filament-export/resources/css/filament-export.css";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";

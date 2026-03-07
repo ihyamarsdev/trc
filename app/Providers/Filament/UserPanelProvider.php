@@ -7,11 +7,10 @@ use App\Filament\User\Widgets\SalesForceStatsWidget;
 use App\Http\Middleware\UpgradeToHttpsUnderNgrok;
 use App\Livewire\DetailProfile;
 use App\Livewire\EditProfile;
+use Filament\Actions\Action;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\MenuItem;
-use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -84,8 +83,8 @@ class UserPanelProvider extends PanelProvider
                 DashboardHome::class,
             ])
             ->userMenuItems([
-                'profile' => MenuItem::make()
-                    ->label(fn () => Auth::user()->name)
+                'profile' => Action::make('profile')
+                    ->label(fn () => Auth::user()?->name ?? 'Profile')
                     ->url(fn (): string => EditProfilePage::getUrl())
                     ->icon('heroicon-m-user-circle')
                     ->sort(1),
@@ -127,16 +126,11 @@ class UserPanelProvider extends PanelProvider
                     ->shouldShowDeleteAccountForm(false)
                     ->shouldShowSanctumTokens(false)
                     ->shouldShowBrowserSessionsForm(false)
-                    // ->shouldShowAvatarForm(
-                    //     value: true,
-                    //     directory: 'avatars',
-                    //     rules: 'mimes:jpg,jpeg,png|max:1024'
-                    // )
                     ->customProfileComponents([
                         EditProfile::class,
                         DetailProfile::class,
                     ]),
-                new RenewPasswordPlugin()
+                RenewPasswordPlugin::make()
                     ->forceRenewPassword()
                     ->timestampColumn(),
                 MobileBottomNav::make()

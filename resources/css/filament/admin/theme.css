@@ -13,7 +13,7 @@
 }
 
 /* =====================
-   SIDEBAR
+SIDEBAR
    ===================== */
 
 .fi-sidebar-header {
@@ -22,7 +22,7 @@
 
 /* Logo styling - positioned top left with padding */
 .fi-sidebar-header img {
-    @apply w-auto object-contain;
+    @apply object-contain w-auto;
 }
 
 .fi-sidebar {
@@ -69,7 +69,7 @@
 }
 
 .fi-topbar {
-    @apply bg-sky-900 ring-0 dark:bg-gray-950 shadow-none h-24;
+    @apply h-24 shadow-none bg-sky-900 ring-0 dark:bg-gray-950;
 }
 
 /* Main content container background */
@@ -98,26 +98,26 @@
    ===================== */
 
 .fi-btn {
-    @apply bg-lime-500 hover:bg-lime-700 !text-white;
+    @apply bg-lime-500 hover:bg-lime-700 text-white!;
 }
 
 .fi-btn-label, 
 .fi-btn-icon,
 .fi-btn span,
 .fi-btn svg {
-    @apply !text-white;
+    @apply text-white;
 }
 
 .fi-ac-btn-action {
-    @apply hover:bg-lime-700 !text-white;
+    @apply text-white hover:bg-lime-700;
 }
 .fi-ac-btn-action span, 
 .fi-ac-btn-action svg {
-    @apply !text-white;
+    @apply text-white!;
 }
 
 .fi-ac-btn-group {
-    @apply hover:bg-lime-700 !text-white;
+    @apply hover:bg-lime-700 text-white!;
 }
 
 /* =====================

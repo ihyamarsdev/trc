@@ -1,0 +1,18 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.3.0/schema.json",
+    "files": {
+        "ignore": ["resources/css/filament/**/*.css"]
+    },
+    "css": {
+        "parser": {
+            "tailwindDirectives": true
+        }
+    },
+    "linter": {
+        "rules": {
+            "complexity": {
+                "noImportantStyles": "off"
+            }
+        }
+    }
+}

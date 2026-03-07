@@ -99,16 +99,15 @@
    ===================== */
 
 .fi-btn {
-    @apply bg-lime-500 hover:bg-lime-700 !text-white;
+    @apply bg-lime-500 hover:bg-lime-700 text-white;
 }
 
 .fi-btn-label,
 .fi-btn-icon,
 .fi-btn span,
 .fi-btn svg {
-    @apply !text-white;
+    @apply text-white;
 }
-
 
 .fi-ac-btn-action {
     @apply hover:bg-lime-700;

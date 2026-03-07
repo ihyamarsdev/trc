@@ -45,8 +45,8 @@
         "ysfkaya/filament-phone-input": "^4.0"
     },
     "require-dev": {
-        "barryvdh/laravel-ide-helper": "^3.2",
-        "filament/upgrade": "^4.0",
+        "barryvdh/laravel-ide-helper": "^3.6",
+        "filament/upgrade": "^5.0",
         "laravel/boost": "^1.8",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.26",
