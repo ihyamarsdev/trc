@@ -2,16 +2,15 @@
 
 namespace App\Filament\User\Resources\Timelines;
 
+use App\Filament\User\Resources\Timelines\Forms\TimelineForm;
 use App\Filament\User\Resources\Timelines\Pages\ListTimelines;
 use App\Filament\User\Resources\Timelines\Pages\ViewTimeline;
+use App\Filament\User\Resources\Timelines\Tables\TimelineTable;
 use App\Models\RegistrationData;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Gate;
 
 class TimelineResource extends Resource
 {
@@ -27,35 +26,17 @@ class TimelineResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return auth()->user()?->can('ViewAny:TimelineResource') ?? false;
+        return Gate::allows('ViewAny:TimelineResource');
     }
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                //
-            ]);
+        return TimelineForm::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        return $table
-            ->columns([
-                //
-            ])
-            ->filters([
-                //
-            ])
-            ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ]);
+        return TimelineTable::configure($table);
     }
 
     public static function getRelations(): array

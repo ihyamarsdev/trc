@@ -4,9 +4,15 @@ namespace App\Filament\User\Resources\Finance\Tables;
 
 use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
 
 class FinanceTable
 {
+    public static function configure(Table $table): Table
+    {
+        return $table->columns(self::columns());
+    }
+
     public static function columns(): array
     {
         return [

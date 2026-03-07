@@ -12,6 +12,7 @@ use App\Models\RegistrationData;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Gate;
 
 class ServiceResource extends Resource
 {
@@ -33,25 +34,12 @@ class ServiceResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return auth()->user()?->can('ViewAny:ServiceResource') ?? false;
+        return Gate::allows('ViewAny:ServiceResource');
     }
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components(ServiceForm::configure())
-            ->extraAttributes([
-                'onkeydown' => "
-                if (event.key === 'Enter' && event.target.tagName !== 'TEXTAREA') {
-                    event.preventDefault();
-                    let focusables = Array.from(document.querySelectorAll('input, select, button, [contenteditable]'));
-                    let index = focusables.indexOf(event.target);
-                    if (index > -1 && focusables[index + 1]) {
-                        focusables[index + 1].focus();
-                    }
-                }
-            ",
-            ]);
+        return ServiceForm::configure($schema);
     }
 
     public static function table(Table $table): Table

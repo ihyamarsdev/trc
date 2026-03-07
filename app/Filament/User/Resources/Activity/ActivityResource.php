@@ -2,20 +2,15 @@
 
 namespace App\Filament\User\Resources\Activity;
 
-use App\Filament\Enum\Program;
+use App\Filament\User\Resources\Activity\Forms\ActivityForm;
 use App\Filament\User\Resources\Activity\Pages\ListActivity;
 use App\Filament\User\Resources\Activity\Pages\ViewActivities;
+use App\Filament\User\Resources\Activity\Tables\ActivityTable;
 use App\Models\RegistrationData;
-use Carbon\Carbon;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Enums\RecordActionsPosition;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Gate;
 
 class ActivityResource extends Resource
 {
@@ -37,104 +32,17 @@ class ActivityResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return auth()->user()?->can('ViewAny:ActivityResource') ?? false;
+        return Gate::allows('ViewAny:ActivityResource');
     }
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                //
-            ]);
+        return ActivityForm::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        return $table
-            ->deferLoading()
-            ->poll('3s')
-            ->searchable()
-            ->striped()
-            ->modifyQueryUsing(
-                fn (Builder $query) => $query
-                    ->withMax('activity', 'id')
-                    ->orderByDesc('updated_at')
-                    ->when(
-                        auth()->user()->hasRole('sales') && ! auth()->user()->hasRole('admin'),
-                        fn (Builder $q) => $q->where('users_id', auth()->id())
-                    )
-            )
-            ->columns([
-                TextColumn::make('schools')
-                    ->label('Sekolah')
-                    ->searchable()
-                    ->wrap()
-                    ->sortable(),
-                TextColumn::make('type')
-                    ->label('Program')
-                    ->badge()
-                    ->extraAttributes(['class' => 'uppercase']),
-                TextColumn::make('periode')
-                    ->label('Periode')
-                    ->badge()
-                    ->extraAttributes(['class' => 'uppercase']),
-                TextColumn::make('latestStatusLog.status.name')
-                    ->label('Status')
-                    ->badge()
-                    ->color(
-                        fn ($record) => match ($record->latestStatusLog?->status?->color) {
-                            'green' => 'success',
-                            'blue' => 'blue',
-                            'yellow' => 'warning',
-                            'red' => 'danger',
-                            default => 'gray',
-                        }
-                    )
-                    ->placeholder('Belum Ada Status'),
-                TextColumn::make('updated_at')
-                    ->label('Terakhir Update')
-                    ->alignCenter()
-                    ->formatStateUsing(
-                        fn ($state) => Carbon::parse($state)->translatedFormat('l, d/m/Y H:i'),
-                    )
-                    ->sortable(),
-            ])
-            ->filters([
-                SelectFilter::make('type')
-                    ->label('Program')
-                    ->options(Program::list())
-                    ->preload()
-                    ->indicator('Program'),
-                SelectFilter::make('latestStatusLog.status.color')
-                    ->label('Status Warna')
-                    ->options([
-                        'red' => 'Merah',
-                        'yellow' => 'Kuning',
-                        'blue' => 'Biru',
-                        'green' => 'Hijau',
-                    ])
-                    ->preload()
-                    ->indicator('Status Warna')
-                    ->query(function (Builder $query, array $data) {
-                        if (empty($data['value'])) {
-                            return;
-                        }
-
-                        $query->whereHas(
-                            'status',
-                            fn (Builder $q) => $q->where('color', $data['value'])
-                        );
-                    }),
-            ])
-            ->recordUrl(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record]))
-            ->recordActions([
-                //
-            ], position: RecordActionsPosition::BeforeColumns)
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ]);
+        return ActivityTable::configure($table);
     }
 
     public static function getRelations(): array

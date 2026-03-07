@@ -8,10 +8,16 @@ use App\Models\RegistrationData;
 use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
 class AdminTable
 {
+    public static function configure(Table $table): Table
+    {
+        return $table->columns(self::columns())->filters(self::filters());
+    }
+
     public static function columns(): array
     {
         return [

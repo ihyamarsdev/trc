@@ -2,6 +2,7 @@
 
 namespace App\Filament\User\Resources\Admin;
 
+use App\Filament\User\Resources\Admin\Forms\AdminForm;
 use App\Filament\User\Resources\Admin\Pages\CreateAdmin;
 use App\Filament\User\Resources\Admin\Pages\EditAdmin;
 use App\Filament\User\Resources\Admin\Pages\ListAdmins;
@@ -13,6 +14,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Gate;
 
 class AdminResource extends Resource
 {
@@ -36,18 +38,17 @@ class AdminResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return auth()->user()?->can('ViewAny:AdminResource') ?? false;
+        return Gate::allows('ViewAny:AdminResource');
     }
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components(\App\Filament\User\Resources\Admin\Forms\AdminForm::schema());
+        return AdminForm::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        return $table
+        return AdminTable::configure($table)
             ->deferLoading()
             ->poll('5s')
             ->searchable()
@@ -58,8 +59,6 @@ class AdminResource extends Resource
                 fn (Builder $query) => $query->withMax('activity', 'id')
                     ->orderByDesc('updated_at')
             )
-            ->columns(AdminTable::columns())
-            ->filters(AdminTable::filters())
             ->recordAction('view')
             ->recordActions([])
             ->toolbarActions([

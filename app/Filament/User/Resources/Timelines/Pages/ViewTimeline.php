@@ -2,7 +2,7 @@
 
 namespace App\Filament\User\Resources\Timelines\Pages;
 
-use App\Filament\User\Resources\Service\Infolists\ServiceInfolist;
+use App\Filament\User\Resources\Timelines\Infolists\TimelineInfolist;
 use App\Filament\User\Resources\Timelines\TimelineResource;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Schema;
@@ -25,6 +25,6 @@ class ViewTimeline extends ViewRecord
 
     public function infolist(Schema $schema): Schema
     {
-        return ServiceInfolist::configure($schema, $this->record);
+        return TimelineInfolist::configure($schema, $this->record);
     }
 }

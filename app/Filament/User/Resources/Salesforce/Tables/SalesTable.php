@@ -8,9 +8,18 @@ use App\Filament\Enum\Program;
 use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
 
 class SalesTable
 {
+    public static function configure(Table $table): Table
+    {
+        return $table
+            ->columns(self::columns())
+            ->filters(self::filters())
+            ->toolbarActions(self::bulkActions());
+    }
+
     public static function columns(): array
     {
         return [

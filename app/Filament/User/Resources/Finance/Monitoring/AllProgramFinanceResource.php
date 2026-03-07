@@ -2,18 +2,14 @@
 
 namespace App\Filament\User\Resources\Finance\Monitoring;
 
+use App\Filament\User\Resources\Finance\Monitoring\Forms\AllProgramFinanceForm;
 use App\Filament\User\Resources\Finance\Monitoring\Pages\ListAllProgramFinances;
+use App\Filament\User\Resources\Finance\Monitoring\Tables\AllProgramFinanceTable;
 use App\Models\RegistrationData;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Columns\Summarizers\Summarizer;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
-use Illuminate\Database;
+use Illuminate\Support\Facades\Gate;
 
 class AllProgramFinanceResource extends Resource
 {
@@ -35,63 +31,17 @@ class AllProgramFinanceResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return auth()->user()?->can('ViewAny:AllProgramFinanceResource') ?? false;
+        return Gate::allows('ViewAny:AllProgramFinanceResource');
     }
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                //
-            ]);
+        return AllProgramFinanceForm::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        return $table
-            ->columns([
-                TextColumn::make('monthYear')
-                    ->label('Bulan'),
-                TextColumn::make('schools')
-                    ->label('Jumlah Sekolah')
-                    ->summarize(
-                        Summarizer::make()
-                            ->label('')
-                            ->using(fn (Database\Query\Builder $query) => $query->count('schools'))
-                    ),
-                TextColumn::make('payment')
-                    ->label('Jumlah Terbayarkan')
-                    ->summarize(
-                        Summarizer::make()
-                            ->label('')
-                            ->using(fn (Database\Query\Builder $query) => $query->count('payment'))
-                    ),
-            ])
-            ->filters([
-                SelectFilter::make('periode')
-                    ->label('Periode')
-                    ->options([
-                        'Januari - Juni' => 'Januari - Juni',
-                        'Juli - Desember' => 'Juli - Desember',
-                    ])
-                    ->preload()
-                    ->indicator('Periode'),
-            ])
-            ->recordActions([
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ])
-            ->groups([
-                Group::make('monthYear')
-                    ->collapsible()
-                    ->titlePrefixedWithLabel(false),
-            ])
-            ->defaultGroup('monthYear')
-            ->groupingSettingsHidden()
-            ->groupsOnly();
+        return AllProgramFinanceTable::configure($table);
     }
 
     public static function getRelations(): array

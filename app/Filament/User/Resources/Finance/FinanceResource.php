@@ -2,6 +2,7 @@
 
 namespace App\Filament\User\Resources\Finance;
 
+use App\Filament\User\Resources\Finance\Forms\FinanceForm;
 use App\Filament\User\Resources\Finance\Pages\CreateFinance;
 use App\Filament\User\Resources\Finance\Pages\EditFinance;
 use App\Filament\User\Resources\Finance\Pages\ListFinances;
@@ -12,6 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Gate;
 
 class FinanceResource extends Resource
 {
@@ -33,18 +35,17 @@ class FinanceResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return auth()->user()?->can('ViewAny:FinanceResource') ?? false;
+        return Gate::allows('ViewAny:FinanceResource');
     }
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components(\App\Filament\User\Resources\Finance\Forms\FinanceForm::schema());
+        return FinanceForm::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        return $table
+        return FinanceTable::configure($table)
             ->deferLoading()
             ->poll('5s')
             ->searchable()
@@ -56,7 +57,6 @@ class FinanceResource extends Resource
                     ->whereRelation('status', 'order', '>=', 7)
                     ->orderByDesc('updated_at')
             )
-            ->columns(FinanceTable::columns())
             ->filters([])
             ->recordAction('view')
             ->recordActions([])

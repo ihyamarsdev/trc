@@ -11,10 +11,12 @@ use App\Filament\User\Resources\Salesforce\Pages\ViewSales;
 use App\Filament\User\Resources\Salesforce\Tables\SalesTable;
 use App\Models\RegistrationData;
 use BezhanSalleh\FilamentShield\Traits\HasShieldFormComponents;
+use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Gate;
 
 class SalesResource extends Resource
 {
@@ -38,13 +40,12 @@ class SalesResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return auth()->user()?->can('ViewAny:SalesResource') ?? false;
+        return Gate::allows('ViewAny:SalesResource');
     }
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components(SalesForm::schema())
+        return SalesForm::configure($schema)
             ->extraAttributes([
                 'onkeydown' => "
                 if (event.key === 'Enter' && event.target.tagName !== 'TEXTAREA') {
@@ -61,7 +62,7 @@ class SalesResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return $table
+        return SalesTable::configure($table)
             ->deferLoading()
             ->poll('5s')
             ->searchable()
@@ -72,19 +73,16 @@ class SalesResource extends Resource
                 fn (Builder $query) => $query
                     ->where('years', now('Asia/Jakarta')->format('Y'))
                     ->when(
-                        fn ($query) => $query->where('users_id', auth()->id())
+                        fn ($query) => $query->where('users_id', Filament::auth()->id())
                     )
                     ->orderBy('implementation_estimate', 'asc')
             )
-            ->columns(SalesTable::columns())
-            ->filters(SalesTable::filters())
-            ->recordActions([])
-            ->toolbarActions(SalesTable::bulkActions());
+            ->recordActions([]);
     }
 
     public static function infolist(Schema $schema): Schema
     {
-        return SalesInfolist::configure($schema, auth()->user());
+        return SalesInfolist::configure($schema);
     }
 
     public static function getRelations(): array

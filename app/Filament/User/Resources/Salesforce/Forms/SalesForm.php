@@ -17,13 +17,19 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class SalesForm
 {
-    public static function schema(): array
+    public static function configure(Schema $schema): Schema
+    {
+        return $schema->components(self::components());
+    }
+
+    public static function components(): array
     {
         return [
             Section::make('Form Sales')

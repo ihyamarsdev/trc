@@ -2,14 +2,7 @@
 
 namespace App\Filament\User\Resources\Service\Forms;
 
-use App\Filament\Enum\Jenjang;
-use App\Filament\Enum\Periode;
 use App\Filament\Enum\Program;
-use App\Models\User;
-use Carbon\Carbon;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
@@ -17,10 +10,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
-use Filament\Tables;
-use Filament\Tables\Columns\Layout\Split;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -36,7 +26,25 @@ class ServiceForm
         return Program::meta($record->type, true);
     }
 
-    public static function configure(): array
+    public static function configure(Schema $schema): Schema
+    {
+        return $schema
+            ->components(self::components())
+            ->extraAttributes([
+                'onkeydown' => "
+                if (event.key === 'Enter' && event.target.tagName !== 'TEXTAREA') {
+                    event.preventDefault();
+                    let focusables = Array.from(document.querySelectorAll('input, select, button, [contenteditable]'));
+                    let index = focusables.indexOf(event.target);
+                    if (index > -1 && focusables[index + 1]) {
+                        focusables[index + 1].focus();
+                    }
+                }
+            ",
+            ]);
+    }
+
+    public static function components(): array
     {
         return [
             Section::make('Form Service')
@@ -148,124 +156,6 @@ class ServiceForm
         ];
     }
 
-    public static function columns(): array
-    {
-        return [
-            Split::make([
-                TextColumn::make('type')
-                    ->label('Program')
-                    ->description('Program', position: 'above')
-                    ->extraAttributes(['class' => 'uppercase']),
-                TextColumn::make('schools')->label('Sekolah')->description('Sekolah', position: 'above')->searchable()->wrap(),
-                TextColumn::make('periode')->label('Periode')->description('Periode', position: 'above')->extraAttributes(['class' => 'uppercase'])->wrap(),
-                TextColumn::make('years')->label('Tahun')->description('Tahun', position: 'above'),
-                TextColumn::make('latestStatusLog.status.name')
-                    ->label('Status')
-                    ->badge()
-                    ->color(
-                        fn ($record) => match ($record->latestStatusLog?->status?->color) {
-                            'green' => 'success',
-                            'blue' => 'blue',
-                            'yellow' => 'warning',
-                            'red' => 'danger',
-                            default => 'gray',
-                        }
-                    )
-                    ->placeholder('Belum Ada Status'),
-            ])->from('md'),
-        ];
-    }
-
-    public static function TextColumns(): array
-    {
-        return [
-            TextColumn::make('group')
-                ->label('Grup')
-                ->formatStateUsing(
-                    fn ($state) => Carbon::parse($state)->translatedFormat(
-                        'l, jS F Y',
-                    ),
-                ),
-            TextColumn::make('bimtek')
-                ->label('Bimtek')
-                ->formatStateUsing(
-                    fn ($state) => Carbon::parse($state)->translatedFormat(
-                        'l, jS F Y',
-                    ),
-                ),
-            TextColumn::make('account_count_created')->label(
-                'Jumlah Akun Dibuat',
-            ),
-            TextColumn::make('implementer_count')->label('Jumlah Pelaksanaan'),
-            TextColumn::make('difference')->label('Selisih'),
-            TextColumn::make('students_download')->label('Siswa Download'),
-            TextColumn::make('schools_download')->label('Sekolah Download'),
-            TextColumn::make('pm')->label('PM'),
-            TextColumn::make('counselor_consultation_date')
-                ->label('Tanggal Konseling')
-                ->formatStateUsing(
-                    fn ($state) => Carbon::parse($state)->translatedFormat(
-                        'l, jS F Y',
-                    ),
-                ),
-            TextColumn::make('student_consultation_date')
-                ->label('Tanggal Konseling Siswa')
-                ->formatStateUsing(
-                    fn ($state) => Carbon::parse($state)->translatedFormat(
-                        'l, jS F Y',
-                    ),
-                ),
-        ];
-    }
-
-    public static function filters(): array
-    {
-        return [
-            SelectFilter::make('periode')
-                ->label('Periode')
-                ->options(Periode::list())
-                ->preload(),
-            SelectFilter::make('education_level')
-                ->label('Jenjang')
-                ->options(Jenjang::list())
-                ->preload()
-                ->indicator('Jenjang'),
-            SelectFilter::make('type')
-                ->label('Program')
-                ->options(Program::list())
-                ->preload()
-                ->indicator('Program'),
-            SelectFilter::make('users_id')
-                ->label('User')
-                ->options(function () {
-                    return User::all()
-                        ->pluck('name', 'id')
-                        ->toArray();
-                })
-                ->preload()
-                ->indicator('user'),
-            SelectFilter::make('status_color')
-                ->label('Status Warna')
-                ->options([
-                    'yellow' => 'Kuning',
-                    'blue' => 'Biru',
-                    'green' => 'Hijau',
-                ])
-                ->preload()
-                ->indicator('Status Warna')
-                ->query(function (Builder $query, array $data) {
-                    if (empty($data['value'])) {
-                        return;
-                    }
-
-                    $query->whereHas(
-                        'status',
-                        fn (Builder $q) => $q->where('color', $data['value']),
-                    );
-                }),
-        ];
-    }
-
     public static function getDifference(Get $get, Set $set): void
     {
         $accountCount = (int) $get('account_count_created');
@@ -276,22 +166,5 @@ class ServiceForm
         } else {
             $set('difference', 0);
         }
-    }
-
-    public static function actions(): array
-    {
-        return [
-            ViewAction::make(),
-            // Tables\Actions\EditAction::make(),
-        ];
-    }
-
-    public static function bulkActions(): array
-    {
-        return [
-            BulkActionGroup::make([
-                DeleteBulkAction::make(),
-            ]),
-        ];
     }
 }
