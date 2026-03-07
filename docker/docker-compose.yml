@@ -2,8 +2,8 @@ services:
     app:
         image: ihyamars/trc
         build:
-            context: .
-            dockerfile: Dockerfile
+            context: ..
+            dockerfile: docker/Dockerfile
             args:
                 APP_ENV: production
                 APP_DEBUG: 'false'
