@@ -179,9 +179,9 @@
             </div>
 
             {{-- Chart Canvas --}}
-            <div class="px-5 pb-3" wire:key="line-chart-{{ $lineChartId }}" wire:ignore>
+            <div class="px-4 pb-1" wire:key="line-chart-{{ $lineChartId }}" wire:ignore>
                 @if(count($lineData['datasets']) > 0)
-                    <canvas id="{{ $lineChartId }}" height="200"
+                    <canvas id="{{ $lineChartId }}" height="120"
                         x-data="{
                             chart: null,
                             init() {
