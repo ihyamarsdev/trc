@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\User\Resources\Finance\RekapitulasiFinanceResource\Pages;
+namespace App\Filament\User\Resources\Finance\Monitoring\Pages;
 
 use App\Filament\Components\Finance;
-use App\Filament\User\Resources\Finance\RekapitulasiFinanceResource;
+use App\Filament\User\Resources\Finance\Monitoring\RekapitulasiFinanceResource;
 use Filament\Actions;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
