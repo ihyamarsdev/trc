@@ -11,6 +11,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Schemas\Schema;
 use Filament\Widgets\Widget;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class SalesForceStatsWidget extends Widget implements HasActions, HasForms
@@ -26,10 +27,11 @@ class SalesForceStatsWidget extends Widget implements HasActions, HasForms
 
     protected string $view = 'filament.user.widgets.sales-force-stats-widget';
 
-    // Direct public properties for form binding
     public ?string $education_level = null;
 
     public ?string $years = null;
+
+    public string $period = 'week';
 
     public function mount(): void
     {
@@ -75,6 +77,119 @@ class SalesForceStatsWidget extends Widget implements HasActions, HasForms
         ]);
     }
 
+    public function setPeriod(string $period): void
+    {
+        $this->period = $period;
+    }
+
+    public function getLineChartData(): array
+    {
+        [$labels, $startDate, $bucketFn] = match ($this->period) {
+            'day' => $this->buildDayConfig(),
+            'month' => $this->buildMonthConfig(),
+            default => $this->buildWeekConfig(),
+        };
+
+        // Fetch raw rows — no SQL date functions (SQLite + MySQL compatible)
+        $rows = RegistrationData::query()
+            ->when(! Auth::user()->hasRole(['admin', 'service', 'finance']), fn ($q) => $q->where('users_id', Auth::id()))
+            ->when($this->education_level, fn ($q) => $q->where('education_level', $this->education_level))
+            ->when($this->years, fn ($q) => $q->where('years', $this->years))
+            ->whereNotNull('type')
+            ->whereNotNull('schools')
+            ->where('created_at', '>=', $startDate)
+            ->select(['type', 'created_at'])
+            ->get();
+
+        // Bucket in PHP via Carbon closure — count schools (1 row = 1 school)
+        $aggregated = [];
+        foreach ($rows as $row) {
+            $key = $bucketFn(Carbon::parse($row->created_at));
+            $aggregated[$row->type][$key] = ($aggregated[$row->type][$key] ?? 0) + 1;
+        }
+
+        $types = array_keys($aggregated);
+        sort($types);
+
+        $palette = [
+            '#38bdf8', '#a3e635', '#fb923c', '#f472b6',
+            '#c084fc', '#34d399', '#fbbf24', '#f87171',
+            '#60a5fa', '#2dd4bf',
+        ];
+
+        $datasets = [];
+        foreach ($types as $index => $type) {
+            $color = $palette[$index % count($palette)];
+            $datasets[] = [
+                'label' => strtoupper($type),
+                'data' => array_map(fn ($key) => $aggregated[$type][$key] ?? 0, $labels['keys']),
+                'borderColor' => $color,
+                'backgroundColor' => $color.'33',
+                'pointBackgroundColor' => $color,
+                'pointBorderColor' => '#ffffff',
+                'pointBorderWidth' => 2,
+                'pointRadius' => 4,
+                'pointHoverRadius' => 6,
+                'tension' => 0.4,
+                'fill' => true,
+                'borderWidth' => 2,
+            ];
+        }
+
+        return [
+            'labels' => $labels['display'],
+            'datasets' => $datasets,
+        ];
+    }
+
+    /** @return array{array{keys: array<string>, display: array<string>}, Carbon, \Closure} */
+    private function buildDayConfig(): array
+    {
+        $start = Carbon::now()->subDays(29)->startOfDay();
+        $keys = [];
+        $display = [];
+
+        for ($i = 0; $i < 30; $i++) {
+            $day = $start->copy()->addDays($i);
+            $keys[] = $day->format('Y-m-d');
+            $display[] = $day->translatedFormat('d M');
+        }
+
+        return [['keys' => $keys, 'display' => $display], $start, fn (Carbon $dt) => $dt->format('Y-m-d')];
+    }
+
+    /** @return array{array{keys: array<string>, display: array<string>}, Carbon, \Closure} */
+    private function buildWeekConfig(): array
+    {
+        $start = Carbon::now()->subWeeks(11)->startOfWeek();
+        $keys = [];
+        $display = [];
+
+        for ($i = 0; $i < 12; $i++) {
+            $week = $start->copy()->addWeeks($i);
+            $keys[] = $week->format('Y-m-d'); // Monday of that week as key
+            $display[] = 'W'.$week->format('W').' '.$week->translatedFormat('M');
+        }
+
+        return [['keys' => $keys, 'display' => $display], $start, fn (Carbon $dt) => $dt->copy()->startOfWeek()->format('Y-m-d')];
+    }
+
+    /** @return array{array{keys: array<string>, display: array<string>}, Carbon, \Closure} */
+    private function buildMonthConfig(): array
+    {
+        $start = Carbon::now()->subMonths(11)->startOfMonth();
+        $keys = [];
+        $display = [];
+
+        for ($i = 0; $i < 12; $i++) {
+            $month = $start->copy()->addMonths($i);
+            $keys[] = $month->format('Y-m');
+            $display[] = $month->translatedFormat('M Y');
+        }
+
+        return [['keys' => $keys, 'display' => $display], $start, fn (Carbon $dt) => $dt->format('Y-m')];
+    }
+
     public function getChartData(): array
     {
         $query = RegistrationData::query()
@@ -92,64 +207,19 @@ class SalesForceStatsWidget extends Widget implements HasActions, HasForms
             ->groupBy('type')
             ->get();
 
-        // Status colors matching SalesLeaderboard pattern
-        // Using CSS variables for light/dark mode support
         $statusColors = [
-            [
-                'light' => '#cc0000', // Red (darker for light mode)
-                'dark' => '#ff6b6b',  // Red (lighter for dark mode)
-                'name' => 'red',
-            ],
-            [
-                'light' => '#cc9900', // Yellow (darker for light mode)
-                'dark' => '#ffd93d',  // Yellow (lighter for dark mode)
-                'name' => 'yellow',
-            ],
-            [
-                'light' => '#000099', // Blue (darker for light mode)
-                'dark' => '#6bb3ff',  // Blue (lighter for dark mode)
-                'name' => 'blue',
-            ],
-            [
-                'light' => '#004400', // Green (darker for light mode)
-                'dark' => '#6bff6b',  // Green (lighter for dark mode)
-                'name' => 'green',
-            ],
-            [
-                'light' => '#990000', // Dark Red
-                'dark' => '#ff8888',  // Light Red
-                'name' => 'dark-red',
-            ],
-            [
-                'light' => '#996600', // Dark Yellow
-                'dark' => '#ffe066',  // Light Yellow
-                'name' => 'dark-yellow',
-            ],
-            [
-                'light' => '#000066', // Dark Blue
-                'dark' => '#5599ff',  // Light Blue
-                'name' => 'dark-blue',
-            ],
-            [
-                'light' => '#003300', // Dark Green
-                'dark' => '#55ff55',  // Light Green
-                'name' => 'dark-green',
-            ],
-            [
-                'light' => '#660000', // Very Dark Red
-                'dark' => '#ffaaaa',  // Very Light Red
-                'name' => 'very-dark-red',
-            ],
-            [
-                'light' => '#664400', // Very Dark Yellow
-                'dark' => '#ffdd88',  // Very Light Yellow
-                'name' => 'very-dark-yellow',
-            ],
+            ['light' => '#cc0000', 'dark' => '#ff6b6b', 'name' => 'red'],
+            ['light' => '#cc9900', 'dark' => '#ffd93d', 'name' => 'yellow'],
+            ['light' => '#000099', 'dark' => '#6bb3ff', 'name' => 'blue'],
+            ['light' => '#004400', 'dark' => '#6bff6b', 'name' => 'green'],
+            ['light' => '#990000', 'dark' => '#ff8888', 'name' => 'dark-red'],
+            ['light' => '#996600', 'dark' => '#ffe066', 'name' => 'dark-yellow'],
+            ['light' => '#000066', 'dark' => '#5599ff', 'name' => 'dark-blue'],
+            ['light' => '#003300', 'dark' => '#55ff55', 'name' => 'dark-green'],
+            ['light' => '#660000', 'dark' => '#ffaaaa', 'name' => 'very-dark-red'],
+            ['light' => '#664400', 'dark' => '#ffdd88', 'name' => 'very-dark-yellow'],
         ];
 
-        $chartData = [];
-        $labels = [];
-        $backgroundColors = [];
         $details = [];
         $totalStudents = 0;
         $totalSchools = 0;
@@ -158,11 +228,6 @@ class SalesForceStatsWidget extends Widget implements HasActions, HasForms
             $studentCount = (int) $item->total_students;
             $schoolCount = (int) $item->school_count;
             $colorInfo = $statusColors[$index % count($statusColors)];
-
-            $labels[] = strtoupper($item->type);
-            $chartData[] = $studentCount;
-            // Use dark color for chart (works well in both modes)
-            $backgroundColors[] = $colorInfo['dark'];
 
             $totalStudents += $studentCount;
             $totalSchools += $schoolCount;
@@ -179,7 +244,6 @@ class SalesForceStatsWidget extends Widget implements HasActions, HasForms
             ];
         }
 
-        // Calculate percentages for each program
         foreach ($details as &$detail) {
             $detail['percentage'] = $totalStudents > 0
                 ? round(($detail['student_count'] / $totalStudents) * 100, 1)
@@ -190,17 +254,6 @@ class SalesForceStatsWidget extends Widget implements HasActions, HasForms
         }
 
         return [
-            'labels' => $labels,
-            'datasets' => [
-                [
-                    'data' => $chartData,
-                    'backgroundColor' => $backgroundColors,
-                    'borderWidth' => 3,
-                    'borderColor' => '#ffffff',
-                    'hoverBorderWidth' => 4,
-                    'hoverBorderColor' => '#ffffff',
-                ],
-            ],
             'details' => $details,
             'totals' => [
                 'programs' => count($data),
