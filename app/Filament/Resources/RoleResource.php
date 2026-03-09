@@ -2,25 +2,22 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Spatie\Permission\Models\Role;
-use Filament\Forms\Components\Section;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Forms\Components\TextInput;
-use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\RoleResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\RoleResource\RelationManagers;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+use Spatie\Permission\Models\Role;
 
 class RoleResource extends Resource
 {
     protected static ?string $model = Role::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-finger-print';
+
     protected static ?string $navigationGroup = 'Management User';
 
     public static function form(Form $form): Form
@@ -31,7 +28,7 @@ class RoleResource extends Resource
                     ->description('Membuat Roles')
                     ->schema([
                         TextInput::make('name')
-                            ->unique()
+                            ->unique(),
                     ])->columns(2),
 
             ]);
@@ -44,23 +41,24 @@ class RoleResource extends Resource
                 TextColumn::make('name')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'finance'  => 'green',
-                        'akademik'   => 'blue',
-                        'teknisi'   => 'blue',
+                        'finance' => 'green',
+                        'akademik' => 'blue',
+                        'teknisi' => 'blue',
                         'sales' => 'yellow',
-                        'admin'  => 'indigo',
-                })
+                        'admin' => 'indigo',
+                        default => 'gray',
+                    }),
             ])
             ->filters([
-                //
+                    //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                    Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                    Tables\Actions\BulkActionGroup::make([
+                        Tables\Actions\DeleteBulkAction::make(),
+                    ]),
             ]);
     }
 
