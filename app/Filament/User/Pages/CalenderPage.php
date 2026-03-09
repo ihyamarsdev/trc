@@ -2,8 +2,8 @@
 
 namespace App\Filament\User\Pages;
 
-use Filament\Pages\Page;
 use App\Filament\User\Widgets\CalendarWidget;
+use Filament\Pages\Page;
 
 class CalenderPage extends Page
 {
@@ -22,7 +22,7 @@ class CalenderPage extends Page
     protected function getHeaderWidgets(): array
     {
         return [
-            CalendarWidget::class
+            CalendarWidget::class,
         ];
     }
 }

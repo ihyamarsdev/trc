@@ -2,28 +2,31 @@
 
 namespace App\Filament\Components;
 
-use Carbon\Carbon;
-use Filament\Tables;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use App\Filament\Enum\Periode;
+use App\Filament\Enum\Program;
+use App\Models\RegistrationData;
 use App\Models\Status;
+use Carbon\Carbon;
+use Creasi\Nusa\Models\District;
+use Creasi\Nusa\Models\Province;
+use Creasi\Nusa\Models\Regency;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Fieldset;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Infolists;
-use App\Filament\Enum\Periode;
-use App\Filament\Enum\Program;
-use Filament\Forms\Components\Radio;
-use Filament\Forms\Components\Fieldset;
-use Illuminate\Database\Eloquent\Model;
-use Filament\Forms\Components\DatePicker;
-use Filament\Tables\Columns\Layout\Split;
-use Filament\Tables\Columns\Layout\Stack;
-use Filament\Tables\Columns\{TextColumn};
-use Illuminate\Database\Eloquent\Builder;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Forms\Components\DateTimePicker;
-use Creasi\Nusa\Models\{Province, Regency, District};
-use Filament\Forms\Components\{Select, TextInput, Section};
-use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
-use App\Models\RegistrationData;
+use Filament\Tables;
+use Filament\Tables\Columns\Layout\Split;
+use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class Admin
 {
@@ -83,7 +86,6 @@ class Admin
         };
     }
 
-
     public static function getDifference(Get $get, Set $set): void
     {
 
@@ -112,7 +114,7 @@ class Admin
                         ->relationship(
                             name: 'status',
                             titleAttribute: 'name',
-                            modifyQueryUsing: fn(Builder $query) => $query
+                            modifyQueryUsing: fn (Builder $query) => $query
                                 ->orderBy('order')
                         )
                         ->searchable()
@@ -131,8 +133,8 @@ class Admin
                         ->maxLength(255),
                 ])->columns(2),
 
-            Section::make(fn(Get $get) => self::meta($get)['nameRegister'])
-                ->description(fn(Get $get) => self::meta($get)['DescriptionRegister'])
+            Section::make(fn (Get $get) => self::meta($get)['nameRegister'])
+                ->description(fn (Get $get) => self::meta($get)['DescriptionRegister'])
                 ->schema([
                     DateTimePicker::make('date_register')
                         ->label('Tanggal Pendaftaran')
@@ -156,6 +158,7 @@ class Admin
                             if ($provinceCode) {
                                 return Regency::where('province_code', $provinceCode)->pluck('name', 'name');
                             }
+
                             return [];
                         }),
                     Select::make('area')
@@ -165,21 +168,22 @@ class Admin
                             $regenciesCode = $regencies ? $regencies->code : null;
                             if ($regenciesCode) {
                                 if ($regenciesCode == '3101') {
-                                    return ['kS 01' => 'KS 01', 'KS_02' => 'KS 02',];
+                                    return ['kS 01' => 'KS 01', 'KS_02' => 'KS 02'];
                                 } elseif ($regenciesCode == '3171') {
-                                    return ['JP 01' => 'JP 01', 'JP 02' => 'JP 02',];
+                                    return ['JP 01' => 'JP 01', 'JP 02' => 'JP 02'];
                                 } elseif ($regenciesCode == '3172') {
-                                    return ['JU 01' => 'JU 01', 'JU 02' => 'JU 02',];
+                                    return ['JU 01' => 'JU 01', 'JU 02' => 'JU 02'];
                                 } elseif ($regenciesCode == '3173') {
-                                    return ['JB 01' => 'JB 01', 'JB 02' => 'JB 02',];
+                                    return ['JB 01' => 'JB 01', 'JB 02' => 'JB 02'];
                                 } elseif ($regenciesCode == '3174') {
-                                    return ['JS 01' => 'JS 01', 'JS 02' => 'JU 02',];
+                                    return ['JS 01' => 'JS 01', 'JS 02' => 'JU 02'];
                                 } elseif ($regenciesCode == '3175') {
-                                    return ['JT 01' => 'JT 01', 'JT 02' => 'JT 02',];
+                                    return ['JT 01' => 'JT 01', 'JT 02' => 'JT 02'];
                                 } else {
                                     return [];
                                 }
                             }
+
                             return [];
                         })
                         ->visible(function (Get $get) {
@@ -197,6 +201,7 @@ class Admin
                             if ($regencyCode) {
                                 return District::where('regency_code', $regencyCode)->pluck('name', 'name');
                             }
+
                             return [];
                         }),
                     TextInput::make('curriculum_deputies')
@@ -272,7 +277,6 @@ class Admin
                         ->telRegex('/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/')
                         ->maxLength(255),
                 ])->columns(2),
-
 
             Section::make('Akademik')
                 ->description('Detail Data Akademik')
@@ -402,8 +406,8 @@ class Admin
                                 ->label('Pilih Opsi')
                                 ->options(function (Get $get): array {
                                     return [
-                                        'implementer_' . $get('implementer_count') => 'Jumlah Pelaksanaan',
-                                        'account_' . $get('account_count_created') => 'Jumlah Akun',
+                                        'implementer_'.$get('implementer_count') => 'Jumlah Pelaksanaan',
+                                        'account_'.$get('account_count_created') => 'Jumlah Akun',
                                     ];
                                 })
                                 ->live(1000)
@@ -430,7 +434,6 @@ class Admin
                                 ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
                                 ->readOnly(),
                         ]),
-
 
                     Fieldset::make('')
                         ->label('TRC')
@@ -552,8 +555,8 @@ class Admin
                                 ->options([
                                     'SIPLAH' => 'SIPLAH',
                                     'SI/TF' => 'SI / TF',
-                                    'CASH' => 'CASH'
-                                ])
+                                    'CASH' => 'CASH',
+                                ]),
                         ]),
                 ])->columns(2),
         ];
@@ -575,7 +578,7 @@ class Admin
                 TextColumn::make('periode')
                     ->label('Periode')
                     ->description('Periode', position: 'above')
-                    ->extraAttributes(["class" => "uppercase"])
+                    ->extraAttributes(['class' => 'uppercase'])
                     ->wrap(),
                 TextColumn::make('years')
                     ->label('Tahun')
@@ -585,15 +588,15 @@ class Admin
                     ->label('Status')
                     ->description('Status', position: 'above')
                     ->badge()
-                    ->formatStateUsing(fn($state) => ucfirst($state))
-                    ->color(fn(string $state): string => match ($state) {
+                    ->formatStateUsing(fn ($state) => ucfirst($state))
+                    ->color(fn (string $state): string => match ($state) {
                         'green' => 'green',
                         'blue' => 'blue',
                         'yellow' => 'yellow',
                         'red' => 'red',
                     })
                     ->default('red'),
-            ])->from('md')
+            ])->from('md'),
 
         ];
     }
@@ -601,8 +604,8 @@ class Admin
     public static function infolist(Model $record): array
     {
         return [
-            Infolists\Components\Section::make(fn() => self::metaInfo($record)['nameRegister'])
-                ->description(fn() => self::metaInfo($record)['DescriptionRegister'])
+            Infolists\Components\Section::make(fn () => self::metaInfo($record)['nameRegister'])
+                ->description(fn () => self::metaInfo($record)['DescriptionRegister'])
                 ->schema([
                     Infolists\Components\Fieldset::make('Aktifitas Saat ini')
                         ->schema([
@@ -622,6 +625,7 @@ class Admin
                                     }
 
                                     $order = (int) $state;
+
                                     return $iconByOrder[$order] ?? 'heroicon-m-clock';
                                 })
                                 ->color(function ($state) {
@@ -690,7 +694,6 @@ class Admin
                                 ->placeholder('tidak ada wilayah'),
                         ]),
 
-
                     Infolists\Components\Fieldset::make('Bagan')
                         ->schema([
                             TextEntry::make('principal')
@@ -755,33 +758,33 @@ class Admin
                         ->schema([
                             Infolists\Components\IconEntry::make('students_download')
                                 ->label('Download Siswa')
-                                ->icon(fn(string $state): string => match ($state) {
+                                ->icon(fn (string $state): string => match ($state) {
                                     'YA' => 'heroicon-s-check-circle',
                                     'TIDAK' => 'heroicon-s-x-circle',
                                 })
-                                ->color(fn(string $state): string => match ($state) {
+                                ->color(fn (string $state): string => match ($state) {
                                     'YA' => 'success',
                                     'TIDAK' => 'danger',
                                 })
                                 ->placeholder('Tidak Ada Status'),
                             Infolists\Components\IconEntry::make('schools_download')
                                 ->label('Download Sekolah')
-                                ->icon(fn(string $state): string => match ($state) {
+                                ->icon(fn (string $state): string => match ($state) {
                                     'YA' => 'heroicon-s-check-circle',
                                     'TIDAK' => 'heroicon-s-x-circle',
                                 })
-                                ->color(fn(string $state): string => match ($state) {
+                                ->color(fn (string $state): string => match ($state) {
                                     'YA' => 'success',
                                     'TIDAK' => 'danger',
                                 })
                                 ->placeholder('Tidak Ada Status'),
                             Infolists\Components\IconEntry::make('pm')
                                 ->label('PM')
-                                ->icon(fn(string $state): string => match ($state) {
+                                ->icon(fn (string $state): string => match ($state) {
                                     'YA' => 'heroicon-s-check-circle',
                                     'TIDAK' => 'heroicon-s-x-circle',
                                 })
-                                ->color(fn(string $state): string => match ($state) {
+                                ->color(fn (string $state): string => match ($state) {
                                     'YA' => 'success',
                                     'TIDAK' => 'danger',
                                 })
@@ -813,7 +816,6 @@ class Admin
                                 ->placeholder('Belum di Pilih'),
 
                         ]),
-
 
                     Infolists\Components\Fieldset::make('Nominal')
                         ->schema([
@@ -913,7 +915,7 @@ class Admin
                                 ->placeholder('Belum Terjadwal'),
                             TextEntry::make('payment_name')
                                 ->label('Pembayaran Via')
-                                ->placeholder('Belum Terisi')
+                                ->placeholder('Belum Terisi'),
                         ]),
                 ])->columns(3),
 
@@ -978,11 +980,11 @@ class Admin
                         ->schema([
                             TextEntry::make('tax_rate')
                                 ->label('PPH 23')
-                                ->formatStateUsing(fn(string $state): string => __("{$state}%"))
+                                ->formatStateUsing(fn (string $state): string => __("{$state}%"))
                                 ->placeholder('Belum Terisi'),
                             TextEntry::make('sales_tsx')
                                 ->label('PPN')
-                                ->formatStateUsing(fn(string $state): string => __("{$state}%"))
+                                ->formatStateUsing(fn (string $state): string => __("{$state}%"))
                                 ->placeholder('Belum Terisi'),
                             TextEntry::make('total_invoice')
                                 ->label('Total')
@@ -1029,8 +1031,7 @@ class Admin
 
                     $query->whereHas(
                         'status',
-                        fn(Builder $q) =>
-                        $q->where('color', $data['value'])
+                        fn (Builder $q) => $q->where('color', $data['value'])
                     );
                 }),
             Tables\Filters\SelectFilter::make('years')
@@ -1066,8 +1067,8 @@ class Admin
                     ->withColumns(self::TextColumns())
                     ->disableTableColumns()
                     ->formatStates([
-                        'type' => fn(?Model $record) => strtoupper($record->type),
-                    ])
+                        'type' => fn (?Model $record) => strtoupper($record->type),
+                    ]),
             ]),
         ];
     }
@@ -1086,7 +1087,7 @@ class Admin
             TextColumn::make('years')->label('Tahun'),
             TextColumn::make('date_register')
                 ->label('Tanggal Pendaftaran')
-                ->formatStateUsing(fn($state) => $state ? Carbon::parse($state)->translatedFormat('l, j F Y H:i') : '-'),
+                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('l, j F Y H:i') : '-'),
             TextColumn::make('provinces')->label('Provinsi'),
             TextColumn::make('regencies')->label('Kota / Kabupaten'),
             TextColumn::make('area')->label('Wilayah'),
@@ -1094,7 +1095,7 @@ class Admin
             TextColumn::make('student_count')->label('Jumlah Siswa'),
             TextColumn::make('implementation_estimate')
                 ->label('Estimasi Pelaksanaan')
-                ->formatStateUsing(fn($state) => $state ? Carbon::parse($state)->translatedFormat('l, j F Y H:i') : '-'),
+                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('l, j F Y H:i') : '-'),
             TextColumn::make('curriculum_deputies')->label('Wakakurikulum'),
             TextColumn::make('curriculum_deputies_phone')->label('No. HP Wakakurikulum'),
             TextColumn::make('counselor_coordinators')->label('Koordinator BK'),
@@ -1114,11 +1115,11 @@ class Admin
             // --- Akademik & Teknisi ---
             TextColumn::make('group')
                 ->label('Tanggal Group')
-                ->formatStateUsing(fn($state) => $state ? Carbon::parse($state)->translatedFormat('l, j F Y') : '-')
+                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('l, j F Y') : '-')
                 ->sortable(),
             TextColumn::make('bimtek')
                 ->label('Tanggal Bimtek')
-                ->formatStateUsing(fn($state) => $state ? Carbon::parse($state)->translatedFormat('l, j F Y') : '-')
+                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('l, j F Y') : '-')
                 ->sortable(),
             TextColumn::make('account_count_created')->label('Akun Dibuat'),
             TextColumn::make('implementer_count')->label('Jumlah Pelaksana'),
@@ -1128,10 +1129,10 @@ class Admin
             TextColumn::make('pm')->label('PM'),
             TextColumn::make('counselor_consultation_date')
                 ->label('Konsultasi BK')
-                ->formatStateUsing(fn($state) => $state ? Carbon::parse($state)->translatedFormat('l, j F Y') : '-'),
+                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('l, j F Y') : '-'),
             TextColumn::make('student_consultation_date')
                 ->label('Konsultasi Siswa')
-                ->formatStateUsing(fn($state) => $state ? Carbon::parse($state)->translatedFormat('l, j F Y') : '-'),
+                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('l, j F Y') : '-'),
 
             // --- Finance (utama) ---
             TextColumn::make('price')->label('Harga'),
@@ -1140,15 +1141,15 @@ class Admin
             TextColumn::make('total_net')->label('Total Netto'),
             TextColumn::make('invoice_date')
                 ->label('Tgl Invoice')
-                ->formatStateUsing(fn($state) => $state ? Carbon::parse($state)->translatedFormat('j F Y') : '-')
+                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('j F Y') : '-')
                 ->sortable(),
             TextColumn::make('spk')
                 ->label('Tgl SPK')
-                ->formatStateUsing(fn($state) => $state ? Carbon::parse($state)->translatedFormat('j F Y') : '-')
+                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('j F Y') : '-')
                 ->sortable(),
             TextColumn::make('payment_date')
                 ->label('Tgl Pembayaran')
-                ->formatStateUsing(fn($state) => $state ? Carbon::parse($state)->translatedFormat('j F Y') : '-')
+                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('j F Y') : '-')
                 ->sortable(),
             TextColumn::make('payment_name')->label('Nama Pembayaran'),
 

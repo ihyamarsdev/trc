@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class () extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -13,7 +14,7 @@ return new class () extends Migration {
         Schema::create('registration_data', function (Blueprint $table) {
             $table->id();
 
-            ## Sales
+            // # Sales
             $table->string('type');
             $table->string('periode')->nullable();
             $table->string('years')->nullable();
@@ -39,7 +40,7 @@ return new class () extends Migration {
             $table->dateTime('implementation_estimate')->nullable();
             $table->string('status_color')->default('red')->nullable();
 
-            ## Service
+            // # Service
             $table->date('group')->nullable();
             $table->date('bimtek')->nullable();
             $table->integer('account_count_created')->nullable();
@@ -51,7 +52,7 @@ return new class () extends Migration {
             $table->date('counselor_consultation_date')->nullable();
             $table->date('student_consultation_date')->nullable();
 
-            ## Finance
+            // # Finance
             $table->string('price')->nullable();
             $table->string('total')->nullable();
             $table->string('net')->nullable();
@@ -64,7 +65,6 @@ return new class () extends Migration {
             $table->string('cb')->nullable();
             $table->string('option_price')->nullable();
             $table->string('monthYear')->nullable();
-
 
             $table->string('mitra_difference')->nullable();
             $table->string('mitra_net')->nullable();
@@ -98,7 +98,6 @@ return new class () extends Migration {
             $table->string('net_2')->nullable();
             $table->string('student_count_1')->nullable();
             $table->string('student_count_2')->nullable();
-
 
             $table->foreignId('users_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('status_id')->constrained('statuses')->nullable();

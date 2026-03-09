@@ -2,15 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use NumberFormatter;
-use Illuminate\Http\Request;
 use App\Models\RegistrationData;
-use LaravelDaily\Invoices\Invoice;
-use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
-use LaravelDaily\Invoices\Classes\Buyer;
+use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpWord\TemplateProcessor;
-use LaravelDaily\Invoices\Classes\InvoiceItem;
 
 class InvoiceGenerator extends Controller
 {
@@ -22,13 +17,13 @@ class InvoiceGenerator extends Controller
         $templateProcessor = new TemplateProcessor('template/rasyidu/invoice.docx');
 
         if ($pph == 0) {
-            $pph = "-";
-            $ppn = $record->sales_tsx . "%";
+            $pph = '-';
+            $ppn = $record->sales_tsx.'%';
         }
 
         if ($ppn == 0) {
-            $ppn = "-";
-            $pph = $record->tax_rate . "%";
+            $ppn = '-';
+            $pph = $record->tax_rate.'%';
         }
 
         $templateProcessor->setValues([
@@ -45,7 +40,7 @@ class InvoiceGenerator extends Controller
             'ppn' => $ppn ?? '-',
         ]);
 
-        $doc_name = 'INVOICE RASYIDUU ANBK ' . $record->schools . '.docx';
+        $doc_name = 'INVOICE RASYIDUU ANBK '.$record->schools.'.docx';
 
         $recipient = Auth::user();
 
@@ -70,13 +65,13 @@ class InvoiceGenerator extends Controller
         $templateProcessor = new TemplateProcessor('template/edunesia/invoice.docx');
 
         if ($pph == 0) {
-            $pph = "-";
-            $ppn = $record->sales_tsx . "%";
+            $pph = '-';
+            $ppn = $record->sales_tsx.'%';
         }
 
         if ($ppn == 0) {
-            $ppn = "-";
-            $pph = $record->tax_rate . "%";
+            $ppn = '-';
+            $pph = $record->tax_rate.'%';
         }
 
         $templateProcessor->setValues([
@@ -93,8 +88,7 @@ class InvoiceGenerator extends Controller
             'ppn' => $ppn ?? '-',
         ]);
 
-        $doc_name = 'INVOICE EDUNESIA ANBK ' . $record->schools . '.docx';
-
+        $doc_name = 'INVOICE EDUNESIA ANBK '.$record->schools.'.docx';
 
         $recipient = Auth::user();
 
@@ -106,10 +100,8 @@ class InvoiceGenerator extends Controller
                 ->toDatabase(),
         );
 
-
         $templateProcessor->saveAs($doc_name);
 
         return response()->download(public_path($doc_name))->deleteFileAfterSend(true);
     }
-
 }

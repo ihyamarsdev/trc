@@ -2,11 +2,10 @@
 
 namespace App\Filament\User\Resources\TimelineResource\Pages;
 
-use Filament\Actions;
-use Filament\Infolists\Infolist;
 use App\Filament\Components\Academic;
-use Filament\Resources\Pages\ViewRecord;
 use App\Filament\User\Resources\TimelineResource;
+use Filament\Infolists\Infolist;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewTimeline extends ViewRecord
 {
@@ -15,12 +14,11 @@ class ViewTimeline extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            
+
         ];
     }
 
-
-    public function mount(int | string $record): void
+    public function mount(int|string $record): void
     {
         $this->record = $this->resolveRecord($record);
     }
@@ -28,6 +26,7 @@ class ViewTimeline extends ViewRecord
     public function infolist(Infolist $infolist): Infolist
     {
         $record = $this->record;
+
         return $infolist
             ->schema(Academic::infolist(record: $record));
     }

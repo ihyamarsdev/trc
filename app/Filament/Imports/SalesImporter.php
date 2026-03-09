@@ -2,16 +2,14 @@
 
 namespace App\Filament\Imports;
 
-use App\Models\Sales;
 use App\Models\RegistrationData;
-use Filament\Actions\Imports\Importer;
+use App\Models\Sales;
 use Filament\Actions\Imports\ImportColumn;
+use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
-use HayderHatem\FilamentExcelImport\Traits\CanAccessAdditionalFormData;
 
 class SalesImporter extends Importer
 {
-    
     protected static ?string $model = RegistrationData::class;
 
     public static function getColumns(): array
@@ -50,15 +48,15 @@ class SalesImporter extends Importer
         //     'email' => $this->data['email'],
         // ]);
 
-        return new RegistrationData();
+        return new RegistrationData;
     }
 
     public static function getCompletedNotificationBody(Import $import): string
     {
-        $body = 'Your sales import has completed and ' . number_format($import->successful_rows) . ' ' . str('row')->plural($import->successful_rows) . ' imported.';
+        $body = 'Your sales import has completed and '.number_format($import->successful_rows).' '.str('row')->plural($import->successful_rows).' imported.';
 
         if ($failedRowsCount = $import->getFailedRowsCount()) {
-            $body .= ' ' . number_format($failedRowsCount) . ' ' . str('row')->plural($failedRowsCount) . ' failed to import.';
+            $body .= ' '.number_format($failedRowsCount).' '.str('row')->plural($failedRowsCount).' failed to import.';
         }
 
         return $body;

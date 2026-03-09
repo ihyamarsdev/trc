@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
-use NumberFormatter;
-use Illuminate\Http\Request;
-use App\Models\RegistrationData;
-use Illuminate\Routing\Controller;
 use App\Filament\Components\Format;
-use Illuminate\Support\Facades\Auth;
+use App\Models\RegistrationData;
 use Filament\Notifications\Notification;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
+use NumberFormatter;
 use PhpOffice\PhpWord\TemplateProcessor;
 
 class APPS extends Controller
@@ -17,8 +15,7 @@ class APPS extends Controller
     public function rasyidu(RegistrationData $record)
     {
 
-        $digit = new NumberFormatter("id", NumberFormatter::SPELLOUT);
-
+        $digit = new NumberFormatter('id', NumberFormatter::SPELLOUT);
 
         $templateProcessor = new TemplateProcessor('template/rasyidu/spk.docx');
 
@@ -27,7 +24,7 @@ class APPS extends Controller
             'year' => $record->years,
             'tanggal' => Format::tanggal($record->date_register->format('Y-m-d')),
             'to' => $record->principal,
-            'jabatan' => 'KEPALA SEKOLAH ' . $record->schools,
+            'jabatan' => 'KEPALA SEKOLAH '.$record->schools,
             'siswa' => $record->student_count,
             'siswaSpell' => $digit->format($record->student_count),
             'harga' => number_format($record->price, 0, ',', '.'),
@@ -38,7 +35,7 @@ class APPS extends Controller
             'province' => $record->provinces,
         ]);
 
-        $doc_name = 'SPK RASYIDUU APPS ' . $record->schools . '.docx';
+        $doc_name = 'SPK RASYIDUU APPS '.$record->schools.'.docx';
 
         $recipient = Auth::user();
 
@@ -58,7 +55,7 @@ class APPS extends Controller
     public function edunesia(RegistrationData $record)
     {
 
-        $digit = new NumberFormatter("id", NumberFormatter::SPELLOUT);
+        $digit = new NumberFormatter('id', NumberFormatter::SPELLOUT);
 
         $templateProcessor = new TemplateProcessor('template/edunesia/spk.docx');
 
@@ -67,7 +64,7 @@ class APPS extends Controller
             'year' => $record->years,
             'tanggal' => Format::tanggal($record->date_register->format('Y-m-d')),
             'to' => $record->principal,
-            'jabatan' => 'KEPALA SEKOLAH ' . $record->schools,
+            'jabatan' => 'KEPALA SEKOLAH '.$record->schools,
             'siswa' => $record->student_count,
             'siswaSpell' => $digit->format($record->student_count),
             'harga' => number_format($record->price, 0, ',', '.'),
@@ -78,7 +75,7 @@ class APPS extends Controller
             'province' => $record->provinces,
         ]);
 
-        $doc_name = 'SPK EDUNESIA APPS ' . $record->schools . '.docx';
+        $doc_name = 'SPK EDUNESIA APPS '.$record->schools.'.docx';
 
         $recipient = Auth::user();
 
@@ -94,6 +91,4 @@ class APPS extends Controller
 
         return response()->download(public_path($doc_name))->deleteFileAfterSend(true);
     }
-
-
 }

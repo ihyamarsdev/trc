@@ -2,9 +2,9 @@
 
 namespace App\Filament\User\Resources\Activity\ActivityResource\Pages;
 
+use App\Filament\User\Resources\Activity\ActivityResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
-use App\Filament\User\Resources\Activity\ActivityResource;
 
 class EditActivity extends EditRecord
 {

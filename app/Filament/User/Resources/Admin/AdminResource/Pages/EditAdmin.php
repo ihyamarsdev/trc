@@ -2,12 +2,12 @@
 
 namespace App\Filament\User\Resources\Admin\AdminResource\Pages;
 
-use Filament\Actions;
-use App\Models\RegistrationStatus;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
-use Filament\Resources\Pages\EditRecord;
 use App\Filament\User\Resources\Admin\AdminResource;
+use App\Models\RegistrationStatus;
+use Filament\Actions;
+use Filament\Resources\Pages\EditRecord;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class EditAdmin extends EditRecord
 {
@@ -28,8 +28,8 @@ class EditAdmin extends EditRecord
     protected function mutateFormDataBeforeSave(array $data): array
     {
         $input = strtotime($data['date_register']);
-        $date = getDate($input);
-        $data['monthYear'] = $date['month'] . ' ' . $date['year'];
+        $date = getdate($input);
+        $data['monthYear'] = $date['month'].' '.$date['year'];
 
         $record = $this->record;
 
@@ -49,9 +49,10 @@ class EditAdmin extends EditRecord
             if (! $last) {
                 RegistrationStatus::create([
                     'registration_id' => $record->id,
-                    'status_id'       => $currentStatusId,
-                    'user_id'         => Auth::id(),
+                    'status_id' => $currentStatusId,
+                    'user_id' => Auth::id(),
                 ]);
+
                 return;
             }
 
@@ -64,9 +65,10 @@ class EditAdmin extends EditRecord
                 // naik -> catat log baru
                 RegistrationStatus::create([
                     'registration_id' => $record->id,
-                    'status_id'       => $currentStatusId,
-                    'user_id'         => Auth::id(),
+                    'status_id' => $currentStatusId,
+                    'user_id' => Auth::id(),
                 ]);
+
                 return;
             }
 
@@ -84,8 +86,8 @@ class EditAdmin extends EditRecord
             if (! $last || (int) $last->status_id < $currentStatusId) {
                 RegistrationStatus::create([
                     'registration_id' => $record->id,
-                    'status_id'       => $currentStatusId,
-                    'user_id'         => Auth::id(),
+                    'status_id' => $currentStatusId,
+                    'user_id' => Auth::id(),
                 ]);
             }
 
@@ -109,7 +111,6 @@ class EditAdmin extends EditRecord
             // }
             */
         });
-
 
         return $data;
     }

@@ -2,13 +2,12 @@
 
 namespace App\Filament\User\Resources\Academic\AcademicResource\Pages;
 
+use App\Filament\Components\Academic;
+use App\Filament\User\Resources\Academic\AcademicResource;
 use Filament\Actions;
 use Filament\Infolists\Infolist;
-use Filament\Resources\Pages\Page;
-use App\Filament\Components\Academic;
-use Filament\Resources\Pages\ViewRecord;
-use App\Filament\User\Resources\Academic\AcademicResource;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewAcademic extends ViewRecord
 {
@@ -25,7 +24,7 @@ class ViewAcademic extends ViewRecord
         ];
     }
 
-    public function mount(int | string $record): void
+    public function mount(int|string $record): void
     {
         $this->record = $this->resolveRecord($record);
     }
@@ -33,6 +32,7 @@ class ViewAcademic extends ViewRecord
     public function infolist(Infolist $infolist): Infolist
     {
         $record = $this->record;
+
         return $infolist
             ->schema(Academic::infolist(record: $record));
     }

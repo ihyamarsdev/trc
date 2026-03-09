@@ -2,12 +2,11 @@
 
 namespace App\Filament\User\Resources\Admin\AdminResource\Pages;
 
-use Carbon\Carbon;
-use Filament\Actions;
-use App\Models\RegistrationStatus;
-use Illuminate\Support\Facades\Auth;
-use Filament\Resources\Pages\CreateRecord;
 use App\Filament\User\Resources\Admin\AdminResource;
+use App\Models\RegistrationStatus;
+use Carbon\Carbon;
+use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Support\Facades\Auth;
 
 class CreateAdmin extends CreateRecord
 {
@@ -24,7 +23,7 @@ class CreateAdmin extends CreateRecord
         // $data['type']     = 'anbk';
 
         // monthYear aman dibentuk (jika date_register diisi)
-        if (!empty($data['date_register'])) {
+        if (! empty($data['date_register'])) {
             $dt = Carbon::parse($data['date_register']);
             $data['monthYear'] = $dt->translatedFormat('F Y'); // contoh: "September 2025"
         }
@@ -48,9 +47,9 @@ class CreateAdmin extends CreateRecord
         if (! $last || (int) $last->status_id !== (int) $record->status_id) {
             RegistrationStatus::create([
                 'registration_id' => $record->id,
-                'status_id'       => $record->status_id,
-                'user_id'         => Auth::id(),
-                ''
+                'status_id' => $record->status_id,
+                'user_id' => Auth::id(),
+                '',
             ]);
         }
     }

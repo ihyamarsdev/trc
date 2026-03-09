@@ -2,27 +2,30 @@
 
 namespace App\Filament\User\Widgets;
 
-use App\Models\RegistrationData;
 use App\Filament\Enum\Jenjang;
-use Illuminate\Support\Facades\Auth;
-use Filament\Widgets\Widget;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Form;
+use App\Models\RegistrationData;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Form;
+use Filament\Widgets\Widget;
+use Illuminate\Support\Facades\Auth;
 
 class SalesForceStatsWidget extends Widget implements HasForms
 {
     use InteractsWithForms;
 
     protected int|string|array $columnSpan = 'full';
+
     protected static ?int $sort = 2;
+
     protected static ?string $heading = 'Rekap Program';
 
     protected static string $view = 'filament.user.widgets.sales-force-stats-widget';
 
     // Direct public properties for form binding
     public ?string $education_level = null;
+
     public ?string $years = null;
 
     public function mount(): void
@@ -42,7 +45,7 @@ class SalesForceStatsWidget extends Widget implements HasForms
                     ->options(Jenjang::list())
                     ->placeholder('Semua Jenjang')
                     ->live()
-                    ->afterStateUpdated(fn() => $this->dispatch('$refresh')),
+                    ->afterStateUpdated(fn () => $this->dispatch('$refresh')),
                 Select::make('years')
                     ->label('Tahun')
                     ->options(function () {
@@ -55,7 +58,7 @@ class SalesForceStatsWidget extends Widget implements HasForms
                     })
                     ->placeholder('Semua Tahun')
                     ->live()
-                    ->afterStateUpdated(fn() => $this->dispatch('$refresh')),
+                    ->afterStateUpdated(fn () => $this->dispatch('$refresh')),
             ]);
     }
 
@@ -72,7 +75,7 @@ class SalesForceStatsWidget extends Widget implements HasForms
     public function getChartData(): array
     {
         $query = RegistrationData::query()
-            ->when(!Auth::user()->hasRole(['admin', 'service', 'finance']), function ($query) {
+            ->when(! Auth::user()->hasRole(['admin', 'service', 'finance']), function ($query) {
                 return $query->where('users_id', Auth::id());
             })
             ->when($this->education_level, function ($query) {
@@ -92,52 +95,52 @@ class SalesForceStatsWidget extends Widget implements HasForms
             [
                 'light' => '#cc0000', // Red (darker for light mode)
                 'dark' => '#ff6b6b',  // Red (lighter for dark mode)
-                'name' => 'red'
+                'name' => 'red',
             ],
             [
                 'light' => '#cc9900', // Yellow (darker for light mode)
                 'dark' => '#ffd93d',  // Yellow (lighter for dark mode)
-                'name' => 'yellow'
+                'name' => 'yellow',
             ],
             [
                 'light' => '#000099', // Blue (darker for light mode)
                 'dark' => '#6bb3ff',  // Blue (lighter for dark mode)
-                'name' => 'blue'
+                'name' => 'blue',
             ],
             [
                 'light' => '#004400', // Green (darker for light mode)
                 'dark' => '#6bff6b',  // Green (lighter for dark mode)
-                'name' => 'green'
+                'name' => 'green',
             ],
             [
                 'light' => '#990000', // Dark Red
                 'dark' => '#ff8888',  // Light Red
-                'name' => 'dark-red'
+                'name' => 'dark-red',
             ],
             [
                 'light' => '#996600', // Dark Yellow
                 'dark' => '#ffe066',  // Light Yellow
-                'name' => 'dark-yellow'
+                'name' => 'dark-yellow',
             ],
             [
                 'light' => '#000066', // Dark Blue
                 'dark' => '#5599ff',  // Light Blue
-                'name' => 'dark-blue'
+                'name' => 'dark-blue',
             ],
             [
                 'light' => '#003300', // Dark Green
                 'dark' => '#55ff55',  // Light Green
-                'name' => 'dark-green'
+                'name' => 'dark-green',
             ],
             [
                 'light' => '#660000', // Very Dark Red
                 'dark' => '#ffaaaa',  // Very Light Red
-                'name' => 'very-dark-red'
+                'name' => 'very-dark-red',
             ],
             [
                 'light' => '#664400', // Very Dark Yellow
                 'dark' => '#ffdd88',  // Very Light Yellow
-                'name' => 'very-dark-yellow'
+                'name' => 'very-dark-yellow',
             ],
         ];
 
@@ -152,12 +155,12 @@ class SalesForceStatsWidget extends Widget implements HasForms
             $studentCount = (int) $item->total_students;
             $schoolCount = (int) $item->school_count;
             $colorInfo = $statusColors[$index % count($statusColors)];
-            
+
             $labels[] = strtoupper($item->type);
             $chartData[] = $studentCount;
             // Use dark color for chart (works well in both modes)
             $backgroundColors[] = $colorInfo['dark'];
-            
+
             $totalStudents += $studentCount;
             $totalSchools += $schoolCount;
 
@@ -175,8 +178,8 @@ class SalesForceStatsWidget extends Widget implements HasForms
 
         // Calculate percentages for each program
         foreach ($details as &$detail) {
-            $detail['percentage'] = $totalStudents > 0 
-                ? round(($detail['student_count'] / $totalStudents) * 100, 1) 
+            $detail['percentage'] = $totalStudents > 0
+                ? round(($detail['student_count'] / $totalStudents) * 100, 1)
                 : 0;
             $detail['avg_students_per_school'] = $detail['school_count'] > 0
                 ? round($detail['student_count'] / $detail['school_count'], 1)

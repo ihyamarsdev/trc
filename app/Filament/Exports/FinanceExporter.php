@@ -2,15 +2,15 @@
 
 namespace App\Filament\Exports;
 
-use Carbon\Carbon;
 use App\Models\RegistrationData;
-use Filament\Actions\Exports\Exporter;
-use OpenSpout\Common\Entity\Style\Color;
-use OpenSpout\Common\Entity\Style\Style;
+use Carbon\Carbon;
 use Filament\Actions\Exports\ExportColumn;
+use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;
 use OpenSpout\Common\Entity\Style\CellAlignment;
 use OpenSpout\Common\Entity\Style\CellVerticalAlignment;
+use OpenSpout\Common\Entity\Style\Color;
+use OpenSpout\Common\Entity\Style\Style;
 
 class FinanceExporter extends Exporter
 {
@@ -21,7 +21,7 @@ class FinanceExporter extends Exporter
         Carbon::setLocale('id');
 
         return [
-            //Datacenter
+            // Datacenter
             ExportColumn::make('type')
                 ->label('Program'),
             ExportColumn::make('periode')
@@ -61,7 +61,7 @@ class FinanceExporter extends Exporter
                 ->label('Estimasi Pelaksanaan')
                 ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
 
-            //Akademic
+            // Akademic
             ExportColumn::make('group')
                 ->label('Grup')
                 ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
@@ -87,7 +87,7 @@ class FinanceExporter extends Exporter
                 ->label('Tanggal Konseling Siswa')
                 ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
 
-            //Finance
+            // Finance
             ExportColumn::make('price')
                 ->label('Harga SPJ')
                 ->prefix('Rp.'),
@@ -151,12 +151,11 @@ class FinanceExporter extends Exporter
             ExportColumn::make('payment')
                 ->label('Pembayaran'),
 
-
-            //Kwitansi
+            // Kwitansi
             ExportColumn::make('detail_kwitansi')
                 ->label('Detail Kwitansi'),
 
-            //Invoice
+            // Invoice
             ExportColumn::make('detail_invoice')
                 ->label('Detail Invoice'),
             ExportColumn::make('number_invoice')
@@ -184,10 +183,10 @@ class FinanceExporter extends Exporter
 
     public static function getCompletedNotificationBody(Export $export): string
     {
-        $body = 'Your registration data export has completed and ' . number_format($export->successful_rows) . ' ' . str('row')->plural($export->successful_rows) . ' exported.';
+        $body = 'Your registration data export has completed and '.number_format($export->successful_rows).' '.str('row')->plural($export->successful_rows).' exported.';
 
         if ($failedRowsCount = $export->getFailedRowsCount()) {
-            $body .= ' ' . number_format($failedRowsCount) . ' ' . str('row')->plural($failedRowsCount) . ' failed to export.';
+            $body .= ' '.number_format($failedRowsCount).' '.str('row')->plural($failedRowsCount).' failed to export.';
         }
 
         return $body;
@@ -195,7 +194,7 @@ class FinanceExporter extends Exporter
 
     public function getXlsxHeaderCellStyle(): ?Style
     {
-        return (new Style())
+        return (new Style)
             ->setFontBold()
             ->setFontSize(12)
             ->setFontName('Arial')

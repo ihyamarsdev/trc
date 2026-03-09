@@ -2,29 +2,27 @@
 
 namespace App\Filament\User\Widgets;
 
-use Filament\Tables;
-use Illuminate\Database;
-use Filament\Tables\Table;
 use App\Filament\Enum\Jenjang;
 use App\Filament\Enum\Program;
 use App\Models\RegistrationData;
-use Illuminate\Support\Facades\DB;
-use Filament\Tables\Grouping\Group;
-use Illuminate\Support\Facades\Auth;
+use Filament\Tables;
 use Filament\Tables\Columns\Summarizers\Sum;
-use Filament\Widgets\TableWidget as BaseWidget;
 use Filament\Tables\Columns\Summarizers\Summarizer;
+use Filament\Tables\Grouping\Group;
+use Filament\Tables\Table;
+use Filament\Widgets\TableWidget as BaseWidget;
+use Illuminate\Database;
+use Illuminate\Support\Facades\DB;
 
 class SalesLeaderboard extends BaseWidget
 {
     protected int|string|array $columnSpan = 'full';
+
     protected static ?int $sort = 2;
+
     protected static ?string $title = 'Leaderboard Sales';
+
     protected static ?string $heading = 'Leaderboard Sales';
-
-
-
-
 
     public function table(Table $table): Table
     {
@@ -78,35 +76,35 @@ class SalesLeaderboard extends BaseWidget
                 Tables\Columns\TextColumn::make('red')->alignCenter()->label('Data')->summarize(
                     Summarizer::make()
                         ->label('')
-                        ->using(fn(Database\Query\Builder $query) => $summarizerCondition($query, 'red'))
-                        ->formatStateUsing(fn($state) => '<span class="status-red" style="--light: #cc0000; --dark: #ff6b6b; color: var(--light); font-weight: 600;">' . $state . '</span>')
+                        ->using(fn (Database\Query\Builder $query) => $summarizerCondition($query, 'red'))
+                        ->formatStateUsing(fn ($state) => '<span class="status-red" style="--light: #cc0000; --dark: #ff6b6b; color: var(--light); font-weight: 600;">'.$state.'</span>')
                         ->html()
                 ),
                 Tables\Columns\TextColumn::make('yellow')->alignCenter()->label('Data')->summarize(
                     Summarizer::make()
                         ->label('')
-                        ->using(fn(Database\Query\Builder $query) => $summarizerCondition($query, 'yellow'))
-                        ->formatStateUsing(fn($state) => '<span class="status-yellow" style="--light: #cc9900; --dark: #ffd93d; color: var(--light); font-weight: 600;">' . $state . '</span>')
+                        ->using(fn (Database\Query\Builder $query) => $summarizerCondition($query, 'yellow'))
+                        ->formatStateUsing(fn ($state) => '<span class="status-yellow" style="--light: #cc9900; --dark: #ffd93d; color: var(--light); font-weight: 600;">'.$state.'</span>')
                         ->html()
                 ),
                 Tables\Columns\TextColumn::make('blue')->alignCenter()->label('Data')->summarize(
                     Summarizer::make()
                         ->label('')
-                        ->using(fn(Database\Query\Builder $query) => $summarizerCondition($query, 'blue'))
-                        ->formatStateUsing(fn($state) => '<span class="status-blue" style="--light: #000099; --dark: #6bb3ff; color: var(--light); font-weight: 600;">' . $state . '</span>')
+                        ->using(fn (Database\Query\Builder $query) => $summarizerCondition($query, 'blue'))
+                        ->formatStateUsing(fn ($state) => '<span class="status-blue" style="--light: #000099; --dark: #6bb3ff; color: var(--light); font-weight: 600;">'.$state.'</span>')
                         ->html()
                 ),
                 Tables\Columns\TextColumn::make('green')->alignCenter()->label('Data')->summarize(
                     Summarizer::make()
                         ->label('')
-                        ->using(fn(Database\Query\Builder $query) => $summarizerCondition($query, 'green'))
-                        ->formatStateUsing(fn($state) => '<span class="status-green" style="--light: #004400; --dark: #6bff6b; color: var(--light); font-weight: 600;">' . $state . '</span>')
+                        ->using(fn (Database\Query\Builder $query) => $summarizerCondition($query, 'green'))
+                        ->formatStateUsing(fn ($state) => '<span class="status-green" style="--light: #004400; --dark: #6bff6b; color: var(--light); font-weight: 600;">'.$state.'</span>')
                         ->html()
                 ),
                 Tables\Columns\TextColumn::make('schools')->alignCenter()->label('Jumlah Sekolah')->summarize(
                     Summarizer::make()
                         ->label('')
-                        ->using(fn(Database\Query\Builder $query) => $query->count('schools'))
+                        ->using(fn (Database\Query\Builder $query) => $query->count('schools'))
                 ),
                 Tables\Columns\TextColumn::make('student_count')->alignCenter()->label('Jumlah Siswa')->summarize(Sum::make()->label('')),
             ])
@@ -132,7 +130,7 @@ class SalesLeaderboard extends BaseWidget
                             ->pluck('years', 'years')
                             ->toArray();
                     })
-                    ->searchable()
+                    ->searchable(),
             ])
             // ->groups([
             //     Group::make('users.name')
@@ -144,6 +142,4 @@ class SalesLeaderboard extends BaseWidget
             ->groupsOnly();
 
     }
-
-
 }

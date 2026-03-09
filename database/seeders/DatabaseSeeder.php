@@ -17,10 +17,10 @@ class DatabaseSeeder extends Seeder
         $roleNames = ['sales', 'service', 'finance'];
 
         $user = User::firstOrCreate([
-            'email' => 'admin@trc.com'
+            'email' => 'admin@trc.com',
         ], [
             'name' => 'admin',
-            'password' => 'admin123'
+            'password' => 'admin123',
         ]);
 
         $role = Role::firstOrCreate(['name' => 'admin']);

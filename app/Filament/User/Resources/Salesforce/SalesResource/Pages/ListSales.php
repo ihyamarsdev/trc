@@ -38,7 +38,7 @@ class ListSales extends ListRecords
                     FileUpload::make('attachment'),
                 ])
                 ->action(function (array $data) {
-                    $file = public_path('storage/' . $data['attachment']);
+                    $file = public_path('storage/'.$data['attachment']);
 
                     try {
                         Excel::import(new SalesImport, $file);
@@ -48,7 +48,7 @@ class ListSales extends ListRecords
                             ->success()
                             ->send();
                     } catch (\Throwable $th) {
-                        Log::error('Error saat mengimpor file: ' . $th->getMessage(), [
+                        Log::error('Error saat mengimpor file: '.$th->getMessage(), [
                             'file' => $file,
                             'data' => $data,
                             'trace' => $th->getTraceAsString(),

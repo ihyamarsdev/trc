@@ -4,27 +4,24 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Carbon\Carbon;
-use Filament\Panel;
-use Spatie\Permission\Contracts\Role;
-use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Support\Facades\Storage;
-use Filament\Models\Contracts\HasAvatar;
-use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\FilamentUser;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
+use Filament\Models\Contracts\HasAvatar;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Traits\HasRoles;
+use Yebor974\Filament\RenewPassword\Contracts\RenewPasswordContract;
 use Yebor974\Filament\RenewPassword\RenewPasswordPlugin;
 use Yebor974\Filament\RenewPassword\Traits\RenewPassword;
-use Yebor974\Filament\RenewPassword\Contracts\RenewPasswordContract;
 
-class User extends Authenticatable implements HasAvatar, FilamentUser, RenewPasswordContract
+class User extends Authenticatable implements FilamentUser, HasAvatar, RenewPasswordContract
 {
     use HasFactory;
-    use Notifiable;
     use HasRoles;
+    use Notifiable;
     use RenewPassword;
 
     public function getFilamentAvatarUrl(): ?string
@@ -37,7 +34,7 @@ class User extends Authenticatable implements HasAvatar, FilamentUser, RenewPass
         if ($panel->getId() === 'admin') {
             return $this->hasRole('admin');
         } elseif ($panel->getId() === 'user') {
-            return $this->hasRole(['sales','service','finance','admin']);
+            return $this->hasRole(['sales', 'service', 'finance', 'admin']);
         }
 
         return false;
@@ -58,7 +55,7 @@ class User extends Authenticatable implements HasAvatar, FilamentUser, RenewPass
         'gender',
         'date_joined',
         'devisions_id',
-        'force_renew_password'
+        'force_renew_password',
     ];
 
     /**
@@ -95,7 +92,7 @@ class User extends Authenticatable implements HasAvatar, FilamentUser, RenewPass
 
         return
             (
-                !is_null($plugin->getPasswordExpiresIn())
+                ! is_null($plugin->getPasswordExpiresIn())
                 && Carbon::parse($this->{$plugin->getTimestampColumn()})->addDays($plugin->getPasswordExpiresIn()) < now()
             ) || (
                 $plugin->getForceRenewPassword()

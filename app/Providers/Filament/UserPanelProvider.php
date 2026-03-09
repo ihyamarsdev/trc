@@ -2,35 +2,33 @@
 
 namespace App\Providers\Filament;
 
-use Filament\Panel;
-use Filament\Widgets;
-use Filament\PanelProvider;
-use App\Livewire\EditProfile;
-use Filament\Pages\Dashboard;
-use App\Livewire\DetailProfile;
-use Filament\Navigation\MenuItem;
-use Filament\Support\Colors\Color;
-use Illuminate\Support\Facades\URL;
-use Filament\Support\Enums\MaxWidth;
-use Illuminate\Support\Facades\Auth;
-use Orion\FilamentGreeter\GreeterPlugin;
 use App\Filament\User\Pages\DashboardHome;
-use Filament\Http\Middleware\Authenticate;
-use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Cookie\Middleware\EncryptCookies;
-use App\Http\Middleware\UpgradeToHttpsUnderNgrok;
 use App\Filament\User\Widgets\SalesForceStatsWidget;
+use App\Http\Middleware\UpgradeToHttpsUnderNgrok;
+use App\Livewire\DetailProfile;
+use App\Livewire\EditProfile;
+use Filament\Http\Middleware\Authenticate;
+use Filament\Http\Middleware\DisableBladeIconComponents;
+use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
+use Filament\Pages\Dashboard;
+use Filament\Panel;
+use Filament\PanelProvider;
+use Filament\Support\Colors\Color;
+use Filament\Support\Enums\MaxWidth;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Filament\Http\Middleware\DisableBladeIconComponents;
-use Yebor974\Filament\RenewPassword\RenewPasswordPlugin;
-use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
-use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
 use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
+use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
+use Orion\FilamentGreeter\GreeterPlugin;
+use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
+use Yebor974\Filament\RenewPassword\RenewPasswordPlugin;
 
 class UserPanelProvider extends PanelProvider
 {
@@ -72,7 +70,7 @@ class UserPanelProvider extends PanelProvider
                 'Rekap Akademik',
                 'Rekap Finance',
                 'Data Kuning',
-                'Data Biru'
+                'Data Biru',
             ])
             ->discoverResources(in: app_path('Filament/User/Resources'), for: 'App\\Filament\\User\\Resources')
             ->discoverPages(in: app_path('Filament/User/Pages'), for: 'App\\Filament\\User\\Pages')
@@ -141,9 +139,9 @@ class UserPanelProvider extends PanelProvider
                     ->avatar(size: 'w-16 h-16', enabled: true)
                     ->sort(-1)
                     ->columnSpan('full'),
-                (new RenewPasswordPlugin())
+                (new RenewPasswordPlugin)
                     ->forceRenewPassword()
-                    ->timestampColumn()
+                    ->timestampColumn(),
             ]);
     }
 }

@@ -2,34 +2,36 @@
 
 namespace App\Filament\User\Resources\Admin;
 
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use App\Models\RegistrationData;
-use Filament\Resources\Resource;
 use App\Filament\Components\Admin;
+use App\Filament\User\Resources\Admin\AdminResource\Pages\CreateAdmin;
+use App\Filament\User\Resources\Admin\AdminResource\Pages\EditAdmin;
+use App\Filament\User\Resources\Admin\AdminResource\Pages\ListAdmins;
+use App\Filament\User\Resources\Admin\AdminResource\Pages\ViewAdmin;
+use App\Models\RegistrationData;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
-use Illuminate\Support\Facades\Auth;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Enums\ActionsPosition;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\User\Resources\AdminResource\Pages;
-use App\Filament\User\Resources\AdminResource\RelationManagers;
-use App\Filament\User\Resources\Admin\AdminResource\Pages\{ListAdmins, CreateAdmin, EditAdmin, ViewAdmin};
+use Illuminate\Support\Facades\Auth;
 
 class AdminResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-building-library';
-    protected static ?string $title = 'Admin Database';
-    protected static ?string $navigationLabel = 'Database';
-    protected static ?string $modelLabel = 'Database';
-    protected static ?string $slug = 'admin-database';
-    protected static bool $shouldRegisterNavigation = true;
-    protected static ?int $navigationSort = 3;
 
+    protected static ?string $title = 'Admin Database';
+
+    protected static ?string $navigationLabel = 'Database';
+
+    protected static ?string $modelLabel = 'Database';
+
+    protected static ?string $slug = 'admin-database';
+
+    protected static bool $shouldRegisterNavigation = true;
+
+    protected static ?int $navigationSort = 3;
 
     public static function canViewAny(): bool
     {
@@ -52,14 +54,13 @@ class AdminResource extends Resource
             ->paginated([50, 100, 200])
             ->extremePaginationLinks()
             ->modifyQueryUsing(
-                fn(Builder $query) =>
-                $query->withMax('activity', 'id')
+                fn (Builder $query) => $query->withMax('activity', 'id')
                     ->orderByDesc('updated_at')
             )
             ->columns(Admin::columns())
             ->filters(Admin::filters())
             ->filtersTriggerAction(
-                fn(Action $action) => $action
+                fn (Action $action) => $action
                     ->button()
                     ->label('Filter'),
             )

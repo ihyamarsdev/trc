@@ -2,27 +2,21 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use App\Models\User;
-use Filament\Tables;
-use Filament\Forms\Form;
-use App\Models\Devisions;
-use Filament\Tables\Table;
-use Illuminate\Support\Str;
-use Filament\Resources\Resource;
-use Illuminate\Support\Facades\Hash;
-use App\Filament\Imports\UserImporter;
-use Filament\Forms\Components\Section;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Notifications\Notification;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Actions\ImportAction;
-use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\UserResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\UserResource\RelationManagers;
-use Filament\Forms\Components\{TextInput, DateTimePicker, Select};
+use App\Models\User;
+use Filament\Forms;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UserResource extends Resource
 {
@@ -35,8 +29,6 @@ class UserResource extends Resource
     protected static ?string $title = 'User';
 
     protected static ?string $navigationLabel = 'User';
-
-
 
     public static function form(Form $form): Form
     {
@@ -61,7 +53,7 @@ class UserResource extends Resource
                             ->relationship('roles', 'name')
                             ->multiple()
                             ->preload()
-                            ->searchable()
+                            ->searchable(),
                     ])->columns(2),
             ]);
     }
@@ -87,20 +79,20 @@ class UserResource extends Resource
                 TextColumn::make('roles.name')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'finance'  => 'green',
-                        'service'   => 'blue',
+                        'finance' => 'green',
+                        'service' => 'blue',
                         'sales' => 'yellow',
-                        'admin'  => 'indigo',
+                        'admin' => 'indigo',
                     })
                     ->label('Role'),
             ])
             ->filters([
-                    //
+                //
             ])
             ->actions([
-                    Tables\Actions\ActionGroup::make([
-                        Tables\Actions\EditAction::make(),
-                        Tables\Actions\Action::make('change-password')
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\Action::make('change-password')
                         ->label('Ubah Password')
                         ->icon('heroicon-o-key')
                         ->action(function ($record, array $data) {
@@ -126,11 +118,11 @@ class UserResource extends Resource
                                 ->dehydrated(fn ($state) => ! is_null($state)),
                         ])
                         ->requiresConfirmation(),
-                    ]),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                        Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }

@@ -6,9 +6,10 @@ use Carbon\Carbon;
 
 class Format
 {
-     public static function tanggal($tanggal): string
+    public static function tanggal($tanggal): string
     {
         Carbon::setLocale('id');
+
         return Carbon::parse($tanggal)->translatedFormat('jS F Y');
     }
 
@@ -61,6 +62,6 @@ class Format
 
     public static function formatKeRupiah($angka)
     {
-        return terbilang($angka) . ' Rupiah';
+        return terbilang($angka).' Rupiah';
     }
 }

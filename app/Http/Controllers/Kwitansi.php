@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use NumberFormatter;
-use Illuminate\Http\Request;
-use App\Models\RegistrationData;
 use App\Filament\Components\Format;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
+use App\Models\RegistrationData;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Auth;
+use NumberFormatter;
 use PhpOffice\PhpWord\TemplateProcessor;
 
 class Kwitansi extends Controller
@@ -16,7 +14,7 @@ class Kwitansi extends Controller
     public function rasyidu(RegistrationData $record)
     {
 
-        $digit = new NumberFormatter("id", NumberFormatter::SPELLOUT);
+        $digit = new NumberFormatter('id', NumberFormatter::SPELLOUT);
 
         $templateProcessor = new TemplateProcessor('template/rasyidu/kuitansi.docx');
 
@@ -25,7 +23,7 @@ class Kwitansi extends Controller
             'year' => $record->years,
             'tanggal' => Format::tanggal($record->payment_date),
             'to' => $record->principal,
-            'jabatan' => 'KEPALA SEKOLAH ' . $record->schools,
+            'jabatan' => 'KEPALA SEKOLAH '.$record->schools,
             'siswa' => $record->student_count,
             'siswaSpell' => $digit->format($record->student_count),
             'harga' => number_format($record->price, 0, ',', '.'),
@@ -36,10 +34,10 @@ class Kwitansi extends Controller
             'province' => $record->provinces,
             'schools' => $record->schools,
             'detail' => $record->detail_kwitansi,
-            'principal' => $record->principal
+            'principal' => $record->principal,
         ]);
 
-        $doc_name = 'KWITANSI RASYIDUU ' . $record->schools . '.docx';
+        $doc_name = 'KWITANSI RASYIDUU '.$record->schools.'.docx';
 
         $recipient = Auth::user();
 
@@ -56,10 +54,10 @@ class Kwitansi extends Controller
         return response()->download(public_path($doc_name))->deleteFileAfterSend(true);
     }
 
-     public function edunesia(RegistrationData $record)
+    public function edunesia(RegistrationData $record)
     {
 
-        $digit = new NumberFormatter("id", NumberFormatter::SPELLOUT);
+        $digit = new NumberFormatter('id', NumberFormatter::SPELLOUT);
 
         $templateProcessor = new TemplateProcessor('template/edunesia/kuitansi.docx');
 
@@ -68,7 +66,7 @@ class Kwitansi extends Controller
             'year' => $record->years,
             'tanggal' => Format::tanggal($record->payment_date),
             'to' => $record->principal,
-            'jabatan' => 'KEPALA SEKOLAH ' . $record->schools,
+            'jabatan' => 'KEPALA SEKOLAH '.$record->schools,
             'siswa' => $record->student_count,
             'siswaSpell' => $digit->format($record->student_count),
             'harga' => number_format($record->price, 0, ',', '.'),
@@ -79,10 +77,10 @@ class Kwitansi extends Controller
             'province' => $record->provinces,
             'schools' => $record->schools,
             'detail' => $record->detail_kwitansi,
-            'principal' => $record->principal
+            'principal' => $record->principal,
         ]);
 
-        $doc_name = 'KWITANSI EDUNESIA ' . $record->schools . '.docx';
+        $doc_name = 'KWITANSI EDUNESIA '.$record->schools.'.docx';
 
         $recipient = Auth::user();
 

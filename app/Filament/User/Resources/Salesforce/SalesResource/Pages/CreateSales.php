@@ -7,7 +7,6 @@ use App\Models\RegistrationStatus;
 use App\Models\Status;
 use App\Models\User;
 use Carbon\Carbon;
-use Filament\Actions;
 use Filament\Notifications\Actions\Action as NotificationAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
@@ -21,7 +20,6 @@ class CreateSales extends CreateRecord
     {
         return $this->getResource()::getUrl('index');
     }
-
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
@@ -38,7 +36,7 @@ class CreateSales extends CreateRecord
         }
 
         // monthYear aman dibentuk (jika date_register diisi)
-        if (!empty($data['date_register'])) {
+        if (! empty($data['date_register'])) {
             $dt = Carbon::parse($data['date_register']);
             $data['monthYear'] = $dt->translatedFormat('F Y'); // contoh: "September 2025"
         }
@@ -59,7 +57,7 @@ class CreateSales extends CreateRecord
             $recipients = User::role('service')->get();
 
             Notification::make()
-                ->title('Data Sekolah ' . $record->schools . ' memasuki status ' . $status->name)
+                ->title('Data Sekolah '.$record->schools.' memasuki status '.$status->name)
                 ->icon('heroicon-o-document-text')
                 ->success()
                 ->actions([
@@ -76,7 +74,7 @@ class CreateSales extends CreateRecord
             ->latest('id')
             ->first();
 
-        if (!$last || (int) $last->status_id !== (int) $record->status_id) {
+        if (! $last || (int) $last->status_id !== (int) $record->status_id) {
             RegistrationStatus::create([
                 'registration_id' => $record->id,
                 'status_id' => $record->status_id,

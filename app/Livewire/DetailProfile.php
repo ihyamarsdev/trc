@@ -3,22 +3,22 @@
 namespace App\Livewire;
 
 use Filament\Forms;
-use Livewire\Component;
-use Filament\Forms\Form;
-use Illuminate\Contracts\View\View;
-use Filament\Support\Exceptions\Halt;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Notifications\Notification;
 use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Form;
+use Filament\Notifications\Notification;
+use Filament\Support\Exceptions\Halt;
+use Illuminate\Contracts\View\View;
 use Joaopaulolndev\FilamentEditProfile\Concerns\HasSort;
 use Joaopaulolndev\FilamentEditProfile\Concerns\HasUser;
+use Livewire\Component;
 
 class DetailProfile extends Component implements HasForms
 {
-    use InteractsWithForms;
     use HasSort;
     use HasUser;
+    use InteractsWithForms;
 
     public $userClass;
 

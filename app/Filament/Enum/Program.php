@@ -28,5 +28,4 @@ enum Program: string
             'tka' => self::TKA->label(),
         ];
     }
-
 }

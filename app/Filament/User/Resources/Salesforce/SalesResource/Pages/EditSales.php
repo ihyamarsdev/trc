@@ -2,15 +2,15 @@
 
 namespace App\Filament\User\Resources\Salesforce\SalesResource\Pages;
 
+use App\Filament\User\Resources\Salesforce\SalesResource;
+use App\Models\RegistrationStatus;
+use App\Models\Status;
 use App\Models\User;
 use Filament\Actions;
-use App\Models\Status;
-use App\Models\RegistrationStatus;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
-use App\Filament\User\Resources\Salesforce\SalesResource;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class EditSales extends EditRecord
 {
@@ -26,13 +26,14 @@ class EditSales extends EditRecord
         return Actions\Action::make('save')
             ->label(__('filament-panels::resources/pages/edit-record.form.actions.save.label'))
             ->requiresConfirmation()
-            ->modalDescription("Apakah status sudah sesuai? Pastikan kembali status yang Anda pilih sudah benar sebelum menyimpan.")
+            ->modalDescription('Apakah status sudah sesuai? Pastikan kembali status yang Anda pilih sudah benar sebelum menyimpan.')
             ->modalIconColor('danger')
             ->keyBindings(['mod+s']);
     }
+
     protected function getRedirectUrl(): string
     {
-        return $this->getResource()::getUrl("index");
+        return $this->getResource()::getUrl('index');
     }
 
     protected function afterSave(): void
@@ -40,15 +41,13 @@ class EditSales extends EditRecord
         // Runs after the form fields are saved to the database.
     }
 
-
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        $input = strtotime($data["date_register"]);
-        $date = getDate($input);
-        $data["monthYear"] = $date["month"] . " " . $date["year"];
-        $status = Status::find($data["status_id"]);
+        $input = strtotime($data['date_register']);
+        $date = getdate($input);
+        $data['monthYear'] = $date['month'].' '.$date['year'];
+        $status = Status::find($data['status_id']);
         $data['status_color'] = $status->color;
-
 
         if ($status->order == 2) {
             $recipients = User::whereHas('roles', function ($q) {
@@ -56,17 +55,16 @@ class EditSales extends EditRecord
             })->get();
 
             Notification::make()
-                ->title('Data Sekolah ' . $data["schools"] . ' memasuki status ' . $status->name)
+                ->title('Data Sekolah '.$data['schools'].' memasuki status '.$status->name)
                 ->icon('heroicon-o-document-text')
                 ->success()
                 ->sendToDatabase($recipients);
 
         }
 
-
         $record = $this->record;
 
-        if ($data["status_id"]) {
+        if ($data['status_id']) {
             DB::transaction(function () use ($record) {
                 if (empty($record->status_id)) {
                     return;
@@ -75,17 +73,18 @@ class EditSales extends EditRecord
                 $currentStatusId = (int) $record->status_id;
 
                 $last = RegistrationStatus::query()
-                    ->where("registration_id", $record->id)
-                    ->latest("id")
+                    ->where('registration_id', $record->id)
+                    ->latest('id')
                     ->first();
 
                 // --- SIMPLE: bandingkan berdasar angka status_id (sesuai permintaanmu) ---
-                if (!$last) {
+                if (! $last) {
                     RegistrationStatus::create([
-                        "registration_id" => $record->id,
-                        "status_id" => $currentStatusId,
-                        "user_id" => Auth::id(),
+                        'registration_id' => $record->id,
+                        'status_id' => $currentStatusId,
+                        'user_id' => Auth::id(),
                     ]);
+
                     return;
                 }
 
@@ -97,10 +96,11 @@ class EditSales extends EditRecord
                 if ((int) $last->status_id < $currentStatusId) {
                     // naik -> catat log baru
                     RegistrationStatus::create([
-                        "registration_id" => $record->id,
-                        "status_id" => $currentStatusId,
-                        "user_id" => Auth::id(),
+                        'registration_id' => $record->id,
+                        'status_id' => $currentStatusId,
+                        'user_id' => Auth::id(),
                     ]);
+
                     return;
                 }
 
@@ -109,17 +109,17 @@ class EditSales extends EditRecord
                     $last->delete();
 
                     $last = RegistrationStatus::query()
-                        ->where("registration_id", $record->id)
-                        ->latest("id")
+                        ->where('registration_id', $record->id)
+                        ->latest('id')
                         ->first();
                 }
 
                 // setelah rollback, jika belum persis sama dan ingin set posisinya ke current, tambahkan log current:
-                if (!$last || (int) $last->status_id < $currentStatusId) {
+                if (! $last || (int) $last->status_id < $currentStatusId) {
                     RegistrationStatus::create([
-                        "registration_id" => $record->id,
-                        "status_id" => $currentStatusId,
-                        "user_id" => Auth::id(),
+                        'registration_id' => $record->id,
+                        'status_id' => $currentStatusId,
+                        'user_id' => Auth::id(),
                     ]);
                 }
 

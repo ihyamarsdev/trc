@@ -49,7 +49,7 @@
         "barryvdh/laravel-ide-helper": "^3.2",
         "laravel/boost": "^1.8",
         "laravel/pint": "^1.13",
-        "laravel/sail": "^1.26",
+        "laravel/sail": "^1.53",
         "mockery/mockery": "^1.6",
         "phpunit/phpunit": "^11.0.1"
     },

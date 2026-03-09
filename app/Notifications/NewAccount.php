@@ -3,11 +3,10 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\HtmlString;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
+use Illuminate\Support\HtmlString;
 
 class NewAccount extends Notification
 {
@@ -38,13 +37,13 @@ class NewAccount extends Notification
     {
         $appName = config('app.name');
 
-        return (new MailMessage())
-                ->subject("Akun Anda Baru Saja Dibuat di $appName")
-                ->line("Berikut Informasi Detail:")
-                ->line(new HtmlString("<strong>Email</strong> : {$notifiable->email}"))
-                ->line(new HtmlString("<strong>Password Sementara</strong> : {$this->password}"))
-                ->line("Kamu Akan di Minta untuk mengganti Password baru untuk login pertama kali.")
-                ->action('Pergi Ke Aplikasi', url('/'));
+        return (new MailMessage)
+            ->subject("Akun Anda Baru Saja Dibuat di $appName")
+            ->line('Berikut Informasi Detail:')
+            ->line(new HtmlString("<strong>Email</strong> : {$notifiable->email}"))
+            ->line(new HtmlString("<strong>Password Sementara</strong> : {$this->password}"))
+            ->line('Kamu Akan di Minta untuk mengganti Password baru untuk login pertama kali.')
+            ->action('Pergi Ke Aplikasi', url('/'));
     }
 
     /**

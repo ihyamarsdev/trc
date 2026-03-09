@@ -2,17 +2,17 @@
 
 use App\Http\Controllers\ANBK;
 use App\Http\Controllers\APPS;
+use App\Http\Controllers\InvoiceGenerator;
+use App\Http\Controllers\Kwitansi;
+use App\Http\Controllers\SampleSalesforce;
 use App\Http\Controllers\SNBT;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\InvoiceGenerator;
-use App\Http\Controllers\SampleSalesforce;
-use App\Http\Controllers\Kwitansi;
 
 // Route::get('/', function () {
 //     return view('welcome');
 // });
 
-## RASYIDU
+// # RASYIDU
 
 Route::get('/{record}/rasyidu/download/anbk', [ANBK::class, 'rasyidu'])
     ->name('rasyidu.anbk.download');
@@ -29,8 +29,7 @@ Route::get('/{record}/rasyidu/download/kwitansi', [Kwitansi::class, 'rasyidu'])
 Route::get('/{record}/rasyidu/download/invoice', [InvoiceGenerator::class, 'rasyidu'])
     ->name('rasyidu.invoice.download');
 
-
-## EDUNESIA
+// # EDUNESIA
 Route::get('/{record}/edunesia/download/anbk', [ANBK::class, 'edunesia'])
     ->name('edunesia.anbk.download');
 
