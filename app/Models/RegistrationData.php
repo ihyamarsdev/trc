@@ -2,16 +2,13 @@
 
 namespace App\Models;
 
-use App\Models\Status;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class RegistrationData extends Model
 {
     use HasFactory;
-
-
 
     protected $fillable = [
         'type',
@@ -133,6 +130,4 @@ class RegistrationData extends Model
         return $this->hasOne(RegistrationStatus::class, 'registration_id')
             ->latestOfMany(); // ambil baris log terakhir (created_at / id terbesar)
     }
-
-
 }

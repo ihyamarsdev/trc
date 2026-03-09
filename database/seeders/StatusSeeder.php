@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use App\Models\Status;
+use Illuminate\Database\Seeder;
 
 class StatusSeeder extends Seeder
 {
@@ -150,8 +149,7 @@ class StatusSeeder extends Seeder
                 'category' => 'finance',
                 'icon' => 'heroicon-s-lifebuoy',
             ],
-    ];
-
+        ];
 
         foreach ($statuses as $status) {
             Status::updateOrCreate($status);

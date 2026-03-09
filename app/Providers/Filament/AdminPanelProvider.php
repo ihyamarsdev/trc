@@ -134,10 +134,20 @@ class AdminPanelProvider extends PanelProvider
                             ->url('/admin/users')
                             ->isActive(fn () => request()->is('admin/users*')),
 
+                        MobileBottomNavItem::make('Home')
+                            ->icon('heroicon-o-home')
+                            ->url('/admin')
+                            ->isActive(fn () => request()->is('admin')),
+
                         MobileBottomNavItem::make('Roles')
                             ->icon('heroicon-o-shield-check')
                             ->url('/admin/shield/roles')
                             ->isActive(fn () => request()->is('admin/shield/roles*')),
+
+                        MobileBottomNavItem::make('Log')
+                            ->icon('heroicon-o-document-text')
+                            ->url('/admin/log-manager')
+                            ->isActive(fn () => request()->is('admin/log-manager*')),
                     ]),
             ]);
     }

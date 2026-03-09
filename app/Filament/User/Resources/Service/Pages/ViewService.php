@@ -2,8 +2,8 @@
 
 namespace App\Filament\User\Resources\Service\Pages;
 
-use App\Filament\User\Resources\Service\ServiceResource;
 use App\Filament\User\Resources\Service\Infolists\ServiceInfolist;
+use App\Filament\User\Resources\Service\ServiceResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Schema;

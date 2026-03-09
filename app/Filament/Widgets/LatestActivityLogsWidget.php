@@ -2,17 +2,15 @@
 
 namespace App\Filament\Widgets;
 
-use Filament\Actions\BulkActionGroup;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
-use Illuminate\Database\Eloquent\Builder;
 use Spatie\Activitylog\Models\Activity;
-
-use Filament\Tables\Columns\TextColumn;
 
 class LatestActivityLogsWidget extends TableWidget
 {
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
+
     protected static ?int $sort = 4;
 
     public function table(Table $table): Table

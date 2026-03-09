@@ -139,27 +139,37 @@ class UserPanelProvider extends PanelProvider
                         MobileBottomNavItem::make('Service')
                             ->icon('heroicon-o-wrench-screwdriver')
                             ->url('/database-service')
-                            ->isActive(fn () => request()->is('database-service*')),
+                            ->isActive(fn () => request()->is('database-service*'))
+                            ->visible(fn () => Auth::user()?->hasAnyRole(['admin', 'service'])),
 
                         MobileBottomNavItem::make('Salesforce')
                             ->icon('heroicon-o-presentation-chart-line')
                             ->url('/database-salesforce')
-                            ->isActive(fn () => request()->is('database-salesforce*')),
+                            ->isActive(fn () => request()->is('database-salesforce*'))
+                            ->visible(fn () => Auth::user()?->hasAnyRole(['admin', 'sales'])),
+
+                        MobileBottomNavItem::make('Home')
+                            ->icon('heroicon-o-home')
+                            ->url('/')
+                            ->isActive(fn () => request()->is('/')),
 
                         MobileBottomNavItem::make('Finance')
                             ->icon('heroicon-m-credit-card')
                             ->url('/database-finance')
-                            ->isActive(fn () => request()->is('database-finance*')),
+                            ->isActive(fn () => request()->is('database-finance*'))
+                            ->visible(fn () => Auth::user()?->hasAnyRole(['admin', 'finance'])),
 
                         MobileBottomNavItem::make('Activity')
                             ->icon('heroicon-o-arrow-trending-up')
                             ->url('/activity')
-                            ->isActive(fn () => request()->is('activity*')),
+                            ->isActive(fn () => request()->is('activity*'))
+                            ->visible(fn () => Auth::user()?->hasAnyRole(['admin', 'sales', 'finance', 'service'])),
 
                         MobileBottomNavItem::make('Timeline')
                             ->icon('heroicon-o-clock')
                             ->url('/timeline')
-                            ->isActive(fn () => request()->is('timeline*')),
+                            ->isActive(fn () => request()->is('timeline*'))
+                            ->visible(fn () => Auth::user()?->hasAnyRole(['admin', 'service', 'finance', 'sales'])),
                     ]),
             ]);
     }

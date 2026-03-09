@@ -2,16 +2,15 @@
 
 namespace App\Filament\Exports;
 
-use Carbon\Carbon;
-use App\Models\Service;
 use App\Models\RegistrationData;
-use Filament\Actions\Exports\Exporter;
-use OpenSpout\Common\Entity\Style\Color;
-use OpenSpout\Common\Entity\Style\Style;
+use Carbon\Carbon;
 use Filament\Actions\Exports\ExportColumn;
+use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;
 use OpenSpout\Common\Entity\Style\CellAlignment;
 use OpenSpout\Common\Entity\Style\CellVerticalAlignment;
+use OpenSpout\Common\Entity\Style\Color;
+use OpenSpout\Common\Entity\Style\Style;
 
 class ServiceExporter extends Exporter
 {
@@ -20,6 +19,7 @@ class ServiceExporter extends Exporter
     public static function getColumns(): array
     {
         Carbon::setLocale('id');
+
         return [
             ExportColumn::make('users.name')
                 ->label('User Salesforce'),
@@ -84,19 +84,18 @@ class ServiceExporter extends Exporter
 
     public static function getCompletedNotificationBody(Export $export): string
     {
-        $body = 'Your service export has completed and ' . number_format($export->successful_rows) . ' ' . str('row')->plural($export->successful_rows) . ' exported.';
+        $body = 'Your service export has completed and '.number_format($export->successful_rows).' '.str('row')->plural($export->successful_rows).' exported.';
 
         if ($failedRowsCount = $export->getFailedRowsCount()) {
-            $body .= ' ' . number_format($failedRowsCount) . ' ' . str('row')->plural($failedRowsCount) . ' failed to export.';
+            $body .= ' '.number_format($failedRowsCount).' '.str('row')->plural($failedRowsCount).' failed to export.';
         }
 
         return $body;
     }
 
-
     public function getXlsxHeaderCellStyle(): ?Style
     {
-        return (new Style())
+        return (new Style)
             ->setFontBold()
             ->setFontSize(12)
             ->setFontName('Arial')

@@ -25,6 +25,22 @@ SIDEBAR
     @apply object-contain w-auto;
 }
 
+/* =====================
+   AUTH / LOGIN PAGE LOGO
+   ===================== */
+
+/* Override Filament's hardcoded height: 1.5rem on .fi-logo so logo
+   can display at its intended size on the login/register pages. */
+.fi-simple-layout .fi-logo {
+    height: auto !important;
+}
+
+.fi-simple-layout .fi-logo img {
+    max-height: 7.5rem;
+    width: auto;
+    object-fit: contain;
+}
+
 .fi-sidebar {
     @apply bg-sky-900 dark:bg-gray-950;
 }

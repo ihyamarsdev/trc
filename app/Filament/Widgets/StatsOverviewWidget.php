@@ -2,14 +2,14 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\RegistrationData;
 use Filament\Widgets\StatsOverviewWidget as BaseStatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-
-use App\Models\RegistrationData;
 
 class StatsOverviewWidget extends BaseStatsOverviewWidget
 {
     protected static ?int $sort = 1;
+
     protected function getStats(): array
     {
         return [
@@ -21,7 +21,7 @@ class StatsOverviewWidget extends BaseStatsOverviewWidget
                 ->description('Jumlah seluruh siswa')
                 ->descriptionIcon('heroicon-m-user-group')
                 ->color('success'),
-            Stat::make('Total Pemasukan', 'Rp ' . number_format(RegistrationData::sum('total_invoice'), 0, ',', '.'))
+            Stat::make('Total Pemasukan', 'Rp '.number_format(RegistrationData::sum('total_invoice'), 0, ',', '.'))
                 ->description('Jumlah seluruh invoice')
                 ->descriptionIcon('heroicon-m-currency-dollar')
                 ->color('warning'),

@@ -9,7 +9,7 @@ enum Periode: string
 
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PERIODE_1 => 'PERIODE 1',
             self::PERIODE_2 => 'PERIODE 2',
         };

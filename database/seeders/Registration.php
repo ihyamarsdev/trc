@@ -2,12 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Support\Arr;
-use Illuminate\Database\Seeder;
 use App\Models\RegistrationData;
 use App\Models\RegistrationStatus;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class Registration extends Seeder
 {

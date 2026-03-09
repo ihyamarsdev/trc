@@ -20,7 +20,7 @@ class RekapitulasiServiceResource extends Resource
 
     protected static ?string $navigationLabel = 'Rekapitulasi';
 
-    protected static ?string $modelLabel = 'rekapitulasi';
+    protected static ?string $modelLabel = 'Rekapitulasi Service';
 
     public static function canViewAny(): bool
     {
