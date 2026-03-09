@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use App\Models\Status;
+use Illuminate\Database\Seeder;
 
 class StatusSeeder extends Seeder
 {
@@ -126,7 +125,7 @@ class StatusSeeder extends Seeder
             [
                 'id' => 40,
                 'order' => 13,
-                'name' => 'SPJ',
+                'name' => 'SPJ dan Hasil',
                 'description' => 'Penyusunan Surat Pertanggungjawaban dan kelengkapan administrasi.',
                 'color' => 'green',
                 'category' => 'finance',
@@ -150,8 +149,16 @@ class StatusSeeder extends Seeder
                 'category' => 'finance',
                 'icon' => 'heroicon-s-lifebuoy',
             ],
-    ];
-
+            [
+                'id' => 43,
+                'order' => 16,
+                'name' => 'Pesanan Selesai',
+                'description' => 'Semua proses telah selesai dan pesanan dianggap selesai.',
+                'color' => 'green',
+                'category' => 'finance',
+                'icon' => 'heroicon-s-check-circle',
+            ],
+        ];
 
         foreach ($statuses as $status) {
             Status::updateOrCreate($status);
