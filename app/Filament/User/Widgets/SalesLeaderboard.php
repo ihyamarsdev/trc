@@ -8,7 +8,6 @@ use App\Models\RegistrationData;
 use Filament\Tables;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\Summarizers\Summarizer;
-use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database;
@@ -132,12 +131,12 @@ class SalesLeaderboard extends BaseWidget
                     })
                     ->searchable(),
                 Tables\Filters\SelectFilter::make('warna')
-                    ->label('Warna')
+                    ->label('Status')
                     ->options([
-                        'green' => 'Green',
-                        'blue' => 'Blue',
-                        'yellow' => 'Yellow',
-                        'red' => 'Red',
+                        'green' => 'Hijau',
+                        'blue' => 'Biru',
+                        'yellow' => 'Kuning',
+                        'red' => 'Merah',
                     ])
                     ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
                         if (! empty($data['value'])) {
