@@ -131,12 +131,28 @@ class SalesLeaderboard extends BaseWidget
                             ->toArray();
                     })
                     ->searchable(),
+                Tables\Filters\SelectFilter::make('warna')
+                    ->label('Warna')
+                    ->options([
+                        'green' => 'Green',
+                        'blue' => 'Blue',
+                        'yellow' => 'Yellow',
+                        'red' => 'Red',
+                    ])
+                    ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
+                        if (! empty($data['value'])) {
+                            return $query->whereExists(function ($subQuery) use ($data) {
+                                $subQuery->select(DB::raw(1))
+                                    ->from('registration_statuses')
+                                    ->join('statuses', 'statuses.id', '=', 'registration_statuses.status_id')
+                                    ->whereColumn('registration_statuses.registration_id', 'registration_data.id')
+                                    ->whereRaw('registration_statuses.id = (SELECT MAX(id) FROM registration_statuses WHERE registration_id = registration_data.id)')
+                                    ->where('statuses.color', $data['value']);
+                            });
+                        }
+                        return $query;
+                    }),
             ])
-            // ->groups([
-            //     Group::make('users.name')
-            //         ->collapsible()
-            //         ->titlePrefixedWithLabel(false),
-            // ])
             ->defaultGroup('users.name')
             ->groupingSettingsHidden()
             ->groupsOnly();
