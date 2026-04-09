@@ -16,9 +16,15 @@ class FinanceResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-m-credit-card';
+    public static function getNavigationIcon(): ?string
+    {
+        return 'heroicon-m-credit-card';
+    }
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Finance';
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Finance';
+    }
 
     protected static ?string $title = 'Database';
 

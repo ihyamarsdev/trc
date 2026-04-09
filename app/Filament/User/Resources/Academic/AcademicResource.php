@@ -16,9 +16,15 @@ class AcademicResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-wrench-screwdriver';
+    public static function getNavigationIcon(): ?string
+    {
+        return 'heroicon-o-wrench-screwdriver';
+    }
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Service';
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Service';
+    }
 
     protected static ?string $title = 'Database';
 

@@ -16,9 +16,15 @@ class SalesResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-presentation-chart-line';
+    public static function getNavigationIcon(): ?string
+    {
+        return 'heroicon-o-presentation-chart-line';
+    }
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Salesforce';
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Salesforce';
+    }
 
     protected static ?string $title = 'Database';
 

@@ -22,9 +22,15 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user-group';
+    public static function getNavigationIcon(): ?string
+    {
+        return 'heroicon-o-user-group';
+    }
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Management User';
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Management User';
+    }
 
     protected static ?string $title = 'User';
 

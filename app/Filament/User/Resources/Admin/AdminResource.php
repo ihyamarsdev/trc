@@ -19,7 +19,10 @@ class AdminResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-building-library';
+    public static function getNavigationIcon(): ?string
+    {
+        return 'heroicon-o-building-library';
+    }
 
     protected static ?string $title = 'Admin Database';
 

@@ -21,7 +21,10 @@ class ActivityResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-arrow-trending-up';
+    public static function getNavigationIcon(): ?string
+    {
+        return 'heroicon-o-arrow-trending-up';
+    }
 
     protected static ?string $title = 'Activity';
 
