@@ -5,9 +5,9 @@ namespace App\Filament\User\Resources\Salesforce;
 use App\Filament\Components\SalesForce;
 use App\Filament\User\Resources\Salesforce\SalesResource\Pages;
 use App\Models\RegistrationData;
+use Filament\Actions\Action;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -57,17 +57,16 @@ class SalesResource extends Resource
     {
         return $table
             ->deferLoading()
-            ->poll('5s')
+            ->poll('15s')
             ->searchable()
             ->striped()
             ->paginated([50, 100, 200])
             ->recordAction('view')
             ->modifyQueryUsing(
                 fn (Builder $query) => $query
+                    ->with(['latestStatusLog.status'])
                     ->where('years', now('Asia/Jakarta')->format('Y'))
-                    ->when(
-                        fn ($query) => $query->where('users_id', auth()->id())
-                    )
+                    ->when(Auth::id(), fn (Builder $builder, int $userId) => $builder->where('users_id', $userId))
                     ->orderBy('implementation_estimate', 'asc')
             )
             ->columns(SalesForce::columns())

@@ -8,9 +8,9 @@ use App\Filament\User\Resources\Admin\AdminResource\Pages\EditAdmin;
 use App\Filament\User\Resources\Admin\AdminResource\Pages\ListAdmins;
 use App\Filament\User\Resources\Admin\AdminResource\Pages\ViewAdmin;
 use App\Models\RegistrationData;
+use Filament\Actions\Action;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -48,13 +48,14 @@ class AdminResource extends Resource
     {
         return $table
             ->deferLoading()
-            ->poll('5s')
+            ->poll('15s')
             ->searchable()
             ->striped()
             ->paginated([50, 100, 200])
             ->extremePaginationLinks()
             ->modifyQueryUsing(
-                fn (Builder $query) => $query->withMax('activity', 'id')
+                fn (Builder $query) => $query
+                    ->with(['latestStatusLog.status'])
                     ->orderByDesc('updated_at')
             )
             ->columns(Admin::columns())

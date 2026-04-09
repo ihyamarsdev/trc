@@ -4,78 +4,41 @@ namespace App\Providers\Filament;
 
 use App\Filament\User\Pages\DashboardHome;
 use App\Filament\User\Widgets\SalesForceStatsWidget;
-use App\Http\Middleware\UpgradeToHttpsUnderNgrok;
-use App\Livewire\DetailProfile;
-use App\Livewire\EditProfile;
 use Filament\Http\Middleware\Authenticate;
-use Filament\Http\Middleware\DisableBladeIconComponents;
-use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\MenuItem;
-use Filament\Pages\Dashboard;
 use Filament\Panel;
-use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Illuminate\Cookie\Middleware\EncryptCookies;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
-use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\Session\Middleware\AuthenticateSession;
-use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
-use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
 use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
 use Yebor974\Filament\RenewPassword\RenewPasswordPlugin;
 
-class UserPanelProvider extends PanelProvider
+class UserPanelProvider extends BasePanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        $plugins = [
-            FilamentFullCalendarPlugin::make()
-                ->schedulerLicenseKey('')
+        $plugins = [];
+
+        if (class_exists(FilamentFullCalendarPlugin::class)) {
+            $plugins[] = FilamentFullCalendarPlugin::make()
+                ->schedulerLicenseKey((string) config('filament.fullcalendar.scheduler_license_key', ''))
                 ->selectable()
                 ->timezone(config('app.timezone'))
                 ->locale(config('app.locale'))
                 ->plugins(['dayGrid', 'timeGrid'])
-                ->config([]),
-            FilamentEditProfilePlugin::make()
-                ->slug('my-profile')
-                ->setTitle('My Profile')
-                ->setNavigationLabel('My Profile')
-                ->setNavigationGroup('Group Profile')
-                ->setIcon('heroicon-o-user')
-                ->setSort(10)
-                ->shouldRegisterNavigation(false)
-                ->shouldShowDeleteAccountForm(false)
-                ->shouldShowSanctumTokens(false)
-                ->shouldShowBrowserSessionsForm(false)
-                // ->shouldShowAvatarForm(
-                //     value: true,
-                //     directory: 'avatars',
-                //     rules: 'mimes:jpg,jpeg,png|max:1024'
-                // )
-                ->customProfileComponents([
-                    EditProfile::class,
-                    DetailProfile::class,
-                ]),
-            (new RenewPasswordPlugin)
+                ->config([]);
+        }
+
+        $plugins[] = $this->makeProfilePlugin();
+
+        if (class_exists(RenewPasswordPlugin::class)) {
+            $plugins[] = (new RenewPasswordPlugin)
                 ->forceRenewPassword()
-                ->timestampColumn(),
-        ];
+                ->timestampColumn();
+        }
 
-        $greeterPluginClass = '\\Orion\\FilamentGreeter\\GreeterPlugin';
+        $greeterPlugin = $this->makeGreeterPlugin('BIG DREAM TRC : 1 JUTA SISWA / TAHUN, 100% BISA!!!');
 
-        if (class_exists($greeterPluginClass)) {
-            $plugins[] = $greeterPluginClass::make()
-                ->message('Selamat Datang,')
-                ->name(text: fn () => Auth::user()->name)
-                ->title('BIG DREAM TRC : 1 JUTA SISWA / TAHUN, 100% BISA!!!')
-                ->avatar(size: 'w-16 h-16', enabled: true)
-                ->sort(-1)
-                ->columnSpan('full');
+        if ($greeterPlugin !== null) {
+            $plugins[] = $greeterPlugin;
         }
 
         return $panel
@@ -123,28 +86,13 @@ class UserPanelProvider extends PanelProvider
                 DashboardHome::class,
             ])
             ->userMenuItems([
-                'profile' => MenuItem::make()
-                    ->label(fn () => Auth::user()->name)
-                    ->url(fn (): string => EditProfilePage::getUrl())
-                    ->icon('heroicon-m-user-circle')
-                    ->sort(1),
+                'profile' => $this->makeProfileMenuItem(1),
             ])
             ->discoverWidgets(in: app_path('Filament/User/Widgets'), for: 'App\\Filament\\User\\Widgets')
             ->widgets([
                 SalesForceStatsWidget::class,
             ])
-            ->middleware([
-                EncryptCookies::class,
-                AddQueuedCookiesToResponse::class,
-                StartSession::class,
-                AuthenticateSession::class,
-                ShareErrorsFromSession::class,
-                VerifyCsrfToken::class,
-                SubstituteBindings::class,
-                DisableBladeIconComponents::class,
-                DispatchServingFilamentEvent::class,
-                UpgradeToHttpsUnderNgrok::class,
-            ])
+            ->middleware($this->panelMiddleware())
             ->authMiddleware([
                 Authenticate::class,
             ])

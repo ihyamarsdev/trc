@@ -5,9 +5,9 @@ namespace App\Filament\User\Resources\Academic;
 use App\Filament\Components\Academic;
 use App\Filament\User\Resources\Academic\AcademicResource\Pages;
 use App\Models\RegistrationData;
+use Filament\Actions\Action;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +32,7 @@ class AcademicResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole(Academic::getRoles());
+        return Auth::user()?->hasRole(Academic::getRoles()) ?? false;
     }
 
     public static function form(Schema $form): Schema
@@ -45,12 +45,13 @@ class AcademicResource extends Resource
     {
         return $table
             ->deferLoading()
-            ->poll('5s')
+            ->poll('15s')
             ->searchable()
             ->striped()
             ->paginated([50, 100, 200])
             ->modifyQueryUsing(
-                fn (Builder $query) => $query->withMax('activity', 'id')
+                fn (Builder $query) => $query
+                    ->with(['latestStatusLog.status'])
                     ->where('years', now('Asia/Jakarta')->format('Y'))
                     ->whereRelation('status', fn ($q) => $q->whereBetween('order', [2, 10]))
                     ->orderByDesc('updated_at')

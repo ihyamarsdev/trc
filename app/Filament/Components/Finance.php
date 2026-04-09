@@ -2,9 +2,9 @@
 
 namespace App\Filament\Components;
 
+use App\Filament\Components\Support\StatusPalette;
 use App\Filament\Enum\Jenjang;
 use App\Filament\Enum\Periode;
-use App\Models\Status;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Fieldset;
@@ -508,46 +508,8 @@ class Finance
                             'latestStatusLog.status.order',
                         )
                             ->label('')
-                            ->icon(function ($state) {
-                                // $state = nilai order (bisa null)
-                                static $iconByOrder;
-
-                                if ($iconByOrder === null) {
-                                    // Ambil sekali: [order => icon]
-                                    $iconByOrder = Status::query()
-                                        ->pluck('icon', 'order') // pastikan kolom 'icon' ada
-                                        ->all();
-                                }
-
-                                $order = (int) $state;
-
-                                return $iconByOrder[$order] ??
-                                    'heroicon-m-clock';
-                            })
-                            ->color(function ($state) {
-                                static $colorByOrder;
-
-                                if ($colorByOrder === null) {
-                                    // Ambil sekali: [order => color_dari_DB]
-                                    $colorByOrder = Status::query()
-                                        ->pluck('color', 'order')
-                                        ->all();
-                                }
-
-                                $order = (int) $state;
-                                $raw = strtolower(
-                                    (string) ($colorByOrder[$order] ?? ''),
-                                );
-
-                                // Map warna DB -> warna Filament
-                                return match ($raw) {
-                                    'green' => 'green',
-                                    'blue' => 'blue',
-                                    'yellow' => 'yellow',
-                                    'red' => 'red',
-                                    default => 'gray',
-                                };
-                            })
+                            ->icon(fn ($state): string => StatusPalette::icon($state))
+                            ->color(fn ($state): string => StatusPalette::color($state))
                             ->default('red')
                             ->size('lg'),
                     ]),
@@ -1000,9 +962,11 @@ class Finance
             Tables\Filters\SelectFilter::make('users_id')
                 ->label('User')
                 ->options(function () {
-                    return \App\Models\User::all()
+                    return \App\Models\User::query()
+                        ->select(['id', 'name'])
+                        ->orderBy('name')
                         ->pluck('name', 'id')
-                        ->toArray();
+                        ->all();
                 })
                 ->preload()
                 ->indicator('user'),
