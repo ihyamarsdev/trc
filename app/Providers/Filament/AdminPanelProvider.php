@@ -2,66 +2,31 @@
 
 namespace App\Providers\Filament;
 
-use App\Http\Middleware\UpgradeToHttpsUnderNgrok;
-use App\Livewire\DetailProfile;
-use App\Livewire\EditProfile;
 use Filament\Http\Middleware\Authenticate;
-use Filament\Http\Middleware\DisableBladeIconComponents;
-use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\MenuItem;
 use Filament\Pages;
 use Filament\Panel;
-use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Illuminate\Cookie\Middleware\EncryptCookies;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
-use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\Session\Middleware\AuthenticateSession;
-use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
-use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
 
-class AdminPanelProvider extends PanelProvider
+class AdminPanelProvider extends BasePanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         $plugins = [
-            \FilipFonal\FilamentLogManager\FilamentLogManager::make(),
-            FilamentEditProfilePlugin::make()
-                ->slug('my-profile')
-                ->setTitle('My Profile')
-                ->setNavigationLabel('My Profile')
-                ->setNavigationGroup('Group Profile')
-                ->setIcon('heroicon-o-user')
-                ->setSort(10)
-                ->shouldRegisterNavigation(false)
-                ->shouldShowDeleteAccountForm(false)
-                ->shouldShowSanctumTokens(false)
-                ->shouldShowBrowserSessionsForm(false)
-                // ->shouldShowAvatarForm(
-                //     value: true,
-                //     directory: 'avatars', // image will be stored in 'storage/app/public/avatars
-                //     rules: 'mimes:jpeg,png|max:1024' //only accept jpeg and png files with a maximum size of 1MB
-                // )
-                ->customProfileComponents([
-                    EditProfile::class,
-                    DetailProfile::class,
-                ]),
+            $this->makeProfilePlugin(),
         ];
 
-        $greeterPluginClass = '\\Orion\\FilamentGreeter\\GreeterPlugin';
+        $logManagerPluginClass = '\\FilipFonal\\FilamentLogManager\\FilamentLogManager';
 
-        if (class_exists($greeterPluginClass)) {
-            $plugins[] = $greeterPluginClass::make()
-                ->message('Selamat Datang,')
-                ->name(text: fn () => Auth::user()->name)
-                ->title('Satu-satunya cara untuk melakukan pekerjaan hebat yaitu dengan mencintai apa yang sedang kamu lakukan.')
-                ->avatar(size: 'w-16 h-16', enabled: true)
-                ->sort(-1)
-                ->columnSpan('full');
+        if (class_exists($logManagerPluginClass)) {
+            array_unshift($plugins, $logManagerPluginClass::make());
+        }
+
+        $greeterPlugin = $this->makeGreeterPlugin(
+            'Satu-satunya cara untuk melakukan pekerjaan hebat yaitu dengan mencintai apa yang sedang kamu lakukan.'
+        );
+
+        if ($greeterPlugin !== null) {
+            $plugins[] = $greeterPlugin;
         }
 
         return $panel
@@ -108,23 +73,9 @@ class AdminPanelProvider extends PanelProvider
 
             ])
             ->userMenuItems([
-                'profile' => MenuItem::make()
-                    ->label(fn () => Auth::user()->name)
-                    ->url(fn (): string => EditProfilePage::getUrl())
-                    ->icon('heroicon-m-user-circle'),
+                'profile' => $this->makeProfileMenuItem(),
             ])
-            ->middleware([
-                EncryptCookies::class,
-                AddQueuedCookiesToResponse::class,
-                StartSession::class,
-                AuthenticateSession::class,
-                ShareErrorsFromSession::class,
-                VerifyCsrfToken::class,
-                SubstituteBindings::class,
-                DisableBladeIconComponents::class,
-                DispatchServingFilamentEvent::class,
-                UpgradeToHttpsUnderNgrok::class,
-            ])
+            ->middleware($this->panelMiddleware())
             ->authMiddleware([
                 Authenticate::class,
             ])

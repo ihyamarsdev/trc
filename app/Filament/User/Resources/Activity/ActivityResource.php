@@ -6,13 +6,16 @@ use App\Filament\Components\Admin;
 use App\Filament\Enum\Program;
 use App\Filament\User\Resources\Activity\ActivityResource\Pages;
 use App\Models\RegistrationData;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Enums\RecordActionsPosition;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class ActivityResource extends Resource
 {
@@ -49,11 +52,12 @@ class ActivityResource extends Resource
             ->striped()
             ->modifyQueryUsing(
                 fn (Builder $query) => $query
+                    ->with(['latestStatusLog.status'])
                     ->withMax('activity', 'id')
                     ->orderByDesc('updated_at')
                     ->when(
-                        auth()->user()->hasRole('sales') && ! auth()->user()->hasRole('admin'),
-                        fn (Builder $q) => $q->where('users_id', auth()->id())
+                        Auth::user()?->hasRole('sales') && ! Auth::user()?->hasRole('admin'),
+                        fn (Builder $q) => $q->where('users_id', Auth::id())
                     )
             )
             ->columns(Admin::columns())
@@ -92,10 +96,10 @@ class ActivityResource extends Resource
             ->recordUrl(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record]))
             ->actions([
                 //
-            ], position: ActionsPosition::BeforeColumns)
+            ], position: RecordActionsPosition::BeforeColumns)
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

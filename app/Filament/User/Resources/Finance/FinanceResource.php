@@ -5,9 +5,9 @@ namespace App\Filament\User\Resources\Finance;
 use App\Filament\Components\Finance;
 use App\Filament\User\Resources\Finance\FinanceResource\Pages;
 use App\Models\RegistrationData;
+use Filament\Actions\Action;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +32,7 @@ class FinanceResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole(Finance::getRoles());
+        return Auth::user()?->hasRole(Finance::getRoles()) ?? false;
     }
 
     public static function form(Schema $form): Schema
@@ -50,7 +50,9 @@ class FinanceResource extends Resource
             ->striped()
             ->paginated([50, 100, 200])
             ->modifyQueryUsing(
-                fn (Builder $query) => $query->withMax('activity', 'id')
+                fn (Builder $query) => $query
+                    ->with(['latestStatusLog.status'])
+                    ->withMax('activity', 'id')
                     ->where('years', now('Asia/Jakarta')->format('Y'))
                     ->whereRelation('status', 'order', '>=', 7)
                     ->orderByDesc('updated_at')

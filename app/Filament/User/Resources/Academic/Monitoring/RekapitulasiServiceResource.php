@@ -13,7 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Enums\RecordActionsPosition;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -39,6 +39,9 @@ class RekapitulasiServiceResource extends Resource
     {
         return $table
             ->paginated([50, 100, 200])
+            ->modifyQueryUsing(
+                fn (Builder $query) => $query->with(['latestStatusLog.status'])
+            )
             ->columns([
                 TextColumn::make('row_number')
                     ->label('No')
@@ -227,7 +230,7 @@ class RekapitulasiServiceResource extends Resource
                 [
                     // Tables\Actions\EditAction::make(),
                 ],
-                position: ActionsPosition::BeforeColumns,
+                position: RecordActionsPosition::BeforeColumns,
             )
             ->bulkActions([]);
     }
