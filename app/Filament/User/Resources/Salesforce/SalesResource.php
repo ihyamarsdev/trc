@@ -5,10 +5,10 @@ namespace App\Filament\User\Resources\Salesforce;
 use App\Filament\Components\SalesForce;
 use App\Filament\User\Resources\Salesforce\SalesResource\Pages;
 use App\Models\RegistrationData;
-use Filament\Actions\Action;
 use Filament\Forms\Form;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -39,7 +39,7 @@ class SalesResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole(Salesforce::getRoles());
+        return Auth::user()->hasRole(SalesForce::getRoles());
     }
 
     public static function form(Form $form): Form

@@ -6,13 +6,13 @@ use App\Filament\Components\Admin;
 use App\Filament\Enum\Program;
 use App\Filament\User\Resources\Activity\ActivityResource\Pages;
 use App\Models\RegistrationData;
-use Filament\Actions\Action;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Enums\RecordActionsPosition;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -98,7 +98,7 @@ class ActivityResource extends Resource
             ->recordUrl(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record]))
             ->actions([
                 //
-            ], position: RecordActionsPosition::BeforeColumns)
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

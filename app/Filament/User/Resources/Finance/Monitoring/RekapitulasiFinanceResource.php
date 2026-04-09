@@ -12,7 +12,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Enums\RecordActionsPosition;
+use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -235,7 +235,7 @@ class RekapitulasiFinanceResource extends Resource
                 [
                     // Tables\Actions\EditAction::make(),
                 ],
-                position: RecordActionsPosition::BeforeColumns,
+                position: ActionsPosition::BeforeColumns,
             )
             ->bulkActions([]);
     }
