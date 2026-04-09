@@ -9,8 +9,8 @@ use App\Filament\User\Resources\Admin\AdminResource\Pages\ListAdmins;
 use App\Filament\User\Resources\Admin\AdminResource\Pages\ViewAdmin;
 use App\Models\RegistrationData;
 use Filament\Actions\Action;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -41,7 +41,7 @@ class AdminResource extends Resource
         return Auth::user()->hasRole(['admin']);
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form
             ->schema(Admin::formSchema());

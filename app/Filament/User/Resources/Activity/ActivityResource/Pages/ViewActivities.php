@@ -5,9 +5,9 @@ namespace App\Filament\User\Resources\Activity\ActivityResource\Pages;
 use App\Filament\User\Resources\Activity\ActivityResource;
 use App\Models\RegistrationStatus;
 use App\Models\Status;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
-use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use JaOcero\ActivityTimeline\Components\ActivityDate;
@@ -30,7 +30,7 @@ class ViewActivities extends Page
         $this->record = $this->resolveRecord($record);
     }
 
-    public function activityTimelineInfolist(Schema $infolist): Schema
+    public function activityTimelineInfolist(Infolist $infolist): Infolist
     {
 
         $logs = RegistrationStatus::query()

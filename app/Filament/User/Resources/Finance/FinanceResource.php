@@ -6,8 +6,8 @@ use App\Filament\Components\Finance;
 use App\Filament\User\Resources\Finance\FinanceResource\Pages;
 use App\Models\RegistrationData;
 use Filament\Actions\Action;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -41,7 +41,7 @@ class FinanceResource extends Resource
         return Auth::user()?->hasRole(Finance::getRoles()) ?? false;
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form
             ->schema(Finance::formSchema());
