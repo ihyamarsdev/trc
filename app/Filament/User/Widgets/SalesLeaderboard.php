@@ -11,6 +11,7 @@ use Filament\Tables\Columns\Summarizers\Summarizer;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 class SalesLeaderboard extends BaseWidget
@@ -55,11 +56,11 @@ class SalesLeaderboard extends BaseWidget
 
         $summarizerCondition = function (Database\Query\Builder $query, string $color) {
             return (clone $query)
-                ->where('latest_statuses.color', $color)
+                ->where('latest_status_color', $color)
                 ->count();
         };
 
-        /** @var \Illuminate\Database\Eloquent\Builder $leaderboardQuery */
+        /** @var Builder $leaderboardQuery */
         $leaderboardQuery = RegistrationData::query()
             ->leftJoinSub(
                 $latestStatusSubquery(),
@@ -73,6 +74,7 @@ class SalesLeaderboard extends BaseWidget
                 fn (Database\Query\JoinClause $join) => $join->on('leaderboard_aggregate.users_id', '=', 'registration_data.users_id'),
             )
             ->select('registration_data.*')
+            ->selectRaw("COALESCE(latest_statuses.color, '') as latest_status_color")
             ->selectRaw('COALESCE(leaderboard_aggregate.green_count, 0) as green_count')
             ->selectRaw('COALESCE(leaderboard_aggregate.blue_count, 0) as blue_count')
             ->selectRaw('COALESCE(leaderboard_aggregate.yellow_count, 0) as yellow_count')
@@ -156,9 +158,9 @@ class SalesLeaderboard extends BaseWidget
                         'yellow' => 'Kuning',
                         'red' => 'Merah',
                     ])
-                    ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
+                    ->query(function (Builder $query, array $data): Builder {
                         if (! empty($data['value'])) {
-                            return $query->where('latest_statuses.color', $data['value']);
+                            return $query->where('latest_status_color', $data['value']);
                         }
 
                         return $query;
