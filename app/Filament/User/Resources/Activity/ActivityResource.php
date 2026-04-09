@@ -47,7 +47,7 @@ class ActivityResource extends Resource
     {
         return $table
             ->deferLoading()
-            ->poll('3s')
+            ->poll('10s')
             ->searchable()
             ->striped()
             ->modifyQueryUsing(

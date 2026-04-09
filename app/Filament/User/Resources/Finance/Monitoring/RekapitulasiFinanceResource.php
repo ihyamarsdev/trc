@@ -194,12 +194,12 @@ class RekapitulasiFinanceResource extends Resource
                     ->indicator('Program'),
                 Tables\Filters\SelectFilter::make('users_id')
                     ->label('User')
-                    ->options(function () {
-                        return \App\Models\User::all()
-                            ->pluck('name', 'id')
-                            ->toArray();
-                    })
-                    ->preload()
+                    ->relationship(
+                        name: 'users',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: fn (Builder $query) => $query->orderBy('name'),
+                    )
+                    ->searchable()
                     ->indicator('user'),
                 Tables\Filters\SelectFilter::make('status_color')
                     ->label('Status Warna')

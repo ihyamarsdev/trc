@@ -57,7 +57,7 @@ class SalesResource extends Resource
     {
         return $table
             ->deferLoading()
-            ->poll('5s')
+            ->poll('10s')
             ->searchable()
             ->striped()
             ->paginated([50, 100, 200])
