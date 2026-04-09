@@ -21,7 +21,7 @@ class SalesForceStatsWidget extends Widget implements HasForms
 
     protected static ?string $heading = 'Rekap Program';
 
-    protected string $view = 'filament.user.widgets.sales-force-stats-widget';
+    protected static string $view = 'filament.user.widgets.sales-force-stats-widget';
 
     // Direct public properties for form binding
     public ?string $education_level = null;

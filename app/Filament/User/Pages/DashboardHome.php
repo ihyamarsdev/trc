@@ -13,7 +13,7 @@ class DashboardHome extends Page
         return 'heroicon-o-home';
     }
 
-    protected string $view = 'filament.user.pages.dashboard-home';
+    protected static string $view = 'filament.user.pages.dashboard-home';
 
     protected static ?int $navigationSort = 1;
 

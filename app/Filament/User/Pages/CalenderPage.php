@@ -12,7 +12,7 @@ class CalenderPage extends Page
         return 'heroicon-m-calendar-days';
     }
 
-    protected string $view = 'filament.user.pages.calender-page';
+    protected static string $view = 'filament.user.pages.calender-page';
 
     protected static ?string $navigationLabel = 'Timeline';
 

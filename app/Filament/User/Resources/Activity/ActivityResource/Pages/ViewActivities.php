@@ -23,7 +23,7 @@ class ViewActivities extends Page
 
     protected static string $resource = ActivityResource::class;
 
-    protected string $view = 'filament.user.resources.registration-data-resource.pages.view-color-activities';
+    protected static string $view = 'filament.user.resources.registration-data-resource.pages.view-color-activities';
 
     public function mount(int|string $record): void
     {
