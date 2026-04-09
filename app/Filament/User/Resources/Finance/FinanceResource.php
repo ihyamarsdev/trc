@@ -45,14 +45,13 @@ class FinanceResource extends Resource
     {
         return $table
             ->deferLoading()
-            ->poll('10s')
+            ->poll('15s')
             ->searchable()
             ->striped()
             ->paginated([50, 100, 200])
             ->modifyQueryUsing(
                 fn (Builder $query) => $query
                     ->with(['latestStatusLog.status'])
-                    ->withMax('activity', 'id')
                     ->where('years', now('Asia/Jakarta')->format('Y'))
                     ->whereRelation('status', 'order', '>=', 7)
                     ->orderByDesc('updated_at')

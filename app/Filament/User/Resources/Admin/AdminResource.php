@@ -48,7 +48,7 @@ class AdminResource extends Resource
     {
         return $table
             ->deferLoading()
-            ->poll('10s')
+            ->poll('15s')
             ->searchable()
             ->striped()
             ->paginated([50, 100, 200])
@@ -56,7 +56,6 @@ class AdminResource extends Resource
             ->modifyQueryUsing(
                 fn (Builder $query) => $query
                     ->with(['latestStatusLog.status'])
-                    ->withMax('activity', 'id')
                     ->orderByDesc('updated_at')
             )
             ->columns(Admin::columns())

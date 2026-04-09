@@ -45,14 +45,13 @@ class AcademicResource extends Resource
     {
         return $table
             ->deferLoading()
-            ->poll('10s')
+            ->poll('15s')
             ->searchable()
             ->striped()
             ->paginated([50, 100, 200])
             ->modifyQueryUsing(
                 fn (Builder $query) => $query
                     ->with(['latestStatusLog.status'])
-                    ->withMax('activity', 'id')
                     ->where('years', now('Asia/Jakarta')->format('Y'))
                     ->whereRelation('status', fn ($q) => $q->whereBetween('order', [2, 10]))
                     ->orderByDesc('updated_at')

@@ -68,7 +68,7 @@ class SalesLeaderboard extends BaseWidget
             ->orderBy('users_id'); // tie-breaker opsional
 
         return $table
-            ->poll('10s')
+            ->poll('30s')
             ->query($leaderboardQuery)
             ->columns([
                 Tables\Columns\TextColumn::make('users.name')->label('Sales'),
@@ -149,6 +149,7 @@ class SalesLeaderboard extends BaseWidget
                                     ->where('statuses.color', $data['value']);
                             });
                         }
+
                         return $query;
                     }),
             ])

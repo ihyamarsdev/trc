@@ -47,13 +47,12 @@ class ActivityResource extends Resource
     {
         return $table
             ->deferLoading()
-            ->poll('10s')
+            ->poll('15s')
             ->searchable()
             ->striped()
             ->modifyQueryUsing(
                 fn (Builder $query) => $query
                     ->with(['latestStatusLog.status'])
-                    ->withMax('activity', 'id')
                     ->orderByDesc('updated_at')
                     ->when(
                         Auth::user()?->hasRole('sales') && ! Auth::user()?->hasRole('admin'),
