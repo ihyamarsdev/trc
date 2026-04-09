@@ -28,6 +28,7 @@ class EditSales extends EditRecord
             ->requiresConfirmation()
             ->modalDescription('Apakah status sudah sesuai? Pastikan kembali status yang Anda pilih sudah benar sebelum menyimpan.')
             ->modalIconColor('danger')
+            ->action(fn () => $this->save())
             ->keyBindings(['mod+s']);
     }
 
@@ -43,13 +44,25 @@ class EditSales extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        $input = strtotime($data['date_register']);
-        $date = getdate($input);
-        $data['monthYear'] = $date['month'].' '.$date['year'];
-        $status = Status::find($data['status_id']);
-        $data['status_color'] = $status->color;
+        $dateRegister = $data['date_register'] ?? null;
 
-        if ($status->order == 2) {
+        if ($dateRegister) {
+            $input = strtotime((string) $dateRegister);
+
+            if ($input !== false) {
+                $date = getdate($input);
+                $data['monthYear'] = $date['month'].' '.$date['year'];
+            }
+        }
+
+        $statusId = $data['status_id'] ?? null;
+        $status = $statusId ? Status::find($statusId) : null;
+
+        if ($status) {
+            $data['status_color'] = $status->color;
+        }
+
+        if ($status && $status->order == 2) {
             $recipients = User::whereHas('roles', function ($q) {
                 $q->where('name', 'service');
             })->get();
@@ -64,7 +77,7 @@ class EditSales extends EditRecord
 
         $record = $this->record;
 
-        if ($data['status_id']) {
+        if ($status) {
             DB::transaction(function () use ($record) {
                 if (empty($record->status_id)) {
                     return;
