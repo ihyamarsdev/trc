@@ -23,12 +23,47 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
 use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
-use Orion\FilamentGreeter\GreeterPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
+        $plugins = [
+            \FilipFonal\FilamentLogManager\FilamentLogManager::make(),
+            FilamentEditProfilePlugin::make()
+                ->slug('my-profile')
+                ->setTitle('My Profile')
+                ->setNavigationLabel('My Profile')
+                ->setNavigationGroup('Group Profile')
+                ->setIcon('heroicon-o-user')
+                ->setSort(10)
+                ->shouldRegisterNavigation(false)
+                ->shouldShowDeleteAccountForm(false)
+                ->shouldShowSanctumTokens(false)
+                ->shouldShowBrowserSessionsForm(false)
+                // ->shouldShowAvatarForm(
+                //     value: true,
+                //     directory: 'avatars', // image will be stored in 'storage/app/public/avatars
+                //     rules: 'mimes:jpeg,png|max:1024' //only accept jpeg and png files with a maximum size of 1MB
+                // )
+                ->customProfileComponents([
+                    EditProfile::class,
+                    DetailProfile::class,
+                ]),
+        ];
+
+        $greeterPluginClass = '\\Orion\\FilamentGreeter\\GreeterPlugin';
+
+        if (class_exists($greeterPluginClass)) {
+            $plugins[] = $greeterPluginClass::make()
+                ->message('Selamat Datang,')
+                ->name(text: fn () => Auth::user()->name)
+                ->title('Satu-satunya cara untuk melakukan pekerjaan hebat yaitu dengan mencintai apa yang sedang kamu lakukan.')
+                ->avatar(size: 'w-16 h-16', enabled: true)
+                ->sort(-1)
+                ->columnSpan('full');
+        }
+
         return $panel
             ->default()
             ->id('admin')
@@ -93,35 +128,6 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-            ->plugins([
-                \FilipFonal\FilamentLogManager\FilamentLogManager::make(),
-                FilamentEditProfilePlugin::make()
-                    ->slug('my-profile')
-                    ->setTitle('My Profile')
-                    ->setNavigationLabel('My Profile')
-                    ->setNavigationGroup('Group Profile')
-                    ->setIcon('heroicon-o-user')
-                    ->setSort(10)
-                    ->shouldRegisterNavigation(false)
-                    ->shouldShowDeleteAccountForm(false)
-                    ->shouldShowSanctumTokens(false)
-                    ->shouldShowBrowserSessionsForm(false)
-                    // ->shouldShowAvatarForm(
-                    //     value: true,
-                    //     directory: 'avatars', // image will be stored in 'storage/app/public/avatars
-                    //     rules: 'mimes:jpeg,png|max:1024' //only accept jpeg and png files with a maximum size of 1MB
-                    // )
-                    ->customProfileComponents([
-                        EditProfile::class,
-                        DetailProfile::class,
-                    ]),
-                GreeterPlugin::make()
-                    ->message('Selamat Datang,')
-                    ->name(text: fn () => Auth::user()->name)
-                    ->title('Satu-satunya cara untuk melakukan pekerjaan hebat yaitu dengan mencintai apa yang sedang kamu lakukan.')
-                    ->avatar(size: 'w-16 h-16', enabled: true)
-                    ->sort(-1)
-                    ->columnSpan('full'),
-            ]);
+            ->plugins($plugins);
     }
 }

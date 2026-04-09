@@ -5,9 +5,8 @@ namespace App\Filament\User\Resources\Salesforce;
 use App\Filament\Components\SalesForce;
 use App\Filament\User\Resources\Salesforce\SalesResource\Pages;
 use App\Models\RegistrationData;
-use Filament\Forms\Form;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -17,9 +16,9 @@ class SalesResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-presentation-chart-line';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-presentation-chart-line';
 
-    protected static ?string $navigationGroup = 'Salesforce';
+    protected static string|\UnitEnum|null $navigationGroup = 'Salesforce';
 
     protected static ?string $title = 'Database';
 
@@ -36,7 +35,7 @@ class SalesResource extends Resource
         return Auth::user()->hasRole(Salesforce::getRoles());
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema(SalesForce::schema())
@@ -82,7 +81,7 @@ class SalesResource extends Resource
             ->bulkActions(SalesForce::bulkActions());
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $infolist): Schema
     {
         return $infolist
             ->schema(SalesForce::infolist());

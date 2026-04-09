@@ -5,8 +5,8 @@ namespace App\Filament\User\Resources\Finance;
 use App\Filament\Components\Finance;
 use App\Filament\User\Resources\Finance\FinanceResource\Pages;
 use App\Models\RegistrationData;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,9 +16,9 @@ class FinanceResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
-    protected static ?string $navigationIcon = 'heroicon-m-credit-card';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-m-credit-card';
 
-    protected static ?string $navigationGroup = 'Finance';
+    protected static string|\UnitEnum|null $navigationGroup = 'Finance';
 
     protected static ?string $title = 'Database';
 
@@ -35,7 +35,7 @@ class FinanceResource extends Resource
         return Auth::user()->hasRole(Finance::getRoles());
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema(Finance::formSchema());

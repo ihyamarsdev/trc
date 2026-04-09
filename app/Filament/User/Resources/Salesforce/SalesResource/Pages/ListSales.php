@@ -9,14 +9,11 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
-use HayderHatem\FilamentExcelImport\Actions\Concerns\CanImportExcelRecords;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ListSales extends ListRecords
 {
-    use CanImportExcelRecords;
-
     protected static string $resource = SalesResource::class;
 
     protected function getHeaderActions(): array

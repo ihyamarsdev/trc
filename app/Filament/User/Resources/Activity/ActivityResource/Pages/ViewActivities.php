@@ -5,9 +5,9 @@ namespace App\Filament\User\Resources\Activity\ActivityResource\Pages;
 use App\Filament\User\Resources\Activity\ActivityResource;
 use App\Models\RegistrationStatus;
 use App\Models\Status;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use JaOcero\ActivityTimeline\Components\ActivityDate;
@@ -23,14 +23,14 @@ class ViewActivities extends Page
 
     protected static string $resource = ActivityResource::class;
 
-    protected static string $view = 'filament.user.resources.registration-data-resource.pages.view-color-activities';
+    protected string $view = 'filament.user.resources.registration-data-resource.pages.view-color-activities';
 
     public function mount(int|string $record): void
     {
         $this->record = $this->resolveRecord($record);
     }
 
-    public function activityTimelineInfolist(Infolist $infolist): Infolist
+    public function activityTimelineInfolist(Schema $infolist): Schema
     {
 
         $logs = RegistrationStatus::query()

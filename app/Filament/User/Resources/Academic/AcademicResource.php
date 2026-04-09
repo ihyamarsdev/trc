@@ -5,8 +5,8 @@ namespace App\Filament\User\Resources\Academic;
 use App\Filament\Components\Academic;
 use App\Filament\User\Resources\Academic\AcademicResource\Pages;
 use App\Models\RegistrationData;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,9 +16,9 @@ class AcademicResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-wrench-screwdriver';
 
-    protected static ?string $navigationGroup = 'Service';
+    protected static string|\UnitEnum|null $navigationGroup = 'Service';
 
     protected static ?string $title = 'Database';
 
@@ -35,7 +35,7 @@ class AcademicResource extends Resource
         return Auth::user()->hasRole(Academic::getRoles());
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema(Academic::formSchema());

@@ -5,8 +5,8 @@ namespace App\Filament\User\Resources\Admin\AdminResource\Pages;
 use App\Filament\Components\Admin;
 use App\Filament\User\Resources\Admin\AdminResource;
 use Filament\Actions;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Schemas\Schema;
 
 class ViewAdmin extends ViewRecord
 {
@@ -24,7 +24,7 @@ class ViewAdmin extends ViewRecord
         $this->record = $this->resolveRecord($record);
     }
 
-    public function infolist(Infolist $infolist): Infolist
+    public function infolist(Schema $infolist): Schema
     {
         $record = $this->record;
 

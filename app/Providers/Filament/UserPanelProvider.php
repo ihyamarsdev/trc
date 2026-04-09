@@ -15,7 +15,7 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Support\Enums\Width;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -26,7 +26,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
 use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
-use Orion\FilamentGreeter\GreeterPlugin;
 use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
 use Yebor974\Filament\RenewPassword\RenewPasswordPlugin;
 
@@ -34,12 +33,57 @@ class UserPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
+        $plugins = [
+            FilamentFullCalendarPlugin::make()
+                ->schedulerLicenseKey('')
+                ->selectable()
+                ->timezone(config('app.timezone'))
+                ->locale(config('app.locale'))
+                ->plugins(['dayGrid', 'timeGrid'])
+                ->config([]),
+            FilamentEditProfilePlugin::make()
+                ->slug('my-profile')
+                ->setTitle('My Profile')
+                ->setNavigationLabel('My Profile')
+                ->setNavigationGroup('Group Profile')
+                ->setIcon('heroicon-o-user')
+                ->setSort(10)
+                ->shouldRegisterNavigation(false)
+                ->shouldShowDeleteAccountForm(false)
+                ->shouldShowSanctumTokens(false)
+                ->shouldShowBrowserSessionsForm(false)
+                // ->shouldShowAvatarForm(
+                //     value: true,
+                //     directory: 'avatars',
+                //     rules: 'mimes:jpg,jpeg,png|max:1024'
+                // )
+                ->customProfileComponents([
+                    EditProfile::class,
+                    DetailProfile::class,
+                ]),
+            (new RenewPasswordPlugin)
+                ->forceRenewPassword()
+                ->timestampColumn(),
+        ];
+
+        $greeterPluginClass = '\\Orion\\FilamentGreeter\\GreeterPlugin';
+
+        if (class_exists($greeterPluginClass)) {
+            $plugins[] = $greeterPluginClass::make()
+                ->message('Selamat Datang,')
+                ->name(text: fn () => Auth::user()->name)
+                ->title('BIG DREAM TRC : 1 JUTA SISWA / TAHUN, 100% BISA!!!')
+                ->avatar(size: 'w-16 h-16', enabled: true)
+                ->sort(-1)
+                ->columnSpan('full');
+        }
+
         return $panel
             ->id('user')
             ->path('')
             ->login()
             ->passwordReset()
-            ->maxContentWidth(MaxWidth::Full)
+            ->maxContentWidth(Width::Full)
             ->font('Poppins')
             ->brandLogo(asset('images/logo.png'))
             ->favicon(asset('images/logo.png'))
@@ -104,44 +148,6 @@ class UserPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-            ->plugins([
-                FilamentFullCalendarPlugin::make()
-                    ->schedulerLicenseKey('')
-                    ->selectable()
-                    ->timezone(config('app.timezone'))
-                    ->locale(config('app.locale'))
-                    ->plugins(['dayGrid', 'timeGrid'])
-                    ->config([]),
-                FilamentEditProfilePlugin::make()
-                    ->slug('my-profile')
-                    ->setTitle('My Profile')
-                    ->setNavigationLabel('My Profile')
-                    ->setNavigationGroup('Group Profile')
-                    ->setIcon('heroicon-o-user')
-                    ->setSort(10)
-                    ->shouldRegisterNavigation(false)
-                    ->shouldShowDeleteAccountForm(false)
-                    ->shouldShowSanctumTokens(false)
-                    ->shouldShowBrowserSessionsForm(false)
-                    // ->shouldShowAvatarForm(
-                    //     value: true,
-                    //     directory: 'avatars',
-                    //     rules: 'mimes:jpg,jpeg,png|max:1024'
-                    // )
-                    ->customProfileComponents([
-                        EditProfile::class,
-                        DetailProfile::class,
-                    ]),
-                GreeterPlugin::make()
-                    ->message('Selamat Datang,')
-                    ->name(text: fn () => Auth::user()->name)
-                    ->title('BIG DREAM TRC : 1 JUTA SISWA / TAHUN, 100% BISA!!!')
-                    ->avatar(size: 'w-16 h-16', enabled: true)
-                    ->sort(-1)
-                    ->columnSpan('full'),
-                (new RenewPasswordPlugin)
-                    ->forceRenewPassword()
-                    ->timestampColumn(),
-            ]);
+            ->plugins($plugins);
     }
 }

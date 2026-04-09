@@ -21,9 +21,9 @@ class RekapitulasiFinanceResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?string $navigationGroup = 'Finance';
+    protected static string|\UnitEnum|null $navigationGroup = 'Finance';
 
     protected static ?string $navigationLabel = 'Rekapitulasi';
 

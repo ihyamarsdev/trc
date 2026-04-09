@@ -8,8 +8,8 @@ use App\Filament\User\Resources\Admin\AdminResource\Pages\EditAdmin;
 use App\Filament\User\Resources\Admin\AdminResource\Pages\ListAdmins;
 use App\Filament\User\Resources\Admin\AdminResource\Pages\ViewAdmin;
 use App\Models\RegistrationData;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -19,7 +19,7 @@ class AdminResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-building-library';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-building-library';
 
     protected static ?string $title = 'Admin Database';
 
@@ -38,7 +38,7 @@ class AdminResource extends Resource
         return Auth::user()->hasRole(['admin']);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema(Admin::formSchema());

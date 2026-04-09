@@ -4,8 +4,8 @@ namespace App\Filament\User\Resources;
 
 use App\Filament\User\Resources\TimelineResource\Pages;
 use App\Models\RegistrationData;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -21,7 +21,7 @@ class TimelineResource extends Resource
 
     protected static bool $shouldRegisterNavigation = false;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([

@@ -6,8 +6,8 @@ use App\Filament\Components\Admin;
 use App\Filament\Enum\Program;
 use App\Filament\User\Resources\Activity\ActivityResource\Pages;
 use App\Models\RegistrationData;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Enums\ActionsPosition;
@@ -18,7 +18,7 @@ class ActivityResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-arrow-trending-up';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-arrow-trending-up';
 
     protected static ?string $title = 'Activity';
 
@@ -32,7 +32,7 @@ class ActivityResource extends Resource
 
     protected static ?int $navigationSort = 4;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([
