@@ -7,7 +7,6 @@ use App\Filament\User\Widgets\SalesForceStatsWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Panel;
 use Filament\Support\Colors\Color;
-use Filament\Support\Enums\Width;
 use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
 use Yebor974\Filament\RenewPassword\RenewPasswordPlugin;
 
@@ -46,7 +45,7 @@ class UserPanelProvider extends BasePanelProvider
             ->path('')
             ->login()
             ->passwordReset()
-            ->maxContentWidth(Width::Full)
+            ->maxContentWidth('full')
             ->font('Poppins')
             ->brandLogo(asset('images/logo.png'))
             ->favicon(asset('images/logo.png'))
