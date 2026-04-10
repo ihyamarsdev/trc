@@ -5,8 +5,8 @@ namespace App\Filament\User\Resources\Academic;
 use App\Filament\Components\Academic;
 use App\Filament\User\Resources\Academic\AcademicResource\Pages;
 use App\Models\RegistrationData;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,9 +16,15 @@ class AcademicResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-wrench-screwdriver';
+    public static function getNavigationIcon(): ?string
+    {
+        return 'heroicon-o-wrench-screwdriver';
+    }
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Service';
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Service';
+    }
 
     protected static ?string $title = 'Database';
 
@@ -32,10 +38,10 @@ class AcademicResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole(Academic::getRoles());
+        return Auth::user()?->hasRole(Academic::getRoles()) ?? false;
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form
             ->schema(Academic::formSchema());
@@ -45,12 +51,13 @@ class AcademicResource extends Resource
     {
         return $table
             ->deferLoading()
-            ->poll('5s')
+            ->poll('15s')
             ->searchable()
             ->striped()
             ->paginated([50, 100, 200])
             ->modifyQueryUsing(
-                fn (Builder $query) => $query->withMax('activity', 'id')
+                fn (Builder $query) => $query
+                    ->with(['latestStatusLog.status'])
                     ->where('years', now('Asia/Jakarta')->format('Y'))
                     ->whereRelation('status', fn ($q) => $q->whereBetween('order', [2, 10]))
                     ->orderByDesc('updated_at')

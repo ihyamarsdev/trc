@@ -81,6 +81,14 @@
             "@php artisan key:generate --ansi",
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
             "@php artisan migrate --graceful --ansi"
+        ],
+        "build:filament-cache": [
+            "@php artisan filament:optimize --ansi",
+            "@php artisan optimize --ansi"
+        ],
+        "build:filament-cache-clear": [
+            "@php artisan filament:optimize-clear --ansi",
+            "@php artisan optimize:clear --ansi"
         ]
     },
     "extra": {

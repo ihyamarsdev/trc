@@ -5,8 +5,8 @@ namespace App\Filament\User\Resources\Finance\Monitoring\Pages;
 use App\Filament\Components\Finance;
 use App\Filament\User\Resources\Finance\Monitoring\RekapitulasiFinanceResource;
 use Filament\Actions;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Schemas\Schema;
 
 class ViewRekapitulasiFinance extends ViewRecord
 {
@@ -19,7 +19,7 @@ class ViewRekapitulasiFinance extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $infolist): Schema
+    public function infolist(Infolist $infolist): Infolist
     {
         return $infolist->schema(Finance::infolist($this->record));
     }

@@ -6,19 +6,25 @@ use App\Filament\Components\Admin;
 use App\Filament\Enum\Program;
 use App\Filament\User\Resources\Activity\ActivityResource\Pages;
 use App\Models\RegistrationData;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class ActivityResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-arrow-trending-up';
+    public static function getNavigationIcon(): ?string
+    {
+        return 'heroicon-o-arrow-trending-up';
+    }
 
     protected static ?string $title = 'Activity';
 
@@ -32,7 +38,7 @@ class ActivityResource extends Resource
 
     protected static ?int $navigationSort = 4;
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -44,16 +50,16 @@ class ActivityResource extends Resource
     {
         return $table
             ->deferLoading()
-            ->poll('3s')
+            ->poll('15s')
             ->searchable()
             ->striped()
             ->modifyQueryUsing(
                 fn (Builder $query) => $query
-                    ->withMax('activity', 'id')
+                    ->with(['latestStatusLog.status'])
                     ->orderByDesc('updated_at')
                     ->when(
-                        auth()->user()->hasRole('sales') && ! auth()->user()->hasRole('admin'),
-                        fn (Builder $q) => $q->where('users_id', auth()->id())
+                        Auth::user()?->hasRole('sales') && ! Auth::user()?->hasRole('admin'),
+                        fn (Builder $q) => $q->where('users_id', Auth::id())
                     )
             )
             ->columns(Admin::columns())
@@ -94,8 +100,8 @@ class ActivityResource extends Resource
                 //
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

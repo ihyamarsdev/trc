@@ -7,7 +7,7 @@ use App\Models\RegistrationData;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Widgets\Widget;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,7 +21,7 @@ class SalesForceStatsWidget extends Widget implements HasForms
 
     protected static ?string $heading = 'Rekap Program';
 
-    protected string $view = 'filament.user.widgets.sales-force-stats-widget';
+    protected static string $view = 'filament.user.widgets.sales-force-stats-widget';
 
     // Direct public properties for form binding
     public ?string $education_level = null;
@@ -36,7 +36,7 @@ class SalesForceStatsWidget extends Widget implements HasForms
         ]);
     }
 
-    public function form(Schema $form): Schema
+    public function form(Form $form): Form
     {
         return $form
             ->schema([

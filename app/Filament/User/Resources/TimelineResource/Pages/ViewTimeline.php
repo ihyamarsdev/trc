@@ -4,8 +4,8 @@ namespace App\Filament\User\Resources\TimelineResource\Pages;
 
 use App\Filament\Components\Academic;
 use App\Filament\User\Resources\TimelineResource;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Schemas\Schema;
 
 class ViewTimeline extends ViewRecord
 {
@@ -23,7 +23,7 @@ class ViewTimeline extends ViewRecord
         $this->record = $this->resolveRecord($record);
     }
 
-    public function infolist(Schema $infolist): Schema
+    public function infolist(Infolist $infolist): Infolist
     {
         $record = $this->record;
 

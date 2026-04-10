@@ -5,8 +5,8 @@ namespace App\Filament\User\Resources\Finance;
 use App\Filament\Components\Finance;
 use App\Filament\User\Resources\Finance\FinanceResource\Pages;
 use App\Models\RegistrationData;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,9 +16,15 @@ class FinanceResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-m-credit-card';
+    public static function getNavigationIcon(): ?string
+    {
+        return 'heroicon-m-credit-card';
+    }
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Finance';
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Finance';
+    }
 
     protected static ?string $title = 'Database';
 
@@ -32,10 +38,10 @@ class FinanceResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole(Finance::getRoles());
+        return Auth::user()?->hasRole(Finance::getRoles()) ?? false;
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form
             ->schema(Finance::formSchema());
@@ -45,12 +51,13 @@ class FinanceResource extends Resource
     {
         return $table
             ->deferLoading()
-            ->poll('5s')
+            ->poll('15s')
             ->searchable()
             ->striped()
             ->paginated([50, 100, 200])
             ->modifyQueryUsing(
-                fn (Builder $query) => $query->withMax('activity', 'id')
+                fn (Builder $query) => $query
+                    ->with(['latestStatusLog.status'])
                     ->where('years', now('Asia/Jakarta')->format('Y'))
                     ->whereRelation('status', 'order', '>=', 7)
                     ->orderByDesc('updated_at')

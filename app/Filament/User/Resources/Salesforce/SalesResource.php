@@ -5,8 +5,9 @@ namespace App\Filament\User\Resources\Salesforce;
 use App\Filament\Components\SalesForce;
 use App\Filament\User\Resources\Salesforce\SalesResource\Pages;
 use App\Models\RegistrationData;
+use Filament\Forms\Form;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,9 +17,15 @@ class SalesResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-presentation-chart-line';
+    public static function getNavigationIcon(): ?string
+    {
+        return 'heroicon-o-presentation-chart-line';
+    }
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Salesforce';
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Salesforce';
+    }
 
     protected static ?string $title = 'Database';
 
@@ -32,10 +39,10 @@ class SalesResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole(Salesforce::getRoles());
+        return Auth::user()->hasRole(SalesForce::getRoles());
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form
             ->schema(SalesForce::schema())
@@ -57,17 +64,16 @@ class SalesResource extends Resource
     {
         return $table
             ->deferLoading()
-            ->poll('5s')
+            ->poll('15s')
             ->searchable()
             ->striped()
             ->paginated([50, 100, 200])
             ->recordAction('view')
             ->modifyQueryUsing(
                 fn (Builder $query) => $query
+                    ->with(['latestStatusLog.status'])
                     ->where('years', now('Asia/Jakarta')->format('Y'))
-                    ->when(
-                        fn ($query) => $query->where('users_id', auth()->id())
-                    )
+                    ->when(Auth::id(), fn (Builder $builder, int $userId) => $builder->where('users_id', $userId))
                     ->orderBy('implementation_estimate', 'asc')
             )
             ->columns(SalesForce::columns())
@@ -81,7 +87,7 @@ class SalesResource extends Resource
             ->bulkActions(SalesForce::bulkActions());
     }
 
-    public static function infolist(Schema $infolist): Schema
+    public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
             ->schema(SalesForce::infolist());

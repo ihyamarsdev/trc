@@ -2,13 +2,12 @@
 
 namespace App\Filament\Components;
 
+use App\Filament\Components\Support\RegionalOptions;
+use App\Filament\Components\Support\StatusPalette;
 use App\Filament\Enum\Jenjang;
 use App\Filament\Enum\Periode;
 use App\Filament\Enum\Program;
 use App\Models\Status;
-use Creasi\Nusa\Models\District;
-use Creasi\Nusa\Models\Province;
-use Creasi\Nusa\Models\Regency;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -92,7 +91,7 @@ class SalesForce
                         ->displayFormat('l, jS F Y H:i'),
                     Select::make('provinces')
                         ->label('Provinsi')
-                        ->options(Province::all()->pluck('name', 'name'))
+                        ->options(RegionalOptions::provinces())
                         ->searchable()
                         ->reactive()
                         ->dehydrateStateUsing(
@@ -108,72 +107,13 @@ class SalesForce
                             fn (?string $state): string => Str::upper($state),
                         )
                         ->live(100)
-                        ->options(function (Get $get) {
-                            $province = Province::where(
-                                'name',
-                                $get('provinces'),
-                            )->first();
-                            $provinceCode = $province ? $province->code : null;
-                            if ($provinceCode) {
-                                return Regency::where(
-                                    'province_code',
-                                    $provinceCode,
-                                )->pluck('name', 'name');
-                            }
-
-                            return [];
-                        }),
+                        ->options(fn (Get $get): array => RegionalOptions::regenciesByProvinceName($get('provinces'))),
                     Select::make('area')
                         ->label('Wilayah')
                         ->dehydrateStateUsing(
                             fn (?string $state): string => Str::upper($state),
                         )
-                        ->options(function (Get $get) {
-                            $regencies = Regency::where(
-                                'name',
-                                $get('regencies'),
-                            )->first();
-                            $regenciesCode = $regencies
-                                ? $regencies->code
-                                : null;
-                            if ($regenciesCode) {
-                                if ($regenciesCode == '31.01') {
-                                    return [
-                                        'kS 01' => 'KS 01',
-                                        'KS_02' => 'KS 02',
-                                    ];
-                                } elseif ($regenciesCode == '31.71') {
-                                    return [
-                                        'JP 01' => 'JP 01',
-                                        'JP 02' => 'JP 02',
-                                    ];
-                                } elseif ($regenciesCode == '31.72') {
-                                    return [
-                                        'JU 01' => 'JU 01',
-                                        'JU 02' => 'JU 02',
-                                    ];
-                                } elseif ($regenciesCode == '31.73') {
-                                    return [
-                                        'JB 01' => 'JB 01',
-                                        'JB 02' => 'JB 02',
-                                    ];
-                                } elseif ($regenciesCode == '31.74') {
-                                    return [
-                                        'JS 01' => 'JS 01',
-                                        'JS 02' => 'JU 02',
-                                    ];
-                                } elseif ($regenciesCode == '31.75') {
-                                    return [
-                                        'JT 01' => 'JT 01',
-                                        'JT 02' => 'JT 02',
-                                    ];
-                                } else {
-                                    return [];
-                                }
-                            }
-
-                            return [];
-                        })
+                        ->options(fn (Get $get): array => RegionalOptions::areasByRegencyName($get('regencies')))
                         ->visible(function (Get $get) {
                             return $get('provinces') ===
                                 'Daerah Khusus Ibukota Jakarta';
@@ -187,21 +127,7 @@ class SalesForce
                         ->dehydrateStateUsing(
                             fn (?string $state): string => Str::upper($state),
                         )
-                        ->options(function (Get $get) {
-                            $district = Regency::where(
-                                'name',
-                                $get('regencies'),
-                            )->first();
-                            $regencyCode = $district ? $district->code : null;
-                            if ($regencyCode) {
-                                return District::where(
-                                    'regency_code',
-                                    $regencyCode,
-                                )->pluck('name', 'name');
-                            }
-
-                            return [];
-                        }),
+                        ->options(fn (Get $get): array => RegionalOptions::districtsByRegencyName($get('regencies'))),
                     TextInput::make('curriculum_deputies')
                         ->label(
                             new \Illuminate\Support\HtmlString(
@@ -425,46 +351,8 @@ class SalesForce
                             'latestStatusLog.status.order',
                         )
                             ->label('')
-                            ->icon(function ($state) {
-                                // $state = nilai order (bisa null)
-                                static $iconByOrder;
-
-                                if ($iconByOrder === null) {
-                                    // Ambil sekali: [order => icon]
-                                    $iconByOrder = Status::query()
-                                        ->pluck('icon', 'order') // pastikan kolom 'icon' ada
-                                        ->all();
-                                }
-
-                                $order = (int) $state;
-
-                                return $iconByOrder[$order] ??
-                                    'heroicon-m-clock';
-                            })
-                            ->color(function ($state) {
-                                static $colorByOrder;
-
-                                if ($colorByOrder === null) {
-                                    // Ambil sekali: [order => color_dari_DB]
-                                    $colorByOrder = Status::query()
-                                        ->pluck('color', 'order')
-                                        ->all();
-                                }
-
-                                $order = (int) $state;
-                                $raw = strtolower(
-                                    (string) ($colorByOrder[$order] ?? ''),
-                                );
-
-                                // Map warna DB -> warna Filament
-                                return match ($raw) {
-                                    'green' => 'green',
-                                    'blue' => 'blue',
-                                    'yellow' => 'yellow',
-                                    'red' => 'red',
-                                    default => 'gray',
-                                };
-                            })
+                            ->icon(fn ($state): string => StatusPalette::icon($state))
+                            ->color(fn ($state): string => StatusPalette::color($state))
                             ->default('red')
                             ->size('lg'),
                     ]),

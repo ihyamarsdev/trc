@@ -7,9 +7,12 @@ use Filament\Pages\Page;
 
 class CalenderPage extends Page
 {
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-m-calendar-days';
+    public static function getNavigationIcon(): ?string
+    {
+        return 'heroicon-m-calendar-days';
+    }
 
-    protected string $view = 'filament.user.pages.calender-page';
+    protected static string $view = 'filament.user.pages.calender-page';
 
     protected static ?string $navigationLabel = 'Timeline';
 

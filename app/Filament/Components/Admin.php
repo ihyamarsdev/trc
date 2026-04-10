@@ -3,14 +3,12 @@
 namespace App\Filament\Components;
 
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use App\Filament\Components\Support\RegionalOptions;
+use App\Filament\Components\Support\StatusPalette;
 use App\Filament\Enum\Periode;
 use App\Filament\Enum\Program;
 use App\Models\RegistrationData;
-use App\Models\Status;
 use Carbon\Carbon;
-use Creasi\Nusa\Models\District;
-use Creasi\Nusa\Models\Province;
-use Creasi\Nusa\Models\Regency;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Fieldset;
@@ -142,7 +140,7 @@ class Admin
                         ->displayFormat('l, jS F Y H:i'),
                     Select::make('provinces')
                         ->label('Provinsi')
-                        ->options(Province::all()->pluck('name', 'name'))
+                        ->options(RegionalOptions::provinces())
                         ->searchable()
                         ->reactive()
                         ->live(500),
@@ -152,40 +150,10 @@ class Admin
                         ->searchable()
                         ->reactive()
                         ->live(100)
-                        ->options(function (Get $get) {
-                            $province = Province::where('name', $get('provinces'))->first();
-                            $provinceCode = $province ? $province->code : null;
-                            if ($provinceCode) {
-                                return Regency::where('province_code', $provinceCode)->pluck('name', 'name');
-                            }
-
-                            return [];
-                        }),
+                        ->options(fn (Get $get): array => RegionalOptions::regenciesByProvinceName($get('provinces'))),
                     Select::make('area')
                         ->label('Wilayah')
-                        ->options(function (Get $get) {
-                            $regencies = Regency::where('name', $get('regencies'))->first();
-                            $regenciesCode = $regencies ? $regencies->code : null;
-                            if ($regenciesCode) {
-                                if ($regenciesCode == '3101') {
-                                    return ['kS 01' => 'KS 01', 'KS_02' => 'KS 02'];
-                                } elseif ($regenciesCode == '3171') {
-                                    return ['JP 01' => 'JP 01', 'JP 02' => 'JP 02'];
-                                } elseif ($regenciesCode == '3172') {
-                                    return ['JU 01' => 'JU 01', 'JU 02' => 'JU 02'];
-                                } elseif ($regenciesCode == '3173') {
-                                    return ['JB 01' => 'JB 01', 'JB 02' => 'JB 02'];
-                                } elseif ($regenciesCode == '3174') {
-                                    return ['JS 01' => 'JS 01', 'JS 02' => 'JU 02'];
-                                } elseif ($regenciesCode == '3175') {
-                                    return ['JT 01' => 'JT 01', 'JT 02' => 'JT 02'];
-                                } else {
-                                    return [];
-                                }
-                            }
-
-                            return [];
-                        })
+                        ->options(fn (Get $get): array => RegionalOptions::areasByRegencyName($get('regencies')))
                         ->visible(function (Get $get) {
                             return $get('provinces') === 'Dki Jakarta';
                         }),
@@ -195,15 +163,7 @@ class Admin
                         ->searchable()
                         ->reactive()
                         ->live(100)
-                        ->options(function (Get $get) {
-                            $district = Regency::where('name', $get('regencies'))->first();
-                            $regencyCode = $district ? $district->code : null;
-                            if ($regencyCode) {
-                                return District::where('regency_code', $regencyCode)->pluck('name', 'name');
-                            }
-
-                            return [];
-                        }),
+                        ->options(fn (Get $get): array => RegionalOptions::districtsByRegencyName($get('regencies'))),
                     TextInput::make('curriculum_deputies')
                         ->label('Wakakurikulum')
                         ->maxLength(255),
@@ -613,43 +573,8 @@ class Admin
                                 ->label(''),
                             Infolists\Components\IconEntry::make('latestStatusLog.status.order')
                                 ->label('')
-                                ->icon(function ($state) {
-                                    // $state = nilai order (bisa null)
-                                    static $iconByOrder;
-
-                                    if ($iconByOrder === null) {
-                                        // Ambil sekali: [order => icon]
-                                        $iconByOrder = Status::query()
-                                            ->pluck('icon', 'order')  // pastikan kolom 'icon' ada
-                                            ->all();
-                                    }
-
-                                    $order = (int) $state;
-
-                                    return $iconByOrder[$order] ?? 'heroicon-m-clock';
-                                })
-                                ->color(function ($state) {
-                                    static $colorByOrder;
-
-                                    if ($colorByOrder === null) {
-                                        // Ambil sekali: [order => color_dari_DB]
-                                        $colorByOrder = Status::query()
-                                            ->pluck('color', 'order')
-                                            ->all();
-                                    }
-
-                                    $order = (int) $state;
-                                    $raw = strtolower((string) ($colorByOrder[$order] ?? ''));
-
-                                    // Map warna DB -> warna Filament
-                                    return match ($raw) {
-                                        'green' => 'green',
-                                        'blue' => 'blue',
-                                        'yellow' => 'yellow',
-                                        'red' => 'red',
-                                        default => 'gray',
-                                    };
-                                })
+                                ->icon(fn ($state): string => StatusPalette::icon($state))
+                                ->color(fn ($state): string => StatusPalette::color($state))
                                 ->default('red')
                                 ->size('lg'),
                         ]),

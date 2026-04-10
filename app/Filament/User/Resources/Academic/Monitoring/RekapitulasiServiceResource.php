@@ -22,9 +22,15 @@ class RekapitulasiServiceResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
+    public static function getNavigationIcon(): ?string
+    {
+        return 'heroicon-o-document-text';
+    }
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Service';
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Service';
+    }
 
     protected static ?string $navigationLabel = 'Rekapitulasi';
 
@@ -39,6 +45,9 @@ class RekapitulasiServiceResource extends Resource
     {
         return $table
             ->paginated([50, 100, 200])
+            ->modifyQueryUsing(
+                fn (Builder $query) => $query->with(['latestStatusLog.status'])
+            )
             ->columns([
                 TextColumn::make('row_number')
                     ->label('No')
@@ -192,12 +201,12 @@ class RekapitulasiServiceResource extends Resource
                     ->indicator('Program'),
                 Tables\Filters\SelectFilter::make('users_id')
                     ->label('User')
-                    ->options(function () {
-                        return \App\Models\User::all()
-                            ->pluck('name', 'id')
-                            ->toArray();
-                    })
-                    ->preload()
+                    ->relationship(
+                        name: 'users',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: fn (Builder $query) => $query->orderBy('name'),
+                    )
+                    ->searchable()
                     ->indicator('user'),
                 Tables\Filters\SelectFilter::make('status_color')
                     ->label('Status Warna')

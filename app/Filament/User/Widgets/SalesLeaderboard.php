@@ -11,6 +11,7 @@ use Filament\Tables\Columns\Summarizers\Summarizer;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 class SalesLeaderboard extends BaseWidget
@@ -25,40 +26,59 @@ class SalesLeaderboard extends BaseWidget
 
     public function table(Table $table): Table
     {
-        $colorCountSubquery = function (string $color) {
+        $latestStatusSubquery = static function (): Database\Query\Builder {
+            return DB::table('registration_statuses as rs')
+                ->select(['rs.registration_id', 'rs.status_id'])
+                ->joinSub(
+                    DB::table('registration_statuses')
+                        ->selectRaw('registration_id, MAX(id) as latest_id')
+                        ->groupBy('registration_id'),
+                    'latest_rs',
+                    fn (Database\Query\JoinClause $join) => $join->on('latest_rs.latest_id', '=', 'rs.id'),
+                );
+        };
+
+        $leaderboardAggregateSubquery = static function () use ($latestStatusSubquery): Database\Query\Builder {
             return DB::table('registration_data as r2')
-                ->selectRaw('COUNT(*)')
-                ->whereColumn('r2.users_id', 'registration_data.users_id')
-                ->whereExists(function ($query) use ($color) {
-                    $query->select(DB::raw(1))
-                        ->from('registration_statuses')
-                        ->join('statuses', 'statuses.id', '=', 'registration_statuses.status_id')
-                        ->whereColumn('registration_statuses.registration_id', 'r2.id')
-                        ->whereRaw('registration_statuses.id = (SELECT MAX(id) FROM registration_statuses WHERE registration_id = r2.id)')
-                        ->where('statuses.color', $color);
-                });
+                ->leftJoinSub(
+                    $latestStatusSubquery(),
+                    'latest_registration_statuses_r2',
+                    fn (Database\Query\JoinClause $join) => $join->on('latest_registration_statuses_r2.registration_id', '=', 'r2.id'),
+                )
+                ->leftJoin('statuses as latest_statuses_r2', 'latest_statuses_r2.id', '=', 'latest_registration_statuses_r2.status_id')
+                ->select('r2.users_id')
+                ->selectRaw("SUM(CASE WHEN latest_statuses_r2.color = 'green' THEN 1 ELSE 0 END) as green_count")
+                ->selectRaw("SUM(CASE WHEN latest_statuses_r2.color = 'blue' THEN 1 ELSE 0 END) as blue_count")
+                ->selectRaw("SUM(CASE WHEN latest_statuses_r2.color = 'yellow' THEN 1 ELSE 0 END) as yellow_count")
+                ->selectRaw("SUM(CASE WHEN latest_statuses_r2.color = 'red' THEN 1 ELSE 0 END) as red_count")
+                ->groupBy('r2.users_id');
         };
 
         $summarizerCondition = function (Database\Query\Builder $query, string $color) {
-            return $query->whereExists(function ($subQuery) use ($color) {
-                $subQuery->select(DB::raw(1))
-                    ->from('registration_statuses')
-                    ->join('statuses', 'statuses.id', '=', 'registration_statuses.status_id')
-                    ->whereColumn('registration_statuses.registration_id', 'registration_data.id')
-                    ->whereRaw('registration_statuses.id = (SELECT MAX(id) FROM registration_statuses WHERE registration_id = registration_data.id)')
-                    ->where('statuses.color', $color);
-            })->count();
+            return (clone $query)
+                ->where('latest_status_color', $color)
+                ->count();
         };
 
-        /** @var \Illuminate\Database\Eloquent\Builder $leaderboardQuery */
-        $leaderboardQuery = RegistrationData::query();
-
-        $leaderboardQuery->addSelect([
-            'green_count' => $colorCountSubquery('green'),
-            'blue_count' => $colorCountSubquery('blue'),
-            'yellow_count' => $colorCountSubquery('yellow'),
-            'red_count' => $colorCountSubquery('red'),
-        ]);
+        /** @var Builder $leaderboardQuery */
+        $leaderboardQuery = RegistrationData::query()
+            ->leftJoinSub(
+                $latestStatusSubquery(),
+                'latest_registration_statuses',
+                fn (Database\Query\JoinClause $join) => $join->on('latest_registration_statuses.registration_id', '=', 'registration_data.id'),
+            )
+            ->leftJoin('statuses as latest_statuses', 'latest_statuses.id', '=', 'latest_registration_statuses.status_id')
+            ->leftJoinSub(
+                $leaderboardAggregateSubquery(),
+                'leaderboard_aggregate',
+                fn (Database\Query\JoinClause $join) => $join->on('leaderboard_aggregate.users_id', '=', 'registration_data.users_id'),
+            )
+            ->select('registration_data.*')
+            ->selectRaw("COALESCE(latest_statuses.color, '') as latest_status_color")
+            ->selectRaw('COALESCE(leaderboard_aggregate.green_count, 0) as green_count')
+            ->selectRaw('COALESCE(leaderboard_aggregate.blue_count, 0) as blue_count')
+            ->selectRaw('COALESCE(leaderboard_aggregate.yellow_count, 0) as yellow_count')
+            ->selectRaw('COALESCE(leaderboard_aggregate.red_count, 0) as red_count');
 
         $leaderboardQuery
             ->orderByDesc('green_count')
@@ -68,7 +88,7 @@ class SalesLeaderboard extends BaseWidget
             ->orderBy('users_id'); // tie-breaker opsional
 
         return $table
-            ->poll('10s')
+            ->poll('30s')
             ->query($leaderboardQuery)
             ->columns([
                 Tables\Columns\TextColumn::make('users.name')->label('Sales'),
@@ -138,17 +158,11 @@ class SalesLeaderboard extends BaseWidget
                         'yellow' => 'Kuning',
                         'red' => 'Merah',
                     ])
-                    ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
+                    ->query(function (Builder $query, array $data): Builder {
                         if (! empty($data['value'])) {
-                            return $query->whereExists(function ($subQuery) use ($data) {
-                                $subQuery->select(DB::raw(1))
-                                    ->from('registration_statuses')
-                                    ->join('statuses', 'statuses.id', '=', 'registration_statuses.status_id')
-                                    ->whereColumn('registration_statuses.registration_id', 'registration_data.id')
-                                    ->whereRaw('registration_statuses.id = (SELECT MAX(id) FROM registration_statuses WHERE registration_id = registration_data.id)')
-                                    ->where('statuses.color', $data['value']);
-                            });
+                            return $query->where('latest_status_color', $data['value']);
                         }
+
                         return $query;
                     }),
             ])

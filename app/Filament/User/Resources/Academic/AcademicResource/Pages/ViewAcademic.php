@@ -5,9 +5,9 @@ namespace App\Filament\User\Resources\Academic\AcademicResource\Pages;
 use App\Filament\Components\Academic;
 use App\Filament\User\Resources\Academic\AcademicResource;
 use Filament\Actions;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Schemas\Schema;
 
 class ViewAcademic extends ViewRecord
 {
@@ -29,7 +29,7 @@ class ViewAcademic extends ViewRecord
         $this->record = $this->resolveRecord($record);
     }
 
-    public function infolist(Schema $infolist): Schema
+    public function infolist(Infolist $infolist): Infolist
     {
         $record = $this->record;
 

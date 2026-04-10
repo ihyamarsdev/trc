@@ -14,9 +14,9 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -471,7 +471,7 @@ class ViewFinance extends ViewRecord
         $this->record = $this->resolveRecord($record);
     }
 
-    public function infolist(Schema $infolist): Schema
+    public function infolist(Infolist $infolist): Infolist
     {
         $record = $this->record;
 

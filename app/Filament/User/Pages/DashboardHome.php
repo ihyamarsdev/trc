@@ -8,9 +8,12 @@ use Filament\Pages\Page;
 
 class DashboardHome extends Page
 {
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-home';
+    public static function getNavigationIcon(): ?string
+    {
+        return 'heroicon-o-home';
+    }
 
-    protected string $view = 'filament.user.pages.dashboard-home';
+    protected static string $view = 'filament.user.pages.dashboard-home';
 
     protected static ?int $navigationSort = 1;
 
