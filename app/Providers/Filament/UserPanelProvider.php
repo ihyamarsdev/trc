@@ -11,11 +11,10 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\MenuItem;
-use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Support\Enums\Width;
+use Filament\Support\Enums\MaxWidth;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -61,7 +60,7 @@ class UserPanelProvider extends PanelProvider
                     EditProfile::class,
                     DetailProfile::class,
                 ]),
-            (new RenewPasswordPlugin)
+            (new RenewPasswordPlugin())
                 ->forceRenewPassword()
                 ->timestampColumn(),
         ];
@@ -83,7 +82,7 @@ class UserPanelProvider extends PanelProvider
             ->path('')
             ->login()
             ->passwordReset()
-            ->maxContentWidth(Width::Full)
+            ->maxContentWidth(MaxWidth::Full)
             ->font('Poppins')
             ->brandLogo(asset('images/logo.png'))
             ->favicon(asset('images/logo.png'))
