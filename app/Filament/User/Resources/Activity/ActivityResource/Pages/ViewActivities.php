@@ -2,6 +2,7 @@
 
 namespace App\Filament\User\Resources\Activity\ActivityResource\Pages;
 
+use App\Filament\Components\ActivitySection;
 use App\Filament\Components\Support\StatusPalette;
 use App\Filament\User\Resources\Activity\ActivityResource;
 use App\Models\RegistrationStatus;
@@ -11,7 +12,6 @@ use Filament\Resources\Pages\Page;
 use JaOcero\ActivityTimeline\Components\ActivityDate;
 use JaOcero\ActivityTimeline\Components\ActivityDescription;
 use JaOcero\ActivityTimeline\Components\ActivityIcon;
-use JaOcero\ActivityTimeline\Components\ActivitySection;
 use JaOcero\ActivityTimeline\Components\ActivityTitle;
 use JaOcero\ActivityTimeline\Enums\IconAnimation;
 

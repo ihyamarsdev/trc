@@ -6,11 +6,22 @@ use App\Http\Controllers\InvoiceGenerator;
 use App\Http\Controllers\Kwitansi;
 use App\Http\Controllers\SampleSalesforce;
 use App\Http\Controllers\SNBT;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {
 //     return view('welcome');
 // });
+
+Route::post('/login', function (Request $request) {
+    if ($request->expectsJson()) {
+        return response()->json([
+            'message' => 'Use the login page at /login.',
+        ], 405);
+    }
+
+    return redirect('/login');
+})->middleware('guest');
 
 // # RASYIDU
 
