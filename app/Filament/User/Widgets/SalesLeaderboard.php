@@ -160,7 +160,7 @@ class SalesLeaderboard extends BaseWidget
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         if (! empty($data['value'])) {
-                            return $query->where('latest_status_color', $data['value']);
+                            return $query->where('latest_statuses.color', $data['value']);
                         }
 
                         return $query;
