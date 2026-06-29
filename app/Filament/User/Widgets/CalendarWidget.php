@@ -32,6 +32,7 @@ class CalendarWidget extends FullCalendarWidget
             'titleFormat' => [
                 '',
             ],
+            'dayMaxEvents' => true,
         ];
     }
 
