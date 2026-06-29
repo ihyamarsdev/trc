@@ -9,7 +9,7 @@
     ]
   },
   "resources/css/filament/admin/theme.css": {
-    "file": "assets/theme-Wee8K_CS.css",
+    "file": "assets/theme-BpVjtfLm.css",
     "src": "resources/css/filament/admin/theme.css",
     "isEntry": true,
     "name": "theme",
@@ -18,7 +18,7 @@
     ]
   },
   "resources/css/filament/user/theme.css": {
-    "file": "assets/theme-EdzdP7AQ.css",
+    "file": "assets/theme-Cb6DxDWx.css",
     "src": "resources/css/filament/user/theme.css"
   },
   "resources/js/app.js": {

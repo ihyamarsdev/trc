@@ -188,3 +188,29 @@
 .table-footer td {
     transition: color 0.2s ease, background-color 0.2s ease;
 }
+
+/* FullCalendar Popover max height and scrollability */
+.fc .fc-popover {
+    max-height: 350px !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.fc .fc-popover-body {
+    overflow-y: auto !important;
+    flex-grow: 1 !important;
+    scrollbar-width: thin;
+}
+
+.fc .fc-popover-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.fc .fc-popover-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.fc .fc-popover-body::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.5);
+    border-radius: 3px;
+}
