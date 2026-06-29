@@ -59,36 +59,14 @@ class SalesForce
             Section::make()
                 ->description()
                 ->schema([
-                    DatePicker::make('date_register')
+                    DateTimePicker::make('date_register')
                         ->label(
                             new \Illuminate\Support\HtmlString(
                                 '<span style="color: #ef4444;">Tanggal Pendaftaran</span>',
                             ),
                         )
-                        ->native(false)
-                        ->displayFormat('l, jS F Y')
-                        ->afterStateHydrated(function (Set $set, $state) {
-                            if ($state) {
-                                $dateTime = \Carbon\Carbon::parse($state);
-                                $set('date_register_time', $dateTime->format('H:i'));
-                            }
-                        })
-                        ->dehydrateStateUsing(fn ($state, Get $get) => $state ? (\Carbon\Carbon::parse($state)->format('Y-m-d') . ' ' . ($get('date_register_time') ?? '00:00:00')) : null),
-                    Select::make('date_register_time')
-                        ->label('Jam Pendaftaran')
-                        ->options(function ($state) {
-                            $options = self::getTimeOptions();
-                            if ($state) {
-                                $time = substr($state, 0, 5);
-                                if (!isset($options[$time])) {
-                                    $options[$time] = $time;
-                                    ksort($options);
-                                }
-                            }
-                            return $options;
-                        })
-                        ->dehydrated(false)
-                        ->native(false),
+                        ->native(true)
+                        ->seconds(false),
                     ...SharedSchema::locationFields(),
                     TextInput::make('curriculum_deputies')
                         ->label(
@@ -137,37 +115,14 @@ class SalesForce
                             ),
                         )
                         ->numeric(),
-                    DatePicker::make('implementation_estimate')
+                    DateTimePicker::make('implementation_estimate')
                         ->label(
                             new \Illuminate\Support\HtmlString(
                                 '<span style="color: #ef4444;">Estimasi Pelaksanaan</span>',
                             ),
                         )
-                        ->native(false)
-                        ->displayFormat('l, jS F Y')
-                        ->afterStateHydrated(function (Set $set, $state) {
-                            if ($state) {
-                                $dateTime = \Carbon\Carbon::parse($state);
-                                $set('implementation_estimate_time', $dateTime->format('H:i'));
-                            }
-                        })
-                        ->dehydrateStateUsing(fn ($state, Get $get) => $state ? (\Carbon\Carbon::parse($state)->format('Y-m-d') . ' ' . ($get('implementation_estimate_time') ?? '00:00:00')) : null)
-                        ->live(),
-                    Select::make('implementation_estimate_time')
-                        ->label('Jam Estimasi')
-                        ->options(function ($state) {
-                            $options = self::getTimeOptions();
-                            if ($state) {
-                                $time = substr($state, 0, 5);
-                                if (!isset($options[$time])) {
-                                    $options[$time] = $time;
-                                    ksort($options);
-                                }
-                            }
-                            return $options;
-                        })
-                        ->dehydrated(false)
-                        ->native(false)
+                        ->native(true)
+                        ->seconds(false)
                         ->live(),
                     Textarea::make('notes')->label('Catatan')->autosize(),
                 ])
@@ -459,17 +414,5 @@ class SalesForce
                 Tables\Actions\DeleteBulkAction::make(),
             ]),
         ];
-    }
-
-    public static function getTimeOptions(): array
-    {
-        $options = [];
-        for ($hour = 0; $hour < 24; $hour++) {
-            foreach (['00', '30'] as $minute) {
-                $time = sprintf('%02d:%s', $hour, $minute);
-                $options[$time] = $time;
-            }
-        }
-        return $options;
     }
 }
