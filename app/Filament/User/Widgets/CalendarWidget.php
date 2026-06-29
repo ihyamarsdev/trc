@@ -29,8 +29,11 @@ class CalendarWidget extends FullCalendarWidget
                 'center' => 'today',
                 'right' => 'dayGridMonth,dayGridWeek,dayGridDay',
             ],
+            'locale' => 'id',
             'titleFormat' => [
-                '',
+                'year' => 'numeric',
+                'month' => 'long',
+                'day' => 'numeric',
             ],
             'dayMaxEvents' => true,
         ];
