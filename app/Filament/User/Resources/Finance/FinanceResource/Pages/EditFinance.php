@@ -53,13 +53,13 @@ class EditFinance extends EditRecord
             }
 
             $currentStatusId = (int) $record->status_id;
+            $currentOrder = (int) Status::whereKey($currentStatusId)->value('order');
 
             $last = RegistrationStatus::query()
                 ->where('registration_id', $record->id)
                 ->latest('id')
                 ->first();
 
-            // --- SIMPLE: bandingkan berdasar angka status_id (sesuai permintaanmu) ---
             if (! $last) {
                 RegistrationStatus::create([
                     'registration_id' => $record->id,
@@ -70,13 +70,13 @@ class EditFinance extends EditRecord
                 return;
             }
 
-            if ((int) $last->status_id === $currentStatusId) {
-                // sama -> tidak perlu apa-apa
+            $lastOrder = (int) Status::whereKey($last->status_id)->value('order');
+
+            if ($lastOrder === $currentOrder) {
                 return;
             }
 
-            if ((int) $last->status_id < $currentStatusId) {
-                // naik -> catat log baru
+            if ($lastOrder < $currentOrder) {
                 RegistrationStatus::create([
                     'registration_id' => $record->id,
                     'status_id' => $currentStatusId,
@@ -87,7 +87,7 @@ class EditFinance extends EditRecord
             }
 
             // turun -> hapus log sampai posisi terakhir <= current
-            while ($last && (int) $last->status_id > $currentStatusId) {
+            while ($last && (int) Status::whereKey($last->status_id)->value('order') > $currentOrder) {
                 $last->delete();
 
                 $last = RegistrationStatus::query()
@@ -97,33 +97,14 @@ class EditFinance extends EditRecord
             }
 
             // setelah rollback, jika belum persis sama dan ingin set posisinya ke current, tambahkan log current:
-            if (! $last || (int) $last->status_id < $currentStatusId) {
+            $lastOrderAfterRollback = $last ? (int) Status::whereKey($last->status_id)->value('order') : 0;
+            if (! $last || $lastOrderAfterRollback < $currentOrder) {
                 RegistrationStatus::create([
                     'registration_id' => $record->id,
                     'status_id' => $currentStatusId,
                     'user_id' => Auth::id(),
                 ]);
             }
-
-            /*
-            // --- ALTERNATIF LEBIH AKURAT: bandingkan berdasar urutan (statuses.order) ---
-            // $currentOrder = (int) Status::whereKey($currentStatusId)->value('order');
-            // $lastOrder    = (int) Status::whereKey($last->status_id)->value('order');
-
-            // if ($lastOrder === $currentOrder) { return; }
-
-            // if ($lastOrder < $currentOrder) {
-            //     RegistrationStatus::create([...]); return;
-            // }
-
-            // while ($last && (int) Status::whereKey($last->status_id)->value('order') > $currentOrder) {
-            //     $last->delete();
-            //     $last = RegistrationStatus::where('registration_id', $record->id)->latest('id')->first();
-            // }
-            // if (! $last || (int) Status::whereKey($last->status_id)->value('order') < $currentOrder) {
-            //     RegistrationStatus::create([...]);
-            // }
-            */
         });
 
         return $data;

@@ -125,15 +125,24 @@ class StatusSeeder extends Seeder
             [
                 'id' => 40,
                 'order' => 13,
-                'name' => 'SPJ dan Hasil',
+                'name' => 'SPJ',
                 'description' => 'Penyusunan Surat Pertanggungjawaban dan kelengkapan administrasi.',
                 'color' => 'green',
                 'category' => 'finance',
                 'icon' => 'heroicon-s-clipboard-document-check',
             ],
             [
-                'id' => 41,
+                'id' => 44,
                 'order' => 14,
+                'name' => 'Pengiriman Hasil',
+                'description' => 'Pengiriman berkas laporan hasil pelaksanaan kegiatan ke sekolah.',
+                'color' => 'green',
+                'category' => 'finance',
+                'icon' => 'heroicon-s-document-check',
+            ],
+            [
+                'id' => 41,
+                'order' => 15,
                 'name' => 'Kirim Invoice',
                 'description' => 'Pengiriman invoice resmi ke sekolah/instansi terkait.',
                 'color' => 'green',
@@ -142,7 +151,7 @@ class StatusSeeder extends Seeder
             ],
             [
                 'id' => 42,
-                'order' => 15,
+                'order' => 16,
                 'name' => 'Support Sekolah',
                 'description' => 'Dukungan purnajual dan respons isu/permintaan bantuan sekolah.',
                 'color' => 'green',
@@ -151,7 +160,7 @@ class StatusSeeder extends Seeder
             ],
             [
                 'id' => 43,
-                'order' => 16,
+                'order' => 17,
                 'name' => 'Pesanan Selesai',
                 'description' => 'Semua proses telah selesai dan pesanan dianggap selesai.',
                 'color' => 'green',
@@ -161,7 +170,9 @@ class StatusSeeder extends Seeder
         ];
 
         foreach ($statuses as $status) {
-            Status::updateOrCreate($status);
+            $id = $status['id'];
+            unset($status['id']);
+            Status::updateOrCreate(['id' => $id], $status);
         }
     }
 }

@@ -32,9 +32,12 @@ class ViewActivities extends Page
     {
         $logs = RegistrationStatus::query()
             ->where('registration_id', $this->record->id)
+            ->join('statuses', 'registration_statuses.status_id', '=', 'statuses.id')
+            ->select('registration_statuses.*')
             ->with(['status:id,name,description,color,icon,order', 'user:id,name'])
-            ->orderBy('created_at')
-            ->orderBy('id')
+            ->orderBy('registration_statuses.created_at')
+            ->orderBy('statuses.order')
+            ->orderBy('registration_statuses.id')
             ->get();
 
         $colorByState = [];
