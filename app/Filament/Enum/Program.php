@@ -19,6 +19,34 @@ enum Program: string
         };
     }
 
+    public function description(): string
+    {
+        return match ($this) {
+            self::ANBK => 'ASESMEN NASIONAL BERBASIS KOMPUTER',
+            self::APPS => 'ASESMEN PSIKOTES POTENSI SISWA',
+            self::SNBT => 'SELEKSI NASIONAL BERDASARKAN TES',
+            self::TKA => 'TEST KEMAMPUAN AKADEMIK',
+        };
+    }
+
+    public static function getMetadata(?string $type, string $default = 'apps'): array
+    {
+        $program = self::tryFrom(strtolower($type ?? ''));
+
+        if ($program) {
+            return [
+                'nameRegister' => $program->label(),
+                'DescriptionRegister' => $program->description(),
+            ];
+        }
+
+        $fallback = self::tryFrom($default);
+        return [
+            'nameRegister' => $fallback ? $fallback->label() : strtoupper($default),
+            'DescriptionRegister' => $fallback ? $fallback->description() : strtoupper($default),
+        ];
+    }
+
     public static function list(): array
     {
         return [

@@ -4,6 +4,7 @@ namespace App\Filament\Components;
 
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
 use App\Filament\Components\Support\RegionalOptions;
+use App\Filament\Components\Support\SharedSchema;
 use App\Filament\Components\Support\StatusPalette;
 use App\Filament\Enum\Periode;
 use App\Filament\Enum\Program;
@@ -30,71 +31,17 @@ class Admin
 {
     protected static function meta(Get $get): array
     {
-        $type = $get('type') ?? 'apps';
-
-        return match ($type) {
-            'anbk' => [
-                'nameRegister' => 'ANBK',
-                'DescriptionRegister' => 'ASESMEN NASIONAL BERBASIS KOMPUTER',
-            ],
-            'apps' => [
-                'nameRegister' => 'APPS',
-                'DescriptionRegister' => 'ASESMEN PSIKOTES POTENSI SISWA',
-            ],
-            'snbt' => [
-                'nameRegister' => 'SNBT',
-                'DescriptionRegister' => 'SELEKSI NASIONAL BERDASARKAN TES',
-            ],
-            'tka' => [
-                'nameRegister' => 'TKA',
-                'DescriptionRegister' => 'TEST KEMAMPUAN AKADEMIK',
-            ],
-            default => [
-                'nameRegister' => 'APPS',
-                'DescriptionRegister' => 'ASESMEN PSIKOTES POTENSI SISWA',
-            ],
-        };
+        return Program::getMetadata($get('type'), 'apps');
     }
 
     protected static function metaInfo(Model $record): array
     {
-        $type = $record->type;
-
-        return match ($type) {
-            'anbk' => [
-                'nameRegister' => 'ANBK',
-                'DescriptionRegister' => 'ASESMEN NASIONAL BERBASIS KOMPUTER',
-            ],
-            'apps' => [
-                'nameRegister' => 'APPS',
-                'DescriptionRegister' => 'ASESMEN PSIKOTES POTENSI SISWA',
-            ],
-            'snbt' => [
-                'nameRegister' => 'SNBT',
-                'DescriptionRegister' => 'SELEKSI NASIONAL BERDASARKAN TES',
-            ],
-            'tka' => [
-                'nameRegister' => 'TKA',
-                'DescriptionRegister' => 'TEST KEMAMPUAN AKADEMIK',
-            ],
-            default => [
-                'nameRegister' => 'NONE',
-                'DescriptionRegister' => 'NONE',
-            ],
-        };
+        return Program::getMetadata($record->type, 'none');
     }
 
     public static function getDifference(Get $get, Set $set): void
     {
-
-        $accountCount = (int) $get('account_count_created');
-        $implementerCount = (int) $get('implementer_count');
-
-        if ($accountCount !== 0 || $implementerCount !== 0) {
-            $set('difference', abs($accountCount - $implementerCount));
-        } else {
-            $set('difference', 0);
-        }
+        SharedSchema::getDifference($get, $set);
     }
 
     public static function formSchema(): array
@@ -138,32 +85,7 @@ class Admin
                         ->label('Tanggal Pendaftaran')
                         ->native(false)
                         ->displayFormat('l, jS F Y H:i'),
-                    Select::make('provinces')
-                        ->label('Provinsi')
-                        ->options(RegionalOptions::provinces())
-                        ->searchable()
-                        ->reactive()
-                        ->live(500),
-                    Select::make('regencies')
-                        ->label('Kota / Kabupaten')
-                        ->preload()
-                        ->searchable()
-                        ->reactive()
-                        ->live(100)
-                        ->options(fn (Get $get): array => RegionalOptions::regenciesByProvinceName($get('provinces'))),
-                    Select::make('area')
-                        ->label('Wilayah')
-                        ->options(fn (Get $get): array => RegionalOptions::areasByRegencyName($get('regencies')))
-                        ->visible(function (Get $get) {
-                            return $get('provinces') === 'Dki Jakarta';
-                        }),
-                    Select::make('district')
-                        ->label('Kecamatan')
-                        ->preload()
-                        ->searchable()
-                        ->reactive()
-                        ->live(100)
-                        ->options(fn (Get $get): array => RegionalOptions::districtsByRegencyName($get('regencies'))),
+                    ...SharedSchema::locationFields(),
                     TextInput::make('curriculum_deputies')
                         ->label('Wakakurikulum')
                         ->maxLength(255),
@@ -524,41 +446,7 @@ class Admin
 
     public static function columns(): array
     {
-        return [
-            Split::make([
-                TextColumn::make('type')
-                    ->label('Program')
-                    ->description('Program', position: 'above')
-                    ->extraAttributes(['class' => 'uppercase']),
-                TextColumn::make('schools')
-                    ->label('Sekolah')
-                    ->description('Sekolah', position: 'above')
-                    ->searchable()
-                    ->wrap(),
-                TextColumn::make('periode')
-                    ->label('Periode')
-                    ->description('Periode', position: 'above')
-                    ->extraAttributes(['class' => 'uppercase'])
-                    ->wrap(),
-                TextColumn::make('years')
-                    ->label('Tahun')
-                    ->description('Tahun', position: 'above'),
-
-                TextColumn::make('latestStatusLog.status.color')
-                    ->label('Status')
-                    ->description('Status', position: 'above')
-                    ->badge()
-                    ->formatStateUsing(fn ($state) => ucfirst($state))
-                    ->color(fn (string $state): string => match ($state) {
-                        'green' => 'green',
-                        'blue' => 'blue',
-                        'yellow' => 'yellow',
-                        'red' => 'red',
-                    })
-                    ->default('red'),
-            ])->from('md'),
-
-        ];
+        return SharedSchema::columns();
     }
 
     public static function infolist(Model $record): array

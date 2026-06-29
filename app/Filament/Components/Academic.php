@@ -2,6 +2,7 @@
 
 namespace App\Filament\Components;
 
+use App\Filament\Components\Support\SharedSchema;
 use App\Filament\Components\Support\StatusPalette;
 use App\Filament\Enum\Jenjang;
 use App\Filament\Enum\Periode;
@@ -27,58 +28,12 @@ class Academic
 {
     protected static function meta(Get $get): array
     {
-        $type = $get('type') ?? 'apps';
-
-        return match ($type) {
-            'anbk' => [
-                'nameRegister' => 'ANBK',
-                'DescriptionRegister' => 'ASESMEN NASIONAL BERBASIS KOMPUTER',
-            ],
-            'apps' => [
-                'nameRegister' => 'APPS',
-                'DescriptionRegister' => 'ASESMEN PSIKOTES POTENSI SISWA',
-            ],
-            'snbt' => [
-                'nameRegister' => 'SNBT',
-                'DescriptionRegister' => 'SELEKSI NASIONAL BERDASARKAN TES',
-            ],
-            'tka' => [
-                'nameRegister' => 'TKA',
-                'DescriptionRegister' => 'TEST KEMAMPUAN AKADEMIK',
-            ],
-            default => [
-                'nameRegister' => 'APPS',
-                'DescriptionRegister' => 'ASESMEN PSIKOTES POTENSI SISWA',
-            ],
-        };
+        return Program::getMetadata($get('type'), 'apps');
     }
 
     protected static function metaInfo(Model $record): array
     {
-        $type = $record->type;
-
-        return match ($type) {
-            'anbk' => [
-                'nameRegister' => 'ANBK',
-                'DescriptionRegister' => 'ASESMEN NASIONAL BERBASIS KOMPUTER',
-            ],
-            'apps' => [
-                'nameRegister' => 'APPS',
-                'DescriptionRegister' => 'ASESMEN PSIKOTES POTENSI SISWA',
-            ],
-            'snbt' => [
-                'nameRegister' => 'SNBT',
-                'DescriptionRegister' => 'SELEKSI NASIONAL BERDASARKAN TES',
-            ],
-            'tka' => [
-                'nameRegister' => 'TKA',
-                'DescriptionRegister' => 'TEST KEMAMPUAN AKADEMIK',
-            ],
-            default => [
-                'nameRegister' => 'NONE',
-                'DescriptionRegister' => 'NONE',
-            ],
-        };
+        return Program::getMetadata($record->type, 'none');
     }
 
     public static function formSchema(): array
@@ -182,31 +137,7 @@ class Academic
 
     public static function columns(): array
     {
-        return [
-            Split::make([
-                TextColumn::make('type')
-                    ->label('Program')
-                    ->description('Program', position: 'above')
-                    ->extraAttributes(['class' => 'uppercase']),
-                TextColumn::make('schools')->label('Sekolah')->description('Sekolah', position: 'above')->searchable()->wrap(),
-                TextColumn::make('periode')->label('Periode')->description('Periode', position: 'above')->extraAttributes(['class' => 'uppercase'])->wrap(),
-                TextColumn::make('years')->label('Tahun')->description('Tahun', position: 'above'),
-                TextColumn::make('latestStatusLog.status.color')
-                    ->label('Status')
-                    ->description('Status', position: 'above')
-                    ->badge()
-                    ->formatStateUsing(fn ($state) => ucfirst($state))
-                    ->color(
-                        fn (string $state): string => match ($state) {
-                            'green' => 'green',
-                            'blue' => 'blue',
-                            'yellow' => 'yellow',
-                            'red' => 'red',
-                        },
-                    )
-                    ->default('red'),
-            ])->from('md'),
-        ];
+        return SharedSchema::columns();
     }
 
     public static function TextColumns(): array
@@ -523,14 +454,7 @@ class Academic
 
     public static function getDifference(Get $get, Set $set): void
     {
-        $accountCount = (int) $get('account_count_created');
-        $implementerCount = (int) $get('implementer_count');
-
-        if ($accountCount !== 0 || $implementerCount !== 0) {
-            $set('difference', abs($accountCount - $implementerCount));
-        } else {
-            $set('difference', 0);
-        }
+        SharedSchema::getDifference($get, $set);
     }
 
     public static function actions(): array

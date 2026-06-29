@@ -90,11 +90,11 @@ class RegionalOptions
     private static function areaMap(): array
     {
         return [
-            '3101' => ['kS 01' => 'KS 01', 'KS_02' => 'KS 02'],
+            '3101' => ['KS 01' => 'KS 01', 'KS 02' => 'KS 02'],
             '3171' => ['JP 01' => 'JP 01', 'JP 02' => 'JP 02'],
             '3172' => ['JU 01' => 'JU 01', 'JU 02' => 'JU 02'],
             '3173' => ['JB 01' => 'JB 01', 'JB 02' => 'JB 02'],
-            '3174' => ['JS 01' => 'JS 01', 'JS 02' => 'JU 02'],
+            '3174' => ['JS 01' => 'JS 01', 'JS 02' => 'JS 02'],
             '3175' => ['JT 01' => 'JT 01', 'JT 02' => 'JT 02'],
         ];
     }

@@ -3,6 +3,7 @@
 namespace App\Filament\Components;
 
 use App\Filament\Components\Support\RegionalOptions;
+use App\Filament\Components\Support\SharedSchema;
 use App\Filament\Components\Support\StatusPalette;
 use App\Filament\Enum\Jenjang;
 use App\Filament\Enum\Periode;
@@ -29,30 +30,7 @@ class SalesForce
 {
     protected static function meta(Get $get): array
     {
-        $type = $get('type');
-
-        return match ($type) {
-            'anbk' => [
-                'nameRegister' => 'ANBK',
-                'DescriptionRegister' => 'ASESMEN NASIONAL BERBASIS KOMPUTER',
-            ],
-            'apps' => [
-                'nameRegister' => 'APPS',
-                'DescriptionRegister' => 'ASESMEN PSIKOTES POTENSI SISWA',
-            ],
-            'snbt' => [
-                'nameRegister' => 'SNBT',
-                'DescriptionRegister' => 'SELEKSI NASIONAL BERDASARKAN TES',
-            ],
-            'tka' => [
-                'nameRegister' => 'TKA',
-                'DescriptionRegister' => 'TEST KEMAMPUAN AKADEMIK',
-            ],
-            default => [
-                'nameRegister' => 'APPS',
-                'DescriptionRegister' => 'ASESMEN PSIKOTES POTENSI SISWA',
-            ],
-        };
+        return Program::getMetadata($get('type'), 'apps');
     }
 
     public static function schema(): array
@@ -89,45 +67,7 @@ class SalesForce
                         ->native(false)
                         ->seconds(false)
                         ->displayFormat('l, jS F Y H:i'),
-                    Select::make('provinces')
-                        ->label('Provinsi')
-                        ->options(RegionalOptions::provinces())
-                        ->searchable()
-                        ->reactive()
-                        ->dehydrateStateUsing(
-                            fn (?string $state): string => Str::upper($state),
-                        )
-                        ->live(500),
-                    Select::make('regencies')
-                        ->label('Kota / Kabupaten')
-                        ->preload()
-                        ->searchable()
-                        ->reactive()
-                        ->dehydrateStateUsing(
-                            fn (?string $state): string => Str::upper($state),
-                        )
-                        ->live(100)
-                        ->options(fn (Get $get): array => RegionalOptions::regenciesByProvinceName($get('provinces'))),
-                    Select::make('area')
-                        ->label('Wilayah')
-                        ->dehydrateStateUsing(
-                            fn (?string $state): string => Str::upper($state),
-                        )
-                        ->options(fn (Get $get): array => RegionalOptions::areasByRegencyName($get('regencies')))
-                        ->visible(function (Get $get) {
-                            return $get('provinces') ===
-                                'Daerah Khusus Ibukota Jakarta';
-                        }),
-                    Select::make('district')
-                        ->label('Kecamatan')
-                        ->preload()
-                        ->searchable()
-                        ->reactive()
-                        ->live(100)
-                        ->dehydrateStateUsing(
-                            fn (?string $state): string => Str::upper($state),
-                        )
-                        ->options(fn (Get $get): array => RegionalOptions::districtsByRegencyName($get('regencies'))),
+                    ...SharedSchema::locationFields(),
                     TextInput::make('curriculum_deputies')
                         ->label(
                             new \Illuminate\Support\HtmlString(
@@ -298,41 +238,7 @@ class SalesForce
 
     public static function columns(): array
     {
-        return [
-            Split::make([
-                TextColumn::make('type')
-                    ->label('Program')
-                    ->description('Program', position: 'above')
-                    ->extraAttributes(['class' => 'uppercase']),
-                TextColumn::make('schools')
-                    ->label('Sekolah')
-                    ->description('Sekolah', position: 'above')
-                    ->wrap()
-                    ->searchable(),
-                TextColumn::make('periode')
-                    ->label('Periode')
-                    ->description('Periode', position: 'above')
-                    ->extraAttributes(['class' => 'uppercase'])
-                    ->wrap(),
-                TextColumn::make('years')
-                    ->label('Tahun')
-                    ->description('Tahun', position: 'above'),
-                TextColumn::make('latestStatusLog.status.color')
-                    ->label('Status')
-                    ->description('Status', position: 'above')
-                    ->badge()
-                    ->formatStateUsing(fn ($state) => ucfirst($state))
-                    ->color(
-                        fn (string $state): string => match ($state) {
-                            'green' => 'green',
-                            'blue' => 'blue',
-                            'yellow' => 'yellow',
-                            'red' => 'red',
-                        },
-                    )
-                    ->default('red'),
-            ])->from('md'),
-        ];
+        return SharedSchema::columns();
     }
 
     public static function infolist(): array
