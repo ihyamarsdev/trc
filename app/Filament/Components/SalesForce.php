@@ -66,8 +66,8 @@ class SalesForce
                             ),
                         )
                         ->native(false)
-                        ->time24hr()
-                        ->seconds(false),
+                        ->seconds(false)
+                        ->displayFormat('l, jS F Y H:i'),
                     ...SharedSchema::locationFields(),
                     TextInput::make('curriculum_deputies')
                         ->label(
@@ -123,8 +123,8 @@ class SalesForce
                             ),
                         )
                         ->native(false)
-                        ->time24hr()
                         ->seconds(false)
+                        ->displayFormat('l, jS F Y H:i')
                         ->live(),
                     Textarea::make('notes')->label('Catatan')->autosize(),
                 ])
