@@ -65,7 +65,8 @@ class SalesForce
                                 '<span style="color: #ef4444;">Tanggal Pendaftaran</span>',
                             ),
                         )
-                        ->native(true)
+                        ->native(false)
+                        ->time24hr()
                         ->seconds(false),
                     ...SharedSchema::locationFields(),
                     TextInput::make('curriculum_deputies')
@@ -121,7 +122,8 @@ class SalesForce
                                 '<span style="color: #ef4444;">Estimasi Pelaksanaan</span>',
                             ),
                         )
-                        ->native(true)
+                        ->native(false)
+                        ->time24hr()
                         ->seconds(false)
                         ->live(),
                     Textarea::make('notes')->label('Catatan')->autosize(),
