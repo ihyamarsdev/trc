@@ -8,6 +8,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class TimelineResource extends Resource
 {
@@ -20,6 +21,15 @@ class TimelineResource extends Resource
     protected static ?string $slug = 'database-timeline';
 
     protected static bool $shouldRegisterNavigation = false;
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->where(function (Builder $query) {
+                $query->whereHas('status', fn (Builder $q) => $q->where('color', '!=', 'red'))
+                    ->orWhereNull('status_id');
+            });
+    }
 
     public static function form(Form $form): Form
     {
