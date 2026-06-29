@@ -8,6 +8,7 @@ enum Program: string
     case APPS = 'apps';
     case SNBT = 'snbt';
     case TKA = 'tka';
+    case PASJ = 'pasj';
 
     public function label(): string
     {
@@ -16,6 +17,7 @@ enum Program: string
             self::APPS => 'APPS',
             self::SNBT => 'SNBT',
             self::TKA => 'TKA',
+            self::PASJ => 'PASJ',
         };
     }
 
@@ -26,6 +28,7 @@ enum Program: string
             self::APPS => 'ASESMEN PSIKOTES POTENSI SISWA',
             self::SNBT => 'SELEKSI NASIONAL BERDASARKAN TES',
             self::TKA => 'TEST KEMAMPUAN AKADEMIK',
+            self::PASJ => 'PROGRAM ANALISIS SIDIK JARI',
         };
     }
 
@@ -54,6 +57,7 @@ enum Program: string
             'apps' => self::APPS->label(),
             'snbt' => self::SNBT->label(),
             'tka' => self::TKA->label(),
+            'pasj' => self::PASJ->label(),
         ];
     }
 }

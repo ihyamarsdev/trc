@@ -33,6 +33,11 @@ class SharedSchemaAndProgramTest extends TestCase
         $noneMeta = Program::getMetadata('invalid_program', 'none');
         $this->assertEquals('NONE', $noneMeta['nameRegister']);
         $this->assertEquals('NONE', $noneMeta['DescriptionRegister']);
+
+        // Test PASJ
+        $pasjMeta = Program::getMetadata('pasj');
+        $this->assertEquals('PASJ', $pasjMeta['nameRegister']);
+        $this->assertEquals('PROGRAM ANALISIS SIDIK JARI', $pasjMeta['DescriptionRegister']);
     }
 
     /**
