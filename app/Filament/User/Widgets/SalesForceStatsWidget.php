@@ -3,6 +3,7 @@
 namespace App\Filament\User\Widgets;
 
 use App\Filament\Enum\Jenjang;
+use App\Filament\Enum\Program;
 use App\Models\RegistrationData;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -156,7 +157,9 @@ class SalesForceStatsWidget extends Widget implements HasForms
             $schoolCount = (int) $item->school_count;
             $colorInfo = $statusColors[$index % count($statusColors)];
 
-            $labels[] = strtoupper($item->type);
+            $programLabel = Program::tryFrom($item->type)?->label() ?? strtoupper($item->type);
+
+            $labels[] = $programLabel;
             $chartData[] = $studentCount;
             // Use dark color for chart (works well in both modes)
             $backgroundColors[] = $colorInfo['dark'];
@@ -165,7 +168,7 @@ class SalesForceStatsWidget extends Widget implements HasForms
             $totalSchools += $schoolCount;
 
             $details[] = [
-                'label' => strtoupper($item->type),
+                'label' => $programLabel,
                 'school_count' => $schoolCount,
                 'student_count' => $studentCount,
                 'color' => $colorInfo['dark'],
