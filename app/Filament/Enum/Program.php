@@ -10,26 +10,40 @@ enum Program: string
     case TKA = 'tka';
     case PASJ = 'pasj';
 
+    private static function registry(): array
+    {
+        return [
+            self::ANBK->value => [
+                'label' => 'ANBK',
+                'description' => 'ASESMEN NASIONAL BERBASIS KOMPUTER',
+            ],
+            self::APPS->value => [
+                'label' => 'APPS',
+                'description' => 'ASESMEN PSIKOTES POTENSI SISWA',
+            ],
+            self::SNBT->value => [
+                'label' => 'SNBT',
+                'description' => 'SELEKSI NASIONAL BERDASARKAN TES',
+            ],
+            self::TKA->value => [
+                'label' => 'TKA',
+                'description' => 'TEST KEMAMPUAN AKADEMIK',
+            ],
+            self::PASJ->value => [
+                'label' => 'PASJ',
+                'description' => 'PROGRAM ANALISIS SIDIK JARI',
+            ],
+        ];
+    }
+
     public function label(): string
     {
-        return match ($this) {
-            self::ANBK => 'ANBK',
-            self::APPS => 'APPS',
-            self::SNBT => 'SNBT',
-            self::TKA => 'TKA',
-            self::PASJ => 'PASJ',
-        };
+        return self::registry()[$this->value]['label'] ?? strtoupper($this->value);
     }
 
     public function description(): string
     {
-        return match ($this) {
-            self::ANBK => 'ASESMEN NASIONAL BERBASIS KOMPUTER',
-            self::APPS => 'ASESMEN PSIKOTES POTENSI SISWA',
-            self::SNBT => 'SELEKSI NASIONAL BERDASARKAN TES',
-            self::TKA => 'TEST KEMAMPUAN AKADEMIK',
-            self::PASJ => 'PROGRAM ANALISIS SIDIK JARI',
-        };
+        return self::registry()[$this->value]['description'] ?? strtoupper($this->value);
     }
 
     public static function getMetadata(?string $type, string $default = 'apps'): array
@@ -52,12 +66,10 @@ enum Program: string
 
     public static function list(): array
     {
-        return [
-            'anbk' => self::ANBK->label(),
-            'apps' => self::APPS->label(),
-            'snbt' => self::SNBT->label(),
-            'tka' => self::TKA->label(),
-            'pasj' => self::PASJ->label(),
-        ];
+        $list = [];
+        foreach (self::cases() as $case) {
+            $list[$case->value] = $case->label();
+        }
+        return $list;
     }
 }

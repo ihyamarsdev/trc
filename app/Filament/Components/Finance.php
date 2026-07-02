@@ -2,6 +2,7 @@
 
 namespace App\Filament\Components;
 
+use App\Filament\Components\Support\HasProgramMetadata;
 use App\Filament\Components\Support\SharedSchema;
 use App\Filament\Components\Support\StatusPalette;
 use App\Filament\Enum\Jenjang;
@@ -28,14 +29,11 @@ use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
 
 class Finance
 {
-    protected static function meta(Get $get): array
-    {
-        return Program::getMetadata($get('type'), 'apps');
-    }
+    use HasProgramMetadata;
 
-    protected static function metaInfo(Model $record): array
+    protected static function metaInfo(Model $record, string $default = 'apps'): array
     {
-        return Program::getMetadata($record->type, 'apps');
+        return Program::getMetadata($record->type, $default);
     }
 
     public static function formSchema(): array

@@ -3,6 +3,7 @@
 namespace App\Filament\Components;
 
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use App\Filament\Components\Support\HasProgramMetadata;
 use App\Filament\Components\Support\RegionalOptions;
 use App\Filament\Components\Support\SharedSchema;
 use App\Filament\Components\Support\StatusPalette;
@@ -29,15 +30,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Admin
 {
-    protected static function meta(Get $get): array
-    {
-        return Program::getMetadata($get('type'), 'apps');
-    }
-
-    protected static function metaInfo(Model $record): array
-    {
-        return Program::getMetadata($record->type, 'none');
-    }
+    use HasProgramMetadata;
 
     public static function getDifference(Get $get, Set $set): void
     {

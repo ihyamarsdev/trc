@@ -2,6 +2,7 @@
 
 namespace App\Filament\Components;
 
+use App\Filament\Components\Support\HasProgramMetadata;
 use App\Filament\Components\Support\SharedSchema;
 use App\Filament\Components\Support\StatusPalette;
 use App\Filament\Enum\Jenjang;
@@ -26,15 +27,7 @@ use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
 
 class Academic
 {
-    protected static function meta(Get $get): array
-    {
-        return Program::getMetadata($get('type'), 'apps');
-    }
-
-    protected static function metaInfo(Model $record): array
-    {
-        return Program::getMetadata($record->type, 'none');
-    }
+    use HasProgramMetadata;
 
     public static function formSchema(): array
     {

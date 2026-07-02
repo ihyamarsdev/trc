@@ -60,4 +60,56 @@ class TimelineResourceTest extends TestCase
         $this->assertTrue($results->contains($greenRecord));
         $this->assertFalse($results->contains($redRecord));
     }
+
+    public function test_calendar_widget_excludes_red_status_records(): void
+    {
+        $user = \App\Models\User::create([
+            'name' => 'Test User',
+            'email' => 'test_cal@example.com',
+            'password' => bcrypt('password'),
+        ]);
+
+        $this->actingAs($user);
+
+        $redStatus = Status::create([
+            'name' => 'Red Status',
+            'description' => 'A red status description',
+            'color' => 'red',
+            'order' => 1,
+            'category' => 'sales',
+        ]);
+
+        $greenStatus = Status::create([
+            'name' => 'Green Status',
+            'description' => 'A green status description',
+            'color' => 'green',
+            'order' => 2,
+            'category' => 'finance',
+        ]);
+
+        $redRecord = RegistrationData::factory()->create([
+            'users_id' => $user->id,
+            'status_id' => $redStatus->id,
+            'status_color' => 'red',
+            'implementation_estimate' => now(),
+        ]);
+
+        $greenRecord = RegistrationData::factory()->create([
+            'users_id' => $user->id,
+            'status_id' => $greenStatus->id,
+            'status_color' => 'green',
+            'implementation_estimate' => now(),
+        ]);
+
+        $widget = new \App\Filament\User\Widgets\CalendarWidget();
+        $events = $widget->fetchEvents([
+            'start' => now()->subDay()->toIso8601String(),
+            'end' => now()->addDay()->toIso8601String(),
+        ]);
+
+        $eventIds = array_column($events, 'id');
+
+        $this->assertContains($greenRecord->id, $eventIds);
+        $this->assertNotContains($redRecord->id, $eventIds);
+    }
 }

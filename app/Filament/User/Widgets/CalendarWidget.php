@@ -50,6 +50,10 @@ class CalendarWidget extends FullCalendarWidget
         return RegistrationData::query()
             ->where('implementation_estimate', '>=', $fetchInfo['start'])
             ->where('implementation_estimate', '<=', $fetchInfo['end'])
+            ->where(function (Builder $query) {
+                $query->whereHas('status', fn (Builder $q) => $q->where('color', '!=', 'red'))
+                    ->orWhereNull('status_id');
+            })
             ->unless(
                 auth()->user()->hasRole('admin'), // Selama BUKAN admin...
                 fn (Builder $q) => $q->when(
@@ -65,7 +69,7 @@ class CalendarWidget extends FullCalendarWidget
                     ->title($event->schools)
                     ->start($event->implementation_estimate)
                     ->end($event->implementation_estimate)
-                    ->url(url: TimelineResource::getUrl(name: 'view', parameters: ['record' => $event]));
+                    ->url(url: TimelineResource::getUrl(name: 'view', parameters: ['record' => $event], panel: 'user'));
 
             })
             ->toArray();

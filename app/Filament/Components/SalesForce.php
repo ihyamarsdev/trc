@@ -2,6 +2,7 @@
 
 namespace App\Filament\Components;
 
+use App\Filament\Components\Support\HasProgramMetadata;
 use App\Filament\Components\Support\RegionalOptions;
 use App\Filament\Components\Support\SharedSchema;
 use App\Filament\Components\Support\StatusPalette;
@@ -29,10 +30,7 @@ use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
 
 class SalesForce
 {
-    protected static function meta(Get $get): array
-    {
-        return Program::getMetadata($get('type'), 'apps');
-    }
+    use HasProgramMetadata;
 
     public static function schema(): array
     {
