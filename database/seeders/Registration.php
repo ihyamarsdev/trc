@@ -28,19 +28,31 @@ class Registration extends Seeder
             $userIds = User::take(10)->pluck('id')->all();
         }
 
-        // Seed registration_data 200 baris untuk 10 user (20 baris per user)
-        foreach ($userIds as $userId) {
-            $registrations = RegistrationData::factory(20)->state(fn () => [
-                'users_id' => $userId,
-            ])->create();
+        $yearsList = ['2024', '2025', '2026'];
 
-            // Buat RegistrationStatus untuk setiap registration
-            foreach ($registrations as $registration) {
-                RegistrationStatus::create([
-                    'registration_id' => $registration->id,
-                    'status_id' => $registration->status_id,
-                    'user_id' => $userId, // user yang membuat registration
-                ]);
+        foreach ($userIds as $userId) {
+            foreach ($yearsList as $year) {
+                // Create 7 records for each year per user (total 21 records per user)
+                $registrations = RegistrationData::factory(7)->state(function () use ($userId, $year) {
+                    $dateRegister = now()->setYear((int) $year)->subDays(rand(1, 300));
+                    $implementationEstimate = (clone $dateRegister)->addDays(rand(7, 60));
+
+                    return [
+                        'users_id' => $userId,
+                        'years' => $year,
+                        'date_register' => $dateRegister,
+                        'implementation_estimate' => $implementationEstimate,
+                    ];
+                })->create();
+
+                // Buat RegistrationStatus untuk setiap registration
+                foreach ($registrations as $registration) {
+                    RegistrationStatus::create([
+                        'registration_id' => $registration->id,
+                        'status_id' => $registration->status_id,
+                        'user_id' => $userId, // user yang membuat registration
+                    ]);
+                }
             }
         }
     }

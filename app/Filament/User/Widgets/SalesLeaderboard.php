@@ -24,6 +24,28 @@ class SalesLeaderboard extends BaseWidget
 
     protected static ?string $heading = 'Leaderboard Sales';
 
+    protected static string $view = 'filament.user.widgets.sales-leaderboard';
+
+    public ?int $selectedUserId = null;
+
+    public function getUserRegistrationMap(): array
+    {
+        return RegistrationData::query()
+            ->join('users', 'users.id', '=', 'registration_data.users_id')
+            ->select('users.name', 'registration_data.id', 'registration_data.users_id')
+            ->get()
+            ->unique('users_id')
+            ->mapWithKeys(fn ($row) => [$row->name => $row->id])
+            ->toArray();
+    }
+
+    public function openSalesSchools(int $registrationId): void
+    {
+        $registration = RegistrationData::find($registrationId);
+        $this->selectedUserId = $registration?->users_id;
+        $this->dispatch('open-modal', id: 'sales-schools-modal');
+    }
+
     public function table(Table $table): Table
     {
         $latestStatusSubquery = static function (): Database\Query\Builder {
@@ -92,34 +114,72 @@ class SalesLeaderboard extends BaseWidget
             ->query($leaderboardQuery)
             ->columns([
                 Tables\Columns\TextColumn::make('users.name')->label('Sales'),
-                Tables\Columns\TextColumn::make('red')->alignCenter()->label('Data')->summarize(
-                    Summarizer::make()
-                        ->label('')
-                        ->using(fn (Database\Query\Builder $query) => $summarizerCondition($query, 'red'))
-                        ->formatStateUsing(fn ($state) => '<span class="status-red" style="--light: #cc0000; --dark: #ff6b6b; color: var(--light); font-weight: 600;">'.$state.'</span>')
-                        ->html()
-                ),
-                Tables\Columns\TextColumn::make('yellow')->alignCenter()->label('Data')->summarize(
-                    Summarizer::make()
-                        ->label('')
-                        ->using(fn (Database\Query\Builder $query) => $summarizerCondition($query, 'yellow'))
-                        ->formatStateUsing(fn ($state) => '<span class="status-yellow" style="--light: #cc9900; --dark: #ffd93d; color: var(--light); font-weight: 600;">'.$state.'</span>')
-                        ->html()
-                ),
-                Tables\Columns\TextColumn::make('blue')->alignCenter()->label('Data')->summarize(
-                    Summarizer::make()
-                        ->label('')
-                        ->using(fn (Database\Query\Builder $query) => $summarizerCondition($query, 'blue'))
-                        ->formatStateUsing(fn ($state) => '<span class="status-blue" style="--light: #000099; --dark: #6bb3ff; color: var(--light); font-weight: 600;">'.$state.'</span>')
-                        ->html()
-                ),
-                Tables\Columns\TextColumn::make('green')->alignCenter()->label('Data')->summarize(
-                    Summarizer::make()
-                        ->label('')
-                        ->using(fn (Database\Query\Builder $query) => $summarizerCondition($query, 'green'))
-                        ->formatStateUsing(fn ($state) => '<span class="status-green" style="--light: #004400; --dark: #6bff6b; color: var(--light); font-weight: 600;">'.$state.'</span>')
-                        ->html()
-                ),
+                Tables\Columns\TextColumn::make('program_details')
+                    ->label('Detail Program')
+                    ->html()
+                    ->summarize(
+                        Summarizer::make()
+                            ->label('')
+                            ->html()
+                            ->using(function (Database\Query\Builder $query) {
+                                $results = (clone $query)
+                                    ->select('type')
+                                    ->selectRaw('COUNT(schools) as schools_count')
+                                    ->selectRaw('SUM(student_count) as students_sum')
+                                    ->whereNotNull('type')
+                                    ->groupBy('type')
+                                    ->get();
+
+                                $lines = $results->map(function ($row) {
+                                    $program = Program::tryFrom(strtolower($row->type));
+                                    $programLabel = $program ? $program->label() : strtoupper($row->type);
+                                    $studentsSum = (int) $row->students_sum;
+
+                                    return "<div class='flex items-center justify-between gap-4 text-xs'>".
+                                           "<span class='font-semibold text-gray-800 dark:text-slate-100'>{$programLabel}:</span>".
+                                           "<span class='font-medium text-gray-600 dark:text-slate-300'>{$row->schools_count} Sekolah / {$studentsSum} Siswa</span>".
+                                           '</div>';
+                                });
+
+                                return "<div class='inline-block text-left py-1 min-w-[210px] space-y-0.5'>".$lines->implode('').'</div>';
+                            })
+                    ),
+                Tables\Columns\TextColumn::make('status_details')
+                    ->label('Status')
+                    ->html()
+                    ->summarize(
+                        Summarizer::make()
+                            ->label('')
+                            ->html()
+                            ->using(function (Database\Query\Builder $query) {
+                                $q = (clone $query);
+                                $redCount = (clone $q)->where('latest_status_color', 'red')->count();
+                                $yellowCount = (clone $q)->where('latest_status_color', 'yellow')->count();
+                                $blueCount = (clone $q)->where('latest_status_color', 'blue')->count();
+                                $greenCount = (clone $q)->where('latest_status_color', 'green')->count();
+
+                                $lines = [
+                                    "<div class='flex items-center justify-between gap-4 text-xs'>".
+                                    "<span class='font-semibold status-red'>Merah:</span>".
+                                    "<span class='font-semibold status-red'>{$redCount} Data</span>".
+                                    '</div>',
+                                    "<div class='flex items-center justify-between gap-4 text-xs'>".
+                                    "<span class='font-semibold status-yellow'>Kuning:</span>".
+                                    "<span class='font-semibold status-yellow'>{$yellowCount} Data</span>".
+                                    '</div>',
+                                    "<div class='flex items-center justify-between gap-4 text-xs'>".
+                                    "<span class='font-semibold status-blue'>Biru:</span>".
+                                    "<span class='font-semibold status-blue'>{$blueCount} Data</span>".
+                                    '</div>',
+                                    "<div class='flex items-center justify-between gap-4 text-xs'>".
+                                    "<span class='font-semibold status-green'>Hijau:</span>".
+                                    "<span class='font-semibold status-green'>{$greenCount} Data</span>".
+                                    '</div>',
+                                ];
+
+                                return "<div class='inline-block text-left py-1 min-w-[130px] space-y-0.5'>".implode('', $lines).'</div>';
+                            })
+                    ),
                 Tables\Columns\TextColumn::make('schools')->alignCenter()->label('Jumlah Sekolah')->summarize(
                     Summarizer::make()
                         ->label('')
@@ -128,11 +188,6 @@ class SalesLeaderboard extends BaseWidget
                 Tables\Columns\TextColumn::make('student_count')->alignCenter()->label('Jumlah Siswa')->summarize(Sum::make()->label('')),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('type')
-                    ->label('Program')
-                    ->options(Program::list())
-                    ->preload()
-                    ->indicator('Program'),
                 Tables\Filters\SelectFilter::make('education_level')
                     ->label('Jenjang')
                     ->options(Jenjang::list())
@@ -150,21 +205,6 @@ class SalesLeaderboard extends BaseWidget
                             ->toArray();
                     })
                     ->searchable(),
-                Tables\Filters\SelectFilter::make('warna')
-                    ->label('Status')
-                    ->options([
-                        'green' => 'Hijau',
-                        'blue' => 'Biru',
-                        'yellow' => 'Kuning',
-                        'red' => 'Merah',
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        if (! empty($data['value'])) {
-                            return $query->where('latest_statuses.color', $data['value']);
-                        }
-
-                        return $query;
-                    }),
             ])
             ->defaultGroup('users.name')
             ->groupingSettingsHidden()

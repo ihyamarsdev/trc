@@ -25,8 +25,7 @@
             {{-- Filter Dropdown --}}
             <div x-data="{ open: false }" class="relative">
                 <button @click="open = !open"
-                    class="relative inline-flex items-center justify-center gap-1.5 rounded-xl py-2 px-4 text-sm font-medium transition-all duration-200 outline-none focus:-translate-y-0.5 active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
-                    :class="$hasActiveFilters ? 'bg-gradient-to-r from-gray-600 to-gray-500 dark:from-[#0096d2] dark:to-[#0082a0] text-white shadow-lg' : 'bg-gray-100 dark:bg-[#002a35]/80 text-gray-700 dark:text-[#bae6fd] border border-gray-300 dark:border-[#0096d2]/30 hover:border-gray-400 dark:hover:border-[#0096d2] hover:bg-gray-200 dark:hover:bg-[#0096d2]/20'">
+                    class="relative inline-flex items-center justify-center gap-1.5 rounded-xl py-2 px-4 text-sm font-medium transition-all duration-200 outline-none focus:-translate-y-0.5 active:translate-y-0 disabled:pointer-events-none disabled:opacity-50 {{ $hasActiveFilters ? 'bg-gradient-to-r from-gray-600 to-gray-500 dark:from-[#0096d2] dark:to-[#0082a0] text-white shadow-lg' : 'bg-gray-100 dark:bg-[#002a35]/80 text-gray-700 dark:text-[#bae6fd] border border-gray-300 dark:border-[#0096d2]/30 hover:border-gray-400 dark:hover:border-[#0096d2] hover:bg-gray-200 dark:hover:bg-[#0096d2]/20' }}">
 
                     <x-heroicon-m-funnel class="w-4 h-4" />
                     <span>Filter</span>

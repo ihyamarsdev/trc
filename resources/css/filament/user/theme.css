@@ -134,16 +134,16 @@
 /* Leaderboard Status Colors - Light/Dark mode support */
 /* Light mode colors (darker for readability) */
 .status-red {
-    color: #cc0000 !important;
+    color: #b91c1c !important;
 }
 .status-yellow {
-    color: #cc9900 !important;
+    color: #a16207 !important;
 }
 .status-blue {
-    color: #000099 !important;
+    color: #1d4ed8 !important;
 }
 .status-green {
-    color: #004400 !important;
+    color: #15803d !important;
 }
 
 /* Dark mode colors (lighter/brighter) */
