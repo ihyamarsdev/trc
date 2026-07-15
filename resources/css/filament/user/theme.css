@@ -214,3 +214,13 @@
     background-color: rgba(156, 163, 175, 0.5);
     border-radius: 3px;
 }
+
+/* Allow FullCalendar event titles to wrap instead of cutting off */
+.fc .fc-event-title,
+.fc .fc-event-title-container,
+.fc-event-main,
+.fc-event-main-frame {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+}
