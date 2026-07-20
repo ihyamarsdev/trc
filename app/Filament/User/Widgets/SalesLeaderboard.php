@@ -76,12 +76,6 @@ class SalesLeaderboard extends BaseWidget
                 ->groupBy('r2.users_id');
         };
 
-        $summarizerCondition = function (Database\Query\Builder $query, string $color) {
-            return (clone $query)
-                ->where('latest_status_color', $color)
-                ->count();
-        };
-
         /** @var Builder $leaderboardQuery */
         $leaderboardQuery = RegistrationData::query()
             ->leftJoinSub(
@@ -152,32 +146,34 @@ class SalesLeaderboard extends BaseWidget
                             ->label('')
                             ->html()
                             ->using(function (Database\Query\Builder $query) {
-                                $q = (clone $query);
-                                $redCount = (clone $q)->where('latest_status_color', 'red')->count();
-                                $yellowCount = (clone $q)->where('latest_status_color', 'yellow')->count();
-                                $blueCount = (clone $q)->where('latest_status_color', 'blue')->count();
-                                $greenCount = (clone $q)->where('latest_status_color', 'green')->count();
+                                $results = (clone $query)
+                                    ->select('latest_status_color')
+                                    ->selectRaw('COUNT(*) as data_count')
+                                    ->selectRaw('COALESCE(SUM(student_count), 0) as students_sum')
+                                    ->groupBy('latest_status_color')
+                                    ->get()
+                                    ->keyBy('latest_status_color');
 
-                                $lines = [
-                                    "<div class='flex items-center justify-between gap-4 text-xs'>".
-                                    "<span class='font-semibold status-red'>Merah:</span>".
-                                    "<span class='font-semibold status-red'>{$redCount} Data</span>".
-                                    '</div>',
-                                    "<div class='flex items-center justify-between gap-4 text-xs'>".
-                                    "<span class='font-semibold status-yellow'>Kuning:</span>".
-                                    "<span class='font-semibold status-yellow'>{$yellowCount} Data</span>".
-                                    '</div>',
-                                    "<div class='flex items-center justify-between gap-4 text-xs'>".
-                                    "<span class='font-semibold status-blue'>Biru:</span>".
-                                    "<span class='font-semibold status-blue'>{$blueCount} Data</span>".
-                                    '</div>',
-                                    "<div class='flex items-center justify-between gap-4 text-xs'>".
-                                    "<span class='font-semibold status-green'>Hijau:</span>".
-                                    "<span class='font-semibold status-green'>{$greenCount} Data</span>".
-                                    '</div>',
+                                $colors = [
+                                    'red' => 'Merah',
+                                    'yellow' => 'Kuning',
+                                    'blue' => 'Biru',
+                                    'green' => 'Hijau',
                                 ];
 
-                                return "<div class='inline-block text-left py-1 min-w-[130px] space-y-0.5'>".implode('', $lines).'</div>';
+                                $lines = [];
+                                foreach ($colors as $colorKey => $colorLabel) {
+                                    $row = $results->get($colorKey);
+                                    $dataCount = (int) ($row?->data_count ?? 0);
+                                    $studentsSum = (int) ($row?->students_sum ?? 0);
+
+                                    $lines[] = "<div class='flex items-center justify-between gap-4 text-xs'>".
+                                           "<span class='font-semibold status-{$colorKey}'>{$colorLabel}:</span>".
+                                           "<span class='font-semibold status-{$colorKey}'>{$dataCount} Data / {$studentsSum} Siswa</span>".
+                                           '</div>';
+                                }
+
+                                return "<div class='inline-block text-left py-1 min-w-[210px] space-y-0.5'>".implode('', $lines).'</div>';
                             })
                     ),
                 Tables\Columns\TextColumn::make('schools')->alignCenter()->label('Jumlah Sekolah')->summarize(
