@@ -53,6 +53,7 @@
                 $schools = \App\Models\RegistrationData::query()
                     ->where('users_id', $this->selectedUserId)
                     ->with(['status'])
+                    ->orderByDesc('id')
                     ->get();
             @endphp
             @include('filament.user.widgets.sales-schools-modal', ['schools' => $schools])
