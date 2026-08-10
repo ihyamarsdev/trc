@@ -2,7 +2,6 @@
 
 namespace App\Filament\Components\Support;
 
-use App\Filament\Components\Support\RegionalOptions;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
@@ -93,7 +92,8 @@ class SharedSchema
                 ->options(fn (Get $get): array => RegionalOptions::areasByRegencyName($get('regencies')))
                 ->visible(function (Get $get) {
                     $province = strtolower($get('provinces') ?? '');
-                    return $province === 'daerah khusus ibukota jakarta' || $province === 'dki jakarta';
+
+                    return str_contains($province, 'jakarta');
                 }),
             Select::make('district')
                 ->label('Kecamatan')
