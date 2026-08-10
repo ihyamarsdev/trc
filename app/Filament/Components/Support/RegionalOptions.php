@@ -22,9 +22,7 @@ class RegionalOptions
             return [];
         }
 
-        $provinceCode = Province::query()
-            ->where('name', $provinceName)
-            ->value('code');
+        $provinceCode = Province::search($provinceName)->value('code');
 
         if (! $provinceCode) {
             return [];
@@ -43,9 +41,7 @@ class RegionalOptions
             return [];
         }
 
-        $regencyCode = Regency::query()
-            ->where('name', $regencyName)
-            ->value('code');
+        $regencyCode = Regency::search($regencyName)->value('code');
 
         if (! $regencyCode) {
             return [];
@@ -64,9 +60,7 @@ class RegionalOptions
             return [];
         }
 
-        $regencyCode = Regency::query()
-            ->where('name', $regencyName)
-            ->value('code');
+        $regencyCode = Regency::search($regencyName)->value('code');
 
         if (! $regencyCode) {
             return [];
