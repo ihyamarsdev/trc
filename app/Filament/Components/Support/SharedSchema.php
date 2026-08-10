@@ -93,7 +93,7 @@ class SharedSchema
                 ->visible(function (Get $get) {
                     $province = strtolower($get('provinces') ?? '');
 
-                    return str_contains($province, 'jakarta');
+                    return str_contains($province, 'jakarta') && filled($get('regencies'));
                 }),
             Select::make('district')
                 ->label('Kecamatan')
