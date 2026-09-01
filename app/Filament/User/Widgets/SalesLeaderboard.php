@@ -3,6 +3,7 @@
 namespace App\Filament\User\Widgets;
 
 use App\Filament\Enum\Jenjang;
+use App\Filament\Enum\Periode;
 use App\Filament\Enum\Program;
 use App\Models\RegistrationData;
 use Filament\Tables;
@@ -184,6 +185,11 @@ class SalesLeaderboard extends BaseWidget
                 Tables\Columns\TextColumn::make('student_count')->alignCenter()->label('Jumlah Siswa')->summarize(Sum::make()->label('')),
             ])
             ->filters([
+                Tables\Filters\SelectFilter::make('periode')
+                    ->label('Periode')
+                    ->options(Periode::list())
+                    ->preload()
+                    ->indicator('Periode'),
                 Tables\Filters\SelectFilter::make('education_level')
                     ->label('Jenjang')
                     ->options(Jenjang::list())
