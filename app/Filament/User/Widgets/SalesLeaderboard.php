@@ -196,7 +196,7 @@ class SalesLeaderboard extends BaseWidget
                     ->preload()
                     ->indicator('Jenjang'),
                 Tables\Filters\SelectFilter::make('years')
-                    ->label('Tahun')
+                    ->label('Tahun Ajaran')
                     ->options(function () {
                         // Mengambil daftar tahun unik yang benar-benar ada di database
                         return RegistrationData::query() // Ganti Sales dengan nama Model Anda
@@ -206,7 +206,8 @@ class SalesLeaderboard extends BaseWidget
                             ->pluck('years', 'years')
                             ->toArray();
                     })
-                    ->searchable(),
+                    ->searchable()
+                    ->indicator('Tahun Ajaran'),
             ])
             ->defaultGroup('users.name')
             ->groupingSettingsHidden()

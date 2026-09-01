@@ -894,7 +894,7 @@ class Admin
                     );
                 }),
             Tables\Filters\SelectFilter::make('years')
-                ->label('Tahun')
+                ->label('Tahun Ajaran')
                 ->options(function () {
                     // Mengambil daftar tahun unik yang benar-benar ada di database
                     return RegistrationData::query() // Ganti Sales dengan nama Model Anda
@@ -905,7 +905,8 @@ class Admin
                         ->toArray();
                 })
                 ->searchable()
-                ->preload(),
+                ->preload()
+                ->indicator('Tahun Ajaran'),
         ];
     }
 
