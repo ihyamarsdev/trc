@@ -820,33 +820,6 @@ class Admin
                     DatePicker::make('date_until')
                         ->label('Sampai Tanggal')
                         ->native(false),
-                    Select::make('month')
-                        ->label('Bulan')
-                        ->options([
-                            '1' => 'Januari',
-                            '2' => 'Februari',
-                            '3' => 'Maret',
-                            '4' => 'April',
-                            '5' => 'Mei',
-                            '6' => 'Juni',
-                            '7' => 'Juli',
-                            '8' => 'Agustus',
-                            '9' => 'September',
-                            '10' => 'Oktober',
-                            '11' => 'November',
-                            '12' => 'Desember',
-                        ]),
-                    Select::make('year')
-                        ->label('Tahun')
-                        ->options(function () {
-                            $currentYear = (int) date('Y');
-
-                            return array_combine(
-                                range($currentYear + 2, 2020, -1),
-                                range($currentYear + 2, 2020, -1)
-                            );
-                        })
-                        ->searchable(),
                 ])
                 ->columns(2)
                 ->query(function (Builder $query, array $data): Builder {
@@ -864,14 +837,6 @@ class Admin
                         ->when(
                             $data['date_until'],
                             fn (Builder $q, $date) => $q->whereDate($field, '<=', $date),
-                        )
-                        ->when(
-                            $data['month'],
-                            fn (Builder $q, $month) => $q->whereMonth($field, $month),
-                        )
-                        ->when(
-                            $data['year'],
-                            fn (Builder $q, $year) => $q->whereYear($field, $year),
                         );
                 })
                 ->indicateUsing(function (array $data): array {
@@ -888,27 +853,6 @@ class Admin
                     }
                     if ($data['date_until'] ?? null) {
                         $indicators[] = "Tgl {$fieldLabel} Sampai: ".Carbon::parse($data['date_until'])->format('d/m/Y');
-                    }
-                    if ($data['month'] ?? null) {
-                        $months = [
-                            '1' => 'Januari',
-                            '2' => 'Februari',
-                            '3' => 'Maret',
-                            '4' => 'April',
-                            '5' => 'Mei',
-                            '6' => 'Juni',
-                            '7' => 'Juli',
-                            '8' => 'Agustus',
-                            '9' => 'September',
-                            '10' => 'Oktober',
-                            '11' => 'November',
-                            '12' => 'Desember',
-                        ];
-                        $monthName = $months[$data['month']] ?? $data['month'];
-                        $indicators[] = "Bulan {$fieldLabel}: {$monthName}";
-                    }
-                    if ($data['year'] ?? null) {
-                        $indicators[] = "Tahun {$fieldLabel}: {$data['year']}";
                     }
 
                     return $indicators;
