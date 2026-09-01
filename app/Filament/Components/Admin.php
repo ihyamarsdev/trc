@@ -813,26 +813,13 @@ class Admin
                             'payment_date' => 'Tanggal Pembayaran',
                         ])
                         ->default('date_register')
-                        ->required()
-                        ->live(),
-                    Select::make('filter_type')
-                        ->label('Filter Berdasarkan')
-                        ->options([
-                            'range' => 'Rentang Tanggal',
-                            'month' => 'Bulan & Tahun',
-                            'year' => 'Tahun',
-                        ])
-                        ->default('range')
-                        ->required()
-                        ->live(),
+                        ->columnSpan(2),
                     DatePicker::make('date_from')
                         ->label('Dari Tanggal')
-                        ->native(false)
-                        ->visible(fn (Get $get) => $get('filter_type') === 'range'),
+                        ->native(false),
                     DatePicker::make('date_until')
                         ->label('Sampai Tanggal')
-                        ->native(false)
-                        ->visible(fn (Get $get) => $get('filter_type') === 'range'),
+                        ->native(false),
                     Select::make('month')
                         ->label('Bulan')
                         ->options([
@@ -848,8 +835,7 @@ class Admin
                             '10' => 'Oktober',
                             '11' => 'November',
                             '12' => 'Desember',
-                        ])
-                        ->visible(fn (Get $get) => $get('filter_type') === 'month'),
+                        ]),
                     Select::make('year')
                         ->label('Tahun')
                         ->options(function () {
@@ -860,9 +846,9 @@ class Admin
                                 range($currentYear + 2, 2020, -1)
                             );
                         })
-                        ->searchable()
-                        ->visible(fn (Get $get) => in_array($get('filter_type'), ['month', 'year'], true)),
+                        ->searchable(),
                 ])
+                ->columns(2)
                 ->query(function (Builder $query, array $data): Builder {
                     $field = $data['date_field'] ?? 'date_register';
 
@@ -870,40 +856,23 @@ class Admin
                         $field = 'date_register';
                     }
 
-                    $filterType = $data['filter_type'] ?? 'range';
-
-                    if ($filterType === 'range') {
-                        return $query
-                            ->when(
-                                $data['date_from'],
-                                fn (Builder $q, $date) => $q->whereDate($field, '>=', $date),
-                            )
-                            ->when(
-                                $data['date_until'],
-                                fn (Builder $q, $date) => $q->whereDate($field, '<=', $date),
-                            );
-                    }
-
-                    if ($filterType === 'month') {
-                        return $query
-                            ->when(
-                                $data['month'],
-                                fn (Builder $q, $month) => $q->whereMonth($field, $month),
-                            )
-                            ->when(
-                                $data['year'],
-                                fn (Builder $q, $year) => $q->whereYear($field, $year),
-                            );
-                    }
-
-                    if ($filterType === 'year') {
-                        return $query->when(
+                    return $query
+                        ->when(
+                            $data['date_from'],
+                            fn (Builder $q, $date) => $q->whereDate($field, '>=', $date),
+                        )
+                        ->when(
+                            $data['date_until'],
+                            fn (Builder $q, $date) => $q->whereDate($field, '<=', $date),
+                        )
+                        ->when(
+                            $data['month'],
+                            fn (Builder $q, $month) => $q->whereMonth($field, $month),
+                        )
+                        ->when(
                             $data['year'],
                             fn (Builder $q, $year) => $q->whereYear($field, $year),
                         );
-                    }
-
-                    return $query;
                 })
                 ->indicateUsing(function (array $data): array {
                     $indicators = [];
@@ -913,41 +882,33 @@ class Admin
                         'payment_date' => 'Pembayaran',
                     ];
                     $fieldLabel = $fieldLabels[$data['date_field'] ?? 'date_register'] ?? 'Pendaftaran';
-                    $filterType = $data['filter_type'] ?? 'range';
 
-                    if ($filterType === 'range') {
-                        if ($data['date_from'] ?? null) {
-                            $indicators[] = "Tgl {$fieldLabel} Dari: ".Carbon::parse($data['date_from'])->format('d/m/Y');
-                        }
-                        if ($data['date_until'] ?? null) {
-                            $indicators[] = "Tgl {$fieldLabel} Sampai: ".Carbon::parse($data['date_until'])->format('d/m/Y');
-                        }
-                    } elseif ($filterType === 'month') {
-                        if ($data['month'] ?? null) {
-                            $months = [
-                                '1' => 'Januari',
-                                '2' => 'Februari',
-                                '3' => 'Maret',
-                                '4' => 'April',
-                                '5' => 'Mei',
-                                '6' => 'Juni',
-                                '7' => 'Juli',
-                                '8' => 'Agustus',
-                                '9' => 'September',
-                                '10' => 'Oktober',
-                                '11' => 'November',
-                                '12' => 'Desember',
-                            ];
-                            $monthName = $months[$data['month']] ?? $data['month'];
-                            $indicators[] = "Bulan {$fieldLabel}: {$monthName}";
-                        }
-                        if ($data['year'] ?? null) {
-                            $indicators[] = "Tahun {$fieldLabel}: {$data['year']}";
-                        }
-                    } elseif ($filterType === 'year') {
-                        if ($data['year'] ?? null) {
-                            $indicators[] = "Tahun {$fieldLabel}: {$data['year']}";
-                        }
+                    if ($data['date_from'] ?? null) {
+                        $indicators[] = "Tgl {$fieldLabel} Dari: ".Carbon::parse($data['date_from'])->format('d/m/Y');
+                    }
+                    if ($data['date_until'] ?? null) {
+                        $indicators[] = "Tgl {$fieldLabel} Sampai: ".Carbon::parse($data['date_until'])->format('d/m/Y');
+                    }
+                    if ($data['month'] ?? null) {
+                        $months = [
+                            '1' => 'Januari',
+                            '2' => 'Februari',
+                            '3' => 'Maret',
+                            '4' => 'April',
+                            '5' => 'Mei',
+                            '6' => 'Juni',
+                            '7' => 'Juli',
+                            '8' => 'Agustus',
+                            '9' => 'September',
+                            '10' => 'Oktober',
+                            '11' => 'November',
+                            '12' => 'Desember',
+                        ];
+                        $monthName = $months[$data['month']] ?? $data['month'];
+                        $indicators[] = "Bulan {$fieldLabel}: {$monthName}";
+                    }
+                    if ($data['year'] ?? null) {
+                        $indicators[] = "Tahun {$fieldLabel}: {$data['year']}";
                     }
 
                     return $indicators;

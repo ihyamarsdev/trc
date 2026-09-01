@@ -63,6 +63,7 @@ class AdminResource extends Resource
             )
             ->columns(Admin::columns())
             ->filters(Admin::filters())
+            ->filtersFormColumns(2)
             ->filtersTriggerAction(
                 fn (Action $action) => $action
                     ->button()
