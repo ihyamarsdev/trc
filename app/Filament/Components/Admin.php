@@ -4,7 +4,6 @@ namespace App\Filament\Components;
 
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
 use App\Filament\Components\Support\HasProgramMetadata;
-use App\Filament\Components\Support\RegionalOptions;
 use App\Filament\Components\Support\SharedSchema;
 use App\Filament\Components\Support\StatusPalette;
 use App\Filament\Enum\Periode;
@@ -23,7 +22,6 @@ use Filament\Forms\Set;
 use Filament\Infolists;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Tables;
-use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -130,14 +128,14 @@ class Admin
                             'SMK' => 'SMK',
                         ])
                         ->native(false),
-                    select::make('description')
+                    Select::make('description')
                         ->label('Keterangan')
                         ->options([
                             'ABK' => 'ABK',
                             'NON-ABK' => 'NON ABK',
                         ])
                         ->native(false),
-                    select::make('schools_type')
+                    Select::make('schools_type')
                         ->label('Negeri / Swasta')
                         ->options([
                             'Negeri' => 'Negeri',
@@ -450,7 +448,7 @@ class Admin
                 ->schema([
                     Infolists\Components\Fieldset::make('Aktifitas Saat ini')
                         ->schema([
-                            Infolists\Components\TextEntry::make('status.name')
+                            TextEntry::make('status.name')
                                 ->label(''),
                             Infolists\Components\IconEntry::make('latestStatusLog.status.order')
                                 ->label('')
@@ -479,23 +477,23 @@ class Admin
 
                     Infolists\Components\Fieldset::make('Sekolah')
                         ->schema([
-                            Infolists\Components\TextEntry::make('schools')
+                            TextEntry::make('schools')
                                 ->label('Sekolah'),
-                            Infolists\Components\TextEntry::make('class')
+                            TextEntry::make('class')
                                 ->label('Kelas'),
-                            Infolists\Components\TextEntry::make('education_level')
+                            TextEntry::make('education_level')
                                 ->label('Jenjang'),
-                            Infolists\Components\TextEntry::make('description')
+                            TextEntry::make('description')
                                 ->label('Keterangan'),
-                            Infolists\Components\TextEntry::make('schools_type')
+                            TextEntry::make('schools_type')
                                 ->label('Negeri / Swasta'),
-                            Infolists\Components\TextEntry::make('student_count')
+                            TextEntry::make('student_count')
                                 ->label('Jumlah Siswa'),
-                            Infolists\Components\TextEntry::make('provinces')
+                            TextEntry::make('provinces')
                                 ->label('Provinsi'),
-                            Infolists\Components\TextEntry::make('regencies')
+                            TextEntry::make('regencies')
                                 ->label('Kota / Kabupaten'),
-                            Infolists\Components\TextEntry::make('area')
+                            TextEntry::make('area')
                                 ->label('Wilayah')
                                 ->placeholder('tidak ada wilayah'),
                         ]),
@@ -537,11 +535,11 @@ class Admin
 
                     Infolists\Components\Fieldset::make('')
                         ->schema([
-                            Infolists\Components\TextEntry::make('group')
+                            TextEntry::make('group')
                                 ->label('Grup')
                                 ->dateTime('l, jS F Y')
                                 ->placeholder('Belum Terjadwal'),
-                            Infolists\Components\TextEntry::make('bimtek')
+                            TextEntry::make('bimtek')
                                 ->label('Bimtek')
                                 ->dateTime('l, jS F Y')
                                 ->placeholder('Belum Terjadwal'),
@@ -549,13 +547,13 @@ class Admin
 
                     Infolists\Components\Fieldset::make('')
                         ->schema([
-                            Infolists\Components\TextEntry::make('account_count_created')
+                            TextEntry::make('account_count_created')
                                 ->label('Akun Dibuat')
                                 ->placeholder('Belum Terbuat'),
-                            Infolists\Components\TextEntry::make('implementer_count')
+                            TextEntry::make('implementer_count')
                                 ->label('Pelaksanaan')
                                 ->placeholder('Belum terbuat'),
-                            Infolists\Components\TextEntry::make('difference')
+                            TextEntry::make('difference')
                                 ->label('Selisih')
                                 ->placeholder('Belum terbuat'),
                         ]),
@@ -599,11 +597,11 @@ class Admin
 
                     Infolists\Components\Fieldset::make('')
                         ->schema([
-                            Infolists\Components\TextEntry::make('counselor_consultation_date')
+                            TextEntry::make('counselor_consultation_date')
                                 ->label('Konsul BK')
                                 ->dateTime('l, jS F Y')
                                 ->placeholder('Belum Terjadwal'),
-                            Infolists\Components\TextEntry::make('student_consultation_date')
+                            TextEntry::make('student_consultation_date')
                                 ->label('Konsul Siswa')
                                 ->dateTime('l, jS F Y')
                                 ->placeholder('Belum Terjadwal'),
@@ -804,6 +802,116 @@ class Admin
     public static function filters(): array
     {
         return [
+            Tables\Filters\Filter::make('date_filter')
+                ->label('Filter Tanggal')
+                ->form([
+                    Select::make('date_field')
+                        ->label('Kategori Tanggal')
+                        ->options([
+                            'date_register' => 'Tanggal Pendaftaran',
+                            'implementation_estimate' => 'Tanggal Pelaksanaan',
+                            'payment_date' => 'Tanggal Pembayaran',
+                        ])
+                        ->default('date_register')
+                        ->required(),
+                    DatePicker::make('date_from')
+                        ->label('Dari Tanggal')
+                        ->native(false),
+                    DatePicker::make('date_until')
+                        ->label('Sampai Tanggal')
+                        ->native(false),
+                    Select::make('month')
+                        ->label('Bulan')
+                        ->options([
+                            '1' => 'Januari',
+                            '2' => 'Februari',
+                            '3' => 'Maret',
+                            '4' => 'April',
+                            '5' => 'Mei',
+                            '6' => 'Juni',
+                            '7' => 'Juli',
+                            '8' => 'Agustus',
+                            '9' => 'September',
+                            '10' => 'Oktober',
+                            '11' => 'November',
+                            '12' => 'Desember',
+                        ]),
+                    Select::make('year')
+                        ->label('Tahun')
+                        ->options(function () {
+                            $currentYear = (int) date('Y');
+
+                            return array_combine(
+                                range($currentYear + 2, 2020, -1),
+                                range($currentYear + 2, 2020, -1)
+                            );
+                        })
+                        ->searchable(),
+                ])
+                ->query(function (Builder $query, array $data): Builder {
+                    $field = $data['date_field'] ?? 'date_register';
+
+                    if (! in_array($field, ['date_register', 'implementation_estimate', 'payment_date'], true)) {
+                        $field = 'date_register';
+                    }
+
+                    return $query
+                        ->when(
+                            $data['date_from'],
+                            fn (Builder $q, $date) => $q->whereDate($field, '>=', $date),
+                        )
+                        ->when(
+                            $data['date_until'],
+                            fn (Builder $q, $date) => $q->whereDate($field, '<=', $date),
+                        )
+                        ->when(
+                            $data['month'],
+                            fn (Builder $q, $month) => $q->whereMonth($field, $month),
+                        )
+                        ->when(
+                            $data['year'],
+                            fn (Builder $q, $year) => $q->whereYear($field, $year),
+                        );
+                })
+                ->indicateUsing(function (array $data): array {
+                    $indicators = [];
+                    $fieldLabels = [
+                        'date_register' => 'Pendaftaran',
+                        'implementation_estimate' => 'Pelaksanaan',
+                        'payment_date' => 'Pembayaran',
+                    ];
+                    $fieldLabel = $fieldLabels[$data['date_field'] ?? 'date_register'] ?? 'Pendaftaran';
+
+                    if ($data['date_from'] ?? null) {
+                        $indicators[] = "Tgl {$fieldLabel} Dari: ".Carbon::parse($data['date_from'])->format('d/m/Y');
+                    }
+                    if ($data['date_until'] ?? null) {
+                        $indicators[] = "Tgl {$fieldLabel} Sampai: ".Carbon::parse($data['date_until'])->format('d/m/Y');
+                    }
+                    if ($data['month'] ?? null) {
+                        $months = [
+                            '1' => 'Januari',
+                            '2' => 'Februari',
+                            '3' => 'Maret',
+                            '4' => 'April',
+                            '5' => 'Mei',
+                            '6' => 'Juni',
+                            '7' => 'Juli',
+                            '8' => 'Agustus',
+                            '9' => 'September',
+                            '10' => 'Oktober',
+                            '11' => 'November',
+                            '12' => 'Desember',
+                        ];
+                        $monthName = $months[$data['month']] ?? $data['month'];
+                        $indicators[] = "Bulan {$fieldLabel}: {$monthName}";
+                    }
+                    if ($data['year'] ?? null) {
+                        $indicators[] = "Tahun {$fieldLabel}: {$data['year']}";
+                    }
+
+                    return $indicators;
+                }),
             Tables\Filters\SelectFilter::make('users')
                 ->label('Salesforce')
                 ->relationship('users', 'name')
