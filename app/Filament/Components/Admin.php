@@ -536,30 +536,10 @@ class Admin
                     Infolists\Components\Fieldset::make('Aktifitas Saat ini')
                         ->schema([
                             TextEntry::make('status.name')
-                                ->label('Status (Klik untuk lihat riwayat)')
-                                ->color('primary')
-                                ->weight('bold')
+                                ->label('')
                                 ->action(
                                     Action::make('viewActivityModal')
                                         ->label('Lihat Riwayat Activity')
-                                        ->modalHeading('Riwayat Activity Sekolah')
-                                        ->modalSubmitAction(false)
-                                        ->modalCancelActionLabel('Tutup')
-                                        ->modalWidth('xl')
-                                        ->extraModalFooterActions([
-                                            Action::make('openFullActivityPage')
-                                                ->label('Buka Halaman Full Activity')
-                                                ->icon('heroicon-m-arrow-top-right-on-square')
-                                                ->url(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record]))
-                                                ->openUrlInNewTab(),
-                                        ])
-                                        ->infolist(fn (Model $record) => self::getActivityTimelineSchema($record))
-                                )
-                                ->suffixAction(
-                                    Action::make('openActivityClockModal')
-                                        ->icon('heroicon-m-clock')
-                                        ->color('primary')
-                                        ->tooltip('Klik untuk lihat detail riwayat activity')
                                         ->modalHeading('Riwayat Activity Sekolah')
                                         ->modalSubmitAction(false)
                                         ->modalCancelActionLabel('Tutup')
