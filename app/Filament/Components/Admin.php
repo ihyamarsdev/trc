@@ -12,6 +12,7 @@ use App\Filament\User\Resources\Activity\ActivityResource;
 use App\Models\RegistrationData;
 use App\Models\RegistrationStatus;
 use Carbon\Carbon;
+use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Fieldset;
@@ -539,14 +540,14 @@ class Admin
                                 ->color('primary')
                                 ->weight('bold')
                                 ->action(
-                                    Infolists\Components\Actions\Action::make('viewActivityModal')
+                                    Action::make('viewActivityModal')
                                         ->label('Lihat Riwayat Activity')
-                                        ->modalTitle('Riwayat Activity Sekolah')
+                                        ->modalHeading('Riwayat Activity Sekolah')
                                         ->modalSubmitAction(false)
                                         ->modalCancelActionLabel('Tutup')
                                         ->modalWidth('xl')
                                         ->extraModalFooterActions([
-                                            Infolists\Components\Actions\Action::make('openFullActivityPage')
+                                            Action::make('openFullActivityPage')
                                                 ->label('Buka Halaman Full Activity')
                                                 ->icon('heroicon-m-arrow-top-right-on-square')
                                                 ->url(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record]))
@@ -555,16 +556,16 @@ class Admin
                                         ->schema(fn ($record) => self::getActivityTimelineSchema($record))
                                 )
                                 ->suffixAction(
-                                    Infolists\Components\Actions\Action::make('openActivityClockModal')
+                                    Action::make('openActivityClockModal')
                                         ->icon('heroicon-m-clock')
                                         ->color('primary')
                                         ->tooltip('Klik untuk lihat detail riwayat activity')
-                                        ->modalTitle('Riwayat Activity Sekolah')
+                                        ->modalHeading('Riwayat Activity Sekolah')
                                         ->modalSubmitAction(false)
                                         ->modalCancelActionLabel('Tutup')
                                         ->modalWidth('xl')
                                         ->extraModalFooterActions([
-                                            Infolists\Components\Actions\Action::make('openFullActivityPage')
+                                            Action::make('openFullActivityPage')
                                                 ->label('Buka Halaman Full Activity')
                                                 ->icon('heroicon-m-arrow-top-right-on-square')
                                                 ->url(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record]))
@@ -579,13 +580,13 @@ class Admin
                                 ->default('red')
                                 ->size('lg')
                                 ->action(
-                                    Infolists\Components\Actions\Action::make('viewActivityIconModal')
-                                        ->modalTitle('Riwayat Activity Sekolah')
+                                    Action::make('viewActivityIconModal')
+                                        ->modalHeading('Riwayat Activity Sekolah')
                                         ->modalSubmitAction(false)
                                         ->modalCancelActionLabel('Tutup')
                                         ->modalWidth('xl')
                                         ->extraModalFooterActions([
-                                            Infolists\Components\Actions\Action::make('openFullActivityPage')
+                                            Action::make('openFullActivityPage')
                                                 ->label('Buka Halaman Full Activity')
                                                 ->icon('heroicon-m-arrow-top-right-on-square')
                                                 ->url(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record]))
@@ -594,6 +595,7 @@ class Admin
                                         ->schema(fn ($record) => self::getActivityTimelineSchema($record))
                                 ),
                         ]),
+
                 ])->columns(2),
             Infolists\Components\Section::make('Salesforce')
                 ->description('Detail data dari Salesforce')
