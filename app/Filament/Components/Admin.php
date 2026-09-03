@@ -553,7 +553,7 @@ class Admin
                                                 ->url(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record]))
                                                 ->openUrlInNewTab(),
                                         ])
-                                        ->schema(fn ($record) => self::getActivityTimelineSchema($record))
+                                        ->infolist(fn (Infolists\Infolist $infolist, Model $record) => $infolist->schema(self::getActivityTimelineSchema($record)))
                                 )
                                 ->suffixAction(
                                     Action::make('openActivityClockModal')
@@ -571,7 +571,7 @@ class Admin
                                                 ->url(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record]))
                                                 ->openUrlInNewTab(),
                                         ])
-                                        ->schema(fn ($record) => self::getActivityTimelineSchema($record))
+                                        ->infolist(fn (Infolists\Infolist $infolist, Model $record) => $infolist->schema(self::getActivityTimelineSchema($record)))
                                 ),
                             Infolists\Components\IconEntry::make('latestStatusLog.status.order')
                                 ->label('')
@@ -592,7 +592,7 @@ class Admin
                                                 ->url(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record]))
                                                 ->openUrlInNewTab(),
                                         ])
-                                        ->schema(fn ($record) => self::getActivityTimelineSchema($record))
+                                        ->infolist(fn (Infolists\Infolist $infolist, Model $record) => $infolist->schema(self::getActivityTimelineSchema($record)))
                                 ),
                         ]),
 
