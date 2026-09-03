@@ -551,7 +551,7 @@ class Admin
                                                 ->url(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record]))
                                                 ->openUrlInNewTab(),
                                         ])
-                                        ->infolist(fn (Model $record) => self::getActivityTimelineSchema($record))
+                                        ->infolist(fn (Infolists\Infolist $infolist, Model $record) => $infolist->record($record)->schema(self::getActivityTimelineSchema($record)))
                                 ),
                             Infolists\Components\IconEntry::make('latestStatusLog.status.order')
                                 ->label('')
@@ -572,7 +572,7 @@ class Admin
                                                 ->url(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record]))
                                                 ->openUrlInNewTab(),
                                         ])
-                                        ->infolist(fn (Model $record) => self::getActivityTimelineSchema($record))
+                                        ->infolist(fn (Infolists\Infolist $infolist, Model $record) => $infolist->record($record)->schema(self::getActivityTimelineSchema($record)))
                                 ),
                         ]),
 
