@@ -443,7 +443,10 @@ class Admin
         ];
     }
 
-    public static function getActivityTimelineSchema(Model $record): array
+    /**
+     * @return array{activities: array<mixed>, colorByState: array<string, string>, iconByState: array<string, string>}
+     */
+    public static function getActivityTimelineData(Model $record): array
     {
         $logs = RegistrationStatus::query()
             ->where('registration_id', $record->id)
@@ -496,30 +499,38 @@ class Admin
             $iconByState['no-status'] = 'heroicon-m-clock';
         }
 
-        return [
-            Infolists\Components\Section::make()
-                ->state(['activities' => $activities])
-                ->schema([
-                    ActivitySection::make('activities')
-                        ->schema([
-                            ActivityTitle::make('title')
-                                ->placeholder('No title is set')
-                                ->allowHtml(),
+        return compact('activities', 'colorByState', 'iconByState');
+    }
 
-                            ActivityDescription::make('description')
-                                ->placeholder('No description is set')
-                                ->allowHtml(),
+    /**
+     * Build the activity timeline infolist for an action modal.
+     */
+    public static function buildActivityInfolist(Infolists\Infolist $infolist, Model $record): Infolists\Infolist
+    {
+        $data = self::getActivityTimelineData($record);
 
-                            ActivityDate::make('updated_at')
-                                ->placeholder('No date is set.'),
+        return $infolist
+            ->state(['activities' => $data['activities']])
+            ->schema([
+                ActivitySection::make('activities')
+                    ->schema([
+                        ActivityTitle::make('title')
+                            ->placeholder('No title is set')
+                            ->allowHtml(),
 
-                            ActivityIcon::make('status')
-                                ->icon(fn (?string $state) => $iconByState[$state] ?? 'heroicon-m-clock')
-                                ->animation(IconAnimation::Pulse)
-                                ->color(fn (?string $state) => $colorByState[$state] ?? 'gray'),
-                        ]),
-                ]),
-        ];
+                        ActivityDescription::make('description')
+                            ->placeholder('No description is set')
+                            ->allowHtml(),
+
+                        ActivityDate::make('updated_at')
+                            ->placeholder('No date is set.'),
+
+                        ActivityIcon::make('status')
+                            ->icon(fn (?string $state) => $data['iconByState'][$state] ?? 'heroicon-m-clock')
+                            ->animation(IconAnimation::Pulse)
+                            ->color(fn (?string $state) => $data['colorByState'][$state] ?? 'gray'),
+                    ]),
+            ]);
     }
 
     public static function columns(): array
@@ -551,7 +562,7 @@ class Admin
                                                 ->url(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record]))
                                                 ->openUrlInNewTab(),
                                         ])
-                                        ->infolist(fn (Infolists\Infolist $infolist, Model $record) => $infolist->record($record)->schema(self::getActivityTimelineSchema($record)))
+                                        ->infolist(fn (Infolists\Infolist $infolist, Model $record) => self::buildActivityInfolist($infolist, $record))
                                 ),
                             Infolists\Components\IconEntry::make('latestStatusLog.status.order')
                                 ->label('')
@@ -572,7 +583,7 @@ class Admin
                                                 ->url(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record]))
                                                 ->openUrlInNewTab(),
                                         ])
-                                        ->infolist(fn (Infolists\Infolist $infolist, Model $record) => $infolist->record($record)->schema(self::getActivityTimelineSchema($record)))
+                                        ->infolist(fn (Infolists\Infolist $infolist, Model $record) => self::buildActivityInfolist($infolist, $record))
                                 ),
                         ]),
 
