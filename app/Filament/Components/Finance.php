@@ -8,6 +8,7 @@ use App\Filament\Components\Support\StatusPalette;
 use App\Filament\Enum\Jenjang;
 use App\Filament\Enum\Periode;
 use App\Filament\Enum\Program;
+use App\Models\User;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Fieldset;
@@ -20,7 +21,6 @@ use Filament\Forms\Set;
 use Filament\Infolists;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Tables;
-use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -430,7 +430,7 @@ class Finance
                     Infolists\Components\Fieldset::make(
                         'Aktifitas Saat ini',
                     )->schema([
-                        Infolists\Components\TextEntry::make(
+                        TextEntry::make(
                             'status.name',
                         )->label(''),
                         Infolists\Components\IconEntry::make(
@@ -457,58 +457,58 @@ class Finance
                     ]),
 
                     Infolists\Components\Fieldset::make('Sekolah')->schema([
-                        Infolists\Components\TextEntry::make('schools')->label(
+                        TextEntry::make('schools')->label(
                             'Sekolah',
                         )->placeholder('Tidak Ada Sekolah'),
-                        Infolists\Components\TextEntry::make('class')->label(
+                        TextEntry::make('class')->label(
                             'Kelas',
                         )->placeholder('Tidak Ada Kelas'),
-                        Infolists\Components\TextEntry::make(
+                        TextEntry::make(
                             'education_level',
                         )->label('Jenjang')->placeholder('Tidak Ada Jenjang'),
-                        Infolists\Components\TextEntry::make(
+                        TextEntry::make(
                             'description',
                         )->label('Keterangan')->placeholder('Tidak Ada Keterangan'),
-                        Infolists\Components\TextEntry::make(
+                        TextEntry::make(
                             'schools_type',
                         )->label('Negeri / Swasta')->placeholder('Tidak Ada Negeri / Swasta'),
-                        Infolists\Components\TextEntry::make(
+                        TextEntry::make(
                             'student_count',
                         )->label('Jumlah Siswa')->placeholder('Tidak Ada Jumlah Siswa'),
-                        Infolists\Components\TextEntry::make(
+                        TextEntry::make(
                             'provinces',
                         )->label('Provinsi')->placeholder('Tidak Ada Provinsi'),
-                        Infolists\Components\TextEntry::make(
+                        TextEntry::make(
                             'regencies',
                         )->label('Kota / Kabupaten')->placeholder('Tidak Ada Kota / Kabupaten'),
-                        Infolists\Components\TextEntry::make('area')
+                        TextEntry::make('area')
                             ->label('Wilayah')
                             ->placeholder('Tidak Ada Wilayah'),
                     ]),
 
                     Infolists\Components\Fieldset::make('Bagan')->schema([
-                        Infolists\Components\TextEntry::make(
+                        TextEntry::make(
                             'principal',
                         )->label('Kepala Sekolah')->placeholder('Tidak Ada Kepala Sekolah'),
                         PhoneEntry::make('principal_phone')
                             ->label('No Hp Kepala Sekolah')
                             ->displayFormat(PhoneInputNumberType::NATIONAL)
                             ->placeholder('Tidak Ada No Hp Kepala Sekolah'),
-                        Infolists\Components\TextEntry::make(
+                        TextEntry::make(
                             'curriculum_deputies',
                         )->label('Wakakurikulum')->placeholder('Tidak Ada Wakakurikulum'),
                         PhoneEntry::make('curriculum_deputies_phone')
                             ->label('No Hp Wakakurikulum')
                             ->displayFormat(PhoneInputNumberType::NATIONAL)
                             ->placeholder('Tidak Ada No Hp Wakakurikulum'),
-                        Infolists\Components\TextEntry::make(
+                        TextEntry::make(
                             'counselor_coordinators',
                         )->label('Koordinator BK')->placeholder('Tidak Ada Koordinator BK'),
                         PhoneEntry::make('counselor_coordinators_phone')
                             ->label('No Hp Koordinator BK')
                             ->displayFormat(PhoneInputNumberType::NATIONAL)
                             ->placeholder('Tidak Ada No Hp Koordinator BK'),
-                        Infolists\Components\TextEntry::make('proctors')->label(
+                        TextEntry::make('proctors')->label(
                             'Proktor',
                         )->placeholder('Tidak Ada Proktor'),
                         PhoneEntry::make('proctors_phone')
@@ -531,28 +531,28 @@ class Finance
                 ->description('Detail Data Service')
                 ->schema([
                     Infolists\Components\Fieldset::make('')->schema([
-                        Infolists\Components\TextEntry::make('group')
+                        TextEntry::make('group')
                             ->label('Grup')
                             ->dateTime('l, jS F Y')
                             ->placeholder('Belum Terjadwal'),
-                        Infolists\Components\TextEntry::make('bimtek')
+                        TextEntry::make('bimtek')
                             ->label('Bimtek')
                             ->dateTime('l, jS F Y')
                             ->placeholder('Belum Terjadwal'),
                     ]),
 
                     Infolists\Components\Fieldset::make('')->schema([
-                        Infolists\Components\TextEntry::make(
+                        TextEntry::make(
                             'account_count_created',
                         )
                             ->label('Akun Dibuat')
                             ->placeholder('Belum Terbuat'),
-                        Infolists\Components\TextEntry::make(
+                        TextEntry::make(
                             'implementer_count',
                         )
                             ->label('Pelaksanaan')
                             ->placeholder('Belum terbuat'),
-                        Infolists\Components\TextEntry::make('difference')
+                        TextEntry::make('difference')
                             ->label('Selisih')
                             ->placeholder('Belum terbuat'),
                     ]),
@@ -624,13 +624,13 @@ class Finance
                         ->columns(3),
 
                     Infolists\Components\Fieldset::make('')->schema([
-                        Infolists\Components\TextEntry::make(
+                        TextEntry::make(
                             'counselor_consultation_date',
                         )
                             ->label('Konsul BK')
                             ->dateTime('l, jS F Y')
                             ->placeholder('Belum Terjadwal'),
-                        Infolists\Components\TextEntry::make(
+                        TextEntry::make(
                             'student_consultation_date',
                         )
                             ->label('Konsul Siswa')
@@ -891,7 +891,7 @@ class Finance
             Tables\Filters\SelectFilter::make('users_id')
                 ->label('User')
                 ->options(function () {
-                    return \App\Models\User::query()
+                    return User::query()
                         ->select(['id', 'name'])
                         ->orderBy('name')
                         ->pluck('name', 'id')

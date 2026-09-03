@@ -2,8 +2,10 @@
 
 namespace Tests\Unit;
 
-use App\Filament\Enum\Program;
 use App\Filament\Components\Support\SharedSchema;
+use App\Filament\Enum\Program;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Tables\Columns\Layout\Split;
 use Tests\TestCase;
 
@@ -57,8 +59,8 @@ class SharedSchemaAndProgramTest extends TestCase
      */
     public function test_shared_schema_get_difference(): void
     {
-        $get = $this->createMock(\Filament\Forms\Get::class);
-        $set = $this->createMock(\Filament\Forms\Set::class);
+        $get = $this->createMock(Get::class);
+        $set = $this->createMock(Set::class);
 
         $get->method('__invoke')
             ->willReturnMap([

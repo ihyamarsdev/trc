@@ -4,6 +4,7 @@ namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
 use App\Imports\UserImport;
+use EightyNine\ExcelImport\ExcelImportAction;
 use Filament\Actions;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Resources\Pages\ListRecords;
@@ -16,7 +17,7 @@ class ListUsers extends ListRecords
     {
         return [
             Actions\CreateAction::make(),
-            \EightyNine\ExcelImport\ExcelImportAction::make()
+            ExcelImportAction::make()
                 ->sampleExcel(
                     sampleData: [
                         ['name' => 'uya', 'email' => 'uya@gmail.com', 'roles' => 'admin'],

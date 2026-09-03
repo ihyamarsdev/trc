@@ -3,8 +3,10 @@
 namespace Tests\Feature;
 
 use App\Filament\User\Resources\TimelineResource;
+use App\Filament\User\Widgets\CalendarWidget;
 use App\Models\RegistrationData;
 use App\Models\Status;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,7 +17,7 @@ class TimelineResourceTest extends TestCase
     public function test_timeline_resource_excludes_red_status_records(): void
     {
         // Create user to satisfy users_id NOT NULL constraint
-        $user = \App\Models\User::create([
+        $user = User::create([
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => bcrypt('password'),
@@ -63,7 +65,7 @@ class TimelineResourceTest extends TestCase
 
     public function test_calendar_widget_excludes_red_status_records(): void
     {
-        $user = \App\Models\User::create([
+        $user = User::create([
             'name' => 'Test User',
             'email' => 'test_cal@example.com',
             'password' => bcrypt('password'),
@@ -101,7 +103,7 @@ class TimelineResourceTest extends TestCase
             'implementation_estimate' => now(),
         ]);
 
-        $widget = new \App\Filament\User\Widgets\CalendarWidget();
+        $widget = new CalendarWidget;
         $events = $widget->fetchEvents([
             'start' => now()->subDay()->toIso8601String(),
             'end' => now()->addDay()->toIso8601String(),

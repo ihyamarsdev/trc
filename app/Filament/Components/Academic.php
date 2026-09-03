@@ -8,6 +8,7 @@ use App\Filament\Components\Support\StatusPalette;
 use App\Filament\Enum\Jenjang;
 use App\Filament\Enum\Periode;
 use App\Filament\Enum\Program;
+use App\Models\User;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Radio;
@@ -18,7 +19,6 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Infolists;
 use Filament\Tables;
-use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -415,7 +415,7 @@ class Academic
             Tables\Filters\SelectFilter::make('users_id')
                 ->label('User')
                 ->options(function () {
-                    return \App\Models\User::query()
+                    return User::query()
                         ->select(['id', 'name'])
                         ->orderBy('name')
                         ->pluck('name', 'id')

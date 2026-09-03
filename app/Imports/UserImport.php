@@ -4,6 +4,7 @@ namespace App\Imports;
 
 use App\Models\User;
 use App\Notifications\NewAccount;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -12,7 +13,7 @@ use Spatie\Permission\Models\Role;
 class UserImport implements ToModel, WithHeadingRow
 {
     /**
-     * @return \Illuminate\Database\Eloquent\Model|null
+     * @return Model|null
      */
     public function model(array $row)
     {

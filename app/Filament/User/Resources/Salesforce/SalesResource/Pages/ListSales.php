@@ -9,6 +9,7 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -22,7 +23,7 @@ class ListSales extends ListRecords
             Actions\CreateAction::make()
                 ->label('Buat')
                 ->after(function ($record) {
-                    \Filament\Notifications\Notification::make()
+                    Notification::make()
                         ->title('Data berhasil dibuat')
                         ->success()
                         ->send();
@@ -56,7 +57,7 @@ class ListSales extends ListRecords
                         }
 
                         $errorMessage = $th->getMessage();
-                        if ($th instanceof \Illuminate\Database\QueryException) {
+                        if ($th instanceof QueryException) {
                             $errorMessage = 'Terjadi permasalahan terhadap struktur data atau database. Pastikan pengisian format Anda sudah tepat sesuai template.';
                         }
 

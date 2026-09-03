@@ -3,11 +3,12 @@
 namespace Database\Factories;
 
 use App\Models\RegistrationData;
+use App\Models\Status;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\RegistrationData>
+ * @extends Factory<RegistrationData>
  */
 class RegistrationDataFactory extends Factory
 {
@@ -63,7 +64,7 @@ class RegistrationDataFactory extends Factory
             'implementation_estimate' => $implementEst,
 
             'users_id' => null,
-            'status_id' => \App\Models\Status::inRandomOrder()->first()->id,
+            'status_id' => Status::inRandomOrder()->first()->id,
         ];
     }
 }

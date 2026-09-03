@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
-use Filament\Forms;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -112,11 +111,11 @@ class UserResource extends Resource
                                 ->send();
                         })
                         ->form([
-                            Forms\Components\TextInput::make('new_password')
+                            TextInput::make('new_password')
                                 ->label('Password Baru')
                                 ->password()
                                 ->required(),
-                            Forms\Components\TextInput::make('confirm_password')
+                            TextInput::make('confirm_password')
                                 ->label('Konfirmasi Password')
                                 ->password()
                                 ->required()

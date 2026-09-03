@@ -3,18 +3,22 @@
 namespace App\Imports;
 
 use App\Models\RegistrationData;
+use App\Models\RegistrationStatus;
+use App\Models\Status;
 use Carbon\Carbon;
 use Creasi\Nusa\Models\District;
 use Creasi\Nusa\Models\Province;
 use Creasi\Nusa\Models\Regency;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class SalesImport implements ToModel, WithHeadingRow
 {
     /**
-     * @return \Illuminate\Database\Eloquent\Model|null
+     * @return Model|null
      */
     public function model(array $row)
     {
@@ -64,8 +68,8 @@ class SalesImport implements ToModel, WithHeadingRow
         // Jika semua terisi, status order = 2. Jika tidak, order = 1.
         $targetOrder = $requiredFieldsFilled ? 2 : 1;
 
-        $statusRecord = \App\Models\Status::where('order', $targetOrder)->first()
-            ?? \App\Models\Status::first();
+        $statusRecord = Status::where('order', $targetOrder)->first()
+            ?? Status::first();
 
         $data = RegistrationData::updateOrCreate([
             'type' => $row['program'],
@@ -100,7 +104,7 @@ class SalesImport implements ToModel, WithHeadingRow
         ]);
 
         // Dapatkan Status Log terakhir untuk record ini
-        $latestStatus = \App\Models\RegistrationStatus::where('registration_id', $data->id)
+        $latestStatus = RegistrationStatus::where('registration_id', $data->id)
             ->latest('id')
             ->first();
 
@@ -108,7 +112,7 @@ class SalesImport implements ToModel, WithHeadingRow
         $computedStatusId = $statusRecord?->id ?? 1;
 
         if (! $latestStatus || $latestStatus->status_id != $computedStatusId) {
-            \App\Models\RegistrationStatus::create([
+            RegistrationStatus::create([
                 'registration_id' => $data->id,
                 'status_id' => $computedStatusId,
                 'user_id' => Auth::id(),
@@ -123,7 +127,7 @@ class SalesImport implements ToModel, WithHeadingRow
     {
         if ($dateString) {
             if (is_numeric($dateString)) {
-                return Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($dateString));
+                return Carbon::instance(Date::excelToDateTimeObject($dateString));
             } else {
                 $translatedDate = Carbon::translateTimeString($dateString, 'id', 'en');
 

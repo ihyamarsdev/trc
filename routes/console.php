@@ -8,4 +8,4 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote')->hourly();
 
-// Schedule::command('app:delete-avatars-unused')->everyMinute();
+Schedule::command('app:check-overdue-estimations')->dailyAt('00:00');

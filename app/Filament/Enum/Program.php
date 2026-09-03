@@ -58,6 +58,7 @@ enum Program: string
         }
 
         $fallback = self::tryFrom($default);
+
         return [
             'nameRegister' => $fallback ? $fallback->label() : strtoupper($default),
             'DescriptionRegister' => $fallback ? $fallback->description() : strtoupper($default),
@@ -70,6 +71,7 @@ enum Program: string
         foreach (self::cases() as $case) {
             $list[$case->value] = $case->label();
         }
+
         return $list;
     }
 }

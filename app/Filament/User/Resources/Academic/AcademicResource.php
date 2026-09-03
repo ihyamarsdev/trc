@@ -56,11 +56,15 @@ class AcademicResource extends Resource
             ->striped()
             ->paginated([50, 100, 200])
             ->modifyQueryUsing(
-                fn (Builder $query) => $query
-                    ->with(['latestStatusLog.status'])
-                    ->where('years', now('Asia/Jakarta')->format('Y'))
-                    ->whereRelation('status', fn ($q) => $q->whereBetween('order', [2, 10]))
-                    ->orderByDesc('updated_at')
+                function (Builder $query) {
+                    RegistrationData::updateOverdueYellowStatuses();
+
+                    return $query
+                        ->with(['latestStatusLog.status'])
+                        ->where('years', now('Asia/Jakarta')->format('Y'))
+                        ->whereRelation('status', fn ($q) => $q->whereBetween('order', [2, 10]))
+                        ->orderByDesc('updated_at');
+                }
             )
             ->columns(
                 Academic::columns()

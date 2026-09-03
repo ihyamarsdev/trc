@@ -3,14 +3,12 @@
 namespace App\Filament\Components;
 
 use App\Filament\Components\Support\HasProgramMetadata;
-use App\Filament\Components\Support\RegionalOptions;
 use App\Filament\Components\Support\SharedSchema;
 use App\Filament\Components\Support\StatusPalette;
 use App\Filament\Enum\Jenjang;
 use App\Filament\Enum\Periode;
 use App\Filament\Enum\Program;
 use App\Models\Status;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -20,9 +18,8 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Infolists;
 use Filament\Tables;
-use Filament\Tables\Columns\Layout\Split;
-use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 use Ysfkaya\FilamentPhoneInput\Infolists\PhoneEntry;
@@ -59,7 +56,7 @@ class SalesForce
                 ->schema([
                     DateTimePicker::make('date_register')
                         ->label(
-                            new \Illuminate\Support\HtmlString(
+                            new HtmlString(
                                 '<span style="color: #ef4444;">Tanggal Pendaftaran</span>',
                             ),
                         )
@@ -69,7 +66,7 @@ class SalesForce
                     ...SharedSchema::locationFields(),
                     TextInput::make('curriculum_deputies')
                         ->label(
-                            new \Illuminate\Support\HtmlString(
+                            new HtmlString(
                                 '<span style="color: #ef4444;">Wakakurikulum</span>',
                             ),
                         )
@@ -81,7 +78,7 @@ class SalesForce
                         ->live(),
                     PhoneInput::make('curriculum_deputies_phone')
                         ->label(
-                            new \Illuminate\Support\HtmlString(
+                            new HtmlString(
                                 '<span style="color: #ef4444;">No Handphone Wakakurikulum</span>',
                             ),
                         )
@@ -109,14 +106,14 @@ class SalesForce
                         ->defaultCountry('ID'),
                     TextInput::make('student_count')
                         ->label(
-                            new \Illuminate\Support\HtmlString(
+                            new HtmlString(
                                 '<span style="color: #ef4444;">Jumlah Siswa</span>',
                             ),
                         )
                         ->numeric(),
                     DateTimePicker::make('implementation_estimate')
                         ->label(
-                            new \Illuminate\Support\HtmlString(
+                            new HtmlString(
                                 '<span style="color: #ef4444;">Estimasi Pelaksanaan</span>',
                             ),
                         )
@@ -133,7 +130,7 @@ class SalesForce
                 ->schema([
                     TextInput::make('schools')
                         ->label(
-                            new \Illuminate\Support\HtmlString(
+                            new HtmlString(
                                 '<span style="color: #ef4444;">Nama Sekolah</span>',
                             ),
                         )
@@ -148,14 +145,14 @@ class SalesForce
                         ->label('Jenjang')
                         ->options(Jenjang::list())
                         ->native(false),
-                    select::make('description')
+                    Select::make('description')
                         ->label('Keterangan')
                         ->options([
                             'ABK' => 'ABK',
                             'NON-ABK' => 'NON ABK',
                         ])
                         ->native(false),
-                    select::make('schools_type')
+                    Select::make('schools_type')
                         ->label('Negeri / Swasta')
                         ->options([
                             'NEGERI' => 'NEGERI',
@@ -164,7 +161,7 @@ class SalesForce
                         ->native(false),
                     TextInput::make('principal')
                         ->label(
-                            new \Illuminate\Support\HtmlString(
+                            new HtmlString(
                                 '<span style="color: #ef4444;">Nama Kepala Sekolah</span>',
                             ),
                         )
@@ -176,7 +173,7 @@ class SalesForce
                         ->live(),
                     PhoneInput::make('principal_phone')
                         ->label(
-                            new \Illuminate\Support\HtmlString(
+                            new HtmlString(
                                 '<span style="color: #ef4444;">No Handphone Kepala Sekolah</span>',
                             ),
                         )

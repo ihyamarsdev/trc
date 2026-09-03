@@ -70,11 +70,15 @@ class SalesResource extends Resource
             ->paginated([50, 100, 200])
             ->recordAction('view')
             ->modifyQueryUsing(
-                fn (Builder $query) => $query
-                    ->with(['latestStatusLog.status'])
-                    ->where('years', now('Asia/Jakarta')->format('Y'))
-                    ->when(Auth::id(), fn (Builder $builder, int $userId) => $builder->where('users_id', $userId))
-                    ->orderBy('implementation_estimate', 'asc')
+                function (Builder $query) {
+                    RegistrationData::updateOverdueYellowStatuses();
+
+                    return $query
+                        ->with(['latestStatusLog.status'])
+                        ->where('years', now('Asia/Jakarta')->format('Y'))
+                        ->when(Auth::id(), fn (Builder $builder, int $userId) => $builder->where('users_id', $userId))
+                        ->orderBy('implementation_estimate', 'asc');
+                }
             )
             ->columns(SalesForce::columns())
             ->filters(SalesForce::filters())

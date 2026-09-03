@@ -1,15 +1,18 @@
 <?php
 
+use Filament\Forms\Form;
+use Filament\Infolists\Infolist;
+use Filament\Schemas\Schema;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
-if (! class_exists(\Filament\Forms\Form::class) && class_exists(\Filament\Schemas\Schema::class)) {
-    class_alias(\Filament\Schemas\Schema::class, \Filament\Forms\Form::class);
+if (! class_exists(Form::class) && class_exists(Schema::class)) {
+    class_alias(Schema::class, Form::class);
 }
 
-if (! class_exists(\Filament\Infolists\Infolist::class) && class_exists(\Filament\Schemas\Schema::class)) {
-    class_alias(\Filament\Schemas\Schema::class, \Filament\Infolists\Infolist::class);
+if (! class_exists(Infolist::class) && class_exists(Schema::class)) {
+    class_alias(Schema::class, Infolist::class);
 }
 
 return Application::configure(basePath: dirname(__DIR__))
