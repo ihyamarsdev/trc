@@ -8,7 +8,9 @@ use App\Filament\Components\Support\SharedSchema;
 use App\Filament\Components\Support\StatusPalette;
 use App\Filament\Enum\Periode;
 use App\Filament\Enum\Program;
+use App\Filament\User\Resources\Activity\ActivityResource;
 use App\Models\RegistrationData;
+use App\Models\RegistrationStatus;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
@@ -25,6 +27,11 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use JaOcero\ActivityTimeline\Components\ActivityDate;
+use JaOcero\ActivityTimeline\Components\ActivityDescription;
+use JaOcero\ActivityTimeline\Components\ActivityIcon;
+use JaOcero\ActivityTimeline\Components\ActivityTitle;
+use JaOcero\ActivityTimeline\Enums\IconAnimation;
 
 class Admin
 {
@@ -435,6 +442,96 @@ class Admin
         ];
     }
 
+    public static function getActivityTimelineSchema(Model $record): array
+    {
+        $logs = RegistrationStatus::query()
+            ->where('registration_id', $record->id)
+            ->join('statuses', 'registration_statuses.status_id', '=', 'statuses.id')
+            ->select('registration_statuses.*')
+            ->with(['status:id,name,description,color,icon,order', 'user:id,name'])
+            ->orderBy('registration_statuses.created_at')
+            ->orderBy('statuses.order')
+            ->orderBy('registration_statuses.id')
+            ->get();
+
+        $colorByState = [];
+        $iconByState = [];
+        $activities = [];
+
+        foreach ($logs as $log) {
+            $status = $log->status;
+
+            if (! $status) {
+                continue;
+            }
+
+            $state = 'status-'.$status->id;
+
+            $userName = $log->user?->name ? ' (oleh: '.e($log->user->name).')' : '';
+            $title = "Status: <span class='font-semibold'>".e($status->name).'</span>'.$userName;
+            $description = $status->description ? e($status->description) : '—';
+            $date = $log->created_at?->translatedFormat('l, d/m/Y H:i') ?? '-';
+
+            $activities[] = [
+                'title' => $title,
+                'description' => $description,
+                'status' => $state,
+                'updated_at' => $date,
+            ];
+
+            $colorByState[$state] = StatusPalette::color($status->order);
+            $iconByState[$state] = StatusPalette::icon($status->order);
+        }
+
+        if ($activities === []) {
+            $activities[] = [
+                'title' => 'Status: <span class="font-semibold">Belum ada riwayat</span>',
+                'description' => 'Belum ada log status untuk data ini.',
+                'status' => 'no-status',
+                'updated_at' => '-',
+            ];
+
+            $colorByState['no-status'] = 'gray';
+            $iconByState['no-status'] = 'heroicon-m-clock';
+        }
+
+        return [
+            Infolists\Components\Section::make()
+                ->state(['activities' => $activities])
+                ->schema([
+                    ActivitySection::make('activities')
+                        ->schema([
+                            ActivityTitle::make('title')
+                                ->placeholder('No title is set')
+                                ->allowHtml(),
+
+                            ActivityDescription::make('description')
+                                ->placeholder('No description is set')
+                                ->allowHtml(),
+
+                            ActivityDate::make('updated_at')
+                                ->placeholder('No date is set.'),
+
+                            ActivityIcon::make('status')
+                                ->icon(fn (?string $state) => $iconByState[$state] ?? 'heroicon-m-clock')
+                                ->animation(IconAnimation::Pulse)
+                                ->color(fn (?string $state) => $colorByState[$state] ?? 'gray'),
+                        ]),
+                ]),
+        ];
+    }
+
+    public static function getDifference(Get $get, Set $set): void
+    {
+        SharedSchema::getDifference($get, $set);
+    }
+
+    public static function formSchema(): array
+    {
+        return [
+        ];
+    }
+
     public static function columns(): array
     {
         return SharedSchema::columns();
@@ -449,13 +546,64 @@ class Admin
                     Infolists\Components\Fieldset::make('Aktifitas Saat ini')
                         ->schema([
                             TextEntry::make('status.name')
-                                ->label(''),
+                                ->label('Status (Klik untuk lihat riwayat)')
+                                ->color('primary')
+                                ->weight('bold')
+                                ->action(
+                                    Infolists\Components\Actions\Action::make('viewActivityModal')
+                                        ->label('Lihat Riwayat Activity')
+                                        ->modalTitle('Riwayat Activity Sekolah')
+                                        ->modalSubmitAction(false)
+                                        ->modalCancelActionLabel('Tutup')
+                                        ->modalWidth('xl')
+                                        ->extraModalFooterActions([
+                                            Infolists\Components\Actions\Action::make('openFullActivityPage')
+                                                ->label('Buka Halaman Full Activity')
+                                                ->icon('heroicon-m-arrow-top-right-on-square')
+                                                ->url(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record]))
+                                                ->openUrlInNewTab(),
+                                        ])
+                                        ->schema(fn ($record) => self::getActivityTimelineSchema($record))
+                                )
+                                ->suffixAction(
+                                    Infolists\Components\Actions\Action::make('openActivityClockModal')
+                                        ->icon('heroicon-m-clock')
+                                        ->color('primary')
+                                        ->tooltip('Klik untuk lihat detail riwayat activity')
+                                        ->modalTitle('Riwayat Activity Sekolah')
+                                        ->modalSubmitAction(false)
+                                        ->modalCancelActionLabel('Tutup')
+                                        ->modalWidth('xl')
+                                        ->extraModalFooterActions([
+                                            Infolists\Components\Actions\Action::make('openFullActivityPage')
+                                                ->label('Buka Halaman Full Activity')
+                                                ->icon('heroicon-m-arrow-top-right-on-square')
+                                                ->url(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record]))
+                                                ->openUrlInNewTab(),
+                                        ])
+                                        ->schema(fn ($record) => self::getActivityTimelineSchema($record))
+                                ),
                             Infolists\Components\IconEntry::make('latestStatusLog.status.order')
                                 ->label('')
                                 ->icon(fn ($state): string => StatusPalette::icon($state))
                                 ->color(fn ($state): string => StatusPalette::color($state))
                                 ->default('red')
-                                ->size('lg'),
+                                ->size('lg')
+                                ->action(
+                                    Infolists\Components\Actions\Action::make('viewActivityIconModal')
+                                        ->modalTitle('Riwayat Activity Sekolah')
+                                        ->modalSubmitAction(false)
+                                        ->modalCancelActionLabel('Tutup')
+                                        ->modalWidth('xl')
+                                        ->extraModalFooterActions([
+                                            Infolists\Components\Actions\Action::make('openFullActivityPage')
+                                                ->label('Buka Halaman Full Activity')
+                                                ->icon('heroicon-m-arrow-top-right-on-square')
+                                                ->url(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record]))
+                                                ->openUrlInNewTab(),
+                                        ])
+                                        ->schema(fn ($record) => self::getActivityTimelineSchema($record))
+                                ),
                         ]),
                 ])->columns(2),
             Infolists\Components\Section::make('Salesforce')
