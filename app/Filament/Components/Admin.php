@@ -12,7 +12,6 @@ use App\Filament\User\Resources\Activity\ActivityResource;
 use App\Models\RegistrationData;
 use App\Models\RegistrationStatus;
 use Carbon\Carbon;
-use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Fieldset;
@@ -23,6 +22,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Infolists;
+use Filament\Infolists\Components\Actions\Action;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -553,7 +553,7 @@ class Admin
                                                 ->url(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record]))
                                                 ->openUrlInNewTab(),
                                         ])
-                                        ->infolist(fn (Infolists\Infolist $infolist, Model $record) => $infolist->schema(self::getActivityTimelineSchema($record)))
+                                        ->infolist(fn (Model $record) => self::getActivityTimelineSchema($record))
                                 )
                                 ->suffixAction(
                                     Action::make('openActivityClockModal')
@@ -571,7 +571,7 @@ class Admin
                                                 ->url(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record]))
                                                 ->openUrlInNewTab(),
                                         ])
-                                        ->infolist(fn (Infolists\Infolist $infolist, Model $record) => $infolist->schema(self::getActivityTimelineSchema($record)))
+                                        ->infolist(fn (Model $record) => self::getActivityTimelineSchema($record))
                                 ),
                             Infolists\Components\IconEntry::make('latestStatusLog.status.order')
                                 ->label('')
@@ -592,7 +592,7 @@ class Admin
                                                 ->url(fn ($record) => ActivityResource::getUrl('activities', ['record' => $record]))
                                                 ->openUrlInNewTab(),
                                         ])
-                                        ->infolist(fn (Infolists\Infolist $infolist, Model $record) => $infolist->schema(self::getActivityTimelineSchema($record)))
+                                        ->infolist(fn (Model $record) => self::getActivityTimelineSchema($record))
                                 ),
                         ]),
 
