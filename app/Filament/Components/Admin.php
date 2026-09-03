@@ -521,17 +521,6 @@ class Admin
         ];
     }
 
-    public static function getDifference(Get $get, Set $set): void
-    {
-        SharedSchema::getDifference($get, $set);
-    }
-
-    public static function formSchema(): array
-    {
-        return [
-        ];
-    }
-
     public static function columns(): array
     {
         return SharedSchema::columns();
