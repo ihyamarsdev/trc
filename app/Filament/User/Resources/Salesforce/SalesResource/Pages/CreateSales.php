@@ -16,6 +16,13 @@ class CreateSales extends CreateRecord
 {
     protected static string $resource = SalesResource::class;
 
+    protected function getHeaderActions(): array
+    {
+        return [
+            $this->getCreateFormAction(),
+        ];
+    }
+
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

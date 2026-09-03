@@ -12,6 +12,13 @@ class CreateUser extends CreateRecord
 {
     protected static string $resource = UserResource::class;
 
+    protected function getHeaderActions(): array
+    {
+        return [
+            $this->getCreateFormAction(),
+        ];
+    }
+
     protected string $password;
 
     protected function getRedirectUrl(): string

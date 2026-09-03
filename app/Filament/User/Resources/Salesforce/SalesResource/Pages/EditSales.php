@@ -18,7 +18,10 @@ class EditSales extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        return [Actions\DeleteAction::make()];
+        return [
+            $this->getSaveFormAction(),
+            Actions\DeleteAction::make(),
+        ];
     }
 
     protected function getSaveFormAction(): Actions\Action

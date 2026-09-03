@@ -8,4 +8,11 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateFinance extends CreateRecord
 {
     protected static string $resource = FinanceResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            $this->getCreateFormAction(),
+        ];
+    }
 }

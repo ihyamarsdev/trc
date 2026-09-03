@@ -13,6 +13,7 @@ class EditRole extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            $this->getSaveFormAction(),
             Actions\DeleteAction::make(),
         ];
     }

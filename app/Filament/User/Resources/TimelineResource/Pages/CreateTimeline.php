@@ -8,4 +8,11 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateTimeline extends CreateRecord
 {
     protected static string $resource = TimelineResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            $this->getCreateFormAction(),
+        ];
+    }
 }

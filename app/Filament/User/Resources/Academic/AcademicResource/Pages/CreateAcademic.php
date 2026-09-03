@@ -8,4 +8,11 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateAcademic extends CreateRecord
 {
     protected static string $resource = AcademicResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            $this->getCreateFormAction(),
+        ];
+    }
 }

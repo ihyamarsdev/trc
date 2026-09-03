@@ -17,6 +17,7 @@ class EditFinance extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            $this->getSaveFormAction(),
             Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
         ];

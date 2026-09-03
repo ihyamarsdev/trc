@@ -13,6 +13,7 @@ class EditActivity extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            $this->getSaveFormAction(),
             Actions\DeleteAction::make(),
         ];
     }
