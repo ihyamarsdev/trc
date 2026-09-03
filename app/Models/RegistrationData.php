@@ -108,11 +108,9 @@ class RegistrationData extends Model
     {
         static::saving(function (RegistrationData $record) {
             if ($record->implementation_estimate && $record->implementation_estimate < now()) {
-                $yellowStatusIds = Status::query()->where('color', 'yellow')->pluck('id')->toArray();
-                $isYellow = in_array((int) $record->status_id, $yellowStatusIds, true)
-                    || strtolower((string) $record->status_color) === 'yellow';
+                $latestColor = $record->latestStatusLog?->status?->color ?? $record->status?->color ?? $record->status_color;
 
-                if ($isYellow) {
+                if (strtolower((string) $latestColor) === 'yellow') {
                     $redStatus = Status::query()->where('color', 'red')->orderBy('order')->first()
                         ?? Status::query()->where('order', 1)->first();
 
@@ -120,34 +118,6 @@ class RegistrationData extends Model
                         $record->status_id = $redStatus->id;
                         $record->status_color = $redStatus->color;
                     }
-                }
-            }
-        });
-
-        static::saved(function (RegistrationData $record) {
-            $redStatus = Status::query()->where('color', 'red')->orderBy('order')->first()
-                ?? Status::query()->where('order', 1)->first();
-
-            if ($redStatus && (int) $record->status_id === (int) $redStatus->id) {
-                $yellowStatusIds = Status::query()->where('color', 'yellow')->pluck('id')->toArray();
-                if (! empty($yellowStatusIds)) {
-                    RegistrationStatus::query()
-                        ->where('registration_id', $record->id)
-                        ->whereIn('status_id', $yellowStatusIds)
-                        ->delete();
-                }
-
-                $lastLog = RegistrationStatus::query()
-                    ->where('registration_id', $record->id)
-                    ->latest('id')
-                    ->first();
-
-                if (! $lastLog || (int) $lastLog->status_id !== (int) $redStatus->id) {
-                    RegistrationStatus::create([
-                        'registration_id' => $record->id,
-                        'status_id' => $redStatus->id,
-                        'user_id' => $record->users_id,
-                    ]);
                 }
             }
         });
@@ -169,20 +139,51 @@ class RegistrationData extends Model
         }
 
         $overdueRecords = static::query()
-            ->where(function ($query) use ($yellowStatusIds) {
-                $query->whereIn('status_id', $yellowStatusIds)
-                    ->orWhere('status_color', 'yellow');
-            })
             ->whereNotNull('implementation_estimate')
             ->where('implementation_estimate', '<', now())
+            ->where(function ($query) use ($yellowStatusIds) {
+                $query->whereHas('latestStatusLog.status', function ($q) {
+                    $q->where('color', 'yellow');
+                })
+                    ->orWhere(function ($q) use ($yellowStatusIds) {
+                        $q->whereIn('status_id', $yellowStatusIds)
+                            ->whereDoesntHave('latestStatusLog.status', function ($sub) {
+                                $sub->where('color', '!=', 'yellow');
+                            });
+                    });
+            })
             ->get();
 
         $updatedCount = 0;
 
         foreach ($overdueRecords as $record) {
+            $latestColor = $record->latestStatusLog?->status?->color ?? $record->status?->color ?? $record->status_color;
+
+            if (strtolower((string) $latestColor) !== 'yellow') {
+                continue;
+            }
+
             $record->status_id = $redStatus->id;
             $record->status_color = $redStatus->color;
-            $record->save();
+            $record->saveQuietly();
+
+            RegistrationStatus::query()
+                ->where('registration_id', $record->id)
+                ->whereIn('status_id', $yellowStatusIds)
+                ->delete();
+
+            $lastLog = RegistrationStatus::query()
+                ->where('registration_id', $record->id)
+                ->latest('id')
+                ->first();
+
+            if (! $lastLog || (int) $lastLog->status_id !== (int) $redStatus->id) {
+                RegistrationStatus::create([
+                    'registration_id' => $record->id,
+                    'status_id' => $redStatus->id,
+                    'user_id' => $record->users_id,
+                ]);
+            }
 
             $updatedCount++;
         }

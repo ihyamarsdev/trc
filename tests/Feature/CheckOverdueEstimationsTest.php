@@ -154,4 +154,52 @@ class CheckOverdueEstimationsTest extends TestCase
         $this->assertEquals($redStatus->id, $record->status_id);
         $this->assertEquals('red', $record->status_color);
     }
+
+    public function test_green_status_does_not_revert_to_red_even_if_past_estimate(): void
+    {
+        $user = User::create([
+            'name' => 'Test User 4',
+            'email' => 'test_green@example.com',
+            'password' => bcrypt('password'),
+        ]);
+
+        Status::create([
+            'id' => 28,
+            'name' => 'Aktifitas Marketing',
+            'description' => 'Marketing',
+            'color' => 'red',
+            'order' => 1,
+            'category' => 'sales',
+        ]);
+
+        $greenStatus = Status::create([
+            'id' => 38,
+            'name' => 'Invoice',
+            'description' => 'Tagihan',
+            'color' => 'green',
+            'order' => 11,
+            'category' => 'finance',
+        ]);
+
+        $greenRecord = RegistrationData::factory()->create([
+            'users_id' => $user->id,
+            'status_id' => $greenStatus->id,
+            'status_color' => 'green',
+            'implementation_estimate' => now()->subDays(10),
+        ]);
+
+        RegistrationStatus::create([
+            'registration_id' => $greenRecord->id,
+            'status_id' => $greenStatus->id,
+            'user_id' => $user->id,
+        ]);
+
+        RegistrationData::updateOverdueYellowStatuses();
+
+        $greenRecord->refresh();
+
+        $this->assertEquals($greenStatus->id, $greenRecord->status_id);
+        $this->assertEquals('green', $greenRecord->status_color);
+        $this->assertEquals('green', $greenRecord->latestStatusLog->status->color);
+    }
 }
