@@ -226,11 +226,22 @@
                                                                 const label = context.label || '';
                                                                 const value = context.parsed || 0;
                                                                 const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                                                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
+                                                                let percentage = '0%';
+                                                                if (total > 0 && value > 0) {
+                                                                    const raw = (value / total) * 100;
+                                                                    const round2 = Number(raw.toFixed(2));
+                                                                    if (round2 >= 0.1) {
+                                                                        percentage = raw.toFixed(1) + '%';
+                                                                    } else if (round2 >= 0.01) {
+                                                                        percentage = round2.toFixed(2) + '%';
+                                                                    } else {
+                                                                        percentage = '<0.01%';
+                                                                    }
+                                                                }
                                                                 return [
                                                                     label,
                                                                     '👥 ' + value.toLocaleString('id-ID') + ' siswa',
-                                                                    '📊 ' + percentage + '% dari total'
+                                                                    '📊 ' + percentage + ' dari total'
                                                                 ];
                                                             }
                                                         }
@@ -262,7 +273,7 @@
                                         <span class="w-3 h-3 rounded-full flex-shrink-0 shadow-sm status-dot" style="background-color: {{ $detail['color_dark'] }}; box-shadow: 0 0 8px {{ $detail['color_dark'] }}66;"></span>
                                         <div class="min-w-0 flex-1">
                                             <p class="text-xs font-semibold truncate text-gray-900 dark:text-[#f0f9ff]">{{ $detail['label'] }}</p>
-                                            <p class="text-xs text-gray-600 dark:text-white">{{ $detail['percentage'] }}%</p>
+                                            <p class="text-xs text-gray-600 dark:text-white">{{ $detail['percentage_formatted'] ?? ($detail['percentage'] . '%') }}</p>
                                         </div>
                                     </div>
                                 @endif
@@ -329,9 +340,9 @@
                                         <td class="py-3 px-4">
                                             <div class="flex items-center gap-2">
                                                 <div class="flex-1 h-2 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 min-width: 60px;">
-                                                    <div class="h-full rounded-full transition-all duration-500" style="width: {{ $detail['percentage'] }}%; background-color: {{ $detail['color_dark'] }};"></div>
+                                                    <div class="h-full rounded-full transition-all duration-500" style="width: {{ $detail['student_count'] > 0 ? max($detail['percentage'], 1.5) : 0 }}%; background-color: {{ $detail['color_dark'] }};"></div>
                                                 </div>
-                                                <span class="text-xs font-bold w-12 text-right !text-black dark:!text-white">{{ $detail['percentage'] }}%</span>
+                                                <span class="text-xs font-bold w-14 text-right !text-black dark:!text-white">{{ $detail['percentage_formatted'] ?? ($detail['percentage'] . '%') }}</span>
                                             </div>
                                         </td>
                                     </tr>

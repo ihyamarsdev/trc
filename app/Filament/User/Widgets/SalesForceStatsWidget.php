@@ -198,9 +198,24 @@ class SalesForceStatsWidget extends Widget implements HasForms
             // Use dark color for chart (works well in both modes)
             $backgroundColors[] = $colorInfo['dark'];
 
-            $percentage = $totalStudents > 0
-                ? round(($studentCount / $totalStudents) * 100, 1)
+            $rawPercentage = $totalStudents > 0
+                ? ($studentCount / $totalStudents) * 100
                 : 0;
+
+            $percentage = round($rawPercentage, 2);
+
+            if ($totalStudents === 0 || $studentCount === 0) {
+                $percentageFormatted = '0%';
+            } else {
+                $round2 = round($rawPercentage, 2);
+                if ($round2 >= 0.1) {
+                    $percentageFormatted = number_format($rawPercentage, 1).'%';
+                } elseif ($round2 >= 0.01) {
+                    $percentageFormatted = number_format($rawPercentage, 2).'%';
+                } else {
+                    $percentageFormatted = '<0.01%';
+                }
+            }
 
             $avgPerSchool = $schoolCount > 0
                 ? round($studentCount / $schoolCount, 1)
@@ -211,6 +226,7 @@ class SalesForceStatsWidget extends Widget implements HasForms
                 'school_count' => $schoolCount,
                 'student_count' => $studentCount,
                 'percentage' => $percentage,
+                'percentage_formatted' => $percentageFormatted,
                 'avg_students_per_school' => $avgPerSchool,
                 'color' => $colorInfo['dark'],
                 'color_light' => $colorInfo['light'],

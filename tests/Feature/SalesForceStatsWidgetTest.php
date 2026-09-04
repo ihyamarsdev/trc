@@ -64,6 +64,7 @@ class SalesForceStatsWidgetTest extends TestCase
         $this->assertEquals(0, $pasjDetail['student_count']);
         $this->assertEquals(0, $pasjDetail['school_count']);
         $this->assertEquals(0, $pasjDetail['percentage']);
+        $this->assertEquals('0%', $pasjDetail['percentage_formatted']);
     }
 
     public function test_widget_calculates_percentages_dynamically_when_records_exist(): void
@@ -93,10 +94,39 @@ class SalesForceStatsWidgetTest extends TestCase
         $anbkDetail = collect($data['details'])->firstWhere('program_type', 'anbk');
         $this->assertEquals(100, $anbkDetail['student_count']);
         $this->assertEquals(25.0, $anbkDetail['percentage']);
+        $this->assertEquals('25.0%', $anbkDetail['percentage_formatted']);
 
         $pasjDetail = collect($data['details'])->firstWhere('program_type', 'pasj');
         $this->assertEquals(300, $pasjDetail['student_count']);
         $this->assertEquals(75.0, $pasjDetail['percentage']);
+        $this->assertEquals('75.0%', $pasjDetail['percentage_formatted']);
+    }
+
+    public function test_widget_formats_small_percentages_with_precision(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        RegistrationData::factory()->create([
+            'users_id' => $this->adminUser->id,
+            'status_id' => $this->status->id,
+            'type' => 'apps',
+            'student_count' => 353390,
+        ]);
+
+        RegistrationData::factory()->create([
+            'users_id' => $this->adminUser->id,
+            'status_id' => $this->status->id,
+            'type' => 'pasj',
+            'student_count' => 32,
+        ]);
+
+        $widget = new SalesForceStatsWidget;
+        $data = $widget->getChartData();
+
+        $pasjDetail = collect($data['details'])->firstWhere('program_type', 'pasj');
+        $this->assertNotNull($pasjDetail);
+        $this->assertEquals(32, $pasjDetail['student_count']);
+        $this->assertEquals('0.01%', $pasjDetail['percentage_formatted']);
     }
 
     public function test_widget_handles_case_insensitivity_and_whitespace_for_program_type(): void
