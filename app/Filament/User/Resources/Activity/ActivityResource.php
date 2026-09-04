@@ -55,7 +55,7 @@ class ActivityResource extends Resource
             ->striped()
             ->modifyQueryUsing(
                 fn (Builder $query) => $query
-                    ->with(['latestStatusLog.status'])
+                    ->with(['latestStatusLog.status', 'status'])
                     ->orderByDesc('updated_at')
                     ->when(
                         Auth::user()?->hasRole('sales') && ! Auth::user()?->hasRole('admin'),

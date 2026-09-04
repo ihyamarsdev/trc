@@ -74,7 +74,7 @@ class SalesResource extends Resource
                     RegistrationData::updateOverdueYellowStatuses();
 
                     return $query
-                        ->with(['latestStatusLog.status'])
+                        ->with(['latestStatusLog.status', 'status'])
                         ->where('years', now('Asia/Jakarta')->format('Y'))
                         ->when(Auth::id(), fn (Builder $builder, int $userId) => $builder->where('users_id', $userId))
                         ->orderBy('implementation_estimate', 'asc');

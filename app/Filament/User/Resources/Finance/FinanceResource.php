@@ -57,7 +57,7 @@ class FinanceResource extends Resource
             ->paginated([50, 100, 200])
             ->modifyQueryUsing(
                 fn (Builder $query) => $query
-                    ->with(['latestStatusLog.status'])
+                    ->with(['latestStatusLog.status', 'status'])
                     ->where('years', now('Asia/Jakarta')->format('Y'))
                     ->whereRelation('status', 'order', '>=', 7)
                     ->orderByDesc('updated_at')

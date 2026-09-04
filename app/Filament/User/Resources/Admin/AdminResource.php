@@ -58,7 +58,7 @@ class AdminResource extends Resource
             ->extremePaginationLinks()
             ->modifyQueryUsing(
                 fn (Builder $query) => $query
-                    ->with(['latestStatusLog.status'])
+                    ->with(['latestStatusLog.status', 'status'])
                     ->orderByDesc('updated_at')
             )
             ->columns(Admin::columns())

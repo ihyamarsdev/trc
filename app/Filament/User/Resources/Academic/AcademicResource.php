@@ -60,7 +60,7 @@ class AcademicResource extends Resource
                     RegistrationData::updateOverdueYellowStatuses();
 
                     return $query
-                        ->with(['latestStatusLog.status'])
+                        ->with(['latestStatusLog.status', 'status'])
                         ->where('years', now('Asia/Jakarta')->format('Y'))
                         ->whereRelation('status', fn ($q) => $q->whereBetween('order', [2, 10]))
                         ->orderByDesc('updated_at');

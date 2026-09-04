@@ -45,18 +45,18 @@ class SharedSchema
                     ->label('Tahun')
                     ->description('Tahun', position: 'above'),
 
-                TextColumn::make('latestStatusLog.status.color')
+                TextColumn::make('latestStatusLog.status.name')
                     ->label('Status')
                     ->description('Status', position: 'above')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => ucfirst($state))
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn ($record): string => match (strtolower((string) ($record?->latestStatusLog?->status?->color ?? $record?->status?->color ?? 'gray'))) {
                         'green' => 'green',
                         'blue' => 'blue',
                         'yellow' => 'yellow',
                         'red' => 'red',
+                        default => 'gray',
                     })
-                    ->default('red'),
+                    ->default(fn ($record): string => $record?->status?->name ?? '-'),
             ])->from('md'),
         ];
     }

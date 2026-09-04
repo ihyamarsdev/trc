@@ -52,6 +52,12 @@ class SharedSchemaAndProgramTest extends TestCase
         $this->assertIsArray($columns);
         $this->assertCount(1, $columns);
         $this->assertInstanceOf(Split::class, $columns[0]);
+
+        $splitColumns = $columns[0]->getComponents();
+        $columnNames = array_map(fn ($col) => $col->getName(), $splitColumns);
+
+        $this->assertContains('latestStatusLog.status.name', $columnNames);
+        $this->assertNotContains('latestStatusLog.status.color', $columnNames);
     }
 
     /**
