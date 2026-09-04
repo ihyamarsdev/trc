@@ -86,62 +86,99 @@ class SalesForceStatsWidget extends Widget implements HasForms
                 return $query->where('years', $this->years);
             });
 
-        $data = $query->selectRaw('type, COUNT(schools) as school_count, SUM(student_count) as total_students')
-            ->groupBy('type')
+        // Initialize with all programs defined in Program enum
+        $programs = [];
+        foreach (Program::cases() as $case) {
+            $programs[$case->value] = [
+                'type' => $case->value,
+                'label' => $case->label(),
+                'school_count' => 0,
+                'student_count' => 0,
+            ];
+        }
+
+        // Aggregate registration data grouped by normalized type
+        $records = $query->selectRaw('LOWER(TRIM(type)) as normalized_type, COUNT(*) as school_count, COALESCE(SUM(student_count), 0) as total_students')
+            ->whereNotNull('type')
+            ->where('type', '!=', '')
+            ->groupByRaw('LOWER(TRIM(type))')
             ->get();
 
-        // Status colors matching SalesLeaderboard pattern
+        foreach ($records as $record) {
+            $typeKey = strtolower(trim((string) $record->normalized_type));
+            if ($typeKey === '') {
+                continue;
+            }
+
+            if (! isset($programs[$typeKey])) {
+                $enumProgram = Program::tryFrom($typeKey);
+                $programs[$typeKey] = [
+                    'type' => $typeKey,
+                    'label' => $enumProgram?->label() ?? strtoupper($typeKey),
+                    'school_count' => 0,
+                    'student_count' => 0,
+                ];
+            }
+
+            $programs[$typeKey]['school_count'] = (int) $record->school_count;
+            $programs[$typeKey]['student_count'] = (int) $record->total_students;
+        }
+
+        $totalStudents = array_sum(array_column($programs, 'student_count'));
+        $totalSchools = array_sum(array_column($programs, 'school_count'));
+
+        // Status colors matching SalesLeaderboard pattern and vibrant accents
         // Using CSS variables for light/dark mode support
         $statusColors = [
             [
-                'light' => '#cc0000', // Red (darker for light mode)
-                'dark' => '#ff6b6b',  // Red (lighter for dark mode)
+                'light' => '#cc0000', // Red
+                'dark' => '#ff6b6b',
                 'name' => 'red',
             ],
             [
-                'light' => '#cc9900', // Yellow (darker for light mode)
-                'dark' => '#ffd93d',  // Yellow (lighter for dark mode)
+                'light' => '#cc9900', // Yellow
+                'dark' => '#ffd93d',
                 'name' => 'yellow',
             ],
             [
-                'light' => '#000099', // Blue (darker for light mode)
-                'dark' => '#6bb3ff',  // Blue (lighter for dark mode)
+                'light' => '#000099', // Blue
+                'dark' => '#6bb3ff',
                 'name' => 'blue',
             ],
             [
-                'light' => '#004400', // Green (darker for light mode)
-                'dark' => '#6bff6b',  // Green (lighter for dark mode)
+                'light' => '#004400', // Green
+                'dark' => '#6bff6b',
                 'name' => 'green',
             ],
             [
-                'light' => '#990000', // Dark Red
-                'dark' => '#ff8888',  // Light Red
-                'name' => 'dark-red',
+                'light' => '#7c3aed', // Purple
+                'dark' => '#a78bfa',
+                'name' => 'purple',
             ],
             [
-                'light' => '#996600', // Dark Yellow
-                'dark' => '#ffe066',  // Light Yellow
-                'name' => 'dark-yellow',
+                'light' => '#0891b2', // Cyan
+                'dark' => '#38bdf8',
+                'name' => 'cyan',
             ],
             [
-                'light' => '#000066', // Dark Blue
-                'dark' => '#5599ff',  // Light Blue
-                'name' => 'dark-blue',
+                'light' => '#ea580c', // Orange
+                'dark' => '#fb923c',
+                'name' => 'orange',
             ],
             [
-                'light' => '#003300', // Dark Green
-                'dark' => '#55ff55',  // Light Green
-                'name' => 'dark-green',
+                'light' => '#db2777', // Pink
+                'dark' => '#f472b6',
+                'name' => 'pink',
             ],
             [
-                'light' => '#660000', // Very Dark Red
-                'dark' => '#ffaaaa',  // Very Light Red
-                'name' => 'very-dark-red',
+                'light' => '#059669', // Emerald
+                'dark' => '#34d399',
+                'name' => 'emerald',
             ],
             [
-                'light' => '#664400', // Very Dark Yellow
-                'dark' => '#ffdd88',  // Very Light Yellow
-                'name' => 'very-dark-yellow',
+                'light' => '#4f46e5', // Indigo
+                'dark' => '#818cf8',
+                'name' => 'indigo',
             ],
         ];
 
@@ -149,44 +186,40 @@ class SalesForceStatsWidget extends Widget implements HasForms
         $labels = [];
         $backgroundColors = [];
         $details = [];
-        $totalStudents = 0;
-        $totalSchools = 0;
 
-        foreach ($data as $index => $item) {
-            $studentCount = (int) $item->total_students;
-            $schoolCount = (int) $item->school_count;
+        $index = 0;
+        foreach ($programs as $item) {
+            $studentCount = $item['student_count'];
+            $schoolCount = $item['school_count'];
             $colorInfo = $statusColors[$index % count($statusColors)];
 
-            $programLabel = Program::tryFrom($item->type)?->label() ?? strtoupper($item->type);
-
-            $labels[] = $programLabel;
+            $labels[] = $item['label'];
             $chartData[] = $studentCount;
             // Use dark color for chart (works well in both modes)
             $backgroundColors[] = $colorInfo['dark'];
 
-            $totalStudents += $studentCount;
-            $totalSchools += $schoolCount;
+            $percentage = $totalStudents > 0
+                ? round(($studentCount / $totalStudents) * 100, 1)
+                : 0;
+
+            $avgPerSchool = $schoolCount > 0
+                ? round($studentCount / $schoolCount, 1)
+                : 0;
 
             $details[] = [
-                'label' => $programLabel,
+                'label' => $item['label'],
                 'school_count' => $schoolCount,
                 'student_count' => $studentCount,
+                'percentage' => $percentage,
+                'avg_students_per_school' => $avgPerSchool,
                 'color' => $colorInfo['dark'],
                 'color_light' => $colorInfo['light'],
                 'color_dark' => $colorInfo['dark'],
                 'color_name' => $colorInfo['name'],
-                'program_type' => $item->type,
+                'program_type' => $item['type'],
             ];
-        }
 
-        // Calculate percentages for each program
-        foreach ($details as &$detail) {
-            $detail['percentage'] = $totalStudents > 0
-                ? round(($detail['student_count'] / $totalStudents) * 100, 1)
-                : 0;
-            $detail['avg_students_per_school'] = $detail['school_count'] > 0
-                ? round($detail['student_count'] / $detail['school_count'], 1)
-                : 0;
+            $index++;
         }
 
         return [
@@ -203,7 +236,7 @@ class SalesForceStatsWidget extends Widget implements HasForms
             ],
             'details' => $details,
             'totals' => [
-                'programs' => count($data),
+                'programs' => count($programs),
                 'schools' => $totalSchools,
                 'students' => $totalStudents,
                 'avg_students_per_school' => $totalSchools > 0 ? round($totalStudents / $totalSchools, 1) : 0,

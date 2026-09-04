@@ -161,7 +161,7 @@
             <div class="w-full lg:w-5/12">
                 <div class="relative flex flex-col items-center justify-center p-6 rounded-2xl transition-all duration-300 bg-gray-50 dark:bg-gradient-to-br dark:from-[#000a0e] dark:to-[#00141a] border border-gray-200 dark:border-[#0096d2]/20 shadow-xl dark:shadow-2xl dark:shadow-black">
 
-                    @if(count($chartData['labels']) > 0)
+                    @if(count($chartData['labels']) > 0 && $totalStudents > 0)
                         {{-- Chart Container --}}
                         <div class="relative" style="width: 280px; height: 280px;">
                             <div wire:ignore>
@@ -226,7 +226,7 @@
                                                                 const label = context.label || '';
                                                                 const value = context.parsed || 0;
                                                                 const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                                                const percentage = ((value / total) * 100).toFixed(1);
+                                                                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
                                                                 return [
                                                                     label,
                                                                     '👥 ' + value.toLocaleString('id-ID') + ' siswa',
@@ -361,7 +361,7 @@
                                             </span>
                                         </td>
                                         <td class="py-3 px-4">
-                                            <span class="text-xs font-bold text-gray-600 dark:text-[#b4d81a]">100%</span>
+                                            <span class="text-xs font-bold text-gray-600 dark:text-[#b4d81a]">{{ $totalStudents > 0 ? '100%' : '0%' }}</span>
                                         </td>
                                     </tr>
                                 </tfoot>
