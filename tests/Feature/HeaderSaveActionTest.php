@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Filament\User\Resources\Academic\AcademicResource\Pages\EditAcademic;
 use App\Filament\User\Resources\Admin\AdminResource\Pages\CreateAdmin;
 use App\Filament\User\Resources\Admin\AdminResource\Pages\EditAdmin;
+use App\Filament\User\Resources\Salesforce\SalesResource\Pages\CreateSales;
 use App\Filament\User\Resources\Salesforce\SalesResource\Pages\EditSales;
 use App\Models\RegistrationData;
 use App\Models\Status;
@@ -192,6 +193,45 @@ class HeaderSaveActionTest extends TestCase
         $this->assertDatabaseHas(RegistrationData::class, [
             'id' => $record->id,
             'status_id' => $newStatus->id,
+        ]);
+    }
+
+    public function test_header_create_action_works_with_confirmation_on_create_sales(): void
+    {
+        Filament::setCurrentPanel(Filament::getPanel('user'));
+
+        Role::create(['name' => 'sales']);
+
+        $user = User::create([
+            'name' => 'Sales User 2',
+            'email' => 'sales2@example.com',
+            'password' => bcrypt('password'),
+        ]);
+        $user->assignRole('sales');
+
+        $this->actingAs($user);
+
+        $status = Status::create([
+            'id' => 28,
+            'name' => 'Status 1',
+            'description' => 'Desc 1',
+            'color' => 'red',
+            'order' => 1,
+            'category' => 'sales',
+        ]);
+
+        Livewire::test(CreateSales::class)
+            ->fillForm([
+                'type' => 'anbk',
+                'schools' => 'Newly Created Salesforce School',
+                'date_register' => '2026-03-01',
+                'status_id' => $status->id,
+            ])
+            ->callAction('createHeader')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas(RegistrationData::class, [
+            'schools' => 'NEWLY CREATED SALESFORCE SCHOOL',
         ]);
     }
 }

@@ -17,14 +17,30 @@ class CreateSales extends CreateRecord
 {
     protected static string $resource = SalesResource::class;
 
+    protected static bool $canCreateAnother = false;
+
     protected function getHeaderActions(): array
     {
         return [
             Actions\Action::make('createHeader')
-                ->label(__('filament-panels::resources/pages/create-record.form.actions.create.label'))
+                ->label(__('filament-panels::resources/pages/edit-record.form.actions.save.label'))
+                ->requiresConfirmation()
+                ->modalDescription('Apakah status sudah sesuai? Pastikan kembali status yang Anda pilih sudah benar sebelum menyimpan.')
+                ->modalIconColor('danger')
                 ->action(fn () => $this->create())
                 ->keyBindings(['mod+s']),
         ];
+    }
+
+    protected function getCreateFormAction(): Actions\Action
+    {
+        return Actions\Action::make('create')
+            ->label(__('filament-panels::resources/pages/edit-record.form.actions.save.label'))
+            ->requiresConfirmation()
+            ->modalDescription('Apakah status sudah sesuai? Pastikan kembali status yang Anda pilih sudah benar sebelum menyimpan.')
+            ->modalIconColor('danger')
+            ->action(fn () => $this->create())
+            ->keyBindings(['mod+s']);
     }
 
     protected function getRedirectUrl(): string
