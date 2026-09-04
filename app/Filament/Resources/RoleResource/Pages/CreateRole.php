@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\RoleResource\Pages;
 
 use App\Filament\Resources\RoleResource;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateRole extends CreateRecord
@@ -12,7 +13,10 @@ class CreateRole extends CreateRecord
     protected function getHeaderActions(): array
     {
         return [
-            $this->getCreateFormAction(),
+            Actions\Action::make('createHeader')
+                ->label(__('filament-panels::resources/pages/create-record.form.actions.create.label'))
+                ->action(fn () => $this->create())
+                ->keyBindings(['mod+s']),
         ];
     }
 

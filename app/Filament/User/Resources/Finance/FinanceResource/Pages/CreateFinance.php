@@ -3,6 +3,7 @@
 namespace App\Filament\User\Resources\Finance\FinanceResource\Pages;
 
 use App\Filament\User\Resources\Finance\FinanceResource;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateFinance extends CreateRecord
@@ -12,7 +13,10 @@ class CreateFinance extends CreateRecord
     protected function getHeaderActions(): array
     {
         return [
-            $this->getCreateFormAction(),
+            Actions\Action::make('createHeader')
+                ->label(__('filament-panels::resources/pages/create-record.form.actions.create.label'))
+                ->action(fn () => $this->create())
+                ->keyBindings(['mod+s']),
         ];
     }
 }

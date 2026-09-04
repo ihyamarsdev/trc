@@ -3,6 +3,7 @@
 namespace App\Filament\User\Resources\TimelineResource\Pages;
 
 use App\Filament\User\Resources\TimelineResource;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateTimeline extends CreateRecord
@@ -12,7 +13,10 @@ class CreateTimeline extends CreateRecord
     protected function getHeaderActions(): array
     {
         return [
-            $this->getCreateFormAction(),
+            Actions\Action::make('createHeader')
+                ->label(__('filament-panels::resources/pages/create-record.form.actions.create.label'))
+                ->action(fn () => $this->create())
+                ->keyBindings(['mod+s']),
         ];
     }
 }

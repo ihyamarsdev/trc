@@ -20,7 +20,13 @@ class EditAcademic extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            $this->getSaveFormAction(),
+            Actions\Action::make('saveHeader')
+                ->label(__('filament-panels::resources/pages/edit-record.form.actions.save.label'))
+                ->requiresConfirmation()
+                ->modalDescription('Apakah status sudah sesuai? Pastikan kembali status yang Anda pilih sudah benar sebelum menyimpan.')
+                ->modalIconColor('danger')
+                ->action(fn () => $this->save())
+                ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
         ];
     }

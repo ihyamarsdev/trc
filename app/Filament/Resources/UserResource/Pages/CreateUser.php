@@ -5,6 +5,7 @@ namespace App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource;
 use App\Models\User;
 use App\Notifications\NewAccount;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,7 +16,10 @@ class CreateUser extends CreateRecord
     protected function getHeaderActions(): array
     {
         return [
-            $this->getCreateFormAction(),
+            Actions\Action::make('createHeader')
+                ->label(__('filament-panels::resources/pages/create-record.form.actions.create.label'))
+                ->action(fn () => $this->create())
+                ->keyBindings(['mod+s']),
         ];
     }
 

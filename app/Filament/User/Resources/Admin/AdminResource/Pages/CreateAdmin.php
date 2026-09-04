@@ -5,6 +5,7 @@ namespace App\Filament\User\Resources\Admin\AdminResource\Pages;
 use App\Filament\User\Resources\Admin\AdminResource;
 use App\Models\RegistrationStatus;
 use Carbon\Carbon;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
 
@@ -15,7 +16,10 @@ class CreateAdmin extends CreateRecord
     protected function getHeaderActions(): array
     {
         return [
-            $this->getCreateFormAction(),
+            Actions\Action::make('createHeader')
+                ->label(__('filament-panels::resources/pages/create-record.form.actions.create.label'))
+                ->action(fn () => $this->create())
+                ->keyBindings(['mod+s']),
         ];
     }
 

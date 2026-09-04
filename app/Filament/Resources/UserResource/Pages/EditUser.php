@@ -13,7 +13,10 @@ class EditUser extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            $this->getSaveFormAction(),
+            Actions\Action::make('saveHeader')
+                ->label(__('filament-panels::resources/pages/edit-record.form.actions.save.label'))
+                ->action(fn () => $this->save())
+                ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
         ];
     }

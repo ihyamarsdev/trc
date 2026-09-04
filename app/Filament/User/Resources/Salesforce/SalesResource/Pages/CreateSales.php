@@ -7,6 +7,7 @@ use App\Models\RegistrationStatus;
 use App\Models\Status;
 use App\Models\User;
 use Carbon\Carbon;
+use Filament\Actions;
 use Filament\Notifications\Actions\Action as NotificationAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
@@ -19,7 +20,10 @@ class CreateSales extends CreateRecord
     protected function getHeaderActions(): array
     {
         return [
-            $this->getCreateFormAction(),
+            Actions\Action::make('createHeader')
+                ->label(__('filament-panels::resources/pages/create-record.form.actions.create.label'))
+                ->action(fn () => $this->create())
+                ->keyBindings(['mod+s']),
         ];
     }
 
