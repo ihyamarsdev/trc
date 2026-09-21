@@ -2,12 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Filament\User\Resources\Admin\AdminResource;
 use App\Filament\User\Resources\TimelineResource;
 use App\Filament\User\Widgets\CalendarWidget;
 use App\Models\RegistrationData;
 use App\Models\Status;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class TimelineResourceTest extends TestCase
@@ -113,5 +115,88 @@ class TimelineResourceTest extends TestCase
 
         $this->assertContains($greenRecord->id, $eventIds);
         $this->assertNotContains($redRecord->id, $eventIds);
+    }
+
+    public function test_calendar_widget_provides_edit_url_for_admin_role(): void
+    {
+        Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+
+        $admin = User::create([
+            'name' => 'Admin User',
+            'email' => 'admin_cal@example.com',
+            'password' => bcrypt('password'),
+        ]);
+        $admin->assignRole('admin');
+
+        $this->actingAs($admin);
+
+        $status = Status::create([
+            'name' => 'Green Status',
+            'description' => 'A green status description',
+            'color' => 'green',
+            'order' => 1,
+            'category' => 'finance',
+        ]);
+
+        $record = RegistrationData::factory()->create([
+            'users_id' => $admin->id,
+            'status_id' => $status->id,
+            'status_color' => 'green',
+            'schools' => 'SMA Test Admin',
+            'implementation_estimate' => now(),
+        ]);
+
+        $widget = new CalendarWidget;
+        $events = $widget->fetchEvents([
+            'start' => now()->subDay()->toIso8601String(),
+            'end' => now()->addDay()->toIso8601String(),
+        ]);
+
+        $this->assertNotEmpty($events);
+        $targetEvent = collect($events)->firstWhere('id', $record->id);
+        $this->assertNotNull($targetEvent);
+
+        $expectedEditUrl = AdminResource::getUrl('edit', ['record' => $record], panel: 'user');
+        $this->assertSame($expectedEditUrl, $targetEvent['url']);
+    }
+
+    public function test_calendar_widget_provides_view_url_for_non_admin(): void
+    {
+        $user = User::create([
+            'name' => 'Regular User',
+            'email' => 'regular_cal@example.com',
+            'password' => bcrypt('password'),
+        ]);
+
+        $this->actingAs($user);
+
+        $status = Status::create([
+            'name' => 'Green Status 2',
+            'description' => 'A green status description 2',
+            'color' => 'green',
+            'order' => 2,
+            'category' => 'finance',
+        ]);
+
+        $record = RegistrationData::factory()->create([
+            'users_id' => $user->id,
+            'status_id' => $status->id,
+            'status_color' => 'green',
+            'schools' => 'SMA Test Regular',
+            'implementation_estimate' => now(),
+        ]);
+
+        $widget = new CalendarWidget;
+        $events = $widget->fetchEvents([
+            'start' => now()->subDay()->toIso8601String(),
+            'end' => now()->addDay()->toIso8601String(),
+        ]);
+
+        $this->assertNotEmpty($events);
+        $targetEvent = collect($events)->firstWhere('id', $record->id);
+        $this->assertNotNull($targetEvent);
+
+        $expectedViewUrl = TimelineResource::getUrl('view', ['record' => $record], panel: 'user');
+        $this->assertSame($expectedViewUrl, $targetEvent['url']);
     }
 }
