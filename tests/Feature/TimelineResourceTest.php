@@ -2,13 +2,14 @@
 
 namespace Tests\Feature;
 
-use App\Filament\User\Resources\Admin\AdminResource;
 use App\Filament\User\Resources\TimelineResource;
+use App\Filament\User\Resources\TimelineResource\Pages\ViewTimeline;
 use App\Filament\User\Widgets\CalendarWidget;
 use App\Models\RegistrationData;
 use App\Models\Status;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -117,50 +118,7 @@ class TimelineResourceTest extends TestCase
         $this->assertNotContains($redRecord->id, $eventIds);
     }
 
-    public function test_calendar_widget_provides_edit_url_for_admin_role(): void
-    {
-        Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
-
-        $admin = User::create([
-            'name' => 'Admin User',
-            'email' => 'admin_cal@example.com',
-            'password' => bcrypt('password'),
-        ]);
-        $admin->assignRole('admin');
-
-        $this->actingAs($admin);
-
-        $status = Status::create([
-            'name' => 'Green Status',
-            'description' => 'A green status description',
-            'color' => 'green',
-            'order' => 1,
-            'category' => 'finance',
-        ]);
-
-        $record = RegistrationData::factory()->create([
-            'users_id' => $admin->id,
-            'status_id' => $status->id,
-            'status_color' => 'green',
-            'schools' => 'SMA Test Admin',
-            'implementation_estimate' => now(),
-        ]);
-
-        $widget = new CalendarWidget;
-        $events = $widget->fetchEvents([
-            'start' => now()->subDay()->toIso8601String(),
-            'end' => now()->addDay()->toIso8601String(),
-        ]);
-
-        $this->assertNotEmpty($events);
-        $targetEvent = collect($events)->firstWhere('id', $record->id);
-        $this->assertNotNull($targetEvent);
-
-        $expectedEditUrl = AdminResource::getUrl('edit', ['record' => $record], panel: 'user');
-        $this->assertSame($expectedEditUrl, $targetEvent['url']);
-    }
-
-    public function test_calendar_widget_provides_view_url_for_non_admin(): void
+    public function test_calendar_widget_provides_view_url_for_events(): void
     {
         $user = User::create([
             'name' => 'Regular User',
@@ -198,5 +156,68 @@ class TimelineResourceTest extends TestCase
 
         $expectedViewUrl = TimelineResource::getUrl('view', ['record' => $record], panel: 'user');
         $this->assertSame($expectedViewUrl, $targetEvent['url']);
+    }
+
+    public function test_view_timeline_shows_edit_action_for_admin(): void
+    {
+        Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+
+        $admin = User::create([
+            'name' => 'Admin User',
+            'email' => 'admin_view@example.com',
+            'password' => bcrypt('password'),
+        ]);
+        $admin->assignRole('admin');
+
+        $this->actingAs($admin);
+
+        $status = Status::create([
+            'name' => 'Green Status 3',
+            'description' => 'A green status description 3',
+            'color' => 'green',
+            'order' => 3,
+            'category' => 'finance',
+        ]);
+
+        $record = RegistrationData::factory()->create([
+            'users_id' => $admin->id,
+            'status_id' => $status->id,
+            'status_color' => 'green',
+            'schools' => 'SMA Test View Admin',
+            'implementation_estimate' => now(),
+        ]);
+
+        Livewire::test(ViewTimeline::class, ['record' => $record->id])
+            ->assertActionVisible('edit');
+    }
+
+    public function test_view_timeline_hides_edit_action_for_non_admin(): void
+    {
+        $user = User::create([
+            'name' => 'Non Admin User',
+            'email' => 'non_admin_view@example.com',
+            'password' => bcrypt('password'),
+        ]);
+
+        $this->actingAs($user);
+
+        $status = Status::create([
+            'name' => 'Green Status 4',
+            'description' => 'A green status description 4',
+            'color' => 'green',
+            'order' => 4,
+            'category' => 'finance',
+        ]);
+
+        $record = RegistrationData::factory()->create([
+            'users_id' => $user->id,
+            'status_id' => $status->id,
+            'status_color' => 'green',
+            'schools' => 'SMA Test View Non Admin',
+            'implementation_estimate' => now(),
+        ]);
+
+        Livewire::test(ViewTimeline::class, ['record' => $record->id])
+            ->assertActionHidden('edit');
     }
 }

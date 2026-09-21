@@ -2,7 +2,6 @@
 
 namespace App\Filament\User\Widgets;
 
-use App\Filament\User\Resources\Admin\AdminResource;
 use App\Filament\User\Resources\TimelineResource;
 use App\Models\RegistrationData;
 use Filament\Actions\Action;
@@ -47,8 +46,6 @@ class CalendarWidget extends FullCalendarWidget
 
     public function fetchEvents(array $fetchInfo): array
     {
-        $isAdmin = auth()->user()?->hasRole('admin') ?? false;
-
         return RegistrationData::query()
             ->where('implementation_estimate', '>=', $fetchInfo['start'])
             ->where('implementation_estimate', '<=', $fetchInfo['end'])
@@ -57,24 +54,20 @@ class CalendarWidget extends FullCalendarWidget
                     ->orWhereNull('status_id');
             })
             ->unless(
-                $isAdmin, // Selama BUKAN admin...
+                auth()->user()?->hasRole('admin'), // Selama BUKAN admin...
                 fn (Builder $q) => $q->when(
                     auth()->user()?->hasRole('sales'), // ...dan jika dia sales
                     fn ($subQ) => $subQ->where('users_id', auth()->id())
                 )
             )
             ->get()
-            ->map(function (RegistrationData $event) use ($isAdmin) {
-                $url = $isAdmin
-                    ? AdminResource::getUrl(name: 'edit', parameters: ['record' => $event], panel: 'user')
-                    : TimelineResource::getUrl(name: 'view', parameters: ['record' => $event], panel: 'user');
-
+            ->map(function (RegistrationData $event) {
                 return EventData::make()
                     ->id($event->id)
                     ->title($event->schools)
                     ->start($event->implementation_estimate)
                     ->end($event->implementation_estimate)
-                    ->url(url: $url);
+                    ->url(url: TimelineResource::getUrl(name: 'view', parameters: ['record' => $event], panel: 'user'));
 
             })
             ->toArray();
