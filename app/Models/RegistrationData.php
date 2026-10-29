@@ -89,6 +89,12 @@ class RegistrationData extends Model
         'dll_subtotal',
 
         'option_price',
+        'real_count',
+        'invoice_amount',
+        'support_school',
+        'tax_rates',
+        'tax_custom_rate',
+        'tax_amount',
         'cb,',
         'status_id', // Foreign key to statuses table
     ];
@@ -98,6 +104,7 @@ class RegistrationData extends Model
         'counselor_consultation_date' => 'datetime',
         'student_consultation_date' => 'datetime',
         'invoice_date' => 'datetime',
+        'tax_rates' => 'array',
         'spk' => 'datetime',
         'payment_date' => 'datetime',
         'group' => 'datetime',
