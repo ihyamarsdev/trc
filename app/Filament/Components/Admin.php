@@ -1035,7 +1035,6 @@ class Admin
             // --- Finance (utama) ---
             TextColumn::make('price')->label('Harga'),
             TextColumn::make('total')->label('Total'),
-            TextColumn::make('net')->label('Netto'),
             TextColumn::make('total_net')->label('Total Netto'),
             TextColumn::make('invoice_date')
                 ->label('Tgl Invoice')
@@ -1051,20 +1050,16 @@ class Admin
                 ->sortable(),
             TextColumn::make('payment_name')->label('Nama Pembayaran'),
 
-            // --- Finance (Mitra) ---
-            TextColumn::make('mitra_difference')->label('Mitra Selisih'),
-            TextColumn::make('mitra_net')->label('Mitra Net'),
-            TextColumn::make('mitra_subtotal')->label('Mitra Subtotal'),
-
-            // --- Finance (SS) ---
-            TextColumn::make('ss_difference')->label('SS Selisih'),
-            TextColumn::make('ss_net')->label('SS Net'),
-            TextColumn::make('ss_subtotal')->label('SS Subtotal'),
-
-            // --- Finance (DLL) ---
-            TextColumn::make('dll_difference')->label('DLL Selisih'),
-            TextColumn::make('dll_net')->label('DLL Net'),
-            TextColumn::make('dll_subtotal')->label('DLL Subtotal'),
+            // --- Finance (Opsi, SS, Pajak) ---
+            TextColumn::make('option_price')->label('Opsi Jumlah'),
+            TextColumn::make('real_count')->label('Jumlah Siswa Real'),
+            TextColumn::make('support_school')->label('SS (Support Sekolah)'),
+            TextColumn::make('net_2')->label('Harga NET'),
+            TextColumn::make('tax_rates')
+                ->label('Pilihan Pajak')
+                ->state(fn (Model $record): string => implode(', ', SharedSchema::taxRateLabels($record->tax_rates, $record->tax_custom_rate))),
+            TextColumn::make('tax_amount')->label('Nominal Pajak'),
+            TextColumn::make('invoice_amount')->label('Nominal Invoice'),
 
             // --- Invoice detail ---
             TextColumn::make('detail_invoice')->label('Detail Invoice'),
@@ -1080,9 +1075,7 @@ class Admin
             TextColumn::make('detail_kwitansi')->label('Detail Kwitansi'),
             TextColumn::make('difference_total')->label('Total Selisih'),
 
-            TextColumn::make('subtotal_1')->label('Subtotal 1'),
             TextColumn::make('subtotal_2')->label('Subtotal 2'),
-            TextColumn::make('student_count_1')->label('Jumlah Siswa 1'),
         ];
     }
 }

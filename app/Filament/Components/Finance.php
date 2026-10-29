@@ -244,31 +244,8 @@ class Finance
     {
         return [
             // Finance
-            TextColumn::make('price')->label('Harga SPJ')->prefix('Rp.'),
-            TextColumn::make('net_2')->label('Harga NET')->prefix('Rp.'),
-            TextColumn::make('total')
-                ->label('Total Dana Sesuai SPJ')
-                ->prefix('Rp.'),
-            TextColumn::make('total_net')->label('Total Net')->prefix('Rp.'),
-
-            TextColumn::make('student_count_1')->label('Selisih Siswa TRC'),
-            TextColumn::make('net')->label('Satuan')->prefix('Rp.'),
-            TextColumn::make('subtotal_1')->label('Subtotal')->prefix('Rp.'),
-
-            TextColumn::make('mitra_difference')->label('elisih Siswa Sekolah'),
-            TextColumn::make('net')->label('Satuan')->prefix('Rp.'),
-            TextColumn::make('mitra_subtotal')
-                ->label('Subtotal')
-                ->prefix('Rp.'),
-
-            TextColumn::make('ss_difference')->label('SS'),
-            TextColumn::make('ss_net')->label('Satuan')->prefix('Rp.'),
-            TextColumn::make('ss_subtotal')->label('Subtotal')->prefix('Rp.'),
-
-            TextColumn::make('dll_difference')->label('Lain-lain'),
-            TextColumn::make('dll_net')->label('Satuan')->prefix('Rp.'),
-            TextColumn::make('dll_subtotal')->label('Subtotal')->prefix('Rp.'),
-
+            TextColumn::make('option_price')->label('Opsi Jumlah'),
+            TextColumn::make('real_count')->label('Jumlah Siswa Real'),
             TextColumn::make('invoice_date')
                 ->label('Tanggal Invoice')
                 ->formatStateUsing(
@@ -276,6 +253,33 @@ class Finance
                         'l, jS F Y',
                     ),
                 ),
+            TextColumn::make('invoice_amount')
+                ->label('Nominal Invoice')
+                ->prefix('Rp.'),
+            TextColumn::make('price')->label('Harga SPJ')->prefix('Rp.'),
+            TextColumn::make('support_school')
+                ->label('SS (Support Sekolah)')
+                ->prefix('Rp.'),
+            TextColumn::make('net_2')->label('Harga NET')->prefix('Rp.'),
+            TextColumn::make('tax_rates')
+                ->label('Pilihan Pajak')
+                ->state(
+                    fn (Model $record): string => implode(
+                        ', ',
+                        SharedSchema::taxRateLabels(
+                            $record->tax_rates,
+                            $record->tax_custom_rate,
+                        ),
+                    ),
+                ),
+            TextColumn::make('tax_amount')
+                ->label('Nominal Pajak')
+                ->prefix('Rp.'),
+            TextColumn::make('total')
+                ->label('Total Dana Sesuai SPJ')
+                ->prefix('Rp.'),
+            TextColumn::make('total_net')->label('Total Net')->prefix('Rp.'),
+
             TextColumn::make('spk')
                 ->label('SPK Terkirim')
                 ->formatStateUsing(

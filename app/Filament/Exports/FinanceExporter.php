@@ -2,6 +2,7 @@
 
 namespace App\Filament\Exports;
 
+use App\Filament\Components\Support\SharedSchema;
 use App\Models\RegistrationData;
 use Carbon\Carbon;
 use Filament\Actions\Exports\ExportColumn;
@@ -88,60 +89,37 @@ class FinanceExporter extends Exporter
                 ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
 
             // Finance
+            ExportColumn::make('option_price')
+                ->label('Opsi Jumlah Akun / Jumlah Pelaksanaan / Jumlah Real'),
+            ExportColumn::make('real_count')
+                ->label('Jumlah Siswa Real'),
+            ExportColumn::make('invoice_date')
+                ->label('Tanggal Invoice')
+                ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
+            ExportColumn::make('invoice_amount')
+                ->label('Nominal Invoice')
+                ->prefix('Rp.'),
             ExportColumn::make('price')
                 ->label('Harga SPJ')
+                ->prefix('Rp.'),
+            ExportColumn::make('support_school')
+                ->label('SS (Support Sekolah)')
                 ->prefix('Rp.'),
             ExportColumn::make('net_2')
                 ->label('Harga NET')
                 ->prefix('Rp.'),
-            ExportColumn::make('option_price')
-                ->label('Opsi Jumlah Akun / Jumlah Pelaksanaan '),
+            ExportColumn::make('tax_rates')
+                ->label('Pilihan Pajak')
+                ->state(fn (RegistrationData $record): string => implode(', ', SharedSchema::taxRateLabels($record->tax_rates, $record->tax_custom_rate))),
+            ExportColumn::make('tax_amount')
+                ->label('Nominal Pajak')
+                ->prefix('Rp.'),
             ExportColumn::make('total')
                 ->label('Total Dana Sesuai SPJ')
                 ->prefix('Rp.'),
             ExportColumn::make('total_net')
                 ->label('Total Net')
                 ->prefix('Rp.'),
-
-            ExportColumn::make('student_count_1')
-                ->label('Selisih Siswa TRC'),
-            ExportColumn::make('net')
-                ->label('Satuan')
-                ->prefix('Rp.'),
-            ExportColumn::make('subtotal_1')
-                ->label('Subtotal')
-                ->prefix('Rp.'),
-
-            ExportColumn::make('mitra_difference')
-                ->label('elisih Siswa Sekolah'),
-            ExportColumn::make('net')
-                ->label('Satuan')
-                ->prefix('Rp.'),
-            ExportColumn::make('mitra_subtotal')
-                ->label('Subtotal')
-                ->prefix('Rp.'),
-
-            ExportColumn::make('implementer_count')
-                ->label('SS'),
-            ExportColumn::make('ss_net')
-                ->label('Satuan')
-                ->prefix('Rp.'),
-            ExportColumn::make('ss_subtotal')
-                ->label('Subtotal')
-                ->prefix('Rp.'),
-
-            ExportColumn::make('dll_difference')
-                ->label('Lain-lain'),
-            ExportColumn::make('dll_net')
-                ->label('Satuan')
-                ->prefix('Rp.'),
-            ExportColumn::make('dll_subtotal')
-                ->label('Subtotal')
-                ->prefix('Rp.'),
-
-            ExportColumn::make('invoice_date')
-                ->label('Tanggal Invoice')
-                ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
             ExportColumn::make('spk_sent')
                 ->label('SPK Terkirim')
                 ->formatStateUsing(fn ($state) => Carbon::parse($state)->translatedFormat('l, jS F Y')),
