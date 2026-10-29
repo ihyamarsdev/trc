@@ -60,8 +60,8 @@ class FinanceResource extends Resource
                     ->with(['latestStatusLog.status', 'status'])
                     ->where('years', now('Asia/Jakarta')->format('Y'))
                     ->whereRelation('status', 'order', '>=', 7)
+                    ->orderByDesc('updated_at')
             )
-            ->defaultSort('updated_at', 'desc')
             ->columns(Finance::columns())
             ->filters(Finance::filters())
             ->filtersTriggerAction(

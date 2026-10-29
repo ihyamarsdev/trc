@@ -102,26 +102,22 @@ class SharedSchema
                     ->label('Program')
                     ->description('Program', position: 'above')
                     ->extraAttributes(['class' => 'uppercase'])
-                    ->sortable()
                     ->visibleFrom('md'),
                 TextColumn::make('schools')
                     ->label('Sekolah')
                     ->description('Sekolah', position: 'above')
                     ->searchable()
                     ->wrap()
-                    ->sortable()
                     ->visibleFrom('md'),
                 TextColumn::make('periode')
                     ->label('Periode')
                     ->description('Periode', position: 'above')
                     ->extraAttributes(['class' => 'uppercase'])
                     ->wrap()
-                    ->sortable()
                     ->visibleFrom('md'),
                 TextColumn::make('years')
                     ->label('Tahun')
                     ->description('Tahun', position: 'above')
-                    ->sortable()
                     ->visibleFrom('md'),
                 self::statusColumn()
                     ->description('Status', position: 'above')
@@ -135,7 +131,6 @@ class SharedSchema
                     ->searchable()
                     ->weight(FontWeight::SemiBold)
                     ->wrap()
-                    ->sortable()
                     ->hiddenFrom('md'),
                 Split::make([
                     TextColumn::make('type')
@@ -144,7 +139,6 @@ class SharedSchema
                         ->color('primary')
                         ->formatStateUsing($upper)
                         ->grow(false)
-                        ->sortable()
                         ->hiddenFrom('md'),
                     TextColumn::make('periode')
                         ->label('Periode')
@@ -152,14 +146,12 @@ class SharedSchema
                         ->size(TextColumnSize::Small)
                         ->formatStateUsing($upper)
                         ->grow(false)
-                        ->sortable()
                         ->hiddenFrom('md'),
                     TextColumn::make('years')
                         ->label('Tahun')
                         ->color('gray')
                         ->size(TextColumnSize::Small)
                         ->grow(false)
-                        ->sortable()
                         ->hiddenFrom('md'),
                 ]),
                 TextColumn::make('implementation_estimate')
@@ -169,7 +161,6 @@ class SharedSchema
                     ->size(TextColumnSize::Small)
                     ->date('j M Y')
                     ->placeholder('Belum dijadwalkan')
-                    ->sortable()
                     ->hiddenFrom('md'),
                 self::statusColumn()
                     ->grow(false)

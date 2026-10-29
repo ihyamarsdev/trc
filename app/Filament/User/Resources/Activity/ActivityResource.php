@@ -56,12 +56,12 @@ class ActivityResource extends Resource
             ->modifyQueryUsing(
                 fn (Builder $query) => $query
                     ->with(['latestStatusLog.status', 'status'])
+                    ->orderByDesc('updated_at')
                     ->when(
                         Auth::user()?->hasRole('sales') && ! Auth::user()?->hasRole('admin'),
                         fn (Builder $q) => $q->where('users_id', Auth::id())
                     )
             )
-            ->defaultSort('updated_at', 'desc')
             ->columns(Admin::columns())
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
