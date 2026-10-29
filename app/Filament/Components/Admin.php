@@ -15,6 +15,7 @@ use App\Models\RegistrationData;
 use App\Models\RegistrationStatus;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
@@ -163,8 +164,14 @@ class Admin
                                 ->icon('heroicon-o-calendar-days')
                                 ->columns(['default' => 1, 'sm' => 2])
                                 ->schema([
-                                    FormSchema::dateTime('date_register', 'Tanggal Pendaftaran'),
-                                    FormSchema::dateTime('implementation_estimate', 'Estimasi Pelaksanaan'),
+                                    DateTimePicker::make('date_register')
+                                        ->label('Tanggal Pendaftaran')
+                                        ->native(false)
+                                        ->displayFormat('l, jS F Y H:i'),
+                                    DateTimePicker::make('implementation_estimate')
+                                        ->label('Estimasi Pelaksanaan')
+                                        ->native(false)
+                                        ->displayFormat('l, jS F Y H:i'),
                                 ]),
                         ]),
 
