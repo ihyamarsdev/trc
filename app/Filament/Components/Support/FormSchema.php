@@ -2,16 +2,20 @@
 
 namespace App\Filament\Components\Support;
 
+use Carbon\Carbon;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Illuminate\Contracts\Support\Htmlable;
 
 /**
  * Form sections shared by the Admin, Service and Finance resources, so the same
@@ -19,6 +23,92 @@ use Filament\Forms\Set;
  */
 class FormSchema
 {
+    private const TIME_STEP_MINUTES = 15;
+
+    /**
+     * A date + time-of-day input that stores a single datetime attribute.
+     * The date is picked on a calendar and the time from a dropdown (15 minute steps),
+     * so nobody has to type hours and minutes. Only `$name` is saved; the two
+     * `{$name}_date` / `{$name}_time` parts are virtual.
+     */
+    public static function dateTime(
+        string $name,
+        string|Htmlable $dateLabel,
+        string|Htmlable $timeLabel = 'Jam',
+        string $defaultTime = '08:00',
+    ): Grid {
+        $dateKey = $name.'_date';
+        $timeKey = $name.'_time';
+
+        $sync = function (Get $get, Set $set) use ($name, $dateKey, $timeKey, $defaultTime): void {
+            $date = $get($dateKey);
+
+            if (blank($date)) {
+                $set($name, null);
+
+                return;
+            }
+
+            $time = $get($timeKey) ?: $defaultTime;
+
+            $set($timeKey, $time);
+            $set($name, $date.' '.$time.':00');
+        };
+
+        return Grid::make(['default' => 3])
+            ->schema([
+                Hidden::make($name)
+                    ->afterStateHydrated(fn (Hidden $component, mixed $state) => $component->state(self::formatPart($state, 'Y-m-d H:i:s'))),
+                DatePicker::make($dateKey)
+                    ->label($dateLabel)
+                    ->native(false)
+                    ->displayFormat(self::DATE_FORMAT)
+                    ->dehydrated(false)
+                    ->live()
+                    ->afterStateHydrated(fn (DatePicker $component, Get $get) => $component->state(self::formatPart($get($name), 'Y-m-d')))
+                    ->afterStateUpdated($sync)
+                    ->columnSpan(2),
+                Select::make($timeKey)
+                    ->label($timeLabel)
+                    ->native(false)
+                    ->searchable()
+                    ->placeholder('Pilih jam')
+                    ->prefixIcon('heroicon-m-clock')
+                    ->options(fn (Get $get): array => self::timeOptions($get($timeKey)))
+                    ->dehydrated(false)
+                    ->live()
+                    ->afterStateHydrated(fn (Select $component, Get $get) => $component->state(self::formatPart($get($name), 'H:i')))
+                    ->afterStateUpdated($sync),
+            ]);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function timeOptions(?string $current = null): array
+    {
+        $options = [];
+
+        for ($minute = 0; $minute < 1440; $minute += self::TIME_STEP_MINUTES) {
+            $time = sprintf('%02d:%02d', intdiv($minute, 60), $minute % 60);
+            $options[$time] = $time;
+        }
+
+        if (filled($current) && ! isset($options[$current])) {
+            $options[$current] = $current;
+            ksort($options);
+        }
+
+        return $options;
+    }
+
+    private static function formatPart(mixed $value, string $format): ?string
+    {
+        return filled($value)
+            ? Carbon::parse($value)->setTimezone(config('app.timezone'))->format($format)
+            : null;
+    }
+
     private const DATE_FORMAT = 'l, jS F Y';
 
     /**

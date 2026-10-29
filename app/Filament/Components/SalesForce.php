@@ -2,6 +2,7 @@
 
 namespace App\Filament\Components;
 
+use App\Filament\Components\Support\FormSchema;
 use App\Filament\Components\Support\HasProgramMetadata;
 use App\Filament\Components\Support\InfolistSchema;
 use App\Filament\Components\Support\SharedSchema;
@@ -9,7 +10,6 @@ use App\Filament\Enum\Jenjang;
 use App\Filament\Enum\Periode;
 use App\Filament\Enum\Program;
 use App\Models\Status;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -133,17 +133,8 @@ class SalesForce
                 ->icon('heroicon-o-clock')
                 ->columns(['default' => 1, 'sm' => 2])
                 ->schema([
-                    DateTimePicker::make('date_register')
-                        ->label($required('Tanggal Pendaftaran'))
-                        ->native(false)
-                        ->seconds(false)
-                        ->displayFormat('l, jS F Y H:i'),
-                    DateTimePicker::make('implementation_estimate')
-                        ->label($required('Estimasi Pelaksanaan'))
-                        ->native(false)
-                        ->seconds(false)
-                        ->displayFormat('l, jS F Y H:i')
-                        ->live(),
+                    FormSchema::dateTime('date_register', $required('Tanggal Pendaftaran'), $required('Jam')),
+                    FormSchema::dateTime('implementation_estimate', $required('Estimasi Pelaksanaan'), $required('Jam')),
                     Textarea::make('notes')
                         ->label('Catatan')
                         ->autosize()
