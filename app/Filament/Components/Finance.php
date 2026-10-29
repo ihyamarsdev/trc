@@ -2,6 +2,7 @@
 
 namespace App\Filament\Components;
 
+use App\Filament\Components\Support\FormSchema;
 use App\Filament\Components\Support\HasProgramMetadata;
 use App\Filament\Components\Support\InfolistSchema;
 use App\Filament\Components\Support\SharedSchema;
@@ -10,16 +11,8 @@ use App\Filament\Enum\Periode;
 use App\Filament\Enum\Program;
 use App\Models\User;
 use Carbon\Carbon;
-use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Fieldset;
-use Filament\Forms\Components\Group;
-use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
@@ -38,6 +31,7 @@ class Finance
     {
         return [
             Section::make('Status')
+                ->icon('heroicon-o-flag')
                 ->schema([
                     Select::make('status_id')
                         ->label('Status')
@@ -50,184 +44,10 @@ class Finance
                                 ->orderBy('order'),
                         )
                         ->searchable()
-                        ->placeholder('Pilih status...')
-                        ->columnSpan(1),
-                ])
-                ->columns(2),
-            Section::make()
-                ->description()
-                ->schema([
-                    Fieldset::make('')->schema([
-                        TextInput::make('account_count_created')
-                            ->label('Jumlah Akun Dibuat')
-                            ->disabled(),
-                        TextInput::make('implementer_count')
-                            ->label('Jumlah Pelaksanaan')
-                            ->disabled(),
-                    ]),
+                        ->placeholder('Pilih status...'),
+                ]),
 
-                    Fieldset::make('Opsi')->schema([
-                        Radio::make('option_price')
-                            ->label('Pilih Opsi')
-                            ->options(function (Get $get): array {
-                                return [
-                                    'implementer_'.$get('implementer_count') => 'JUMLAH PELAKSANAAN',
-                                    'account_'.$get('account_count_created') => 'JUMLAH AKUN',
-                                    'real' => 'JUMLAH REAL',
-                                ];
-                            })
-                            ->live(1000)
-                            ->reactive()
-                            ->afterStateUpdated(function (Get $get, Set $set) {
-                                SharedSchema::syncTotal($get, $set);
-                            }),
-                        TextInput::make('real_count')
-                            ->label('Jumlah Siswa Real')
-                            ->numeric()
-                            ->minValue(0)
-                            ->live(debounce: 1000)
-                            ->visible(fn (Get $get): bool => $get('option_price') === 'real')
-                            ->afterStateUpdated(function (Get $get, Set $set) {
-                                SharedSchema::syncTotal($get, $set);
-                            }),
-                    ]),
-
-                    Fieldset::make('Invoice')->schema([
-                        DatePicker::make('invoice_date')
-                            ->label('Tanggal Invoice')
-                            ->native(false)
-                            ->displayFormat('l, jS F Y'),
-                        TextInput::make('invoice_amount')
-                            ->label('Nominal Invoice')
-                            ->prefix('Rp')
-                            ->currencyMask(
-                                thousandSeparator: ',',
-                                decimalSeparator: '.',
-                                precision: 0,
-                            ),
-                    ]),
-
-                    Fieldset::make('Nominal')
-                        ->schema([
-                            TextInput::make('price')
-                                ->label('Harga SPJ')
-                                ->prefix('Rp')
-                                ->live(1000)
-                                ->reactive()
-                                ->currencyMask(
-                                    thousandSeparator: ',',
-                                    decimalSeparator: '.',
-                                    precision: 0,
-                                )
-                                ->afterStateUpdated(function (Get $get, Set $set) {
-                                    SharedSchema::syncTotal($get, $set);
-                                }),
-                            TextInput::make('support_school')
-                                ->label('SS (Support Sekolah)')
-                                ->prefix('Rp')
-                                ->currencyMask(
-                                    thousandSeparator: ',',
-                                    decimalSeparator: '.',
-                                    precision: 0,
-                                ),
-                            TextInput::make('net_2')
-                                ->label('Harga NET')
-                                ->prefix('Rp')
-                                ->live(1000)
-                                ->reactive()
-                                ->currencyMask(
-                                    thousandSeparator: ',',
-                                    decimalSeparator: '.',
-                                    precision: 0,
-                                )
-                                ->afterStateUpdated(function (Get $get, Set $set) {
-                                    $set(
-                                        'total_net',
-                                        abs(
-                                            (float) $get('implementer_count') *
-                                            (float) $get('net_2'),
-                                        ),
-                                    );
-                                }),
-                        ])
-                        ->columns(3),
-
-                    Fieldset::make('Pajak')->schema([
-                        Group::make([
-                            CheckboxList::make('tax_rates')
-                                ->label('Pilih Pajak')
-                                ->options([
-                                    '11' => '11%',
-                                    '2' => '2%',
-                                    '0.5' => '0,5%',
-                                    'custom' => 'Isi Manual',
-                                ])
-                                ->live()
-                                ->afterStateUpdated(function (Get $get, Set $set) {
-                                    SharedSchema::syncTax($get, $set);
-                                }),
-                            TextInput::make('tax_custom_rate')
-                                ->label('Pajak Manual')
-                                ->suffix('%')
-                                ->numeric()
-                                ->minValue(0)
-                                ->live(debounce: 1000)
-                                ->visible(fn (Get $get): bool => in_array('custom', (array) $get('tax_rates'), true))
-                                ->afterStateUpdated(function (Get $get, Set $set) {
-                                    SharedSchema::syncTax($get, $set);
-                                }),
-                        ]),
-                        TextInput::make('tax_amount')
-                            ->label('Nominal Pajak')
-                            ->prefix('Rp')
-                            ->currencyMask(
-                                thousandSeparator: ',',
-                                decimalSeparator: '.',
-                                precision: 0,
-                            )
-                            ->readOnly(),
-                    ]),
-
-                    Fieldset::make('Total')->schema([
-                        TextInput::make('total')
-                            ->label('Total Dana Sesuai SPJ')
-                            ->prefix('Rp')
-                            ->currencyMask(
-                                thousandSeparator: ',',
-                                decimalSeparator: '.',
-                                precision: 0,
-                            )
-                            ->readOnly(),
-                        TextInput::make('total_net')
-                            ->label('Total Net')
-                            ->prefix('Rp')
-                            ->currencyMask(
-                                thousandSeparator: ',',
-                                decimalSeparator: '.',
-                                precision: 0,
-                            )
-                            ->readOnly(),
-                    ]),
-
-                    Fieldset::make('')->schema([
-                        DatePicker::make('payment_date')
-                            ->label('Jadwal Pembayaran')
-                            ->native(false)
-                            ->displayFormat('l, jS F Y'),
-                        DatePicker::make('spk')
-                            ->label('Jadwal SPK')
-                            ->native(false)
-                            ->displayFormat('l, jS F Y'),
-                        Select::make('payment_name')
-                            ->label('Pembayaran Via')
-                            ->options([
-                                'SIPLAH' => 'SIPLAH',
-                                'SI/TF' => 'SI / TF',
-                                'CASH' => 'CASH',
-                            ]),
-                    ]),
-                ])
-                ->columns(2),
+            ...FormSchema::financeSections(),
         ];
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Components;
 
+use App\Filament\Components\Support\FormSchema;
 use App\Filament\Components\Support\HasProgramMetadata;
 use App\Filament\Components\Support\InfolistSchema;
 use App\Filament\Components\Support\SharedSchema;
@@ -10,11 +11,8 @@ use App\Filament\Enum\Periode;
 use App\Filament\Enum\Program;
 use App\Models\User;
 use Carbon\Carbon;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Tables;
@@ -29,11 +27,13 @@ class Service
     public static function formSchema(): array
     {
         return [
-            Section::make('Status')
-                ->description('Isi sesuai dengan status saat ini')
+            Section::make(fn (Get $get) => self::meta($get)['nameRegister'])
+                ->description(fn (Get $get) => self::meta($get)['DescriptionRegister'])
+                ->icon('heroicon-o-flag')
                 ->schema([
                     Select::make('status_id')
                         ->label('Status')
+                        ->helperText('Isi sesuai dengan status saat ini')
                         ->preload()
                         ->relationship(
                             name: 'status',
@@ -43,85 +43,10 @@ class Service
                                 ->orderBy('order'),
                         )
                         ->searchable()
-                        ->placeholder('Pilih status...')
-                        ->columnSpan(1),
-                ])
-                ->columns(2),
+                        ->placeholder('Pilih status...'),
+                ]),
 
-            Section::make(fn (Get $get) => self::meta($get)['nameRegister'])
-                ->description(
-                    fn (Get $get) => self::meta($get)['DescriptionRegister'],
-                )
-                ->schema([
-                    DatePicker::make('group')
-                        ->label('Grup')
-                        ->native(false)
-                        ->displayFormat('l, jS F Y'),
-                    DatePicker::make('bimtek')
-                        ->label('Bimtek')
-                        ->native(false)
-                        ->displayFormat('l, jS F Y'),
-                    TextInput::make('account_count_created')
-                        ->label('Jumlah Akun Dibuat')
-                        ->live(debounce: 1000)
-                        ->default('0')
-                        ->afterStateUpdated(function (Get $get, Set $set) {
-                            self::getDifference($get, $set);
-                        }),
-                    TextInput::make('implementer_count')
-                        ->label('Jumlah Akun Pelaksanaan')
-                        ->live(debounce: 1000)
-                        ->default('0')
-                        ->afterStateUpdated(function (Get $get, Set $set) {
-                            self::getDifference($get, $set);
-                        }),
-                    TextInput::make('difference')
-                        ->label('Akun Dibuat')
-                        ->readOnly()
-                        ->numeric()
-                        ->minValue(0)
-                        ->live(),
-                ])
-                ->columns(2),
-
-            Section::make('Konsultasi')
-                ->description('Data Konsultasi')
-                ->schema([
-                    Section::make('')
-                        ->schema([
-                            Radio::make('schools_download')
-                                ->label('Download Sekolah')
-                                ->options([
-                                    'YA' => 'YA',
-                                    'TIDAK' => 'TIDAK',
-                                ])
-                                ->inline(),
-                            Radio::make('students_download')
-                                ->label('Download Siswa')
-                                ->options([
-                                    'YA' => 'YA',
-                                    'TIDAK' => 'TIDAK',
-                                ])
-                                ->inline(),
-                            Radio::make('pm')
-                                ->label('PM')
-                                ->options([
-                                    'YA' => 'YA',
-                                    'TIDAK' => 'TIDAK',
-                                ])
-                                ->inline(),
-                        ])
-                        ->columns(2),
-                    DatePicker::make('counselor_consultation_date')
-                        ->label('Konsul BK')
-                        ->native(false)
-                        ->displayFormat('l, jS F Y'),
-                    DatePicker::make('student_consultation_date')
-                        ->label('Konsul Siswa')
-                        ->native(false)
-                        ->displayFormat('l, jS F Y'),
-                ])
-                ->columns(2),
+            ...FormSchema::serviceSections(),
         ];
     }
 

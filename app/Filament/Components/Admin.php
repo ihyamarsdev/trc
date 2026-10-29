@@ -3,6 +3,7 @@
 namespace App\Filament\Components;
 
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use App\Filament\Components\Support\FormSchema;
 use App\Filament\Components\Support\HasProgramMetadata;
 use App\Filament\Components\Support\InfolistSchema;
 use App\Filament\Components\Support\SharedSchema;
@@ -13,14 +14,12 @@ use App\Filament\User\Resources\Activity\ActivityResource;
 use App\Models\RegistrationData;
 use App\Models\RegistrationStatus;
 use Carbon\Carbon;
-use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Fieldset;
-use Filament\Forms\Components\Group;
-use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
@@ -47,335 +46,143 @@ class Admin
 
     public static function formSchema(): array
     {
+        $phoneRegex = '/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/';
+
         return [
-            Section::make('Program')
-                ->description('Pilih Program')
-                ->schema([
-                    Select::make('type')
-                        ->label('Program')
-                        ->options(Program::list()),
-                    Select::make('status_id')
-                        ->label('Status')
-                        ->preload()
-                        ->relationship(
-                            name: 'status',
-                            titleAttribute: 'name',
-                            modifyQueryUsing: fn (Builder $query) => $query
-                                ->orderBy('order')
-                        )
-                        ->searchable()
-                        ->placeholder('Pilih status...')
-                        ->columnSpan(1),
-                ])->columns(2),
-
-            Section::make('Periode')
-                ->description('Pilih Periode dan Tahun Ajaran')
-                ->schema([
-                    Select::make('periode')
-                        ->label('Periode')
-                        ->options(Periode::list()),
-                    TextInput::make('years')
-                        ->label('Tahun')
-                        ->maxLength(255),
-                ])->columns(2),
-
-            Section::make(fn (Get $get) => self::meta($get)['nameRegister'])
-                ->description(fn (Get $get) => self::meta($get)['DescriptionRegister'])
-                ->schema([
-                    DateTimePicker::make('date_register')
-                        ->label('Tanggal Pendaftaran')
-                        ->native(false)
-                        ->displayFormat('l, jS F Y H:i'),
-                    ...SharedSchema::locationFields(),
-                    TextInput::make('curriculum_deputies')
-                        ->label('Wakakurikulum')
-                        ->maxLength(255),
-                    TextInput::make('curriculum_deputies_phone')
-                        ->label('No Handphone Wakakurikulum')
-                        ->telRegex('/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/')
-                        ->maxLength(255),
-                    TextInput::make('counselor_coordinators')
-                        ->label('Koordinator BK')
-                        ->maxLength(255),
-                    TextInput::make('counselor_coordinators_phone')
-                        ->label('No Handphone Koordinator BK')
-                        ->telRegex('/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/')
-                        ->maxLength(255),
-                    TextInput::make('proctors')
-                        ->label('Proktor')
-                        ->maxLength(255),
-                    TextInput::make('proctors_phone')
-                        ->label('No Handphone Proktor')
-                        ->telRegex('/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/')
-                        ->maxLength(255),
-                    TextInput::make('student_count')
-                        ->label('Jumlah Siswa')
-                        ->numeric(),
-                    DateTimePicker::make('implementation_estimate')
-                        ->label('Estimasi Pelaksanaan')
-                        ->native(false)
-                        ->displayFormat('l, jS F Y H:i'),
-                ])->columns(2),
-
-            Section::make('Sekolah')
-                ->description('Masukkan Detail Data Sekolah')
-                ->schema([
-                    TextInput::make('schools')
-                        ->label('Nama Sekolah')
-                        ->maxLength(255),
-                    TextInput::make('class')
-                        ->label('Kelas')
-                        ->maxLength(10),
-                    Select::make('education_level')
-                        ->label('Jenjang')
-                        ->options([
-                            'SD' => 'SD',
-                            'MI' => 'MI',
-                            'SMP' => 'SMP',
-                            'MTS' => 'MTS',
-                            'SMA' => 'SMA',
-                            'MA' => 'MA',
-                            'SMK' => 'SMK',
-                        ])
-                        ->native(false),
-                    Select::make('description')
-                        ->label('Keterangan')
-                        ->options([
-                            'ABK' => 'ABK',
-                            'NON-ABK' => 'NON ABK',
-                        ])
-                        ->native(false),
-                    Select::make('schools_type')
-                        ->label('Negeri / Swasta')
-                        ->options([
-                            'Negeri' => 'Negeri',
-                            'Swasta' => 'Swasta',
-                        ])
-                        ->native(false),
-                    TextInput::make('principal')
-                        ->label('Nama Kepala Sekolah')
-                        ->maxLength(255),
-                    TextInput::make('principal_phone')
-                        ->label('No Handphone Kepala Sekolah')
-                        ->telRegex('/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/')
-                        ->maxLength(255),
-                ])->columns(2),
-
-            Section::make('Akademik')
-                ->description('Detail Data Akademik')
-                ->schema([
-                    DatePicker::make('group')
-                        ->label('Grup')
-                        ->native(false)
-                        ->displayFormat('l, jS F Y'),
-                    DatePicker::make('bimtek')
-                        ->label('Bimtek')
-                        ->native(false)
-                        ->displayFormat('l, jS F Y'),
-                    TextInput::make('account_count_created')
-                        ->label('Jumlah Akun Dibuat')
-                        ->live(debounce: 1000)
-                        ->default('0')
-                        ->afterStateUpdated(function (Get $get, Set $set) {
-                            self::getDifference($get, $set);
-                        }),
-                    TextInput::make('implementer_count')
-                        ->label('Jumlah Akun Pelaksanaan')
-                        ->live(debounce: 1000)
-                        ->default('0')
-                        ->afterStateUpdated(function (Get $get, Set $set) {
-                            self::getDifference($get, $set);
-                        }),
-                    TextInput::make('difference')
-                        ->label('Akun Dibuat')
-                        ->readOnly()
-                        ->numeric()
-                        ->minValue(0)
-                        ->live(),
-                ])->columns(2),
-
-            Section::make('Konsultasi')
-                ->description('Detail Data Konsultasi')
-                ->schema([
-                    Section::make('')
+            Tabs::make('Form')
+                ->columnSpanFull()
+                ->persistTabInQueryString()
+                ->tabs([
+                    Tab::make('Sekolah')
+                        ->icon('heroicon-o-building-library')
                         ->schema([
-                            Radio::make('schools_download')
-                                ->label('Download Sekolah')
-                                ->options([
-                                    'YA' => 'YA',
-                                    'TIDAK' => 'TIDAK',
-                                ])
-                                ->inline(),
-                            Radio::make('students_download')
-                                ->label('Download Siswa')
-                                ->options([
-                                    'YA' => 'YA',
-                                    'TIDAK' => 'TIDAK',
-                                ])
-                                ->inline(),
-                            Radio::make('pm')
-                                ->label('PM')
-                                ->options([
-                                    'YA' => 'YA',
-                                    'TIDAK' => 'TIDAK',
-                                ])
-                                ->inline(),
-                        ])->columns(2),
-                    DatePicker::make('counselor_consultation_date')
-                        ->label('Konsul BK')
-                        ->native(false)
-                        ->displayFormat('l, jS F Y'),
-                    DatePicker::make('student_consultation_date')
-                        ->label('Konsul Siswa')
-                        ->native(false)
-                        ->displayFormat('l, jS F Y'),
-                ])->columns(2),
+                            Section::make(fn (Get $get) => self::meta($get)['nameRegister'])
+                                ->description(fn (Get $get) => self::meta($get)['DescriptionRegister'])
+                                ->icon('heroicon-o-flag')
+                                ->columns(['default' => 1, 'sm' => 2, 'xl' => 4])
+                                ->schema([
+                                    Select::make('type')
+                                        ->label('Program')
+                                        ->options(Program::list()),
+                                    Select::make('status_id')
+                                        ->label('Status')
+                                        ->preload()
+                                        ->relationship(
+                                            name: 'status',
+                                            titleAttribute: 'name',
+                                            modifyQueryUsing: fn (Builder $query) => $query
+                                                ->orderBy('order')
+                                        )
+                                        ->searchable()
+                                        ->placeholder('Pilih status...'),
+                                    Select::make('periode')
+                                        ->label('Periode')
+                                        ->options(Periode::list()),
+                                    TextInput::make('years')
+                                        ->label('Tahun Ajaran')
+                                        ->maxLength(255),
+                                ]),
 
-            Section::make('Finance')
-                ->description('Data dari Finance')
-                ->schema([
+                            Section::make('Data Sekolah')
+                                ->icon('heroicon-o-building-library')
+                                ->columns(['default' => 1, 'sm' => 2])
+                                ->schema([
+                                    TextInput::make('schools')
+                                        ->label('Nama Sekolah')
+                                        ->maxLength(255)
+                                        ->columnSpanFull(),
+                                    TextInput::make('class')
+                                        ->label('Kelas')
+                                        ->maxLength(10),
+                                    Select::make('education_level')
+                                        ->label('Jenjang')
+                                        ->options([
+                                            'SD' => 'SD',
+                                            'MI' => 'MI',
+                                            'SMP' => 'SMP',
+                                            'MTS' => 'MTS',
+                                            'SMA' => 'SMA',
+                                            'MA' => 'MA',
+                                            'SMK' => 'SMK',
+                                        ])
+                                        ->native(false),
+                                    Select::make('description')
+                                        ->label('Keterangan')
+                                        ->options([
+                                            'ABK' => 'ABK',
+                                            'NON-ABK' => 'NON ABK',
+                                        ])
+                                        ->native(false),
+                                    Select::make('schools_type')
+                                        ->label('Negeri / Swasta')
+                                        ->options([
+                                            'Negeri' => 'Negeri',
+                                            'Swasta' => 'Swasta',
+                                        ])
+                                        ->native(false),
+                                    TextInput::make('student_count')
+                                        ->label('Jumlah Siswa')
+                                        ->numeric(),
+                                    ...SharedSchema::locationFields(),
+                                ]),
 
-                    Fieldset::make('Akun Siswa')
-                        ->schema([
-                            TextInput::make('account_count_created')
-                                ->label('Jumlah Akun Dibuat')
-                                ->disabled(),
-                            TextInput::make('implementer_count')
-                                ->label('Jumlah Pelaksanaan')
-                                ->disabled(),
-                        ]),
+                            Section::make('Kontak Sekolah')
+                                ->icon('heroicon-o-user-group')
+                                ->columns(['default' => 1, 'sm' => 2])
+                                ->schema([
+                                    TextInput::make('principal')
+                                        ->label('Nama Kepala Sekolah')
+                                        ->maxLength(255),
+                                    TextInput::make('principal_phone')
+                                        ->label('No Handphone Kepala Sekolah')
+                                        ->telRegex($phoneRegex)
+                                        ->maxLength(255),
+                                    TextInput::make('curriculum_deputies')
+                                        ->label('Wakakurikulum')
+                                        ->maxLength(255),
+                                    TextInput::make('curriculum_deputies_phone')
+                                        ->label('No Handphone Wakakurikulum')
+                                        ->telRegex($phoneRegex)
+                                        ->maxLength(255),
+                                    TextInput::make('counselor_coordinators')
+                                        ->label('Koordinator BK')
+                                        ->maxLength(255),
+                                    TextInput::make('counselor_coordinators_phone')
+                                        ->label('No Handphone Koordinator BK')
+                                        ->telRegex($phoneRegex)
+                                        ->maxLength(255),
+                                    TextInput::make('proctors')
+                                        ->label('Proktor')
+                                        ->maxLength(255),
+                                    TextInput::make('proctors_phone')
+                                        ->label('No Handphone Proktor')
+                                        ->telRegex($phoneRegex)
+                                        ->maxLength(255),
+                                ]),
 
-                    Fieldset::make('Opsi')
-                        ->schema([
-                            Radio::make('option_price')
-                                ->label('Pilih Opsi')
-                                ->options(function (Get $get): array {
-                                    return [
-                                        'implementer_'.$get('implementer_count') => 'Jumlah Pelaksanaan',
-                                        'account_'.$get('account_count_created') => 'Jumlah Akun',
-                                        'real' => 'Jumlah Real',
-                                    ];
-                                })
-                                ->live(1000)
-                                ->reactive()
-                                ->afterStateUpdated(function (Get $get, Set $set) {
-                                    SharedSchema::syncTotal($get, $set);
-                                }),
-                            TextInput::make('real_count')
-                                ->label('Jumlah Siswa Real')
-                                ->numeric()
-                                ->minValue(0)
-                                ->live(debounce: 1000)
-                                ->visible(fn (Get $get): bool => $get('option_price') === 'real')
-                                ->afterStateUpdated(function (Get $get, Set $set) {
-                                    SharedSchema::syncTotal($get, $set);
-                                }),
-                        ]),
-
-                    Fieldset::make('Invoice')
-                        ->schema([
-                            DatePicker::make('invoice_date')
-                                ->label('Tanggal Invoice')
-                                ->native(false)
-                                ->displayFormat('l, jS F Y'),
-                            TextInput::make('invoice_amount')
-                                ->label('Nominal Invoice')
-                                ->prefix('Rp')
-                                ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0),
-                        ]),
-
-                    Fieldset::make('Nominal')
-                        ->schema([
-                            TextInput::make('price')
-                                ->label('Harga SPJ')
-                                ->prefix('Rp')
-                                ->live(1000)
-                                ->reactive()
-                                ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
-                                ->afterStateUpdated(function (Get $get, Set $set) {
-                                    SharedSchema::syncTotal($get, $set);
-                                }),
-                            TextInput::make('support_school')
-                                ->label('SS (Support Sekolah)')
-                                ->prefix('Rp')
-                                ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0),
-                            TextInput::make('net_2')
-                                ->label('Harga NET')
-                                ->prefix('Rp')
-                                ->live(1000)
-                                ->reactive()
-                                ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
-                                ->afterStateUpdated(function (Get $get, Set $set) {
-                                    $set('total_net', abs((float) $get('implementer_count') * (float) $get('net_2')));
-                                }),
-                        ])->columns(3),
-
-                    Fieldset::make('Pajak')
-                        ->schema([
-                            Group::make([
-                                CheckboxList::make('tax_rates')
-                                    ->label('Pilih Pajak')
-                                    ->options([
-                                        '11' => '11%',
-                                        '2' => '2%',
-                                        '0.5' => '0,5%',
-                                        'custom' => 'Isi Manual',
-                                    ])
-                                    ->live()
-                                    ->afterStateUpdated(function (Get $get, Set $set) {
-                                        SharedSchema::syncTax($get, $set);
-                                    }),
-                                TextInput::make('tax_custom_rate')
-                                    ->label('Pajak Manual')
-                                    ->suffix('%')
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->live(debounce: 1000)
-                                    ->visible(fn (Get $get): bool => in_array('custom', (array) $get('tax_rates'), true))
-                                    ->afterStateUpdated(function (Get $get, Set $set) {
-                                        SharedSchema::syncTax($get, $set);
-                                    }),
-                            ]),
-                            TextInput::make('tax_amount')
-                                ->label('Nominal Pajak')
-                                ->prefix('Rp')
-                                ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
-                                ->readOnly(),
-                        ]),
-
-                    Fieldset::make('Total')
-                        ->schema([
-                            TextInput::make('total')
-                                ->label('Total Dana Sesuai SPJ')
-                                ->prefix('Rp')
-                                ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
-                                ->readOnly(),
-                            TextInput::make('total_net')
-                                ->label('Total Net')
-                                ->prefix('Rp')
-                                ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
-                                ->readOnly(),
-                        ]),
-
-                    Fieldset::make('')
-                        ->schema([
-                            DatePicker::make('payment_date')
-                                ->label('Jadwal Pembayaran')
-                                ->native(false)
-                                ->displayFormat('l, jS F Y'),
-                            DatePicker::make('spk')
-                                ->label('Jadwal SPK')
-                                ->native(false)
-                                ->displayFormat('l, jS F Y'),
-                            Select::make('payment_name')
-                                ->label('Pembayaran Via')
-                                ->options([
-                                    'SIPLAH' => 'SIPLAH',
-                                    'SI/TF' => 'SI / TF',
-                                    'CASH' => 'CASH',
+                            Section::make('Pendaftaran')
+                                ->icon('heroicon-o-calendar-days')
+                                ->columns(['default' => 1, 'sm' => 2])
+                                ->schema([
+                                    DateTimePicker::make('date_register')
+                                        ->label('Tanggal Pendaftaran')
+                                        ->native(false)
+                                        ->displayFormat('l, jS F Y H:i'),
+                                    DateTimePicker::make('implementation_estimate')
+                                        ->label('Estimasi Pelaksanaan')
+                                        ->native(false)
+                                        ->displayFormat('l, jS F Y H:i'),
                                 ]),
                         ]),
-                ])->columns(2),
+
+                    Tab::make('Service')
+                        ->icon('heroicon-o-wrench-screwdriver')
+                        ->schema(FormSchema::serviceSections()),
+
+                    Tab::make('Finance')
+                        ->icon('heroicon-o-banknotes')
+                        ->schema(FormSchema::financeSections()),
+                ]),
         ];
     }
 

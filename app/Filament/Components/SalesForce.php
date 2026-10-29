@@ -29,115 +29,38 @@ class SalesForce
 
     public static function schema(): array
     {
+        $required = fn (string $label): HtmlString => new HtmlString(
+            '<span style="color: #ef4444;">'.$label.'</span>',
+        );
+        $upper = fn (?string $state): string => Str::upper($state);
+
         return [
-            Section::make('Program')
-                ->description('Pilih Program')
+            Section::make('Program & Periode')
+                ->description('Pilih Program, Periode dan Tahun Ajaran')
+                ->icon('heroicon-o-calendar-days')
+                ->columns(['default' => 1, 'sm' => 3])
                 ->schema([
                     Select::make('type')
                         ->label('Program')
                         ->options(Program::list()),
-                ])
-                ->columns(2),
-
-            Section::make('Periode')
-                ->description('Pilih Periode dan Tahun Ajaran')
-                ->schema([
                     Select::make('periode')
                         ->label('Periode')
                         ->options(Periode::list()),
                     TextInput::make('years')->label('Tahun')->maxLength(255),
-                ])
-                ->columns(2),
+                ]),
 
-            Section::make()
-                ->description()
-                ->schema([
-                    DateTimePicker::make('date_register')
-                        ->label(
-                            new HtmlString(
-                                '<span style="color: #ef4444;">Tanggal Pendaftaran</span>',
-                            ),
-                        )
-                        ->native(false)
-                        ->seconds(false)
-                        ->displayFormat('l, jS F Y H:i'),
-                    ...SharedSchema::locationFields(),
-                    TextInput::make('curriculum_deputies')
-                        ->label(
-                            new HtmlString(
-                                '<span style="color: #ef4444;">Wakakurikulum</span>',
-                            ),
-                        )
-                        ->nullable()
-                        ->dehydrateStateUsing(
-                            fn (?string $state): string => Str::upper($state),
-                        )
-                        ->maxLength(50)
-                        ->live(),
-                    PhoneInput::make('curriculum_deputies_phone')
-                        ->label(
-                            new HtmlString(
-                                '<span style="color: #ef4444;">No Handphone Wakakurikulum</span>',
-                            ),
-                        )
-                        ->defaultCountry('ID')
-                        ->live(),
-                    TextInput::make('counselor_coordinators')
-                        ->label('Koordinator BK')
-                        ->nullable()
-                        ->dehydrateStateUsing(
-                            fn (?string $state): string => Str::upper($state),
-                        )
-                        ->maxLength(255),
-                    PhoneInput::make('counselor_coordinators_phone')
-                        ->label('No Handphone Koordinator BK')
-                        ->defaultCountry('ID'),
-                    TextInput::make('proctors')
-                        ->label('Proktor')
-                        ->nullable()
-                        ->dehydrateStateUsing(
-                            fn (?string $state): string => Str::upper($state),
-                        )
-                        ->maxLength(255),
-                    PhoneInput::make('proctors_phone')
-                        ->label('No Handphone Proktor')
-                        ->defaultCountry('ID'),
-                    TextInput::make('student_count')
-                        ->label(
-                            new HtmlString(
-                                '<span style="color: #ef4444;">Jumlah Siswa</span>',
-                            ),
-                        )
-                        ->numeric(),
-                    DateTimePicker::make('implementation_estimate')
-                        ->label(
-                            new HtmlString(
-                                '<span style="color: #ef4444;">Estimasi Pelaksanaan</span>',
-                            ),
-                        )
-                        ->native(false)
-                        ->seconds(false)
-                        ->displayFormat('l, jS F Y H:i')
-                        ->live(),
-                    Textarea::make('notes')->label('Catatan')->autosize(),
-                ])
-                ->columns(2),
-
-            Section::make('Sekolah')
+            Section::make('Data Sekolah')
                 ->description('Masukkan Detail Data Sekolah')
+                ->icon('heroicon-o-building-library')
+                ->columns(['default' => 1, 'sm' => 2])
                 ->schema([
                     TextInput::make('schools')
-                        ->label(
-                            new HtmlString(
-                                '<span style="color: #ef4444;">Nama Sekolah</span>',
-                            ),
-                        )
+                        ->label($required('Nama Sekolah'))
                         ->nullable()
-                        ->dehydrateStateUsing(
-                            fn (?string $state): string => Str::upper($state),
-                        )
+                        ->dehydrateStateUsing($upper)
                         ->maxLength(255)
-                        ->live(),
+                        ->live()
+                        ->columnSpanFull(),
                     TextInput::make('class')->label('Kelas')->maxLength(10),
                     Select::make('education_level')
                         ->label('Jenjang')
@@ -157,31 +80,79 @@ class SalesForce
                             'SWASTA' => 'SWASTA',
                         ])
                         ->native(false),
+                    TextInput::make('student_count')
+                        ->label($required('Jumlah Siswa'))
+                        ->numeric(),
+                    ...SharedSchema::locationFields(),
+                ]),
+
+            Section::make('Kontak Sekolah')
+                ->description('Penanggung jawab dan nomor handphone')
+                ->icon('heroicon-o-user-group')
+                ->columns(['default' => 1, 'sm' => 2])
+                ->schema([
                     TextInput::make('principal')
-                        ->label(
-                            new HtmlString(
-                                '<span style="color: #ef4444;">Nama Kepala Sekolah</span>',
-                            ),
-                        )
+                        ->label($required('Nama Kepala Sekolah'))
                         ->nullable()
-                        ->dehydrateStateUsing(
-                            fn (?string $state): string => Str::upper($state),
-                        )
+                        ->dehydrateStateUsing($upper)
                         ->maxLength(255)
                         ->live(),
                     PhoneInput::make('principal_phone')
-                        ->label(
-                            new HtmlString(
-                                '<span style="color: #ef4444;">No Handphone Kepala Sekolah</span>',
-                            ),
-                        )
+                        ->label($required('No Handphone Kepala Sekolah'))
                         ->defaultCountry('ID')
                         ->live(),
-                ])
-                ->columns(2),
+                    TextInput::make('curriculum_deputies')
+                        ->label($required('Wakakurikulum'))
+                        ->nullable()
+                        ->dehydrateStateUsing($upper)
+                        ->maxLength(50)
+                        ->live(),
+                    PhoneInput::make('curriculum_deputies_phone')
+                        ->label($required('No Handphone Wakakurikulum'))
+                        ->defaultCountry('ID')
+                        ->live(),
+                    TextInput::make('counselor_coordinators')
+                        ->label('Koordinator BK')
+                        ->nullable()
+                        ->dehydrateStateUsing($upper)
+                        ->maxLength(255),
+                    PhoneInput::make('counselor_coordinators_phone')
+                        ->label('No Handphone Koordinator BK')
+                        ->defaultCountry('ID'),
+                    TextInput::make('proctors')
+                        ->label('Proktor')
+                        ->nullable()
+                        ->dehydrateStateUsing($upper)
+                        ->maxLength(255),
+                    PhoneInput::make('proctors_phone')
+                        ->label('No Handphone Proktor')
+                        ->defaultCountry('ID'),
+                ]),
+
+            Section::make('Jadwal & Catatan')
+                ->icon('heroicon-o-clock')
+                ->columns(['default' => 1, 'sm' => 2])
+                ->schema([
+                    DateTimePicker::make('date_register')
+                        ->label($required('Tanggal Pendaftaran'))
+                        ->native(false)
+                        ->seconds(false)
+                        ->displayFormat('l, jS F Y H:i'),
+                    DateTimePicker::make('implementation_estimate')
+                        ->label($required('Estimasi Pelaksanaan'))
+                        ->native(false)
+                        ->seconds(false)
+                        ->displayFormat('l, jS F Y H:i')
+                        ->live(),
+                    Textarea::make('notes')
+                        ->label('Catatan')
+                        ->autosize()
+                        ->columnSpanFull(),
+                ]),
 
             Section::make('Status')
                 ->description('Isi sesuai dengan status saat ini')
+                ->icon('heroicon-o-flag')
                 ->visible(function (Get $get) {
                     $keys = [
                         'principal',
@@ -215,7 +186,6 @@ class SalesForce
                         )
                         ->searchable()
                         ->placeholder('Pilih status...')
-                        ->columnSpan(1)
                         ->live()
                         ->afterStateUpdated(function (Set $set, $state) {
                             if ($state) {
@@ -225,8 +195,7 @@ class SalesForce
                                 $set('status_color', null);
                             }
                         }),
-                ])
-                ->columns(2),
+                ]),
         ];
     }
 
