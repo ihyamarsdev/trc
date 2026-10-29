@@ -64,10 +64,10 @@ class ServiceResource extends Resource
                     return $query
                         ->with(['latestStatusLog.status', 'status'])
                         ->where('years', now('Asia/Jakarta')->format('Y'))
-                        ->whereRelation('status', fn ($q) => $q->whereBetween('order', [2, 10]))
-                        ->orderByDesc('updated_at');
+                        ->whereRelation('status', fn ($q) => $q->whereBetween('order', [2, 10]));
                 }
             )
+            ->defaultSort('updated_at', 'desc')
             ->columns(
                 Service::columns()
             )

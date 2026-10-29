@@ -76,4 +76,52 @@ class ListPagesTest extends TestCase
             ->searchTable('tidak-ada-sekolah-ini')
             ->assertCanNotSeeTableRecords([$record]);
     }
+
+    /**
+     * @param  class-string  $page
+     */
+    #[DataProvider('listPages')]
+    public function test_user_chosen_sort_overrides_the_default_order(string $role, string $page, int $statusOrder): void
+    {
+        Filament::setCurrentPanel(Filament::getPanel('user'));
+
+        Role::create(['name' => $role]);
+        $user = User::create([
+            'name' => 'Role User',
+            'email' => $role.'@example.com',
+            'password' => bcrypt('password'),
+        ]);
+        $user->assignRole($role);
+        $this->actingAs($user);
+
+        $status = Status::create([
+            'name' => 'Status Daftar',
+            'description' => 'Desc',
+            'color' => 'blue',
+            'order' => $statusOrder,
+            'category' => $role,
+        ]);
+
+        $create = fn (string $school, int $daysAgo, string $estimate): RegistrationData => RegistrationData::factory()->create([
+            'users_id' => $user->id,
+            'status_id' => $status->id,
+            'schools' => $school,
+            'years' => now('Asia/Jakarta')->format('Y'),
+            'date_register' => '2026-01-01',
+            'implementation_estimate' => $estimate,
+            'updated_at' => now()->subDays($daysAgo),
+        ]);
+
+        $c = $create('SMA C', 0, '2026-01-01');
+        $a = $create('SMA A', 1, '2026-02-01');
+        $b = $create('SMA B', 2, '2026-03-01');
+
+        Livewire::test($page)
+            ->loadTable()
+            ->assertCanSeeTableRecords([$c, $a, $b], inOrder: true)
+            ->sortTable('schools', 'asc')
+            ->assertCanSeeTableRecords([$a, $b, $c], inOrder: true)
+            ->sortTable('schools', 'desc')
+            ->assertCanSeeTableRecords([$c, $b, $a], inOrder: true);
+    }
 }

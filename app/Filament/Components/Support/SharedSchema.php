@@ -87,10 +87,10 @@ class SharedSchema
 
     /**
      * List row shared by the Admin, Salesforce, Service and Finance tables.
-     * School name with a meta line (program, periode, year, estimate) and the status badge:
-     * side by side from `md`, stacked on phones so nothing is cut off.
+     * Two layouts toggled by breakpoint: labelled columns from `md`, and a compact
+     * stacked card (school, program/periode/year, estimate, status) on phones.
      *
-     * @return array<int, Split>
+     * @return array<int, Split|Stack>
      */
     public static function columns(): array
     {
@@ -98,60 +98,99 @@ class SharedSchema
 
         return [
             Split::make([
-                Stack::make([
-                    TextColumn::make('schools')
-                        ->label('Sekolah')
-                        ->placeholder('Sekolah belum terisi')
-                        ->searchable()
+                TextColumn::make('type')
+                    ->label('Program')
+                    ->description('Program', position: 'above')
+                    ->extraAttributes(['class' => 'uppercase'])
+                    ->sortable()
+                    ->visibleFrom('md'),
+                TextColumn::make('schools')
+                    ->label('Sekolah')
+                    ->description('Sekolah', position: 'above')
+                    ->searchable()
+                    ->wrap()
+                    ->sortable()
+                    ->visibleFrom('md'),
+                TextColumn::make('periode')
+                    ->label('Periode')
+                    ->description('Periode', position: 'above')
+                    ->extraAttributes(['class' => 'uppercase'])
+                    ->wrap()
+                    ->sortable()
+                    ->visibleFrom('md'),
+                TextColumn::make('years')
+                    ->label('Tahun')
+                    ->description('Tahun', position: 'above')
+                    ->sortable()
+                    ->visibleFrom('md'),
+                self::statusColumn()
+                    ->description('Status', position: 'above')
+                    ->visibleFrom('md'),
+            ])->from('md'),
+
+            Stack::make([
+                TextColumn::make('schools')
+                    ->label('Sekolah')
+                    ->placeholder('Sekolah belum terisi')
+                    ->searchable()
+                    ->weight(FontWeight::SemiBold)
+                    ->wrap()
+                    ->sortable()
+                    ->hiddenFrom('md'),
+                Split::make([
+                    TextColumn::make('type')
+                        ->label('Program')
+                        ->badge()
+                        ->color('primary')
+                        ->formatStateUsing($upper)
+                        ->grow(false)
                         ->sortable()
-                        ->weight(FontWeight::SemiBold)
-                        ->wrap(),
-                    Split::make([
-                        TextColumn::make('type')
-                            ->label('Program')
-                            ->badge()
-                            ->color('primary')
-                            ->formatStateUsing($upper)
-                            ->sortable()
-                            ->grow(false),
-                        TextColumn::make('periode')
-                            ->label('Periode')
-                            ->color('gray')
-                            ->size(TextColumnSize::Small)
-                            ->formatStateUsing($upper)
-                            ->sortable()
-                            ->grow(false),
-                        TextColumn::make('years')
-                            ->label('Tahun')
-                            ->color('gray')
-                            ->size(TextColumnSize::Small)
-                            ->sortable()
-                            ->grow(false),
-                    ]),
-                    TextColumn::make('implementation_estimate')
-                        ->label('Estimasi Pelaksanaan')
-                        ->icon('heroicon-m-clock')
+                        ->hiddenFrom('md'),
+                    TextColumn::make('periode')
+                        ->label('Periode')
                         ->color('gray')
                         ->size(TextColumnSize::Small)
-                        ->date('j M Y')
-                        ->placeholder('Belum dijadwalkan')
-                        ->sortable(),
-                ])->space(1),
-
-                TextColumn::make('latestStatusLog.status.name')
-                    ->label('Status')
-                    ->badge()
-                    ->color(fn ($record): string => match (strtolower((string) ($record?->latestStatusLog?->status?->color ?? $record?->status?->color ?? 'gray'))) {
-                        'green' => 'green',
-                        'blue' => 'blue',
-                        'yellow' => 'yellow',
-                        'red' => 'red',
-                        default => 'gray',
-                    })
-                    ->default(fn ($record): string => $record?->status?->name ?? '-')
-                    ->grow(false),
-            ])->from('md'),
+                        ->formatStateUsing($upper)
+                        ->grow(false)
+                        ->sortable()
+                        ->hiddenFrom('md'),
+                    TextColumn::make('years')
+                        ->label('Tahun')
+                        ->color('gray')
+                        ->size(TextColumnSize::Small)
+                        ->grow(false)
+                        ->sortable()
+                        ->hiddenFrom('md'),
+                ]),
+                TextColumn::make('implementation_estimate')
+                    ->label('Estimasi Pelaksanaan')
+                    ->icon('heroicon-m-clock')
+                    ->color('gray')
+                    ->size(TextColumnSize::Small)
+                    ->date('j M Y')
+                    ->placeholder('Belum dijadwalkan')
+                    ->sortable()
+                    ->hiddenFrom('md'),
+                self::statusColumn()
+                    ->grow(false)
+                    ->hiddenFrom('md'),
+            ])->space(1),
         ];
+    }
+
+    private static function statusColumn(): TextColumn
+    {
+        return TextColumn::make('latestStatusLog.status.name')
+            ->label('Status')
+            ->badge()
+            ->color(fn ($record): string => match (strtolower((string) ($record?->latestStatusLog?->status?->color ?? $record?->status?->color ?? 'gray'))) {
+                'green' => 'green',
+                'blue' => 'blue',
+                'yellow' => 'yellow',
+                'red' => 'red',
+                default => 'gray',
+            })
+            ->default(fn ($record): string => $record?->status?->name ?? '-');
     }
 
     public static function locationFields(): array

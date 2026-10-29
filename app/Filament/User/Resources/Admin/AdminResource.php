@@ -59,8 +59,8 @@ class AdminResource extends Resource
             ->modifyQueryUsing(
                 fn (Builder $query) => $query
                     ->with(['latestStatusLog.status', 'status'])
-                    ->orderByDesc('updated_at')
             )
+            ->defaultSort('updated_at', 'desc')
             ->columns(Admin::columns())
             ->filters(Admin::filters())
             ->filtersFormColumns(2)

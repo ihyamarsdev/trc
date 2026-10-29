@@ -50,7 +50,7 @@ class SharedSchemaAndProgramTest extends TestCase
         $columns = SharedSchema::columns();
 
         $this->assertIsArray($columns);
-        $this->assertCount(1, $columns);
+        $this->assertCount(2, $columns);
         $this->assertInstanceOf(Split::class, $columns[0]);
 
         $columnNames = $this->flattenColumnNames($columns);
