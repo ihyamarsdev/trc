@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\User\Resources\Academic\Monitoring\RekapitulasiServiceResource\Pages;
+namespace App\Filament\User\Resources\Service\Monitoring\RekapitulasiServiceResource\Pages;
 
-use App\Filament\User\Resources\Academic\Monitoring\RekapitulasiServiceResource;
+use App\Filament\User\Resources\Service\Monitoring\RekapitulasiServiceResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 

@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Filament\User\Resources\Academic\Monitoring;
+namespace App\Filament\User\Resources\Service\Monitoring;
 
-use App\Filament\Components\Academic;
+use App\Filament\Components\Service;
 use App\Filament\Enum\Jenjang;
 use App\Filament\Enum\Periode;
 use App\Filament\Enum\Program;
-use App\Filament\User\Resources\Academic\Monitoring\RekapitulasiServiceResource\Pages;
+use App\Filament\User\Resources\Service\Monitoring\RekapitulasiServiceResource\Pages;
 use App\Models\RegistrationData;
 use Carbon\Carbon;
 use Filament\Resources\Resource;
@@ -38,7 +38,7 @@ class RekapitulasiServiceResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole(Academic::getRoles());
+        return Auth::user()->hasRole(Service::getRoles());
     }
 
     public static function table(Table $table): Table

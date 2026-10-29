@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\User\Resources\Academic\AcademicResource\Pages;
+namespace App\Filament\User\Resources\Service\ServiceResource\Pages;
 
-use App\Filament\User\Resources\Academic\AcademicResource;
+use App\Filament\User\Resources\Service\ServiceResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
-class CreateAcademic extends CreateRecord
+class CreateService extends CreateRecord
 {
-    protected static string $resource = AcademicResource::class;
+    protected static string $resource = ServiceResource::class;
 
     protected function getHeaderActions(): array
     {

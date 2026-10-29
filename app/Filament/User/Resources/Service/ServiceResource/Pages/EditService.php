@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\User\Resources\Academic\AcademicResource\Pages;
+namespace App\Filament\User\Resources\Service\ServiceResource\Pages;
 
-use App\Filament\User\Resources\Academic\AcademicResource;
+use App\Filament\User\Resources\Service\ServiceResource;
 use App\Models\RegistrationStatus;
 use App\Models\Status;
 use App\Models\User;
@@ -13,9 +13,9 @@ use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class EditAcademic extends EditRecord
+class EditService extends EditRecord
 {
-    protected static string $resource = AcademicResource::class;
+    protected static string $resource = ServiceResource::class;
 
     protected function getHeaderActions(): array
     {
@@ -66,7 +66,7 @@ class EditAcademic extends EditRecord
                 ->success()
                 ->actions([
                     Action::make('Lihat')
-                        ->url(AcademicResource::getUrl('view', ['record' => $record]))
+                        ->url(ServiceResource::getUrl('view', ['record' => $record]))
                         ->openUrlInNewTab(),
                 ])
                 ->sendToDatabase($recipients);

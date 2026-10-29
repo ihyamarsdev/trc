@@ -2,7 +2,7 @@
 
 namespace App\Filament\User\Resources\TimelineResource\Pages;
 
-use App\Filament\Components\Academic;
+use App\Filament\Components\Service;
 use App\Filament\User\Resources\Admin\AdminResource;
 use App\Filament\User\Resources\TimelineResource;
 use Filament\Actions;
@@ -34,6 +34,6 @@ class ViewTimeline extends ViewRecord
         $record = $this->record;
 
         return $infolist
-            ->schema(Academic::infolist(record: $record));
+            ->schema(Service::infolist(record: $record));
     }
 }

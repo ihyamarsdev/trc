@@ -3,8 +3,8 @@
 namespace App\Filament\Components;
 
 use App\Filament\Components\Support\HasProgramMetadata;
+use App\Filament\Components\Support\InfolistSchema;
 use App\Filament\Components\Support\SharedSchema;
-use App\Filament\Components\Support\StatusPalette;
 use App\Filament\Enum\Jenjang;
 use App\Filament\Enum\Periode;
 use App\Filament\Enum\Program;
@@ -16,14 +16,12 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
-use Filament\Infolists;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
-use Ysfkaya\FilamentPhoneInput\Infolists\PhoneEntry;
-use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
 
 class SalesForce
 {
@@ -237,120 +235,9 @@ class SalesForce
         return SharedSchema::columns();
     }
 
-    public static function infolist(): array
+    public static function infolist(Model $record): array
     {
-        return [
-            Infolists\Components\Section::make('Status')
-                ->description('Progres Activity Saat ini')
-                ->schema([
-                    Infolists\Components\Fieldset::make(
-                        'Kondisi Saat ini',
-                    )->schema([
-                        Infolists\Components\TextEntry::make(
-                            'status.name',
-                        )->label(''),
-                        Infolists\Components\IconEntry::make(
-                            'latestStatusLog.status.order',
-                        )
-                            ->label('')
-                            ->icon(fn ($state): string => StatusPalette::icon($state))
-                            ->color(fn ($state): string => StatusPalette::color($state))
-                            ->default('red')
-                            ->size('lg'),
-                    ]),
-                ])
-                ->columns(2),
-
-            Infolists\Components\Section::make('Sales')
-                ->description('Detail data dari Sales')
-                ->schema([
-                    Infolists\Components\Fieldset::make('Periode')->schema([
-                        Infolists\Components\TextEntry::make('periode')->label(
-                            'Periode',
-                        ),
-                        Infolists\Components\TextEntry::make('years')->label(
-                            'Tahun',
-                        ),
-                    ]),
-
-                    Infolists\Components\Fieldset::make('Salesforce')->schema([
-                        Infolists\Components\TextEntry::make(
-                            'users.name',
-                        )->label('User'),
-                        Infolists\Components\TextEntry::make('type')->label(
-                            'Program',
-                        ),
-                    ]),
-
-                    Infolists\Components\Fieldset::make('Sekolah')->schema([
-                        Infolists\Components\TextEntry::make('schools')->label(
-                            'Sekolah',
-                        ),
-                        Infolists\Components\TextEntry::make('class')->label(
-                            'Kelas',
-                        ),
-                        Infolists\Components\TextEntry::make(
-                            'education_level',
-                        )->label('Jenjang'),
-                        Infolists\Components\TextEntry::make(
-                            'description',
-                        )->label('Keterangan'),
-                        Infolists\Components\TextEntry::make(
-                            'schools_type',
-                        )->label('Negeri / Swasta'),
-                        Infolists\Components\TextEntry::make(
-                            'student_count',
-                        )->label('Jumlah Siswa'),
-                        Infolists\Components\TextEntry::make(
-                            'provinces',
-                        )->label('Provinsi'),
-                        Infolists\Components\TextEntry::make(
-                            'regencies',
-                        )->label('Kota / Kabupaten'),
-                        Infolists\Components\TextEntry::make('area')
-                            ->label('Wilayah')
-                            ->default('-'),
-                    ]),
-
-                    Infolists\Components\Fieldset::make('Bagan')->schema([
-                        Infolists\Components\TextEntry::make(
-                            'principal',
-                        )->label('Kepala Sekolah'),
-                        PhoneEntry::make('principal_phone')
-                            ->label('No Hp Kepala Sekolah')
-                            ->displayFormat(PhoneInputNumberType::NATIONAL),
-                        Infolists\Components\TextEntry::make(
-                            'curriculum_deputies',
-                        )->label('Wakakurikulum'),
-                        PhoneEntry::make('curriculum_deputies_phone')
-                            ->label('No Hp Wakakurikulum')
-                            ->displayFormat(PhoneInputNumberType::NATIONAL),
-                        Infolists\Components\TextEntry::make(
-                            'counselor_coordinators',
-                        )->label('Koordinator BK'),
-                        PhoneEntry::make('counselor_coordinators_phone')
-                            ->label('No Hp Koordinator BK')
-                            ->displayFormat(PhoneInputNumberType::NATIONAL),
-                        Infolists\Components\TextEntry::make('proctors')->label(
-                            'Proktor',
-                        ),
-                        PhoneEntry::make('proctors_phone')
-                            ->label('No Hp Proktor')
-                            ->displayFormat(PhoneInputNumberType::NATIONAL),
-                    ]),
-
-                    Infolists\Components\Fieldset::make('Tanggal')->schema([
-                        Infolists\Components\TextEntry::make('date_register')
-                            ->label('Tanggal Pendaftaran')
-                            ->dateTime('l, jS F Y H:i'),
-                        Infolists\Components\TextEntry::make(
-                            'implementation_estimate',
-                        )
-                            ->label('Estimasi Pelaksanaan')
-                            ->dateTime('l, jS F Y H:i'),
-                    ]),
-                ]),
-        ];
+        return InfolistSchema::compose($record);
     }
 
     public static function filters(): array

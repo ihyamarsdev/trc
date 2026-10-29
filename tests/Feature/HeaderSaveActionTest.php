@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Filament\User\Resources\Academic\AcademicResource\Pages\EditAcademic;
 use App\Filament\User\Resources\Admin\AdminResource\Pages\CreateAdmin;
 use App\Filament\User\Resources\Admin\AdminResource\Pages\EditAdmin;
 use App\Filament\User\Resources\Salesforce\SalesResource\Pages\CreateSales;
 use App\Filament\User\Resources\Salesforce\SalesResource\Pages\EditSales;
+use App\Filament\User\Resources\Service\ServiceResource\Pages\EditService;
 use App\Models\RegistrationData;
 use App\Models\Status;
 use App\Models\User;
@@ -145,7 +145,7 @@ class HeaderSaveActionTest extends TestCase
         ]);
     }
 
-    public function test_header_save_action_works_on_edit_academic(): void
+    public function test_header_save_action_works_on_edit_service(): void
     {
         Filament::setCurrentPanel(Filament::getPanel('user'));
 
@@ -161,29 +161,29 @@ class HeaderSaveActionTest extends TestCase
         $this->actingAs($user);
 
         $status = Status::create([
-            'name' => 'Academic Status',
-            'description' => 'Academic Desc',
+            'name' => 'Service Status',
+            'description' => 'Service Desc',
             'color' => 'yellow',
             'order' => 2,
-            'category' => 'academic',
+            'category' => 'service',
         ]);
 
         $record = RegistrationData::factory()->create([
             'users_id' => $user->id,
             'status_id' => $status->id,
-            'schools' => 'Academic School Name',
+            'schools' => 'Service School Name',
             'date_register' => '2026-01-01',
         ]);
 
         $newStatus = Status::create([
-            'name' => 'Academic Status 2',
-            'description' => 'Academic Desc 2',
+            'name' => 'Service Status 2',
+            'description' => 'Service Desc 2',
             'color' => 'yellow',
             'order' => 3,
-            'category' => 'academic',
+            'category' => 'service',
         ]);
 
-        Livewire::test(EditAcademic::class, ['record' => $record->getKey()])
+        Livewire::test(EditService::class, ['record' => $record->getKey()])
             ->fillForm([
                 'status_id' => $newStatus->id,
             ])

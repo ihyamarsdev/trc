@@ -94,7 +94,7 @@ class SalesResource extends Resource
     public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
-            ->schema(SalesForce::infolist());
+            ->schema(SalesForce::infolist($infolist->getRecord()));
     }
 
     public static function getRelations(): array

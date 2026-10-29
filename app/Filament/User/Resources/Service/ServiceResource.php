@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\User\Resources\Academic;
+namespace App\Filament\User\Resources\Service;
 
-use App\Filament\Components\Academic;
-use App\Filament\User\Resources\Academic\AcademicResource\Pages;
+use App\Filament\Components\Service;
+use App\Filament\User\Resources\Service\ServiceResource\Pages;
 use App\Models\RegistrationData;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -12,7 +12,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
-class AcademicResource extends Resource
+class ServiceResource extends Resource
 {
     protected static ?string $model = RegistrationData::class;
 
@@ -38,13 +38,13 @@ class AcademicResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()?->hasRole(Academic::getRoles()) ?? false;
+        return Auth::user()?->hasRole(Service::getRoles()) ?? false;
     }
 
     public static function form(Form $form): Form
     {
         return $form
-            ->schema(Academic::formSchema());
+            ->schema(Service::formSchema());
     }
 
     public static function table(Table $table): Table
@@ -67,9 +67,9 @@ class AcademicResource extends Resource
                 }
             )
             ->columns(
-                Academic::columns()
+                Service::columns()
             )
-            ->filters(Academic::filters())
+            ->filters(Service::filters())
             ->filtersTriggerAction(
                 fn (Action $action) => $action
                     ->button()
@@ -77,7 +77,7 @@ class AcademicResource extends Resource
             )
             ->recordAction('view')
             ->actions([])
-            ->bulkActions(Academic::bulkActions());
+            ->bulkActions(Service::bulkActions());
     }
 
     public static function getRelations(): array
@@ -90,10 +90,10 @@ class AcademicResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAcademics::route('/'),
-            'create' => Pages\CreateAcademic::route('/create'),
-            'view' => Pages\ViewAcademic::route('/{record}'),
-            'edit' => Pages\EditAcademic::route('/{record}/edit'),
+            'index' => Pages\ListServices::route('/'),
+            'create' => Pages\CreateService::route('/create'),
+            'view' => Pages\ViewService::route('/{record}'),
+            'edit' => Pages\EditService::route('/{record}/edit'),
         ];
     }
 }

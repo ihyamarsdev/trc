@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Filament\User\Resources\Academic\AcademicResource\Pages;
+namespace App\Filament\User\Resources\Service\ServiceResource\Pages;
 
-use App\Filament\Components\Academic;
-use App\Filament\User\Resources\Academic\AcademicResource;
+use App\Filament\Components\Service;
+use App\Filament\User\Resources\Service\ServiceResource;
 use Filament\Actions;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\ViewRecord;
 
-class ViewAcademic extends ViewRecord
+class ViewService extends ViewRecord
 {
     use InteractsWithRecord;
 
-    protected static string $resource = AcademicResource::class;
+    protected static string $resource = ServiceResource::class;
 
     protected function getHeaderActions(): array
     {
@@ -34,6 +34,6 @@ class ViewAcademic extends ViewRecord
         $record = $this->record;
 
         return $infolist
-            ->schema(Academic::infolist(record: $record));
+            ->schema(Service::infolist(record: $record));
     }
 }
