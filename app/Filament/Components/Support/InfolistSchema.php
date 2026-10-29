@@ -15,6 +15,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\TextEntry\TextEntrySize;
 use Filament\Support\Enums\FontWeight;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\HtmlString;
 use Ysfkaya\FilamentPhoneInput\Infolists\PhoneEntry;
 use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
 
@@ -32,7 +33,7 @@ class InfolistSchema
 
     private const EMPTY = 'Belum Terisi';
 
-    private const DATE_FORMAT = 'l, jS F Y';
+    private const DATE_FORMAT = 'j F Y';
 
     /**
      * Header card followed by the tabs for the requested parts.
@@ -50,30 +51,36 @@ class InfolistSchema
         }
 
         $tabs = [
-            Tab::make('Sekolah')
-                ->icon('heroicon-o-building-library')
-                ->schema(self::schoolSections()),
+            self::tab('Sekolah', 'heroicon-o-building-library', self::schoolSections()),
         ];
 
         if (in_array(self::PART_SERVICE, $parts, true)) {
-            $tabs[] = Tab::make('Service')
-                ->icon('heroicon-o-wrench-screwdriver')
-                ->schema(self::serviceSections());
+            $tabs[] = self::tab('Service', 'heroicon-o-wrench-screwdriver', self::serviceSections());
         }
 
         if (in_array(self::PART_FINANCE, $parts, true)) {
-            $tabs[] = Tab::make('Finance')
-                ->icon('heroicon-o-banknotes')
-                ->schema(self::financeSections());
+            $tabs[] = self::tab('Finance', 'heroicon-o-banknotes', self::financeSections());
         }
 
         if (in_array(self::PART_DOCUMENTS, $parts, true)) {
-            $tabs[] = Tab::make('Kwitansi & Invoice')
-                ->icon('heroicon-o-document-text')
-                ->schema(self::documentSections());
+            $tabs[] = self::tab('Kwitansi & Invoice', 'heroicon-o-document-text', self::documentSections());
         }
 
         return [...$schema, Tabs::make('Detail')->tabs($tabs)->persistTabInQueryString()->columnSpanFull()];
+    }
+
+    /**
+     * Icon-only on phones (four labelled tabs do not fit), icon + label from `sm` up.
+     *
+     * @param  array<int, Component>  $schema
+     */
+    private static function tab(string $label, string $icon, array $schema): Tab
+    {
+        return Tab::make($label)
+            ->icon($icon)
+            ->label(new HtmlString('<span class="sr-only sm:hidden">'.e($label).'</span><span class="hidden sm:block">'.e($label).'</span>'))
+            ->extraAttributes(['style' => 'padding: 0.75rem;'])
+            ->schema($schema);
     }
 
     public static function header(Model $record, ?Action $statusAction = null): Section
@@ -101,25 +108,22 @@ class InfolistSchema
                             ->size(TextEntrySize::Large)
                             ->weight(FontWeight::Bold)
                             ->placeholder('Nama Sekolah Belum Terisi'),
-                        Split::make([
-                            TextEntry::make('type')
-                                ->hiddenLabel()
-                                ->badge()
-                                ->color('primary')
-                                ->icon('heroicon-m-academic-cap')
-                                ->formatStateUsing(fn (): string => $program['nameRegister'])
-                                ->tooltip($program['DescriptionRegister'])
-                                ->grow(false),
-                            self::badge('periode')->grow(false),
-                            self::badge('years')->icon('heroicon-m-calendar')->grow(false),
-                            self::badge('education_level')->grow(false),
-                            self::badge('schools_type')->grow(false),
-                        ]),
+                        TextEntry::make('badges')
+                            ->hiddenLabel()
+                            ->badge()
+                            ->state(fn (Model $record): array => array_values(array_filter([
+                                filled($record->type) ? $program['nameRegister'] : null,
+                                $record->periode,
+                                $record->years,
+                                $record->education_level,
+                                $record->schools_type,
+                            ])))
+                            ->color(fn (string $state): string => $state === $program['nameRegister'] ? 'primary' : 'gray'),
                     ]),
                     Group::make([$status])->grow(false),
                 ])->from('md'),
 
-                Grid::make(['default' => 1, 'sm' => 2, 'xl' => 4])
+                Grid::make(['default' => 2, 'xl' => 4])
                     ->schema([
                         TextEntry::make('users.name')
                             ->label('Salesforce')
@@ -151,7 +155,8 @@ class InfolistSchema
         return [
             Section::make('Data Sekolah')
                 ->icon('heroicon-o-building-library')
-                ->columns(['default' => 1, 'sm' => 2, 'xl' => 4])
+                ->compact()
+                ->columns(['default' => 2, 'xl' => 4])
                 ->schema([
                     self::text('education_level', 'Jenjang'),
                     self::text('class', 'Kelas'),
@@ -159,11 +164,12 @@ class InfolistSchema
                     self::text('description', 'Keterangan'),
                     self::text('provinces', 'Provinsi'),
                     self::text('regencies', 'Kota / Kabupaten'),
-                    self::text('area', 'Wilayah')->columnSpan(['xl' => 2]),
+                    self::text('area', 'Wilayah')->columnSpan(['default' => 2, 'xl' => 2]),
                 ]),
 
             Section::make('Kontak Sekolah')
                 ->icon('heroicon-o-user-group')
+                ->compact()
                 ->columns(['default' => 1, 'lg' => 2])
                 ->schema([
                     self::contact('Kepala Sekolah', 'principal'),
@@ -182,7 +188,8 @@ class InfolistSchema
         return [
             Section::make('Akun Siswa')
                 ->icon('heroicon-o-identification')
-                ->columns(3)
+                ->compact()
+                ->columns(['default' => 3])
                 ->schema([
                     self::stat('account_count_created', 'Akun Dibuat', 'Belum Terbuat'),
                     self::stat('implementer_count', 'Pelaksanaan', 'Belum Terbuat'),
@@ -191,7 +198,8 @@ class InfolistSchema
 
             Section::make('Jadwal')
                 ->icon('heroicon-o-calendar-days')
-                ->columns(['default' => 1, 'sm' => 2, 'xl' => 4])
+                ->compact()
+                ->columns(['default' => 2, 'xl' => 4])
                 ->schema([
                     self::date('group', 'Grup'),
                     self::date('bimtek', 'Bimtek'),
@@ -201,7 +209,8 @@ class InfolistSchema
 
             Section::make('Konsultasi')
                 ->icon('heroicon-o-chat-bubble-left-right')
-                ->columns(3)
+                ->compact()
+                ->columns(['default' => 3])
                 ->schema([
                     self::yesNo('students_download', 'Download Siswa'),
                     self::yesNo('schools_download', 'Download Sekolah'),
@@ -218,14 +227,16 @@ class InfolistSchema
         return [
             Section::make('Opsi Perhitungan')
                 ->icon('heroicon-o-calculator')
-                ->columns(2)
+                ->compact()
+                ->columns(['default' => 2])
                 ->schema([
                     TextEntry::make('option_price')
                         ->label('Dasar Jumlah')
                         ->badge()
                         ->color('primary')
                         ->formatStateUsing(fn (?string $state): string => self::optionLabel($state))
-                        ->placeholder('Belum di Pilih'),
+                        ->placeholder('Belum di Pilih')
+                        ->columnSpan(['default' => 2, 'sm' => 1]),
                     TextEntry::make('real_count')
                         ->label('Jumlah Siswa Real')
                         ->placeholder(self::EMPTY)
@@ -234,7 +245,8 @@ class InfolistSchema
 
             Section::make('Invoice')
                 ->icon('heroicon-o-receipt-percent')
-                ->columns(2)
+                ->compact()
+                ->columns(['default' => 2])
                 ->schema([
                     self::date('invoice_date', 'Tanggal Invoice'),
                     self::money('invoice_amount', 'Nominal Invoice'),
@@ -242,7 +254,8 @@ class InfolistSchema
 
             Section::make('Nominal')
                 ->icon('heroicon-o-banknotes')
-                ->columns(['default' => 1, 'sm' => 3])
+                ->compact()
+                ->columns(['default' => 2, 'sm' => 3])
                 ->schema([
                     self::money('price', 'Harga SPJ'),
                     self::money('support_school', 'SS (Support Sekolah)'),
@@ -251,7 +264,8 @@ class InfolistSchema
 
             Section::make('Pajak')
                 ->icon('heroicon-o-scale')
-                ->columns(2)
+                ->compact()
+                ->columns(['default' => 2])
                 ->schema([
                     TextEntry::make('tax_rates')
                         ->label('Pilihan Pajak')
@@ -263,7 +277,8 @@ class InfolistSchema
 
             Section::make('Total')
                 ->icon('heroicon-o-currency-dollar')
-                ->columns(2)
+                ->compact()
+                ->columns(['default' => 2])
                 ->schema([
                     self::money('total', 'Total Dana Sesuai SPJ')
                         ->size(TextEntrySize::Large)
@@ -277,7 +292,8 @@ class InfolistSchema
 
             Section::make('Pembayaran')
                 ->icon('heroicon-o-credit-card')
-                ->columns(['default' => 1, 'sm' => 3])
+                ->compact()
+                ->columns(['default' => 2, 'sm' => 3])
                 ->schema([
                     self::date('payment_date', 'Jadwal Pembayaran'),
                     self::date('spk', 'SPK Dikirim'),
@@ -299,6 +315,7 @@ class InfolistSchema
             Section::make('Kwitansi')
                 ->description('Lakukan Edit untuk merubah Kwitansi')
                 ->icon('heroicon-o-document-text')
+                ->compact()
                 ->columns(['default' => 1, 'lg' => 3])
                 ->schema([
                     self::text('schools', 'Telah Terima Dari'),
@@ -309,11 +326,12 @@ class InfolistSchema
             Section::make('Invoice')
                 ->description('Lakukan Edit untuk merubah Invoice')
                 ->icon('heroicon-o-document-currency-dollar')
-                ->columns(['default' => 1, 'sm' => 2, 'xl' => 4])
+                ->compact()
+                ->columns(['default' => 2, 'xl' => 4])
                 ->schema([
-                    self::text('schools', 'Bill To'),
-                    self::text('number_invoice', 'Nomor Invoice'),
-                    self::text('detail_invoice', 'Deskripsi')->columnSpan(['xl' => 2]),
+                    self::text('schools', 'Bill To')->columnSpan(['default' => 2, 'xl' => 1]),
+                    self::text('number_invoice', 'Nomor Invoice')->columnSpan(['default' => 2, 'xl' => 1]),
+                    self::text('detail_invoice', 'Deskripsi')->columnSpan(['default' => 2, 'xl' => 2]),
                     self::text('qty_invoice', 'Kuantitas'),
                     self::money('unit_price', 'Harga Per Unit'),
                     self::money('amount_invoice', 'Jumlah'),
@@ -324,7 +342,7 @@ class InfolistSchema
                         ->size(TextEntrySize::Large)
                         ->weight(FontWeight::Bold)
                         ->color('primary')
-                        ->columnSpan(['xl' => 2]),
+                        ->columnSpan(['default' => 2, 'xl' => 2]),
                 ]),
         ];
     }
@@ -365,15 +383,6 @@ class InfolistSchema
             ->placeholder(self::EMPTY);
     }
 
-    private static function badge(string $name): TextEntry
-    {
-        return TextEntry::make($name)
-            ->hiddenLabel()
-            ->badge()
-            ->color('gray')
-            ->visible(fn (Model $record): bool => filled($record->{$name}));
-    }
-
     private static function yesNo(string $name, string $label): TextEntry
     {
         return TextEntry::make($name)
@@ -392,12 +401,12 @@ class InfolistSchema
             ->placeholder('Tidak Ada Status');
     }
 
-    private static function contact(string $label, string $name): Group
+    private static function contact(string $label, string $name): Grid
     {
-        return Group::make([
+        return Grid::make(['default' => 2])->schema([
             self::text($name, $label)->icon('heroicon-m-user'),
             PhoneEntry::make($name.'_phone')
-                ->label('No Hp '.$label)
+                ->label('No Hp')
                 ->icon('heroicon-m-phone')
                 ->displayFormat(PhoneInputNumberType::NATIONAL)
                 ->placeholder(self::EMPTY),
