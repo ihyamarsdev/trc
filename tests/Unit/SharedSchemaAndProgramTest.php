@@ -53,11 +53,32 @@ class SharedSchemaAndProgramTest extends TestCase
         $this->assertCount(1, $columns);
         $this->assertInstanceOf(Split::class, $columns[0]);
 
-        $splitColumns = $columns[0]->getComponents();
-        $columnNames = array_map(fn ($col) => $col->getName(), $splitColumns);
+        $columnNames = $this->flattenColumnNames($columns);
 
+        $this->assertContains('schools', $columnNames);
         $this->assertContains('latestStatusLog.status.name', $columnNames);
         $this->assertNotContains('latestStatusLog.status.color', $columnNames);
+    }
+
+    /**
+     * @param  array<int, mixed>  $components
+     * @return list<string>
+     */
+    private function flattenColumnNames(array $components): array
+    {
+        $names = [];
+
+        foreach ($components as $component) {
+            if (method_exists($component, 'getComponents')) {
+                array_push($names, ...$this->flattenColumnNames($component->getComponents()));
+
+                continue;
+            }
+
+            $names[] = $component->getName();
+        }
+
+        return $names;
     }
 
     /**

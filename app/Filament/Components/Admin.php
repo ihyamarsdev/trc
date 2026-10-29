@@ -322,7 +322,7 @@ class Admin
                             'payment_date' => 'Tanggal Pembayaran',
                         ])
                         ->default('date_register')
-                        ->columnSpan(2),
+                        ->columnSpan(['sm' => 2]),
                     DatePicker::make('date_from')
                         ->label('Dari Tanggal')
                         ->native(false),
@@ -330,7 +330,7 @@ class Admin
                         ->label('Sampai Tanggal')
                         ->native(false),
                 ])
-                ->columns(2)
+                ->columns(['default' => 1, 'sm' => 2])
                 ->query(function (Builder $query, array $data): Builder {
                     $field = $data['date_field'] ?? 'date_register';
 

@@ -34,6 +34,8 @@ class RekapitulasiServiceResource extends Resource
 
     protected static ?string $navigationLabel = 'Rekapitulasi';
 
+    protected static ?int $navigationSort = 2;
+
     protected static ?string $modelLabel = 'rekapitulasi';
 
     public static function canViewAny(): bool

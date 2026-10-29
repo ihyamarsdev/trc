@@ -30,6 +30,8 @@ class ServiceResource extends Resource
 
     protected static ?string $navigationLabel = 'Database';
 
+    protected static ?int $navigationSort = 1;
+
     protected static ?string $modelLabel = 'database';
 
     protected static ?string $slug = 'database-service';

@@ -5,8 +5,11 @@ namespace App\Filament\Components\Support;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Columns\Layout\Split;
+use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\TextColumn\TextColumnSize;
 use Illuminate\Support\Str;
 
 class SharedSchema
@@ -82,31 +85,61 @@ class SharedSchema
             ->all();
     }
 
+    /**
+     * List row shared by the Admin, Salesforce, Service and Finance tables.
+     * School name with a meta line (program, periode, year, estimate) and the status badge:
+     * side by side from `md`, stacked on phones so nothing is cut off.
+     *
+     * @return array<int, Split>
+     */
     public static function columns(): array
     {
+        $upper = fn (?string $state): string => Str::upper((string) $state);
+
         return [
             Split::make([
-                TextColumn::make('type')
-                    ->label('Program')
-                    ->description('Program', position: 'above')
-                    ->extraAttributes(['class' => 'uppercase']),
-                TextColumn::make('schools')
-                    ->label('Sekolah')
-                    ->description('Sekolah', position: 'above')
-                    ->searchable()
-                    ->wrap(),
-                TextColumn::make('periode')
-                    ->label('Periode')
-                    ->description('Periode', position: 'above')
-                    ->extraAttributes(['class' => 'uppercase'])
-                    ->wrap(),
-                TextColumn::make('years')
-                    ->label('Tahun')
-                    ->description('Tahun', position: 'above'),
+                Stack::make([
+                    TextColumn::make('schools')
+                        ->label('Sekolah')
+                        ->placeholder('Sekolah belum terisi')
+                        ->searchable()
+                        ->sortable()
+                        ->weight(FontWeight::SemiBold)
+                        ->wrap(),
+                    Split::make([
+                        TextColumn::make('type')
+                            ->label('Program')
+                            ->badge()
+                            ->color('primary')
+                            ->formatStateUsing($upper)
+                            ->sortable()
+                            ->grow(false),
+                        TextColumn::make('periode')
+                            ->label('Periode')
+                            ->color('gray')
+                            ->size(TextColumnSize::Small)
+                            ->formatStateUsing($upper)
+                            ->sortable()
+                            ->grow(false),
+                        TextColumn::make('years')
+                            ->label('Tahun')
+                            ->color('gray')
+                            ->size(TextColumnSize::Small)
+                            ->sortable()
+                            ->grow(false),
+                    ]),
+                    TextColumn::make('implementation_estimate')
+                        ->label('Estimasi Pelaksanaan')
+                        ->icon('heroicon-m-clock')
+                        ->color('gray')
+                        ->size(TextColumnSize::Small)
+                        ->date('j M Y')
+                        ->placeholder('Belum dijadwalkan')
+                        ->sortable(),
+                ])->space(1),
 
                 TextColumn::make('latestStatusLog.status.name')
                     ->label('Status')
-                    ->description('Status', position: 'above')
                     ->badge()
                     ->color(fn ($record): string => match (strtolower((string) ($record?->latestStatusLog?->status?->color ?? $record?->status?->color ?? 'gray'))) {
                         'green' => 'green',
@@ -115,7 +148,8 @@ class SharedSchema
                         'red' => 'red',
                         default => 'gray',
                     })
-                    ->default(fn ($record): string => $record?->status?->name ?? '-'),
+                    ->default(fn ($record): string => $record?->status?->name ?? '-')
+                    ->grow(false),
             ])->from('md'),
         ];
     }
