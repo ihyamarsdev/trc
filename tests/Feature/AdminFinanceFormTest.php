@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Components\Admin;
+use App\Filament\Components\Support\SharedSchema;
 use App\Filament\User\Resources\Admin\AdminResource\Pages\EditAdmin;
 use App\Filament\User\Resources\Admin\AdminResource\Pages\ViewAdmin;
 use App\Models\RegistrationData;
@@ -66,10 +66,10 @@ class AdminFinanceFormTest extends TestCase
 
     public function test_tax_rate_total_sums_selected_rates_and_manual_rate(): void
     {
-        $this->assertSame(13.5, Admin::taxRateTotal(['11', '2', '0.5'], null));
-        $this->assertSame(1.5, Admin::taxRateTotal(['custom'], '1.5'));
-        $this->assertSame(0.0, Admin::taxRateTotal(null, '3'));
-        $this->assertSame(['11%', '0,5%', '1,25%'], Admin::taxRateLabels(['11', '0.5', 'custom'], '1.25'));
+        $this->assertSame(13.5, SharedSchema::taxRateTotal(['11', '2', '0.5'], null));
+        $this->assertSame(1.5, SharedSchema::taxRateTotal(['custom'], '1.5'));
+        $this->assertSame(0.0, SharedSchema::taxRateTotal(null, '3'));
+        $this->assertSame(['11%', '0,5%', '1,25%'], SharedSchema::taxRateLabels(['11', '0.5', 'custom'], '1.25'));
     }
 
     public function test_finance_form_has_requested_fields_and_no_trc_or_mitra(): void

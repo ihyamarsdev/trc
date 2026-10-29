@@ -10,8 +10,10 @@ use App\Filament\Enum\Periode;
 use App\Filament\Enum\Program;
 use App\Models\User;
 use Carbon\Carbon;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Fieldset;
+use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -68,80 +70,126 @@ class Finance
                             ->disabled(),
                     ]),
 
-                    Fieldset::make('Nominal')->schema([
-                        TextInput::make('price')
-                            ->label('Harga SPJ')
-                            ->prefix('Rp')
-                            ->live(1000)
-                            ->reactive()
-                            ->currencyMask(
-                                thousandSeparator: ',',
-                                decimalSeparator: '.',
-                                precision: 0,
-                            )
-                            ->afterStateUpdated(function (Get $get, Set $set) {
-                                $price = (float) $get('price');
-                                $net = 0;
-
-                                if ($price >= 0 && $price <= 100000) {
-                                    $net = 25000;
-                                } elseif ($price > 100000 && $price <= 150000) {
-                                    $net = 50000;
-                                } elseif ($price > 150000 && $price <= 200000) {
-                                    $net = 75000;
-                                } elseif ($price > 200000) {
-                                    $net = 100000;
-                                }
-
-                                $set('net', $net);
-                                $set('mitra_net', $net);
-                                $set('ss_net', $net);
-                                $set('dll_net', $net);
-                            }),
-                        TextInput::make('net_2')
-                            ->label('Harga NET')
-                            ->prefix('Rp')
-                            ->live(1000)
-                            ->reactive()
-                            ->currencyMask(
-                                thousandSeparator: ',',
-                                decimalSeparator: '.',
-                                precision: 0,
-                            )
-                            ->afterStateUpdated(function (Get $get, Set $set) {
-                                $set(
-                                    'total_net',
-                                    abs(
-                                        (float) $get('implementer_count') *
-                                        (float) $get('net_2'),
-                                    ),
-                                );
-                            }),
-                    ]),
-
                     Fieldset::make('Opsi')->schema([
                         Radio::make('option_price')
                             ->label('Pilih Opsi')
                             ->options(function (Get $get): array {
                                 return [
-                                    'implementer_'.
-                                    $get(
-                                        'implementer_count',
-                                    ) => 'JUMLAH PELAKSANAAN',
-                                    'account_'.
-                                    $get(
-                                        'account_count_created',
-                                    ) => 'JUMLAH AKUN',
+                                    'implementer_'.$get('implementer_count') => 'JUMLAH PELAKSANAAN',
+                                    'account_'.$get('account_count_created') => 'JUMLAH AKUN',
+                                    'real' => 'JUMLAH REAL',
                                 ];
                             })
                             ->live(1000)
                             ->reactive()
-                            ->afterStateUpdated(function (Get $get, Set $set, $state) {
-                                preg_match("/\d+/", $state, $matches);
-                                $count = (float) ($matches[0] ?? 0);
-
-                                $set('total', (float) $get('price') * $count);
+                            ->afterStateUpdated(function (Get $get, Set $set) {
+                                SharedSchema::syncTotal($get, $set);
                             }),
+                        TextInput::make('real_count')
+                            ->label('Jumlah Siswa Real')
+                            ->numeric()
+                            ->minValue(0)
+                            ->live(debounce: 1000)
+                            ->visible(fn (Get $get): bool => $get('option_price') === 'real')
+                            ->afterStateUpdated(function (Get $get, Set $set) {
+                                SharedSchema::syncTotal($get, $set);
+                            }),
+                    ]),
+
+                    Fieldset::make('Invoice')->schema([
+                        DatePicker::make('invoice_date')
+                            ->label('Tanggal Invoice')
+                            ->native(false)
+                            ->displayFormat('l, jS F Y'),
+                        TextInput::make('invoice_amount')
+                            ->label('Nominal Invoice')
+                            ->prefix('Rp')
+                            ->currencyMask(
+                                thousandSeparator: ',',
+                                decimalSeparator: '.',
+                                precision: 0,
+                            ),
+                    ]),
+
+                    Fieldset::make('Nominal')
+                        ->schema([
+                            TextInput::make('price')
+                                ->label('Harga SPJ')
+                                ->prefix('Rp')
+                                ->live(1000)
+                                ->reactive()
+                                ->currencyMask(
+                                    thousandSeparator: ',',
+                                    decimalSeparator: '.',
+                                    precision: 0,
+                                )
+                                ->afterStateUpdated(function (Get $get, Set $set) {
+                                    SharedSchema::syncTotal($get, $set);
+                                }),
+                            TextInput::make('support_school')
+                                ->label('SS (Support Sekolah)')
+                                ->prefix('Rp')
+                                ->currencyMask(
+                                    thousandSeparator: ',',
+                                    decimalSeparator: '.',
+                                    precision: 0,
+                                ),
+                            TextInput::make('net_2')
+                                ->label('Harga NET')
+                                ->prefix('Rp')
+                                ->live(1000)
+                                ->reactive()
+                                ->currencyMask(
+                                    thousandSeparator: ',',
+                                    decimalSeparator: '.',
+                                    precision: 0,
+                                )
+                                ->afterStateUpdated(function (Get $get, Set $set) {
+                                    $set(
+                                        'total_net',
+                                        abs(
+                                            (float) $get('implementer_count') *
+                                            (float) $get('net_2'),
+                                        ),
+                                    );
+                                }),
+                        ])
+                        ->columns(3),
+
+                    Fieldset::make('Pajak')->schema([
+                        Group::make([
+                            CheckboxList::make('tax_rates')
+                                ->label('Pilih Pajak')
+                                ->options([
+                                    '11' => '11%',
+                                    '2' => '2%',
+                                    '0.5' => '0,5%',
+                                    'custom' => 'Isi Manual',
+                                ])
+                                ->live()
+                                ->afterStateUpdated(function (Get $get, Set $set) {
+                                    SharedSchema::syncTax($get, $set);
+                                }),
+                            TextInput::make('tax_custom_rate')
+                                ->label('Pajak Manual')
+                                ->suffix('%')
+                                ->numeric()
+                                ->minValue(0)
+                                ->live(debounce: 1000)
+                                ->visible(fn (Get $get): bool => in_array('custom', (array) $get('tax_rates'), true))
+                                ->afterStateUpdated(function (Get $get, Set $set) {
+                                    SharedSchema::syncTax($get, $set);
+                                }),
+                        ]),
+                        TextInput::make('tax_amount')
+                            ->label('Nominal Pajak')
+                            ->prefix('Rp')
+                            ->currencyMask(
+                                thousandSeparator: ',',
+                                decimalSeparator: '.',
+                                precision: 0,
+                            )
+                            ->readOnly(),
                     ]),
 
                     Fieldset::make('Total')->schema([
@@ -165,178 +213,7 @@ class Finance
                             ->readOnly(),
                     ]),
 
-                    Fieldset::make('')
-                        ->label('TRC')
-                        ->schema([
-                            TextInput::make('student_count_1')
-                                ->label('Selisih Siswa TRC')
-                                ->numeric()
-                                ->live(debounce: 1000)
-                                ->afterStateUpdated(function (Get $get, Set $set) {
-                                    $set(
-                                        'subtotal_1',
-                                        (float) $get('student_count_1') *
-                                        (float) $get('net'),
-                                    );
-                                }),
-                            TextInput::make('net')
-                                ->label('Satuan')
-                                ->live(debounce: 1000)
-                                ->prefix('Rp')
-                                ->currencyMask(
-                                    thousandSeparator: ',',
-                                    decimalSeparator: '.',
-                                    precision: 0,
-                                )
-                                ->numeric()
-                                ->afterStateUpdated(function (Get $get, Set $set) {
-                                    $set(
-                                        'subtotal_1',
-                                        (float) $get('student_count_1') *
-                                        (float) $get('net'),
-                                    );
-                                }),
-                            TextInput::make('subtotal_1')
-                                ->label('Subtotal')
-                                ->prefix('Rp')
-                                ->currencyMask(
-                                    thousandSeparator: ',',
-                                    decimalSeparator: '.',
-                                    precision: 0,
-                                )
-                                ->numeric()
-                                ->readOnly(),
-                        ])
-                        ->columns(3),
-
-                    Fieldset::make('')
-                        ->label('MITRA')
-                        ->schema([
-                            TextInput::make('mitra_difference')
-                                ->label('Selisih Siswa Sekolah')
-                                ->numeric()
-                                ->live(debounce: 1000)
-                                ->afterStateUpdated(function (Get $get, Set $set) {
-                                    $set(
-                                        'mitra_subtotal',
-                                        (float) $get('mitra_difference') *
-                                        (float) $get('mitra_net'),
-                                    );
-                                }),
-                            TextInput::make('mitra_net')
-                                ->label('Satuan')
-                                ->live(debounce: 1000)
-                                ->prefix('Rp')
-                                ->currencyMask(
-                                    thousandSeparator: ',',
-                                    decimalSeparator: '.',
-                                    precision: 0,
-                                )
-                                ->numeric()
-                                ->afterStateUpdated(function (Get $get, Set $set) {
-                                    $set(
-                                        'mitra_subtotal',
-                                        (float) $get('mitra_difference') *
-                                        (float) $get('mitra_net'),
-                                    );
-                                }),
-                            TextInput::make('mitra_subtotal')
-                                ->label('Subtotal')
-                                ->prefix('Rp')
-                                ->currencyMask(
-                                    thousandSeparator: ',',
-                                    decimalSeparator: '.',
-                                    precision: 0,
-                                )
-                                ->numeric()
-                                ->readOnly(),
-
-                            TextInput::make('ss_difference')
-                                ->label('SS')
-                                ->numeric()
-                                ->live(debounce: 1000)
-                                ->afterStateUpdated(function (Get $get, Set $set) {
-                                    $set(
-                                        'ss_subtotal',
-                                        (float) $get('ss_difference') *
-                                        (float) $get('ss_net'),
-                                    );
-                                })
-                                ->readOnly(),
-                            TextInput::make('ss_net')
-                                ->label('Satuan')
-                                ->live(debounce: 1000)
-                                ->prefix('Rp')
-                                ->currencyMask(
-                                    thousandSeparator: ',',
-                                    decimalSeparator: '.',
-                                    precision: 0,
-                                )
-                                ->numeric()
-                                ->afterStateUpdated(function (Get $get, Set $set) {
-                                    $set(
-                                        'ss_subtotal',
-                                        (float) $get('ss_difference') *
-                                        (float) $get('ss_net'),
-                                    );
-                                }),
-                            TextInput::make('ss_subtotal')
-                                ->label('Subtotal')
-                                ->prefix('Rp')
-                                ->currencyMask(
-                                    thousandSeparator: ',',
-                                    decimalSeparator: '.',
-                                    precision: 0,
-                                )
-                                ->numeric()
-                                ->readOnly(),
-
-                            TextInput::make('dll_difference')
-                                ->label('Lain-lain')
-                                ->numeric()
-                                ->live(debounce: 1000)
-                                ->afterStateUpdated(function (Get $get, Set $set) {
-                                    $set(
-                                        'dll_subtotal',
-                                        (float) $get('dll_difference') *
-                                        (float) $get('dll_net'),
-                                    );
-                                }),
-                            TextInput::make('dll_net')
-                                ->label('Satuan')
-                                ->live(debounce: 1000)
-                                ->prefix('Rp')
-                                ->currencyMask(
-                                    thousandSeparator: ',',
-                                    decimalSeparator: '.',
-                                    precision: 0,
-                                )
-                                ->numeric()
-                                ->afterStateUpdated(function (Get $get, Set $set) {
-                                    $set(
-                                        'subtotal_1',
-                                        (float) $get('student_count_1') *
-                                        (float) $get('net'),
-                                    );
-                                }),
-                            TextInput::make('dll_subtotal')
-                                ->label('Subtotal')
-                                ->prefix('Rp')
-                                ->currencyMask(
-                                    thousandSeparator: ',',
-                                    decimalSeparator: '.',
-                                    precision: 0,
-                                )
-                                ->numeric()
-                                ->readOnly(),
-                        ])
-                        ->columns(3),
-
                     Fieldset::make('')->schema([
-                        DatePicker::make('invoice_date')
-                            ->label('Invoice')
-                            ->native(false)
-                            ->displayFormat('l, jS F Y'),
                         DatePicker::make('payment_date')
                             ->label('Jadwal Pembayaran')
                             ->native(false)
@@ -643,18 +520,38 @@ class Finance
             Infolists\Components\Section::make('Finance')
                 ->description('Detail Data Finance')
                 ->schema([
-                    Infolists\Components\Fieldset::make(
-                        'Opsi Jumlah Akun / Jumlah Pelaksanaan',
-                    )->schema([
-                        TextEntry::make('option_price')
-                            ->label('')
-                            ->placeholder('Belum di Pilih'),
-                    ]),
+                    Infolists\Components\Fieldset::make('Opsi Jumlah Akun / Jumlah Pelaksanaan / Jumlah Real')
+                        ->schema([
+                            TextEntry::make('option_price')
+                                ->label('')
+                                ->placeholder('Belum di Pilih'),
+                            TextEntry::make('real_count')
+                                ->label('Jumlah Siswa Real')
+                                ->placeholder('Belum Terisi')
+                                ->visible(fn (Model $record): bool => str_starts_with((string) $record->option_price, 'real')),
+                        ]),
+
+                    Infolists\Components\Fieldset::make('Invoice')
+                        ->schema([
+                            TextEntry::make('invoice_date')
+                                ->label('Tanggal Invoice')
+                                ->dateTime('l, jS F Y')
+                                ->placeholder('Belum Terjadwal'),
+                            TextEntry::make('invoice_amount')
+                                ->label('Nominal Invoice')
+                                ->money('IDR')
+                                ->placeholder('Belum Terisi'),
+                        ])
+                        ->columns(3),
 
                     Infolists\Components\Fieldset::make('Nominal')
                         ->schema([
                             TextEntry::make('price')
                                 ->label('Harga SPJ')
+                                ->money('IDR')
+                                ->placeholder('Belum Terisi'),
+                            TextEntry::make('support_school')
+                                ->label('SS (Support Sekolah)')
                                 ->money('IDR')
                                 ->placeholder('Belum Terisi'),
                             TextEntry::make('net_2')
@@ -664,59 +561,15 @@ class Finance
                         ])
                         ->columns(3),
 
-                    Infolists\Components\Fieldset::make('')
-                        ->label('TRC')
+                    Infolists\Components\Fieldset::make('Pajak')
                         ->schema([
-                            TextEntry::make('student_count_1')
-                                ->label('Selisih Siswa TRC')
-                                ->placeholder('Belum Terisi'),
-                            TextEntry::make('net')
-                                ->label('Satuan')
-                                ->money('IDR')
-                                ->placeholder('Belum Terisi'),
-                            TextEntry::make('subtotal_1')
-                                ->label('Sub Total')
-                                ->money('IDR')
-                                ->placeholder('Belum Terisi'),
-                        ])
-                        ->columns(3),
-
-                    Infolists\Components\Fieldset::make('')
-                        ->label('MITRA')
-                        ->schema([
-                            TextEntry::make('mitra_difference')
-                                ->label('Selisih Siswa Sekolah')
-                                ->placeholder('Belum Terisi'),
-                            TextEntry::make('mitra_net')
-                                ->label('Satuan')
-                                ->money('IDR')
-                                ->placeholder('Belum Terisi'),
-                            TextEntry::make('mitra_subtotal')
-                                ->label('Sub Total')
-                                ->money('IDR')
-                                ->placeholder('Belum Terisi'),
-
-                            TextEntry::make('implementer_count')
-                                ->label('SS')
-                                ->placeholder('Belum Terisi'),
-                            TextEntry::make('ss_net')
-                                ->label('Satuan')
-                                ->money('IDR')
-                                ->placeholder('Belum Terisi'),
-                            TextEntry::make('ss_subtotal')
-                                ->label('Sub Total')
-                                ->money('IDR')
-                                ->placeholder('Belum Terisi'),
-
-                            TextEntry::make('dll_difference')
-                                ->label('SS')
-                                ->placeholder('Belum Terisi'),
-                            TextEntry::make('dll_net')
-                                ->label('Satuan')
-                                ->money('IDR')
-                                ->placeholder('Belum Terisi'),
-                            TextEntry::make('dll_subtotal')
-                                ->label('Sub Total')
+                            TextEntry::make('tax_rates')
+                                ->label('Pilihan Pajak')
+                                ->badge()
+                                ->state(fn (Model $record): array => SharedSchema::taxRateLabels($record->tax_rates, $record->tax_custom_rate))
+                                ->placeholder('Tanpa Pajak'),
+                            TextEntry::make('tax_amount')
+                                ->label('Nominal Pajak')
                                 ->money('IDR')
                                 ->placeholder('Belum Terisi'),
                         ])
@@ -739,10 +592,6 @@ class Finance
                     Infolists\Components\Fieldset::make('')
                         ->label('Tanggal')
                         ->schema([
-                            TextEntry::make('invoice_date')
-                                ->label('Invoice')
-                                ->dateTime('l, jS F Y')
-                                ->placeholder('Belum Terjadwal'),
                             TextEntry::make('payment_date')
                                 ->label('Pembayaran')
                                 ->dateTime('l, jS F Y')

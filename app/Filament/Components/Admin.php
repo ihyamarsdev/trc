@@ -45,65 +45,6 @@ class Admin
         SharedSchema::getDifference($get, $set);
     }
 
-    /**
-     * Recalculate "Total Dana Sesuai SPJ" from price and the selected count option, then the tax.
-     */
-    public static function syncTotal(Get $get, Set $set): void
-    {
-        $option = (string) $get('option_price');
-
-        if ($option === 'real') {
-            $count = (float) $get('real_count');
-        } else {
-            preg_match('/\d+/', $option, $matches);
-            $count = (float) ($matches[0] ?? 0);
-        }
-
-        $set('total', (float) $get('price') * $count);
-
-        self::syncTax($get, $set);
-    }
-
-    /**
-     * Recalculate "Nominal Pajak" as the selected tax percentages applied to "Total Dana Sesuai SPJ".
-     */
-    public static function syncTax(Get $get, Set $set): void
-    {
-        $rate = self::taxRateTotal($get('tax_rates'), $get('tax_custom_rate'));
-
-        $set('tax_amount', round((float) $get('total') * $rate / 100));
-    }
-
-    /**
-     * Sum of the selected tax percentages; the `custom` choice uses the manually typed percentage.
-     *
-     * @param  array<int|string, int|string>|null  $rates
-     */
-    public static function taxRateTotal(?array $rates, mixed $customRate): float
-    {
-        $total = 0.0;
-
-        foreach ($rates ?? [] as $rate) {
-            $total += $rate === 'custom' ? (float) $customRate : (float) $rate;
-        }
-
-        return $total;
-    }
-
-    /**
-     * @param  array<int|string, int|string>|null  $rates
-     * @return array<int, string>
-     */
-    public static function taxRateLabels(?array $rates, mixed $customRate): array
-    {
-        $format = fn (float $percent): string => rtrim(rtrim(number_format($percent, 2, ',', ''), '0'), ',').'%';
-
-        return collect($rates ?? [])
-            ->map(fn (int|string $rate): string => $format($rate === 'custom' ? (float) $customRate : (float) $rate))
-            ->values()
-            ->all();
-    }
-
     public static function formSchema(): array
     {
         return [
@@ -318,7 +259,7 @@ class Admin
                                 ->live(1000)
                                 ->reactive()
                                 ->afterStateUpdated(function (Get $get, Set $set) {
-                                    self::syncTotal($get, $set);
+                                    SharedSchema::syncTotal($get, $set);
                                 }),
                             TextInput::make('real_count')
                                 ->label('Jumlah Siswa Real')
@@ -327,7 +268,7 @@ class Admin
                                 ->live(debounce: 1000)
                                 ->visible(fn (Get $get): bool => $get('option_price') === 'real')
                                 ->afterStateUpdated(function (Get $get, Set $set) {
-                                    self::syncTotal($get, $set);
+                                    SharedSchema::syncTotal($get, $set);
                                 }),
                         ]),
 
@@ -352,7 +293,7 @@ class Admin
                                 ->reactive()
                                 ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
                                 ->afterStateUpdated(function (Get $get, Set $set) {
-                                    self::syncTotal($get, $set);
+                                    SharedSchema::syncTotal($get, $set);
                                 }),
                             TextInput::make('support_school')
                                 ->label('SS (Support Sekolah)')
@@ -382,7 +323,7 @@ class Admin
                                     ])
                                     ->live()
                                     ->afterStateUpdated(function (Get $get, Set $set) {
-                                        self::syncTax($get, $set);
+                                        SharedSchema::syncTax($get, $set);
                                     }),
                                 TextInput::make('tax_custom_rate')
                                     ->label('Pajak Manual')
@@ -392,7 +333,7 @@ class Admin
                                     ->live(debounce: 1000)
                                     ->visible(fn (Get $get): bool => in_array('custom', (array) $get('tax_rates'), true))
                                     ->afterStateUpdated(function (Get $get, Set $set) {
-                                        self::syncTax($get, $set);
+                                        SharedSchema::syncTax($get, $set);
                                     }),
                             ]),
                             TextInput::make('tax_amount')
@@ -782,7 +723,7 @@ class Admin
                             TextEntry::make('tax_rates')
                                 ->label('Pilihan Pajak')
                                 ->badge()
-                                ->state(fn (Model $record): array => self::taxRateLabels($record->tax_rates, $record->tax_custom_rate))
+                                ->state(fn (Model $record): array => SharedSchema::taxRateLabels($record->tax_rates, $record->tax_custom_rate))
                                 ->placeholder('Tanpa Pajak'),
                             TextEntry::make('tax_amount')
                                 ->label('Nominal Pajak')
