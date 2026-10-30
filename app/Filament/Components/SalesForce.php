@@ -2,12 +2,12 @@
 
 namespace App\Filament\Components;
 
+use App\Filament\Components\Support\FormSchema;
 use App\Filament\Components\Support\HasProgramMetadata;
 use App\Filament\Components\Support\InfolistSchema;
 use App\Filament\Components\Support\SharedSchema;
-use App\Filament\Enum\Jenjang;
-use App\Filament\Enum\Periode;
-use App\Filament\Enum\Program;
+use App\Filament\Enum\OptionGroup;
+use App\Models\Option;
 use App\Models\Status;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Section;
@@ -40,12 +40,8 @@ class SalesForce
                 ->icon('heroicon-o-calendar-days')
                 ->columns(['default' => 1, 'sm' => 3])
                 ->schema([
-                    Select::make('type')
-                        ->label('Program')
-                        ->options(Program::list()),
-                    Select::make('periode')
-                        ->label('Periode')
-                        ->options(Periode::list()),
+                    FormSchema::optionSelect('type', 'Program', OptionGroup::Program),
+                    FormSchema::optionSelect('periode', 'Periode', OptionGroup::Periode),
                     TextInput::make('years')->label('Tahun')->maxLength(255),
                 ]),
 
@@ -62,24 +58,9 @@ class SalesForce
                         ->live()
                         ->columnSpanFull(),
                     TextInput::make('class')->label('Kelas')->maxLength(10),
-                    Select::make('education_level')
-                        ->label('Jenjang')
-                        ->options(Jenjang::list())
-                        ->native(false),
-                    Select::make('description')
-                        ->label('Keterangan')
-                        ->options([
-                            'ABK' => 'ABK',
-                            'NON-ABK' => 'NON ABK',
-                        ])
-                        ->native(false),
-                    Select::make('schools_type')
-                        ->label('Negeri / Swasta')
-                        ->options([
-                            'NEGERI' => 'NEGERI',
-                            'SWASTA' => 'SWASTA',
-                        ])
-                        ->native(false),
+                    FormSchema::optionSelect('education_level', 'Jenjang', OptionGroup::Jenjang)->native(false),
+                    FormSchema::optionSelect('description', 'Keterangan', OptionGroup::Keterangan)->native(false),
+                    FormSchema::optionSelect('schools_type', 'Negeri / Swasta', OptionGroup::SchoolType)->native(false),
                     TextInput::make('student_count')
                         ->label($required('Jumlah Siswa'))
                         ->numeric(),
@@ -214,17 +195,17 @@ class SalesForce
         return [
             Tables\Filters\SelectFilter::make('type')
                 ->label('Program')
-                ->options(Program::list())
+                ->options(Option::list(OptionGroup::Program, onlyActive: false))
                 ->preload()
                 ->indicator('Program'),
             Tables\Filters\SelectFilter::make('periode')
                 ->label('Periode')
-                ->options(Periode::list())
+                ->options(Option::list(OptionGroup::Periode, onlyActive: false))
                 ->preload()
                 ->indicator('Periode'),
             Tables\Filters\SelectFilter::make('education_level')
                 ->label('Jenjang')
-                ->options(Jenjang::list())
+                ->options(Option::list(OptionGroup::Jenjang, onlyActive: false))
                 ->preload()
                 ->indicator('Jenjang'),
             Tables\Filters\SelectFilter::make('status_color')

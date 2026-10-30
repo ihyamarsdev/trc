@@ -3,8 +3,9 @@
 namespace App\Filament\User\Resources\Activity;
 
 use App\Filament\Components\Admin;
-use App\Filament\Enum\Program;
+use App\Filament\Enum\OptionGroup;
 use App\Filament\User\Resources\Activity\ActivityResource\Pages;
+use App\Models\Option;
 use App\Models\RegistrationData;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -66,7 +67,7 @@ class ActivityResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
                     ->label('Program')
-                    ->options(Program::list())
+                    ->options(Option::list(OptionGroup::Program, onlyActive: false))
                     ->preload()
                     ->indicator('Program'),
                 Tables\Filters\SelectFilter::make('latestStatusLog.status.color')

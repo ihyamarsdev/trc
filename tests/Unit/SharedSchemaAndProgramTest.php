@@ -3,7 +3,6 @@
 namespace Tests\Unit;
 
 use App\Filament\Components\Support\SharedSchema;
-use App\Filament\Enum\Program;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Tables\Columns\Layout\Split;
@@ -11,37 +10,6 @@ use Tests\TestCase;
 
 class SharedSchemaAndProgramTest extends TestCase
 {
-    /**
-     * Test Program enum getMetadata function with various casings and fallbacks.
-     */
-    public function test_program_enum_get_metadata(): void
-    {
-        // Test lowercase
-        $anbkMeta = Program::getMetadata('anbk');
-        $this->assertEquals('ANBK', $anbkMeta['nameRegister']);
-        $this->assertEquals('ASESMEN NASIONAL BERBASIS KOMPUTER', $anbkMeta['DescriptionRegister']);
-
-        // Test uppercase (case insensitivity)
-        $anbkUpperMeta = Program::getMetadata('ANBK');
-        $this->assertEquals('ANBK', $anbkUpperMeta['nameRegister']);
-        $this->assertEquals('ASESMEN NASIONAL BERBASIS KOMPUTER', $anbkUpperMeta['DescriptionRegister']);
-
-        // Test fallback to apps (default fallback)
-        $invalidMeta = Program::getMetadata('invalid_program');
-        $this->assertEquals('APPS', $invalidMeta['nameRegister']);
-        $this->assertEquals('ASESMEN PSIKOTES POTENSI SISWA', $invalidMeta['DescriptionRegister']);
-
-        // Test fallback to custom default (e.g. none)
-        $noneMeta = Program::getMetadata('invalid_program', 'none');
-        $this->assertEquals('NONE', $noneMeta['nameRegister']);
-        $this->assertEquals('NONE', $noneMeta['DescriptionRegister']);
-
-        // Test PASJ
-        $pasjMeta = Program::getMetadata('pasj');
-        $this->assertEquals('PASJ', $pasjMeta['nameRegister']);
-        $this->assertEquals('PROGRAM ANALISIS SIDIK JARI', $pasjMeta['DescriptionRegister']);
-    }
-
     /**
      * Test SharedSchema columns array structure.
      */

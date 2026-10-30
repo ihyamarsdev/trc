@@ -6,9 +6,8 @@ use App\Filament\Components\Support\FormSchema;
 use App\Filament\Components\Support\HasProgramMetadata;
 use App\Filament\Components\Support\InfolistSchema;
 use App\Filament\Components\Support\SharedSchema;
-use App\Filament\Enum\Jenjang;
-use App\Filament\Enum\Periode;
-use App\Filament\Enum\Program;
+use App\Filament\Enum\OptionGroup;
+use App\Models\Option;
 use App\Models\User;
 use Carbon\Carbon;
 use Filament\Forms\Components\Section;
@@ -107,16 +106,16 @@ class Service
         return [
             Tables\Filters\SelectFilter::make('periode')
                 ->label('Periode')
-                ->options(Periode::list())
+                ->options(Option::list(OptionGroup::Periode, onlyActive: false))
                 ->preload(),
             Tables\Filters\SelectFilter::make('education_level')
                 ->label('Jenjang')
-                ->options(Jenjang::list())
+                ->options(Option::list(OptionGroup::Jenjang, onlyActive: false))
                 ->preload()
                 ->indicator('Jenjang'),
             Tables\Filters\SelectFilter::make('type')
                 ->label('Program')
-                ->options(Program::list())
+                ->options(Option::list(OptionGroup::Program, onlyActive: false))
                 ->preload()
                 ->indicator('Program'),
             Tables\Filters\SelectFilter::make('users_id')

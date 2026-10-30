@@ -95,6 +95,9 @@ class RegistrationData extends Model
         'tax_rates',
         'tax_custom_rate',
         'tax_amount',
+        'total_received',
+        'total_support_school',
+        'bank_name',
         'cb,',
         'status_id', // Foreign key to statuses table
     ];

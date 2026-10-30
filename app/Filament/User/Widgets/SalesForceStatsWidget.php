@@ -2,8 +2,8 @@
 
 namespace App\Filament\User\Widgets;
 
-use App\Filament\Enum\Jenjang;
-use App\Filament\Enum\Program;
+use App\Filament\Enum\OptionGroup;
+use App\Models\Option;
 use App\Models\RegistrationData;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -43,7 +43,7 @@ class SalesForceStatsWidget extends Widget implements HasForms
             ->schema([
                 Select::make('education_level')
                     ->label('Jenjang')
-                    ->options(Jenjang::list())
+                    ->options(Option::list(OptionGroup::Jenjang, onlyActive: false))
                     ->placeholder('Semua Jenjang')
                     ->live()
                     ->afterStateUpdated(fn () => $this->dispatch('$refresh')),
@@ -86,12 +86,12 @@ class SalesForceStatsWidget extends Widget implements HasForms
                 return $query->where('years', $this->years);
             });
 
-        // Initialize with all programs defined in Program enum
+        // Initialize with every active program managed in the admin panel
         $programs = [];
-        foreach (Program::cases() as $case) {
-            $programs[$case->value] = [
-                'type' => $case->value,
-                'label' => $case->label(),
+        foreach (Option::list(OptionGroup::Program) as $value => $label) {
+            $programs[(string) $value] = [
+                'type' => (string) $value,
+                'label' => $label,
                 'school_count' => 0,
                 'student_count' => 0,
             ];
@@ -111,10 +111,9 @@ class SalesForceStatsWidget extends Widget implements HasForms
             }
 
             if (! isset($programs[$typeKey])) {
-                $enumProgram = Program::tryFrom($typeKey);
                 $programs[$typeKey] = [
                     'type' => $typeKey,
-                    'label' => $enumProgram?->label() ?? strtoupper($typeKey),
+                    'label' => Option::label(OptionGroup::Program, $typeKey) ?? strtoupper($typeKey),
                     'school_count' => 0,
                     'student_count' => 0,
                 ];

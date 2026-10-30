@@ -2,6 +2,9 @@
 
 namespace App\Filament\Components\Support;
 
+use App\Filament\Enum\OptionGroup;
+use App\Models\Option;
+use Closure;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
@@ -46,13 +49,30 @@ class SharedSchema
     }
 
     /**
-     * Recalculate "Nominal Pajak" as the selected tax percentages applied to "Total Dana Sesuai SPJ".
+     * Recalculate "Nominal Pajak" as the selected tax percentages applied to "Total Dana Sesuai SPJ",
+     * then the money received and the net total that depend on it.
      */
     public static function syncTax(Get $get, Set $set): void
     {
         $rate = self::taxRateTotal($get('tax_rates'), $get('tax_custom_rate'));
+        $tax = round((float) $get('total') * $rate / 100);
 
-        $set('tax_amount', round((float) $get('total') * $rate / 100));
+        $set('tax_amount', $tax);
+        $set('total_received', (float) $get('total') - $tax);
+
+        self::syncNet($get, $set, (float) $get('total') - $tax);
+    }
+
+    /**
+     * "Total Net" = money received in the account minus the manually entered total SS.
+     * `$received` is passed in right after `total_received` was set, because the state
+     * is not re-read until the request ends.
+     */
+    public static function syncNet(Get $get, Set $set, ?float $received = null): void
+    {
+        $received ??= (float) $get('total_received');
+
+        $set('total_net', $received - (float) $get('total_support_school'));
     }
 
     /**
@@ -94,13 +114,14 @@ class SharedSchema
      */
     public static function columns(): array
     {
-        $upper = fn (?string $state): string => Str::upper((string) $state);
+        $label = fn (OptionGroup $group): Closure => fn (?string $state): string => Str::upper(Option::label($group, $state) ?? (string) $state);
 
         return [
             Split::make([
                 TextColumn::make('type')
                     ->label('Program')
                     ->description('Program', position: 'above')
+                    ->formatStateUsing($label(OptionGroup::Program))
                     ->extraAttributes(['class' => 'uppercase'])
                     ->visibleFrom('md'),
                 TextColumn::make('schools')
@@ -112,6 +133,7 @@ class SharedSchema
                 TextColumn::make('periode')
                     ->label('Periode')
                     ->description('Periode', position: 'above')
+                    ->formatStateUsing($label(OptionGroup::Periode))
                     ->extraAttributes(['class' => 'uppercase'])
                     ->wrap()
                     ->visibleFrom('md'),
@@ -137,14 +159,14 @@ class SharedSchema
                         ->label('Program')
                         ->badge()
                         ->color('primary')
-                        ->formatStateUsing($upper)
+                        ->formatStateUsing($label(OptionGroup::Program))
                         ->grow(false)
                         ->hiddenFrom('md'),
                     TextColumn::make('periode')
                         ->label('Periode')
                         ->color('gray')
                         ->size(TextColumnSize::Small)
-                        ->formatStateUsing($upper)
+                        ->formatStateUsing($label(OptionGroup::Periode))
                         ->grow(false)
                         ->hiddenFrom('md'),
                     TextColumn::make('years')

@@ -8,9 +8,9 @@ use App\Filament\Components\Support\HasProgramMetadata;
 use App\Filament\Components\Support\InfolistSchema;
 use App\Filament\Components\Support\SharedSchema;
 use App\Filament\Components\Support\StatusPalette;
-use App\Filament\Enum\Periode;
-use App\Filament\Enum\Program;
+use App\Filament\Enum\OptionGroup;
 use App\Filament\User\Resources\Activity\ActivityResource;
+use App\Models\Option;
 use App\Models\RegistrationData;
 use App\Models\RegistrationStatus;
 use Carbon\Carbon;
@@ -61,9 +61,7 @@ class Admin
                                 ->icon('heroicon-o-flag')
                                 ->columns(['default' => 1, 'sm' => 2, 'xl' => 4])
                                 ->schema([
-                                    Select::make('type')
-                                        ->label('Program')
-                                        ->options(Program::list()),
+                                    FormSchema::optionSelect('type', 'Program', OptionGroup::Program),
                                     Select::make('status_id')
                                         ->label('Status')
                                         ->preload()
@@ -75,9 +73,7 @@ class Admin
                                         )
                                         ->searchable()
                                         ->placeholder('Pilih status...'),
-                                    Select::make('periode')
-                                        ->label('Periode')
-                                        ->options(Periode::list()),
+                                    FormSchema::optionSelect('periode', 'Periode', OptionGroup::Periode),
                                     TextInput::make('years')
                                         ->label('Tahun Ajaran')
                                         ->maxLength(255),
@@ -94,32 +90,9 @@ class Admin
                                     TextInput::make('class')
                                         ->label('Kelas')
                                         ->maxLength(10),
-                                    Select::make('education_level')
-                                        ->label('Jenjang')
-                                        ->options([
-                                            'SD' => 'SD',
-                                            'MI' => 'MI',
-                                            'SMP' => 'SMP',
-                                            'MTS' => 'MTS',
-                                            'SMA' => 'SMA',
-                                            'MA' => 'MA',
-                                            'SMK' => 'SMK',
-                                        ])
-                                        ->native(false),
-                                    Select::make('description')
-                                        ->label('Keterangan')
-                                        ->options([
-                                            'ABK' => 'ABK',
-                                            'NON-ABK' => 'NON ABK',
-                                        ])
-                                        ->native(false),
-                                    Select::make('schools_type')
-                                        ->label('Negeri / Swasta')
-                                        ->options([
-                                            'Negeri' => 'Negeri',
-                                            'Swasta' => 'Swasta',
-                                        ])
-                                        ->native(false),
+                                    FormSchema::optionSelect('education_level', 'Jenjang', OptionGroup::Jenjang),
+                                    FormSchema::optionSelect('description', 'Keterangan', OptionGroup::Keterangan),
+                                    FormSchema::optionSelect('schools_type', 'Negeri / Swasta', OptionGroup::SchoolType),
                                     TextInput::make('student_count')
                                         ->label('Jumlah Siswa')
                                         ->numeric(),
@@ -374,12 +347,12 @@ class Admin
                 ->indicator('Salesforce'),
             Tables\Filters\SelectFilter::make('type')
                 ->label('Program')
-                ->options(Program::list())
+                ->options(Option::list(OptionGroup::Program, onlyActive: false))
                 ->preload()
                 ->indicator('Program'),
             Tables\Filters\SelectFilter::make('periode')
                 ->label('Periode')
-                ->options(Periode::list())
+                ->options(Option::list(OptionGroup::Periode, onlyActive: false))
                 ->preload()
                 ->indicator('Periode'),
             Tables\Filters\SelectFilter::make('status_color')
@@ -506,6 +479,9 @@ class Admin
             // --- Finance (utama) ---
             TextColumn::make('price')->label('Harga'),
             TextColumn::make('total')->label('Total'),
+            TextColumn::make('total_received')->label('Total Uang Masuk Rekening'),
+            TextColumn::make('bank_name')->label('Bank'),
+            TextColumn::make('total_support_school')->label('Total SS'),
             TextColumn::make('total_net')->label('Total Netto'),
             TextColumn::make('invoice_date')
                 ->label('Tgl Invoice')

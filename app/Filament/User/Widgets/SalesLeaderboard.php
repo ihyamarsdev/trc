@@ -2,9 +2,8 @@
 
 namespace App\Filament\User\Widgets;
 
-use App\Filament\Enum\Jenjang;
-use App\Filament\Enum\Periode;
-use App\Filament\Enum\Program;
+use App\Filament\Enum\OptionGroup;
+use App\Models\Option;
 use App\Models\RegistrationData;
 use Filament\Tables;
 use Filament\Tables\Columns\Summarizers\Sum;
@@ -126,8 +125,7 @@ class SalesLeaderboard extends BaseWidget
                                     ->get();
 
                                 $lines = $results->map(function ($row) {
-                                    $program = Program::tryFrom(strtolower($row->type));
-                                    $programLabel = $program ? $program->label() : strtoupper($row->type);
+                                    $programLabel = Option::label(OptionGroup::Program, $row->type) ?? strtoupper($row->type);
                                     $studentsSum = (int) $row->students_sum;
 
                                     return "<div class='flex items-center justify-between gap-4 text-xs'>".
@@ -187,12 +185,12 @@ class SalesLeaderboard extends BaseWidget
             ->filters([
                 Tables\Filters\SelectFilter::make('periode')
                     ->label('Periode')
-                    ->options(Periode::list())
+                    ->options(Option::list(OptionGroup::Periode, onlyActive: false))
                     ->preload()
                     ->indicator('Periode'),
                 Tables\Filters\SelectFilter::make('education_level')
                     ->label('Jenjang')
-                    ->options(Jenjang::list())
+                    ->options(Option::list(OptionGroup::Jenjang, onlyActive: false))
                     ->preload()
                     ->indicator('Jenjang'),
                 Tables\Filters\SelectFilter::make('years')

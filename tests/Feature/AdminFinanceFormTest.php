@@ -64,6 +64,59 @@ class AdminFinanceFormTest extends TestCase
             ->assertSet('data.tax_amount', 240000.0);
     }
 
+    public function test_total_breakdown_subtracts_tax_then_total_support_school(): void
+    {
+        $record = $this->makeRecord();
+
+        Livewire::test(EditAdmin::class, ['record' => $record->getKey()])
+            ->set('data.price', 100000)
+            ->set('data.implementer_count', 5)
+            ->set('data.option_price', 'implementer_5')
+            ->assertSet('data.total', 500000.0)
+            ->assertSet('data.total_received', 500000.0)
+            ->set('data.tax_rates', ['11'])
+            ->assertSet('data.tax_amount', 55000.0)
+            ->assertSet('data.total_received', 445000.0)
+            ->assertSet('data.total_net', 445000.0)
+            ->set('data.total_support_school', 20000)
+            ->assertSet('data.total_net', 425000.0)
+            ->set('data.price', 200000)
+            ->assertSet('data.total', 1000000.0)
+            ->assertSet('data.total_received', 890000.0)
+            ->assertSet('data.total_net', 870000.0)
+            ->set('data.total_support_school', null)
+            ->assertSet('data.total_net', 890000.0);
+    }
+
+    public function test_payment_via_and_total_fields_are_in_the_total_section(): void
+    {
+        $record = $this->makeRecord();
+
+        Livewire::test(EditAdmin::class, ['record' => $record->getKey()])
+            ->assertFormFieldExists('payment_name')
+            ->assertFormFieldExists('bank_name')
+            ->assertFormFieldExists('total_received')
+            ->assertFormFieldExists('total_support_school')
+            ->assertFormFieldExists('total_net');
+    }
+
+    public function test_bank_is_saved_and_must_be_one_of_the_listed_accounts(): void
+    {
+        $record = $this->makeRecord();
+
+        Livewire::test(EditAdmin::class, ['record' => $record->getKey()])
+            ->fillForm(['bank_name' => 'PT. EDUNESIA BANK BNI'])
+            ->callAction('saveHeader')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame('PT. EDUNESIA BANK BNI', $record->refresh()->bank_name);
+
+        Livewire::test(EditAdmin::class, ['record' => $record->getKey()])
+            ->fillForm(['bank_name' => 'PT. BANK LAIN'])
+            ->callAction('saveHeader')
+            ->assertHasFormErrors(['bank_name']);
+    }
+
     public function test_tax_rate_total_sums_selected_rates_and_manual_rate(): void
     {
         $this->assertSame(13.5, SharedSchema::taxRateTotal(['11', '2', '0.5'], null));

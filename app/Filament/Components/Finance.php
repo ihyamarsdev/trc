@@ -6,9 +6,8 @@ use App\Filament\Components\Support\FormSchema;
 use App\Filament\Components\Support\HasProgramMetadata;
 use App\Filament\Components\Support\InfolistSchema;
 use App\Filament\Components\Support\SharedSchema;
-use App\Filament\Enum\Jenjang;
-use App\Filament\Enum\Periode;
-use App\Filament\Enum\Program;
+use App\Filament\Enum\OptionGroup;
+use App\Models\Option;
 use App\Models\User;
 use Carbon\Carbon;
 use Filament\Forms\Components\Section;
@@ -24,7 +23,7 @@ class Finance
 
     protected static function metaInfo(Model $record, string $default = 'apps'): array
     {
-        return Program::getMetadata($record->type, $default);
+        return Option::programMeta($record->type, $default);
     }
 
     public static function formSchema(): array
@@ -94,6 +93,9 @@ class Finance
             TextColumn::make('total')
                 ->label('Total Dana Sesuai SPJ')
                 ->prefix('Rp.'),
+            TextColumn::make('total_received')->label('Total Uang Masuk Rekening')->prefix('Rp.'),
+            TextColumn::make('bank_name')->label('Bank'),
+            TextColumn::make('total_support_school')->label('Total SS')->prefix('Rp.'),
             TextColumn::make('total_net')->label('Total Net')->prefix('Rp.'),
 
             TextColumn::make('spk')
@@ -128,11 +130,11 @@ class Finance
         return [
             Tables\Filters\SelectFilter::make('periode')
                 ->label('Periode')
-                ->options(Periode::list())
+                ->options(Option::list(OptionGroup::Periode, onlyActive: false))
                 ->preload(),
             Tables\Filters\SelectFilter::make('education_level')
                 ->label('Jenjang')
-                ->options(Jenjang::list())
+                ->options(Option::list(OptionGroup::Jenjang, onlyActive: false))
                 ->preload()
                 ->indicator('Jenjang'),
             Tables\Filters\SelectFilter::make('users_id')

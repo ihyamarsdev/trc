@@ -3,10 +3,9 @@
 namespace App\Filament\User\Resources\Service\Monitoring;
 
 use App\Filament\Components\Service;
-use App\Filament\Enum\Jenjang;
-use App\Filament\Enum\Periode;
-use App\Filament\Enum\Program;
+use App\Filament\Enum\OptionGroup;
 use App\Filament\User\Resources\Service\Monitoring\RekapitulasiServiceResource\Pages;
+use App\Models\Option;
 use App\Models\RegistrationData;
 use Carbon\Carbon;
 use Filament\Resources\Resource;
@@ -189,16 +188,16 @@ class RekapitulasiServiceResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('periode')
                     ->label('Periode')
-                    ->options(Periode::list())
+                    ->options(Option::list(OptionGroup::Periode, onlyActive: false))
                     ->preload(),
                 Tables\Filters\SelectFilter::make('education_level')
                     ->label('Jenjang')
-                    ->options(Jenjang::list())
+                    ->options(Option::list(OptionGroup::Jenjang, onlyActive: false))
                     ->preload()
                     ->indicator('Jenjang'),
                 Tables\Filters\SelectFilter::make('type')
                     ->label('Program')
-                    ->options(Program::list())
+                    ->options(Option::list(OptionGroup::Program, onlyActive: false))
                     ->preload()
                     ->indicator('Program'),
                 Tables\Filters\SelectFilter::make('users_id')

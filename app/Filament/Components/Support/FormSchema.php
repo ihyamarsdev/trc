@@ -2,9 +2,12 @@
 
 namespace App\Filament\Components\Support;
 
+use App\Filament\Enum\OptionGroup;
+use App\Models\Option;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Section;
@@ -12,6 +15,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Form sections shared by the Admin, Service and Finance resources, so the same
@@ -20,6 +24,17 @@ use Filament\Forms\Set;
 class FormSchema
 {
     private const DATE_FORMAT = 'l, jS F Y';
+
+    /**
+     * Select fed by a master-data list. A value the record already holds stays selectable
+     * even after its choice was retired, so saving never silently blanks it.
+     */
+    public static function optionSelect(string $name, string $label, OptionGroup $group): Select
+    {
+        return Select::make($name)
+            ->label($label)
+            ->options(fn (Get $get): array => Option::choices($group, $get($name)));
+    }
 
     /**
      * Account counts, schedule and consultation fields owned by the Service role.
@@ -132,12 +147,7 @@ class FormSchema
                         ->reactive()
                         ->afterStateUpdated(fn (Get $get, Set $set) => SharedSchema::syncTotal($get, $set)),
                     self::rupiah('support_school', 'SS (Support Sekolah)'),
-                    self::rupiah('net_2', 'Harga NET')
-                        ->live(1000)
-                        ->reactive()
-                        ->afterStateUpdated(function (Get $get, Set $set) {
-                            $set('total_net', abs((float) $get('implementer_count') * (float) $get('net_2')));
-                        }),
+                    self::rupiah('net_2', 'Harga NET'),
                 ]),
 
             Section::make('Pajak')
@@ -147,12 +157,7 @@ class FormSchema
                     Group::make([
                         CheckboxList::make('tax_rates')
                             ->label('Pilih Pajak')
-                            ->options([
-                                '11' => '11%',
-                                '2' => '2%',
-                                '0.5' => '0,5%',
-                                'custom' => 'Isi Manual',
-                            ])
+                            ->options(fn (Get $get): array => Option::choices(OptionGroup::Tax, (array) $get('tax_rates')) + ['custom' => 'Isi Manual'])
                             ->live()
                             ->afterStateUpdated(fn (Get $get, Set $set) => SharedSchema::syncTax($get, $set)),
                         TextInput::make('tax_custom_rate')
@@ -169,25 +174,35 @@ class FormSchema
 
             Section::make('Total')
                 ->icon('heroicon-o-currency-dollar')
-                ->columns(['default' => 1, 'sm' => 2])
+                ->columns(1)
                 ->schema([
+                    self::optionSelect('payment_name', 'Pembayaran Via', OptionGroup::PaymentVia),
                     self::rupiah('total', 'Total Dana Sesuai SPJ')->readOnly(),
-                    self::rupiah('total_net', 'Total Net')->readOnly(),
+                    Grid::make(['default' => 1, 'sm' => 2])
+                        ->schema([
+                            self::rupiah('total_received', 'Total Uang Masuk Rekening')
+                                ->helperText('Total SPJ dikurangi Pajak')
+                                ->readOnly(),
+                            self::optionSelect('bank_name', 'Bank', OptionGroup::Bank)
+                                ->in(fn (?Model $record): array => array_keys(Option::choices(OptionGroup::Bank, $record?->bank_name)))
+                                ->native(false)
+                                ->placeholder('Pilih bank'),
+                        ]),
+                    self::rupiah('total_support_school', 'Total SS')
+                        ->helperText('Diisi manual')
+                        ->live(debounce: 1000)
+                        ->afterStateUpdated(fn (Get $get, Set $set) => SharedSchema::syncNet($get, $set)),
+                    self::rupiah('total_net', 'Total Net')
+                        ->helperText('Total Uang Masuk dikurangi Total SS')
+                        ->readOnly(),
                 ]),
 
             Section::make('Pembayaran')
                 ->icon('heroicon-o-credit-card')
-                ->columns(['default' => 1, 'sm' => 3])
+                ->columns(['default' => 1, 'sm' => 2])
                 ->schema([
                     self::date('payment_date', 'Jadwal Pembayaran'),
                     self::date('spk', 'Jadwal SPK'),
-                    Select::make('payment_name')
-                        ->label('Pembayaran Via')
-                        ->options([
-                            'SIPLAH' => 'SIPLAH',
-                            'SI/TF' => 'SI / TF',
-                            'CASH' => 'CASH',
-                        ]),
                 ]),
         ];
     }

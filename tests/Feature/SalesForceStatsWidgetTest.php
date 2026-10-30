@@ -2,8 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Enum\Program;
+use App\Filament\Enum\OptionGroup;
 use App\Filament\User\Widgets\SalesForceStatsWidget;
+use App\Models\Option;
 use App\Models\RegistrationData;
 use App\Models\Status;
 use App\Models\User;
@@ -49,13 +50,15 @@ class SalesForceStatsWidgetTest extends TestCase
         $widget = new SalesForceStatsWidget;
         $data = $widget->getChartData();
 
-        $this->assertCount(count(Program::cases()), $data['labels']);
-        $this->assertEquals(count(Program::cases()), $data['totals']['programs']);
+        $programs = Option::list(OptionGroup::Program);
+
+        $this->assertCount(count($programs), $data['labels']);
+        $this->assertEquals(count($programs), $data['totals']['programs']);
         $this->assertEquals(0, $data['totals']['students']);
         $this->assertEquals(0, $data['totals']['schools']);
 
-        foreach (Program::cases() as $case) {
-            $this->assertContains($case->label(), $data['labels']);
+        foreach ($programs as $label) {
+            $this->assertContains($label, $data['labels']);
         }
 
         $pasjDetail = collect($data['details'])->firstWhere('program_type', 'pasj');
@@ -164,7 +167,7 @@ class SalesForceStatsWidgetTest extends TestCase
         $widget = new SalesForceStatsWidget;
         $data = $widget->getChartData();
 
-        $expectedCount = count(Program::cases()) + 1;
+        $expectedCount = count(Option::list(OptionGroup::Program)) + 1;
         $this->assertEquals($expectedCount, $data['totals']['programs']);
         $this->assertContains('SEMINAR', $data['labels']);
 

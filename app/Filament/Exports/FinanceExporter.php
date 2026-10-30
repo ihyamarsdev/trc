@@ -117,6 +117,14 @@ class FinanceExporter extends Exporter
             ExportColumn::make('total')
                 ->label('Total Dana Sesuai SPJ')
                 ->prefix('Rp.'),
+            ExportColumn::make('total_received')
+                ->label('Total Uang Masuk Rekening')
+                ->prefix('Rp.'),
+            ExportColumn::make('bank_name')
+                ->label('Bank'),
+            ExportColumn::make('total_support_school')
+                ->label('Total SS')
+                ->prefix('Rp.'),
             ExportColumn::make('total_net')
                 ->label('Total Net')
                 ->prefix('Rp.'),

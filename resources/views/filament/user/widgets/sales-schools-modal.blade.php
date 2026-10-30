@@ -23,8 +23,7 @@
                             default => 'text-gray-500 dark:text-gray-400',
                         };
 
-                        $program = \App\Filament\Enum\Program::tryFrom(strtolower($school->type));
-                        $programLabel = $program ? $program->label() : strtoupper($school->type);
+                        $programLabel = \App\Models\Option::label(\App\Filament\Enum\OptionGroup::Program, $school->type) ?? strtoupper($school->type);
                     @endphp
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $index + 1 }}</td>

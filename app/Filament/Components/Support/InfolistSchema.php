@@ -2,7 +2,8 @@
 
 namespace App\Filament\Components\Support;
 
-use App\Filament\Enum\Program;
+use App\Filament\Enum\OptionGroup;
+use App\Models\Option;
 use Filament\Infolists\Components\Actions\Action;
 use Filament\Infolists\Components\Component;
 use Filament\Infolists\Components\Grid;
@@ -85,7 +86,7 @@ class InfolistSchema
 
     public static function header(Model $record, ?Action $statusAction = null): Section
     {
-        $program = Program::getMetadata($record->type, 'none');
+        $program = Option::programMeta($record->type, 'none');
 
         $status = TextEntry::make('status.name')
             ->hiddenLabel()
@@ -113,10 +114,10 @@ class InfolistSchema
                             ->badge()
                             ->state(fn (Model $record): array => array_values(array_filter([
                                 filled($record->type) ? $program['nameRegister'] : null,
-                                $record->periode,
+                                self::choiceLabel(OptionGroup::Periode, $record->periode),
                                 $record->years,
-                                $record->education_level,
-                                $record->schools_type,
+                                self::choiceLabel(OptionGroup::Jenjang, $record->education_level),
+                                self::choiceLabel(OptionGroup::SchoolType, $record->schools_type),
                             ])))
                             ->color(fn (string $state): string => $state === $program['nameRegister'] ? 'primary' : 'gray'),
                     ]),
@@ -158,10 +159,10 @@ class InfolistSchema
                 ->compact()
                 ->columns(['default' => 2, 'xl' => 4])
                 ->schema([
-                    self::text('education_level', 'Jenjang'),
+                    self::optionText('education_level', 'Jenjang', OptionGroup::Jenjang),
                     self::text('class', 'Kelas'),
-                    self::text('schools_type', 'Negeri / Swasta'),
-                    self::text('description', 'Keterangan'),
+                    self::optionText('schools_type', 'Negeri / Swasta', OptionGroup::SchoolType),
+                    self::optionText('description', 'Keterangan', OptionGroup::Keterangan),
                     self::text('provinces', 'Provinsi'),
                     self::text('regencies', 'Kota / Kabupaten'),
                     self::text('area', 'Wilayah')->columnSpan(['default' => 2, 'xl' => 2]),
@@ -278,12 +279,20 @@ class InfolistSchema
             Section::make('Total')
                 ->icon('heroicon-o-currency-dollar')
                 ->compact()
-                ->columns(['default' => 2])
+                ->columns(['default' => 1])
                 ->schema([
-                    self::money('total', 'Total Dana Sesuai SPJ')
-                        ->size(TextEntrySize::Large)
-                        ->weight(FontWeight::Bold)
-                        ->color('primary'),
+                    self::optionText('payment_name', 'Pembayaran Via', OptionGroup::PaymentVia)
+                        ->badge()
+                        ->color('gray'),
+                    self::money('total', 'Total Dana Sesuai SPJ'),
+                    Grid::make(['default' => 1, 'sm' => 2])
+                        ->schema([
+                            self::money('total_received', 'Total Uang Masuk Rekening'),
+                            self::optionText('bank_name', 'Bank', OptionGroup::Bank)
+                                ->badge()
+                                ->color('gray'),
+                        ]),
+                    self::money('total_support_school', 'Total SS'),
                     self::money('total_net', 'Total Net')
                         ->size(TextEntrySize::Large)
                         ->weight(FontWeight::Bold)
@@ -293,15 +302,10 @@ class InfolistSchema
             Section::make('Pembayaran')
                 ->icon('heroicon-o-credit-card')
                 ->compact()
-                ->columns(['default' => 2, 'sm' => 3])
+                ->columns(['default' => 2])
                 ->schema([
                     self::date('payment_date', 'Jadwal Pembayaran'),
                     self::date('spk', 'SPK Dikirim'),
-                    TextEntry::make('payment_name')
-                        ->label('Pembayaran Via')
-                        ->badge()
-                        ->color('gray')
-                        ->placeholder(self::EMPTY),
                 ]),
         ];
     }
@@ -350,6 +354,20 @@ class InfolistSchema
     private static function text(string $name, string $label): TextEntry
     {
         return TextEntry::make($name)->label($label)->placeholder(self::EMPTY);
+    }
+
+    /**
+     * Text entry that shows the label of the stored choice instead of its raw value.
+     */
+    private static function optionText(string $name, string $label, OptionGroup $group): TextEntry
+    {
+        return self::text($name, $label)
+            ->formatStateUsing(fn (?string $state): ?string => self::choiceLabel($group, $state));
+    }
+
+    private static function choiceLabel(OptionGroup $group, ?string $value): ?string
+    {
+        return Option::label($group, $value) ?? $value;
     }
 
     private static function stat(string $name, string $label, string $placeholder): TextEntry
