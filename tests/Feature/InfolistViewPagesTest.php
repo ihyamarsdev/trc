@@ -64,10 +64,10 @@ class InfolistViewPagesTest extends TestCase
         $always = ['SMA Negeri Contoh', 'ANBK', 'Status Aktif', 'Kontak Sekolah'];
 
         return [
-            'admin' => ['admin', ViewAdmin::class, [...$always, 'Service', 'Finance', 'Kwitansi & Invoice'], []],
-            'finance' => ['finance', ViewFinance::class, [...$always, 'Service', 'Finance', 'Kwitansi & Invoice'], []],
-            'service' => ['service', ViewService::class, [...$always, 'Service'], ['Finance', 'Kwitansi & Invoice']],
-            'sales' => ['sales', ViewSales::class, $always, ['Service', 'Finance', 'Kwitansi & Invoice']],
+            'admin' => ['admin', ViewAdmin::class, [...$always, 'Service', 'Finance', 'Dokumen'], []],
+            'finance' => ['finance', ViewFinance::class, [...$always, 'Service', 'Finance', 'Dokumen'], []],
+            'service' => ['service', ViewService::class, [...$always, 'Service'], ['Finance', 'Dokumen']],
+            'sales' => ['sales', ViewSales::class, $always, ['Service', 'Finance', 'Dokumen']],
         ];
     }
 

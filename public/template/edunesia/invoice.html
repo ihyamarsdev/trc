@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Invoice Edunesia</title>
+<style>
+  /*
+   * Template Invoice Edunesia: satu halaman A4. Gambar formulir jadi latar, tiap isian
+   * ditempatkan dengan posisi tetap (mm dari sudut kiri atas halaman).
+   * Isian ditandai dolar + kurung kurawal berisi nama (seperti pada teks di bawah) dan diganti oleh sistem;
+   * ubah left/top/width/height untuk menggeser isian.
+   */
+  @page { size: 210mm 297mm; margin: 0; }
+  html, body { margin: 0; padding: 0; }
+  .page { position: relative; width: 210mm; height: 296mm; overflow: hidden;
+          font-family: Helvetica, Arial, sans-serif; line-height: 1.2; }
+  .background { position: absolute; left: 0; top: 0; width: 210mm; height: 297mm; }
+  .field { position: absolute; margin: 0; font-weight: bold; color: #000; }
+  .cell { position: absolute; margin: 0; border-collapse: collapse; table-layout: fixed; font-weight: bold; color: #000; }
+  .cell td { padding: 0; text-align: center; vertical-align: middle; }
+</style>
+</head>
+<body>
+<div class="page">
+  <img class="background" src="images/invoice-background.png" alt="">
+
+  <!-- Date -->
+  <div class="field" style="left: 155.6mm; top: 97.7mm; width: 37.6mm; height: 7.3mm; padding: 1.3mm 2.5mm; font-size: 9pt; text-align: right;">${tanggal}</div>
+  <!-- Bill to -->
+  <div class="field" style="left: 76.2mm; top: 100.3mm; width: 50.1mm; height: 8.0mm; padding: 1.3mm 2.5mm; font-size: 12pt;">${schools}</div>
+  <!-- Invoice # -->
+  <div class="field" style="left: 152.3mm; top: 108.5mm; width: 40.9mm; height: 8.4mm; padding: 1.3mm 2.5mm; font-size: 10.5pt; text-align: right;">${number_invoice}</div>
+  <!-- For / Description -->
+  <div class="field" style="left: 85.2mm; top: 122.9mm; width: 107.9mm; height: 8.5mm; padding: 1.3mm 2.5mm; font-size: 9pt; text-align: right;">${detail}</div>
+  <!--
+    Isian yang dipusatkan: tiap kotak dipasang tepat pada kolom/sel di formulir (ukuran diukur dari
+    gambar latar) dan teks di tengah kotak, baik mendatar maupun menurun.
+  -->
+  <!-- Deskripsi (di bawah judul "Description") -->
+  <table class="cell" style="left: 79.9mm; top: 142mm; width: 30mm; font-size: 6.5pt;"><tr><td style="height: 15.8mm;">${detail}</td></tr></table>
+  <!-- Quantity -->
+  <table class="cell" style="left: 126.3mm; top: 142mm; width: 20mm; font-size: 6.5pt;"><tr><td style="height: 15.8mm;">${qty}</td></tr></table>
+  <!-- Unit price -->
+  <table class="cell" style="left: 146.6mm; top: 142mm; width: 20mm; font-size: 6.5pt;"><tr><td style="height: 15.8mm;">${price}</td></tr></table>
+  <!-- Amount -->
+  <table class="cell" style="left: 167.4mm; top: 142mm; width: 20mm; font-size: 6.5pt;"><tr><td style="height: 15.8mm;">${amount}</td></tr></table>
+  <!-- Subtotal -->
+  <table class="cell" style="left: 148.5mm; top: 171.8mm; width: 41.6mm; font-size: 10pt;"><tr><td style="height: 14mm;">Rp${subtotal_invoice}</td></tr></table>
+  <!-- PPh 23 -->
+  <table class="cell" style="left: 148.5mm; top: 185.8mm; width: 41.6mm; font-size: 12pt;"><tr><td style="height: 14mm;">${pph}</td></tr></table>
+  <!-- PPN -->
+  <table class="cell" style="left: 148.5mm; top: 199.8mm; width: 41.6mm; font-size: 12pt;"><tr><td style="height: 14mm;">${ppn}</td></tr></table>
+  <!-- Total -->
+  <table class="cell" style="left: 148.5mm; top: 213.9mm; width: 41.6mm; font-size: 10pt;"><tr><td style="height: 14mm;">Rp${total_invoice}</td></tr></table>
+</div>
+</body>
+</html>

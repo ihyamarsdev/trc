@@ -74,6 +74,8 @@ class RegistrationData extends Model
         'amount_invoice',
         'tax_rate',
         'sales_tsx',
+        'pph',
+        'ppn',
         'other',
         'subtotal_invoice',
         'total_invoice',

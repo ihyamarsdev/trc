@@ -1,11 +1,8 @@
 <?php
 
-use App\Http\Controllers\ANBK;
-use App\Http\Controllers\APPS;
-use App\Http\Controllers\InvoiceGenerator;
-use App\Http\Controllers\Kwitansi;
+use App\Filament\Components\Support\DocumentTemplate;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\SampleSalesforce;
-use App\Http\Controllers\SNBT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,37 +20,21 @@ Route::post('/login', function (Request $request) {
     return redirect('/login');
 })->middleware('guest');
 
-// # RASYIDU
+// # DOKUMEN (SPK, kwitansi, invoice) per perusahaan; template HTML ada di public/template/{perusahaan}/
+foreach (DocumentTemplate::COMPANIES as $company) {
+    foreach (['anbk', 'apps', 'snbt'] as $program) {
+        Route::get("/{record}/{$company}/download/{$program}", [DocumentController::class, 'spk'])
+            ->defaults('company', $company)
+            ->name("{$company}.{$program}.download");
+    }
 
-Route::get('/{record}/rasyidu/download/anbk', [ANBK::class, 'rasyidu'])
-    ->name('rasyidu.anbk.download');
+    Route::get("/{record}/{$company}/download/kwitansi", [DocumentController::class, 'kwitansi'])
+        ->defaults('company', $company)
+        ->name("{$company}.kwitansi.download");
 
-Route::get('/{record}/rasyidu/download/apps', [APPS::class, 'rasyidu'])
-    ->name('rasyidu.apps.download');
-
-Route::get('/{record}/rasyidu/download/snbt', [SNBT::class, 'rasyidu'])
-    ->name('rasyidu.snbt.download');
-
-Route::get('/{record}/rasyidu/download/kwitansi', [Kwitansi::class, 'rasyidu'])
-    ->name('rasyidu.kwitansi.download');
-
-Route::get('/{record}/rasyidu/download/invoice', [InvoiceGenerator::class, 'rasyidu'])
-    ->name('rasyidu.invoice.download');
-
-// # EDUNESIA
-Route::get('/{record}/edunesia/download/anbk', [ANBK::class, 'edunesia'])
-    ->name('edunesia.anbk.download');
-
-Route::get('/{record}/edunesia/download/apps', [APPS::class, 'edunesia'])
-    ->name('edunesia.apps.download');
-
-Route::get('/{record}/edunesia/download/snbt', [SNBT::class, 'edunesia'])
-    ->name('edunesia.snbt.download');
-
-Route::get('/{record}/edunesia/download/kwitansi', [Kwitansi::class, 'edunesia'])
-    ->name('edunesia.kwitansi.download');
-
-Route::get('/{record}/edunesia/download/invoice', [InvoiceGenerator::class, 'edunesia'])
-    ->name('edunesia.invoice.download');
+    Route::get("/{record}/{$company}/download/invoice", [DocumentController::class, 'invoice'])
+        ->defaults('company', $company)
+        ->name("{$company}.invoice.download");
+}
 
 Route::get('/download-sample-excel', [SampleSalesforce::class, 'download'])->name('download.sample.excel');

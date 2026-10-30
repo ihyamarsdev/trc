@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Kuitansi Rasyidu</title>
+<style>
+  /*
+   * Template Kuitansi Rasyidu: satu halaman A4. Gambar formulir jadi latar, tiap isian
+   * ditempatkan dengan posisi tetap (mm dari sudut kiri atas halaman).
+   * Isian ditandai dolar + kurung kurawal berisi nama (seperti pada teks di bawah) dan diganti oleh sistem;
+   * ubah left/top/width/height untuk menggeser isian.
+   */
+  @page { size: 210mm 297mm; margin: 0; }
+  html, body { margin: 0; padding: 0; }
+  .page { position: relative; width: 210mm; height: 296mm; overflow: hidden;
+          font-family: Helvetica, Arial, sans-serif; line-height: 1.2; }
+  .background { position: absolute; left: 0; top: 0; width: 210mm; height: 297mm; }
+  .field { position: absolute; margin: 0; font-weight: bold; color: #000; }
+</style>
+</head>
+<body>
+<div class="page">
+  <img class="background" src="images/kuitansi-background.jpg" alt="">
+
+  <!-- Telah diterima dari -->
+  <div class="field" style="left: 13.1mm; top: 39.6mm; width: 123.0mm; height: 5.6mm; padding: 0.0mm 2.5mm; font-size: 12pt;">${schools}</div>
+  <!-- Uang sejumlah (dalam huruf) -->
+  <div class="field" style="left: 13.5mm; top: 54.0mm; width: 135.9mm; height: 6.3mm; padding: 0.0mm 2.5mm; font-size: 12pt;">${totalSpell}</div>
+  <!-- Guna pembayaran -->
+  <div class="field" style="left: 14.3mm; top: 68.6mm; width: 134.3mm; height: 13.7mm; padding: 0.0mm 2.5mm; font-size: 12pt;">${detail}</div>
+  <!-- Terbilang (dalam angka) -->
+  <div class="field" style="left: 55.6mm; top: 92.0mm; width: 94.4mm; height: 4.9mm; padding: 0.0mm 2.5mm; font-size: 12pt;">Rp${total},00</div>
+  <!-- Tanggal -->
+  <div class="field" style="left: 175.0mm; top: 103.0mm; width: 34.8mm; height: 4.7mm; padding: 0.0mm 2.5mm; font-size: 8pt;">${tanggal}</div>
+  <!-- Kepala sekolah (nama) -->
+  <div class="field" style="left: 46.3mm; top: 129.1mm; width: 54.1mm; height: 13.2mm; padding: 0.0mm 2.5mm; font-size: 8pt; text-align: center;">${principal}</div>
+  <!-- Telah diterima dari -->
+  <div class="field" style="left: 14.3mm; top: 188.3mm; width: 132.1mm; height: 5.8mm; padding: 0.0mm 2.5mm; font-size: 12pt;">${schools}</div>
+  <!-- Uang sejumlah (dalam huruf) -->
+  <div class="field" style="left: 14.3mm; top: 203.1mm; width: 135.9mm; height: 6.1mm; padding: 0.0mm 2.5mm; font-size: 12pt;">${totalSpell}</div>
+  <!-- Guna pembayaran -->
+  <div class="field" style="left: 14.6mm; top: 217.3mm; width: 134.3mm; height: 13.7mm; padding: 0.0mm 2.5mm; font-size: 12pt;">${detail}</div>
+  <!-- Terbilang (dalam angka) -->
+  <div class="field" style="left: 58.0mm; top: 240.6mm; width: 93.1mm; height: 4.9mm; padding: 0.0mm 2.5mm; font-size: 12pt;">Rp${total},00</div>
+  <!-- Tanggal -->
+  <div class="field" style="left: 174.6mm; top: 251.2mm; width: 34.8mm; height: 4.7mm; padding: 0.0mm 2.5mm; font-size: 8pt;">${tanggal}</div>
+  <!-- Kepala sekolah (nama) -->
+  <div class="field" style="left: 47.7mm; top: 277.4mm; width: 52.5mm; height: 13.2mm; padding: 0.0mm 2.5mm; font-size: 8pt; text-align: center;">${principal}</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>SPK Rasyidu</title>
+<style>
+  /*
+   * Template SPK Rasyidu: satu halaman A4 dengan kop (logo di kanan atas, logo "Go the Extra Mile"
+   * dan alamat di bawah) disusun dari gambar di folder images/.
+   * Isian ditandai dolar + kurung kurawal berisi nama (seperti pada teks di bawah) dan diganti oleh sistem.
+   * Teks surat ada di .letter, kolom tanda tangan di .signature;
+   * semuanya diposisikan dalam mm dari sudut kiri atas halaman.
+   */
+  @page { size: 210mm 297mm; margin: 0; }
+  html, body { margin: 0; padding: 0; }
+  .page { position: relative; width: 210mm; height: 296mm; overflow: hidden;
+          font-family: "Times New Roman", Times, serif; font-size: 10pt; color: #000; }
+
+  /* kop */
+  .logo { position: absolute; left: 170mm; top: 15.9mm; width: 25mm; text-align: center; line-height: 1; }
+  .logo img { display: block; margin: 0 auto; }
+  .logo .mark { width: 17.3mm; }
+  .logo .name { width: 24.9mm; margin-top: 1mm; }
+  .logo .center { width: 13.8mm; margin-top: 0.8mm; }
+  .logo .since { margin-top: 0.8mm; font-family: Helvetica, Arial, sans-serif; font-size: 3.5pt; font-weight: bold; letter-spacing: 0.4pt; }
+  .artwork { position: absolute; left: 15.6mm; top: 185.9mm; width: 79mm; }
+  .footer-text { position: absolute; top: 272mm; font-family: Helvetica, Arial, sans-serif; font-size: 5pt; line-height: 1.35; }
+  .footer-text b { display: block; }
+  .footer-rule { position: absolute; left: 146.2mm; top: 271.5mm; width: 0; height: 15.2mm; border-left: 0.3mm solid #999; }
+
+  /* surat */
+  .letter { position: absolute; left: 29.6mm; top: 35mm; width: 167mm; line-height: 1.5; text-align: justify; }
+  .letter p { margin: 0; }
+  .center { text-align: center; }
+  .left { text-align: left; }
+  .party { margin-left: 12.7mm; border-collapse: collapse; font-weight: bold; text-align: left; }
+  .party td { padding: 0; vertical-align: top; }
+  .party .label { width: 24mm; }
+  .letter ol { margin: 0; padding-left: 7.5mm; }
+  .letter ol li { padding: 0; }
+  .indent { margin-left: 12.7mm; }
+  .bank { margin-left: 12.7mm; }
+  .after { margin-bottom: 8pt; }
+
+  /* tanda tangan */
+  .signature { position: absolute; left: 91.4mm; top: 200.9mm; width: 117.5mm; }
+  .signature table { width: 117.5mm; border-collapse: collapse; }
+  .signature td { text-align: center; vertical-align: top; font-weight: bold; font-size: 8.5pt; line-height: 1.4; padding: 0; }
+  .signature .space { height: 16mm; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="logo">
+    <img class="mark" src="images/logo-r.png" alt="">
+    <img class="name" src="images/logo-name.png" alt="">
+    <img class="center" src="images/logo-center.png" alt="">
+    <div class="since">SINCE 8118</div>
+  </div>
+
+  <img class="artwork" src="images/go-the-extra-mile.png" alt="">
+  <div class="footer-text" style="left: 110.5mm;"><b>HEADOFFICE</b>Jl.Kaliurang km 11,<br>Ruko Candi Indah no 5,<br>Yogyakarta</div>
+  <div class="footer-rule"></div>
+  <div class="footer-text" style="left: 153.5mm;"><b>OPERATION - OFFICE</b>Grand Galaxy,<br>Jl.Rose Garden V no 17 - 19,<br>Bekasi Selatan</div>
+
+  <div class="letter">
+    <p class="center"><b>SURAT PERJANJIAN KERJASAMA</b></p>
+    <p class="center">No …. / AN-TRC / TO /………/ ………</p>
+    <p>&nbsp;</p>
+    <p class="left"><i>Pada hari ini ${deskripsi}</i> bertempat di ${province} dilakukan penandatanganan Surat Perjanjian Kerjasama, untuk Pelaksanaan TRY OUT ASESMEN NASIONAL (AN) <b>Tahun Pelajaran ${year}</b> antara:</p>
+    <table class="party">
+      <tr><td class="label">Nama</td><td>: ${to}</td></tr>
+      <tr><td class="label">Jabatan</td><td>: ${jabatan}</td></tr>
+    </table>
+    <p class="left"><b><i>dengan</i></b></p>
+    <table class="party">
+      <tr><td class="label">Nama</td><td>: WIWIED WIJAYANTI SAPUTRO, SH</td></tr>
+      <tr><td class="label">Jabatan</td><td>: CHIEF EXECUTIVE OFFICER (CEO)</td></tr>
+    </table>
+    <p>&nbsp;</p>
+    <p><b>PARA PIHAK</b> dalam Perjanjian ini sepakat menjalin <b><i>Kerjasama Pelaksanaan</i></b> TRY OUT ASESMEN NASIONAL (AN) <i>Tahun Ajaran ${year}</i>, dengan ketentuan-ketentuan sebagai berikut:</p>
+
+    <ol>
+      <li>Pelaksanaan TRY OUT ASESMEN NASIONAL (AN) dengan pembagian sesi TRY OUT sesuai aturan dengan username/Password dan Token setiap sesi.</li>
+      <li>Pelaksanaan Kegiatan TRY OUT ASESMEN NASIONAL (AN) ini akan dijadwalkan pada :</li>
+    </ol>
+    <p class="indent">Tanggal <b>${tanggal}</b></p>
+    <p class="indent"><b>dengan jumlah peserta sekira ${siswa} [${siswaSpell}]</b> siswa.</p>
+    <ol start="3">
+      <li>Biaya penyelenggaraan TRY OUT ASESMEN NASIONAL (AN) ${year} dalam Perjanjian ini adalah: sebesar <b>Rp${harga} [${hargaSpell}]</b> per-siswa, dengan total nilai sebesar <b>Rp${total} [${totalSpell}]</b> TIDAK termasuk PAJAK dan materai keperluan SP.</li>
+    </ol>
+
+    <p class="left after">Pembayaran dapat dilakukan secara tunai, melalui <b>${payment}</b> maupun transfer melalui pilihan rekening sbb:</p>
+    <p class="bank after">Bank : <b>MANDIRI</b></p>
+    <p class="bank after">Atas Nama : <b>PT. TDW KINARYA INDONESIA</b></p>
+    <p class="bank after">No Rekening : <b>137 00 702 2020 3</b></p>
+
+    <ol start="4">
+      <li>Pihak sekolah akan mendapatkan Akses Login Sekolah beserta Peserta TRY OUT.</li>
+      <li>Pihak sekolah akan mendapatkan format analisis dan Assessment Report di halaman login sekolah, sesuai dalam penawaran proposal.</li>
+    </ol>
+  </div>
+
+  <div class="signature">
+    <table>
+      <tr>
+        <td>PIHAK PERTAMA</td>
+        <td>PIHAK KEDUA</td>
+      </tr>
+      <tr><td class="space">&nbsp;</td><td class="space">&nbsp;</td></tr>
+      <tr>
+        <td>(${to})</td>
+        <td>( WIWIED WIJAYANTI SAPUTRO, SH )</td>
+      </tr>
+    </table>
+  </div>
+</div>
+</body>
+</html>

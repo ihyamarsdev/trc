@@ -3,11 +3,13 @@
 namespace App\Filament\Components\Support;
 
 use App\Filament\Enum\OptionGroup;
+use App\Livewire\DocumentWorkbench;
 use App\Models\Option;
 use Filament\Infolists\Components\Actions\Action;
 use Filament\Infolists\Components\Component;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\Group;
+use Filament\Infolists\Components\Livewire;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\Split;
 use Filament\Infolists\Components\Tabs;
@@ -64,7 +66,7 @@ class InfolistSchema
         }
 
         if (in_array(self::PART_DOCUMENTS, $parts, true)) {
-            $tabs[] = self::tab('Kwitansi & Invoice', 'heroicon-o-document-text', self::documentSections());
+            $tabs[] = self::tab('Dokumen', 'heroicon-o-document-text', self::documentSections());
         }
 
         return [...$schema, Tabs::make('Detail')->tabs($tabs)->persistTabInQueryString()->columnSpanFull()];
@@ -311,43 +313,15 @@ class InfolistSchema
     }
 
     /**
+     * The SPK, kwitansi and invoice are previewed on a company letterhead, filled in where they need data and
+     * downloaded from one embedded Livewire component, instead of read-only entries plus separate buttons.
+     *
      * @return array<int, Component>
      */
     public static function documentSections(): array
     {
         return [
-            Section::make('Kwitansi')
-                ->description('Lakukan Edit untuk merubah Kwitansi')
-                ->icon('heroicon-o-document-text')
-                ->compact()
-                ->columns(['default' => 1, 'lg' => 3])
-                ->schema([
-                    self::text('schools', 'Telah Terima Dari'),
-                    self::money('total', 'Uang Sejumlah'),
-                    self::text('detail_kwitansi', 'Guna Pembayaran'),
-                ]),
-
-            Section::make('Invoice')
-                ->description('Lakukan Edit untuk merubah Invoice')
-                ->icon('heroicon-o-document-currency-dollar')
-                ->compact()
-                ->columns(['default' => 2, 'xl' => 4])
-                ->schema([
-                    self::text('schools', 'Bill To')->columnSpan(['default' => 2, 'xl' => 1]),
-                    self::text('number_invoice', 'Nomor Invoice')->columnSpan(['default' => 2, 'xl' => 1]),
-                    self::text('detail_invoice', 'Deskripsi')->columnSpan(['default' => 2, 'xl' => 2]),
-                    self::text('qty_invoice', 'Kuantitas'),
-                    self::money('unit_price', 'Harga Per Unit'),
-                    self::money('amount_invoice', 'Jumlah'),
-                    self::money('subtotal_invoice', 'Sub Total'),
-                    self::percent('pph', 'PPH 23'),
-                    self::percent('ppn', 'PPN'),
-                    self::money('total_invoice', 'Total')
-                        ->size(TextEntrySize::Large)
-                        ->weight(FontWeight::Bold)
-                        ->color('primary')
-                        ->columnSpan(['default' => 2, 'xl' => 2]),
-                ]),
+            Livewire::make(DocumentWorkbench::class)->columnSpanFull(),
         ];
     }
 
@@ -393,14 +367,6 @@ class InfolistSchema
         return TextEntry::make($name)->label($label)->money('IDR')->placeholder(self::EMPTY);
     }
 
-    private static function percent(string $name, string $label): TextEntry
-    {
-        return TextEntry::make($name)
-            ->label($label)
-            ->formatStateUsing(fn (mixed $state): string => self::formatPercent($state))
-            ->placeholder(self::EMPTY);
-    }
-
     private static function yesNo(string $name, string $label): TextEntry
     {
         return TextEntry::make($name)
@@ -442,17 +408,5 @@ class InfolistSchema
             str_starts_with((string) $state, 'account_') => 'Jumlah Akun ('.substr($state, 8).')',
             default => (string) $state,
         };
-    }
-
-    /**
-     * 2 and 0.02 both mean 2%; trailing zeros are dropped.
-     */
-    private static function formatPercent(mixed $state): string
-    {
-        $value = is_numeric($state) && (float) $state > 0 && (float) $state < 1
-            ? (float) $state * 100
-            : (float) $state;
-
-        return rtrim(rtrim(number_format($value, 2, '.', ''), '0'), '.').'%';
     }
 }
