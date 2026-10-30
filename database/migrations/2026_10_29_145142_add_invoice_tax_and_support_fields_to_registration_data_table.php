@@ -8,16 +8,18 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     *
+     * TEXT instead of VARCHAR(255): `registration_data` is close to MySQL's 65,535-byte row limit.
      */
     public function up(): void
     {
         Schema::table('registration_data', function (Blueprint $table) {
-            $table->string('real_count')->nullable();
-            $table->string('invoice_amount')->nullable();
-            $table->string('support_school')->nullable();
+            $table->text('real_count')->nullable();
+            $table->text('invoice_amount')->nullable();
+            $table->text('support_school')->nullable();
             $table->json('tax_rates')->nullable();
-            $table->string('tax_custom_rate')->nullable();
-            $table->string('tax_amount')->nullable();
+            $table->text('tax_custom_rate')->nullable();
+            $table->text('tax_amount')->nullable();
         });
     }
 
