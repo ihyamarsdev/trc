@@ -35,3 +35,10 @@ boost.json
 opencode.json
 # CocoIndex Code (ccc)
 /.cocoindex_code/
+
+# Local agent / tooling state and generated caches
+.omc/
+.claude/
+/graphify-out/cache/
+.DS_Store
+Thumbs.db
