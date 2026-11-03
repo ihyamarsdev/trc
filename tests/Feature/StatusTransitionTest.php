@@ -4,8 +4,8 @@ namespace Tests\Feature;
 
 use App\Filament\Components\Support\StatusTransition;
 use App\Filament\User\Resources\Activity\ActivityResource\Pages\ViewActivities;
-use App\Filament\User\Resources\Admin\AdminResource\Pages\CreateAdmin;
 use App\Filament\User\Resources\Admin\AdminResource\Pages\EditAdmin;
+use App\Filament\User\Resources\Admin\AdminResource\Pages\ListAdmins;
 use App\Filament\User\Resources\Finance\FinanceResource\Pages\ListFinances;
 use App\Filament\User\Resources\Salesforce\SalesResource\Pages\CreateSales;
 use App\Filament\User\Resources\Salesforce\SalesResource\Pages\EditSales;
@@ -18,7 +18,6 @@ use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -80,90 +79,27 @@ class StatusTransitionTest extends TestCase
     }
 
     /**
-     * @return array<string, array{0: string, 1: string, 2: bool}>
+     * @return array<int, string> colours of the record's log, oldest first
      */
-    public static function colourMoves(): array
+    private function logColours(RegistrationData $record): array
     {
-        return [
-            'red to yellow' => ['red', 'yellow', true],
-            'yellow to blue' => ['yellow', 'blue', true],
-            'blue to green' => ['blue', 'green', true],
-            'yellow back to red' => ['yellow', 'red', true],
-            'green back to blue' => ['green', 'blue', true],
-            'same colour' => ['blue', 'blue', true],
-            'red to blue' => ['red', 'blue', false],
-            'red to green' => ['red', 'green', false],
-            'yellow to green' => ['yellow', 'green', false],
-            'green back to yellow' => ['green', 'yellow', false],
-        ];
+        return $record->activity()->orderBy('id')->get()->map(fn (RegistrationStatus $log): string => $log->status->color)->all();
     }
 
-    #[DataProvider('colourMoves')]
-    public function test_a_status_may_only_move_one_colour_at_a_time(string $from, string $to, bool $allowed): void
+    public function test_admin_can_pick_any_status_and_each_change_is_appended_to_the_log(): void
     {
-        $complete = array_fill_keys(array_keys(StatusTransition::REQUIRED_FIELDS), 'x');
+        $record = $this->recordIn('yellow', $this->actAs('admin'));
 
-        $denial = StatusTransition::denial($this->statuses[$from], $this->statuses[$to], $complete);
+        foreach (['green', 'red', 'blue'] as $color) {
+            Livewire::test(EditAdmin::class, ['record' => $record->getKey()])
+                ->fillForm(['status_id' => $this->statuses[$color]->id])
+                ->callAction('saveHeader')
+                ->assertHasNoErrors();
 
-        $allowed ? $this->assertNull($denial) : $this->assertNotNull($denial);
-    }
+            $this->assertSame($color, $record->refresh()->status->color);
+        }
 
-    public function test_leaving_red_needs_every_required_field_and_names_the_missing_ones(): void
-    {
-        $attributes = array_fill_keys(array_keys(StatusTransition::REQUIRED_FIELDS), 'x');
-        $attributes['principal_phone'] = null;
-        $attributes['student_count'] = '';
-
-        $denial = StatusTransition::denial($this->statuses['red'], $this->statuses['yellow'], $attributes);
-
-        $this->assertStringContainsString('No Handphone Kepala Sekolah', $denial);
-        $this->assertStringContainsString('Jumlah Siswa', $denial);
-    }
-
-    public function test_a_new_record_cannot_start_beyond_yellow(): void
-    {
-        $complete = array_fill_keys(array_keys(StatusTransition::REQUIRED_FIELDS), 'x');
-
-        $this->assertNull(StatusTransition::initialDenial($this->statuses['red'], []));
-        $this->assertNull(StatusTransition::initialDenial($this->statuses['yellow'], $complete));
-        $this->assertNotNull(StatusTransition::initialDenial($this->statuses['yellow'], []));
-        $this->assertNotNull(StatusTransition::initialDenial($this->statuses['blue'], $complete));
-    }
-
-    public function test_admin_cannot_skip_a_colour_from_the_normal_form(): void
-    {
-        $record = $this->recordIn('red', $this->actAs('admin'));
-
-        Livewire::test(EditAdmin::class, ['record' => $record->getKey()])
-            ->fillForm(['status_id' => $this->statuses['blue']->id])
-            ->callAction('saveHeader')
-            ->assertNotified('Status tidak dapat diubah');
-
-        $this->assertSame($this->statuses['red']->id, $record->refresh()->status_id);
-        $this->assertSame(1, $record->activity()->count());
-    }
-
-    public function test_admin_override_needs_a_reason_and_is_flagged_in_the_log(): void
-    {
-        $record = $this->recordIn('red', $this->actAs('admin'));
-
-        Livewire::test(EditAdmin::class, ['record' => $record->getKey()])
-            ->callAction('overrideStatus', ['status_id' => $this->statuses['blue']->id, 'reason' => 'pendek'])
-            ->assertHasActionErrors(['reason']);
-
-        $this->assertSame($this->statuses['red']->id, $record->refresh()->status_id);
-
-        Livewire::test(EditAdmin::class, ['record' => $record->getKey()])
-            ->callAction('overrideStatus', ['status_id' => $this->statuses['blue']->id, 'reason' => 'Sudah berjalan di luar sistem'])
-            ->assertHasNoActionErrors();
-
-        $record->refresh();
-        $latest = $record->latestStatusLog;
-
-        $this->assertSame($this->statuses['blue']->id, $record->status_id);
-        $this->assertSame('blue', $record->status_color);
-        $this->assertTrue($latest->is_override);
-        $this->assertSame('Sudah berjalan di luar sistem', $latest->note);
+        $this->assertSame(['yellow', 'green', 'red', 'blue'], $this->logColours($record));
     }
 
     public function test_service_moves_a_record_forward_and_the_log_only_grows(): void
@@ -175,29 +111,7 @@ class StatusTransitionTest extends TestCase
             ->callAction('saveHeader')
             ->assertHasNoErrors();
 
-        $this->assertSame([$this->statuses['yellow']->id, $this->statuses['blue']->id], $record->activity()->orderBy('id')->pluck('status_id')->all());
-    }
-
-    public function test_moving_back_appends_a_log_entry_instead_of_deleting_history(): void
-    {
-        $record = $this->recordIn('yellow', $this->actAs('admin'));
-
-        Livewire::test(EditAdmin::class, ['record' => $record->getKey()])
-            ->fillForm(['status_id' => $this->statuses['red']->id])
-            ->callAction('saveHeader')
-            ->assertHasNoErrors();
-
-        $this->assertSame('red', $record->refresh()->status->color, 'a status picked in this save is not auto-promoted');
-
-        Livewire::test(EditAdmin::class, ['record' => $record->getKey()])
-            ->fillForm(['status_id' => $this->statuses['yellow']->id])
-            ->callAction('saveHeader')
-            ->assertHasNoErrors();
-
-        $this->assertSame(
-            ['yellow', 'red', 'yellow'],
-            $record->activity()->orderBy('id')->get()->map(fn (RegistrationStatus $log): string => $log->status->color)->all(),
-        );
+        $this->assertSame(['yellow', 'blue'], $this->logColours($record));
     }
 
     public function test_complete_red_record_becomes_yellow_by_itself_when_sales_saves_it(): void
@@ -234,6 +148,18 @@ class StatusTransitionTest extends TestCase
         }
     }
 
+    public function test_a_status_the_admin_picks_is_not_overwritten_by_auto_promotion(): void
+    {
+        $record = $this->recordIn('yellow', $this->actAs('admin'));
+
+        Livewire::test(EditAdmin::class, ['record' => $record->getKey()])
+            ->fillForm(['status_id' => $this->statuses['red']->id])
+            ->callAction('saveHeader')
+            ->assertHasNoErrors();
+
+        $this->assertSame('red', $record->refresh()->status->color);
+    }
+
     public function test_sales_create_starts_red_and_turns_yellow_once_every_required_field_is_filled(): void
     {
         $this->actAs('sales');
@@ -246,18 +172,6 @@ class StatusTransitionTest extends TestCase
 
         Livewire::test(CreateSales::class)->fillForm(array_merge($form, $required, ['schools' => 'SMA Baru Penuh']))->call('create')->assertHasNoFormErrors();
         $this->assertSame('yellow', RegistrationData::where('schools', 'SMA BARU PENUH')->first()->status->color);
-    }
-
-    public function test_admin_cannot_create_a_record_straight_in_blue(): void
-    {
-        $this->actAs('admin');
-
-        Livewire::test(CreateAdmin::class)
-            ->fillForm(['type' => 'anbk', 'status_id' => $this->statuses['blue']->id, 'schools' => 'SMA Baru', 'date_register' => '2026-02-01 08:00:00'])
-            ->call('create')
-            ->assertNotified('Status tidak dapat diubah');
-
-        $this->assertDatabaseMissing(RegistrationData::class, ['schools' => 'SMA BARU']);
     }
 
     public function test_service_sees_yellow_and_blue_only_and_finance_sees_blue_and_green_only(): void
@@ -281,14 +195,63 @@ class StatusTransitionTest extends TestCase
             ->assertCanNotSeeTableRecords([$records['red'], $records['yellow']]);
     }
 
-    public function test_activity_timeline_marks_an_override_and_shows_its_reason(): void
+    public function test_bulk_change_moves_every_selected_record_and_logs_each_one_with_the_note(): void
+    {
+        $admin = $this->actAs('admin');
+        $year = now('Asia/Jakarta')->format('Y');
+        $records = collect(['red', 'yellow', 'blue'])->map(fn (string $color): RegistrationData => $this->recordIn($color, $admin, ['years' => $year]));
+        $alreadyGreen = $this->recordIn('green', $admin, ['years' => $year]);
+
+        Livewire::test(ListAdmins::class)
+            ->loadTable()
+            ->callTableBulkAction('changeStatus', $records->push($alreadyGreen), ['status_id' => $this->statuses['green']->id, 'note' => 'Serentak Kab. Bogor'])
+            ->assertHasNoTableBulkActionErrors()
+            ->assertNotified('3 data diubah ke Status green');
+
+        foreach ($records->take(3) as $record) {
+            $record->refresh();
+
+            $this->assertSame('green', $record->status->color);
+            $this->assertSame('green', $record->status_color);
+            $this->assertSame('Ubah massal: Serentak Kab. Bogor', $record->latestStatusLog->note);
+        }
+
+        $this->assertSame(1, $alreadyGreen->activity()->count(), 'a record already in the status gets no extra entry');
+        $this->assertSame(['red', 'green'], $this->logColours($records[0]));
+    }
+
+    public function test_bulk_change_in_service_only_offers_the_statuses_service_works_in(): void
+    {
+        $service = $this->actAs('service');
+        $record = $this->recordIn('yellow', $service, ['years' => now('Asia/Jakarta')->format('Y')]);
+
+        Livewire::test(ListServices::class)
+            ->loadTable()
+            ->callTableBulkAction('changeStatus', [$record], ['status_id' => $this->statuses['red']->id])
+            ->assertHasTableBulkActionErrors(['status_id']);
+
+        $this->assertSame('yellow', $record->refresh()->status->color);
+    }
+
+    public function test_change_many_handles_more_than_one_chunk(): void
+    {
+        $owner = User::create(['name' => 'Owner', 'email' => 'owner@example.com', 'password' => bcrypt('password')]);
+        $records = RegistrationData::factory()->count(501)->create(['users_id' => $owner->id, 'status_id' => $this->statuses['red']->id]);
+
+        $result = StatusTransition::changeMany($records, $this->statuses['blue'], $owner->id);
+
+        $this->assertSame(['changed' => 501, 'unchanged' => 0], $result);
+        $this->assertSame(501, RegistrationData::where('status_id', $this->statuses['blue']->id)->where('status_color', 'blue')->count());
+        $this->assertSame(501, RegistrationStatus::where('status_id', $this->statuses['blue']->id)->count());
+    }
+
+    public function test_activity_timeline_shows_the_note_of_an_entry(): void
     {
         $admin = $this->actAs('admin');
         $record = $this->recordIn('red', $admin);
-        StatusTransition::override($record, $this->statuses['blue'], 'Sudah berjalan di luar sistem', $admin->id);
+        StatusTransition::changeMany(collect([$record]), $this->statuses['blue'], $admin->id, 'Serentak Kab. Bogor');
 
         Livewire::test(ViewActivities::class, ['record' => $record->getKey()])
-            ->assertSee('Override admin')
-            ->assertSee('Alasan: Sudah berjalan di luar sistem');
+            ->assertSee('Catatan: Ubah massal: Serentak Kab. Bogor');
     }
 }

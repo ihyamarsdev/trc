@@ -2,7 +2,7 @@
 
 namespace App\Filament\User\Resources\Service\ServiceResource\Pages;
 
-use App\Filament\Components\Support\GuardsStatusTransition;
+use App\Filament\Components\Support\LogsStatusChange;
 use App\Filament\User\Resources\Service\ServiceResource;
 use App\Models\Status;
 use App\Models\User;
@@ -13,7 +13,7 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditService extends EditRecord
 {
-    use GuardsStatusTransition;
+    use LogsStatusChange;
 
     protected static string $resource = ServiceResource::class;
 
@@ -59,8 +59,6 @@ class EditService extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        $this->guardStatusChange($data);
-
         $record = $this->record;
         $status = Status::find($data['status_id']);
 

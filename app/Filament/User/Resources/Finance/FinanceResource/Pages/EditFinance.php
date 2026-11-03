@@ -2,7 +2,7 @@
 
 namespace App\Filament\User\Resources\Finance\FinanceResource\Pages;
 
-use App\Filament\Components\Support\GuardsStatusTransition;
+use App\Filament\Components\Support\LogsStatusChange;
 use App\Filament\User\Resources\Finance\FinanceResource;
 use App\Models\Status;
 use Filament\Actions;
@@ -10,7 +10,7 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditFinance extends EditRecord
 {
-    use GuardsStatusTransition;
+    use LogsStatusChange;
 
     protected static string $resource = FinanceResource::class;
 
@@ -52,8 +52,6 @@ class EditFinance extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        $this->guardStatusChange($data);
-
         $status = Status::find($data['status_id']);
 
         if ($status) {

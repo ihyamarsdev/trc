@@ -2,14 +2,14 @@
 
 namespace App\Filament\User\Resources\Salesforce\SalesResource\Pages;
 
-use App\Filament\Components\Support\GuardsStatusTransition;
+use App\Filament\Components\Support\LogsStatusChange;
 use App\Filament\User\Resources\Salesforce\SalesResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
 class EditSales extends EditRecord
 {
-    use GuardsStatusTransition;
+    use LogsStatusChange;
 
     protected static string $resource = SalesResource::class;
 

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Components;
 
+use App\Filament\Components\Support\ChangeStatusBulkAction;
 use App\Filament\Components\Support\FormSchema;
 use App\Filament\Components\Support\HasProgramMetadata;
 use App\Filament\Components\Support\InfolistSchema;
@@ -195,6 +196,8 @@ class Finance
     {
         return [
             Tables\Actions\BulkActionGroup::make([
+                ChangeStatusBulkAction::make()
+                    ->statuses(fn (Builder $query) => $query->where('order', '>', 9)),
                 Tables\Actions\DeleteBulkAction::make(),
             ]),
         ];

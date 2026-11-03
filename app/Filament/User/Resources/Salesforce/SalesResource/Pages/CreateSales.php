@@ -2,7 +2,7 @@
 
 namespace App\Filament\User\Resources\Salesforce\SalesResource\Pages;
 
-use App\Filament\Components\Support\GuardsStatusTransition;
+use App\Filament\Components\Support\LogsStatusChange;
 use App\Filament\User\Resources\Salesforce\SalesResource;
 use App\Models\Status;
 use Carbon\Carbon;
@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 
 class CreateSales extends CreateRecord
 {
-    use GuardsStatusTransition;
+    use LogsStatusChange;
 
     protected static string $resource = SalesResource::class;
 

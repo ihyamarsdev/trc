@@ -7,20 +7,19 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * `note` holds why a status changed outside the normal flow; `is_override` marks an admin bypass.
+     * `note` holds why a status entry was added outside a plain edit (automatic, overdue, bulk change).
      */
     public function up(): void
     {
         Schema::table('registration_statuses', function (Blueprint $table) {
             $table->text('note')->nullable();
-            $table->boolean('is_override')->default(false);
         });
     }
 
     public function down(): void
     {
         Schema::table('registration_statuses', function (Blueprint $table) {
-            $table->dropColumn(['note', 'is_override']);
+            $table->dropColumn('note');
         });
     }
 };

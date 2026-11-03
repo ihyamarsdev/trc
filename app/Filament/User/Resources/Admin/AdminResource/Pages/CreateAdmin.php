@@ -2,7 +2,7 @@
 
 namespace App\Filament\User\Resources\Admin\AdminResource\Pages;
 
-use App\Filament\Components\Support\GuardsStatusTransition;
+use App\Filament\Components\Support\LogsStatusChange;
 use App\Filament\User\Resources\Admin\AdminResource;
 use Carbon\Carbon;
 use Filament\Actions;
@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 class CreateAdmin extends CreateRecord
 {
-    use GuardsStatusTransition;
+    use LogsStatusChange;
 
     protected static string $resource = AdminResource::class;
 
@@ -33,8 +33,6 @@ class CreateAdmin extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['users_id'] = Auth::id();
-
-        $this->guardInitialStatus($data);
         // $data['type']     = 'anbk';
 
         // monthYear aman dibentuk (jika date_register diisi)

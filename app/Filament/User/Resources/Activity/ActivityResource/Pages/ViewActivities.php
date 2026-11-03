@@ -51,16 +51,12 @@ class ViewActivities extends Page
             $state = 'status-'.$status->id;
 
             $title = "Status: <span class='font-semibold'>".e($status->name).'</span>';
-
-            if ($log->is_override) {
-                $title .= " <span class='rounded bg-amber-100 px-1.5 py-0.5 text-xs font-semibold text-amber-800'>Override admin</span>";
-            }
-
             $description = $status->description ? e($status->description) : '—';
 
             if (filled($log->note)) {
-                $description .= '<br><span class="italic">'.($log->is_override ? 'Alasan: ' : 'Catatan: ').e($log->note).'</span>';
+                $description .= '<br><span class="italic">Catatan: '.e($log->note).'</span>';
             }
+
             $date = $log->created_at?->translatedFormat('l, d/m/Y H:i') ?? '-';
 
             $activities[] = [

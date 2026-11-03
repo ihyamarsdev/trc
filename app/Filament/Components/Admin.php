@@ -2,6 +2,7 @@
 
 namespace App\Filament\Components;
 
+use App\Filament\Components\Support\ChangeStatusBulkAction;
 use App\Filament\Components\Support\ExportBulkAction;
 use App\Filament\Components\Support\FormSchema;
 use App\Filament\Components\Support\HasProgramMetadata;
@@ -406,6 +407,7 @@ class Admin
     {
         return [
             Tables\Actions\BulkActionGroup::make([
+                ChangeStatusBulkAction::make(),
                 Tables\Actions\DeleteBulkAction::make(),
                 ExportBulkAction::make('Export')
                     ->groupedColumns(self::exportColumnGroups())
