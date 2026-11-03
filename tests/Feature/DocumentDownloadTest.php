@@ -56,6 +56,13 @@ class DocumentDownloadTest extends TestCase
         $this->actingAs($user);
     }
 
+    public function test_kwitansi_amount_in_words_capitalises_every_word(): void
+    {
+        $data = DocumentData::kwitansi($this->record(['total' => '29575000']));
+
+        $this->assertSame('Dua Puluh Sembilan Juta Lima Ratus Tujuh Puluh Lima Ribu Rupiah', $data['totalSpell']);
+    }
+
     /**
      * @return array<string, array{0: string, 1: string}>
      */
