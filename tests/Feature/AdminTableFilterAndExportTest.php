@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Components\Admin;
 use App\Filament\Enum\OptionGroup;
 use App\Filament\User\Resources\Admin\AdminResource\Pages\ListAdmins;
 use App\Models\Option;
@@ -52,6 +53,17 @@ class AdminTableFilterAndExportTest extends TestCase
         ]);
     }
 
+    /**
+     * Livewire fills untouched checkbox groups with their defaults (all checked), so every group is sent explicitly.
+     *
+     * @param  array<int, array<int, string>>  $picked
+     * @return array<int, array<int, string>>
+     */
+    private function pickColumns(array $picked): array
+    {
+        return array_replace(array_fill(0, count(Admin::exportColumnGroups()), []), $picked);
+    }
+
     public function test_status_color_filter_accepts_multiple_colors(): void
     {
         $red = $this->recordWithColor('red', 1);
@@ -72,7 +84,7 @@ class AdminTableFilterAndExportTest extends TestCase
         Livewire::test(ListAdmins::class)
             ->loadTable()
             ->mountTableBulkAction('Export', [$record->getKey()])
-            ->assertSee('Pilih semua');
+            ->assertSee(['Pilih semua', 'Pendaftaran', 'Finance: Nominal & Pajak']);
     }
 
     public function test_export_uses_current_labels_and_choice_labels(): void
@@ -84,7 +96,11 @@ class AdminTableFilterAndExportTest extends TestCase
 
         $component = Livewire::test(ListAdmins::class)
             ->loadTable()
-            ->callTableBulkAction('Export', [$record->getKey()], ['file_name' => 'uji', 'format' => 'csv'])
+            ->callTableBulkAction('Export', [$record->getKey()], [
+                'file_name' => 'uji',
+                'format' => 'csv',
+                'column_groups' => $this->pickColumns([0 => ['type', 'users.name', 'status.name', 'notes'], 4 => ['option_price', 'price', 'tax_rates']]),
+            ])
             ->assertHasNoTableBulkActionErrors();
 
         $csv = base64_decode($component->effects['download']['content']);
@@ -96,5 +112,17 @@ class AdminTableFilterAndExportTest extends TestCase
         $this->assertStringContainsString('11%', $csv);
         $this->assertStringContainsString('Catatan uji', $csv);
         $this->assertStringContainsString('Status red', $csv);
+        $this->assertStringNotContainsString('Kepala Sekolah', $csv);
+    }
+
+    public function test_export_with_no_column_selected_is_rejected_instead_of_exporting_everything(): void
+    {
+        $record = $this->recordWithColor('red', 1);
+
+        $component = Livewire::test(ListAdmins::class)
+            ->loadTable()
+            ->callTableBulkAction('Export', [$record->getKey()], ['file_name' => 'uji', 'format' => 'csv', 'column_groups' => $this->pickColumns([])]);
+
+        $this->assertArrayNotHasKey('download', $component->effects);
     }
 }
