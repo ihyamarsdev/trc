@@ -283,11 +283,16 @@ class Admin
             ->infolist(fn (Infolists\Infolist $infolist, Model $record) => self::buildActivityInfolist($infolist, $record));
     }
 
+    /**
+     * Filters in the order they appear in the 2-column filter panel: wide ones (date, region) first,
+     * then paired narrow ones (program/periode, year/status).
+     */
     public static function filters(): array
     {
         return [
             Tables\Filters\Filter::make('date_filter')
                 ->label('Filter Tanggal')
+                ->columnSpanFull()
                 ->form([
                     Select::make('date_field')
                         ->label('Kategori Tanggal')
@@ -341,12 +346,7 @@ class Admin
 
                     return $indicators;
                 }),
-            Tables\Filters\SelectFilter::make('users')
-                ->label('Salesforce')
-                ->relationship('users', 'name')
-                ->searchable()
-                ->preload()
-                ->indicator('Salesforce'),
+            self::regionFilter(),
             Tables\Filters\SelectFilter::make('type')
                 ->label('Program')
                 ->options(Option::list(OptionGroup::Program, onlyActive: false))
@@ -357,6 +357,20 @@ class Admin
                 ->options(Option::list(OptionGroup::Periode, onlyActive: false))
                 ->preload()
                 ->indicator('Periode'),
+            Tables\Filters\SelectFilter::make('years')
+                ->label('Tahun Ajaran')
+                ->options(function () {
+                    // Mengambil daftar tahun unik yang benar-benar ada di database
+                    return RegistrationData::query() // Ganti Sales dengan nama Model Anda
+                        ->whereNotNull('years')
+                        ->distinct()
+                        ->orderBy('years', 'desc')
+                        ->pluck('years', 'years')
+                        ->toArray();
+                })
+                ->searchable()
+                ->preload()
+                ->indicator('Tahun Ajaran'),
             Tables\Filters\SelectFilter::make('status_color')
                 ->label('Status Warna')
                 ->multiple()
@@ -378,21 +392,55 @@ class Admin
                         fn (Builder $q) => $q->whereIn('color', $data['values'])
                     );
                 }),
-            Tables\Filters\SelectFilter::make('years')
-                ->label('Tahun Ajaran')
-                ->options(function () {
-                    // Mengambil daftar tahun unik yang benar-benar ada di database
-                    return RegistrationData::query() // Ganti Sales dengan nama Model Anda
-                        ->whereNotNull('years')
-                        ->distinct()
-                        ->orderBy('years', 'desc')
-                        ->pluck('years', 'years')
-                        ->toArray();
-                })
+            Tables\Filters\SelectFilter::make('users')
+                ->label('Salesforce')
+                ->relationship('users', 'name')
                 ->searchable()
                 ->preload()
-                ->indicator('Tahun Ajaran'),
+                ->indicator('Salesforce'),
         ];
+    }
+
+    /**
+     * Province and city/regency side by side. The city list narrows to the chosen provinces, and both only
+     * offer values that exist in the data, so every option returns rows.
+     */
+    private static function regionFilter(): Tables\Filters\Filter
+    {
+        $distinct = fn (string $column, array $provinces = []): array => RegistrationData::query()
+            ->whereNotNull($column)
+            ->where($column, '!=', '')
+            ->when($provinces !== [], fn (Builder $query) => $query->whereIn('provinces', $provinces))
+            ->distinct()
+            ->orderBy($column)
+            ->pluck($column, $column)
+            ->all();
+
+        return Tables\Filters\Filter::make('region')
+            ->label('Wilayah')
+            ->columnSpanFull()
+            ->form([
+                Select::make('provinces')
+                    ->label('Provinsi')
+                    ->multiple()
+                    ->searchable()
+                    ->options(fn (): array => $distinct('provinces'))
+                    ->live()
+                    ->afterStateUpdated(fn (Set $set) => $set('regencies', [])),
+                Select::make('regencies')
+                    ->label('Kota / Kabupaten')
+                    ->multiple()
+                    ->searchable()
+                    ->options(fn (Get $get): array => $distinct('regencies', (array) $get('provinces'))),
+            ])
+            ->columns(['default' => 1, 'sm' => 2])
+            ->query(fn (Builder $query, array $data): Builder => $query
+                ->when(filled($data['provinces'] ?? null), fn (Builder $q) => $q->whereIn('provinces', $data['provinces']))
+                ->when(filled($data['regencies'] ?? null), fn (Builder $q) => $q->whereIn('regencies', $data['regencies'])))
+            ->indicateUsing(fn (array $data): array => array_filter([
+                filled($data['provinces'] ?? null) ? 'Provinsi: '.implode(', ', $data['provinces']) : null,
+                filled($data['regencies'] ?? null) ? 'Kota/Kab: '.implode(', ', $data['regencies']) : null,
+            ]));
     }
 
     public static function actions(): array
