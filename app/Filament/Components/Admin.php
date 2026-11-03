@@ -2,7 +2,7 @@
 
 namespace App\Filament\Components;
 
-use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use App\Filament\Components\Support\ExportBulkAction;
 use App\Filament\Components\Support\FormSchema;
 use App\Filament\Components\Support\HasProgramMetadata;
 use App\Filament\Components\Support\InfolistSchema;
@@ -357,6 +357,7 @@ class Admin
                 ->indicator('Periode'),
             Tables\Filters\SelectFilter::make('status_color')
                 ->label('Status Warna')
+                ->multiple()
                 ->options([
                     'red' => 'Merah',
                     'yellow' => 'Kuning',
@@ -366,13 +367,13 @@ class Admin
                 ->preload()
                 ->indicator('Status Warna')
                 ->query(function (Builder $query, array $data) {
-                    if (empty($data['value'])) {
+                    if (empty($data['values'])) {
                         return;
                     }
 
                     $query->whereHas(
                         'status',
-                        fn (Builder $q) => $q->where('color', $data['value'])
+                        fn (Builder $q) => $q->whereIn('color', $data['values'])
                     );
                 }),
             Tables\Filters\SelectFilter::make('years')
@@ -405,7 +406,7 @@ class Admin
         return [
             Tables\Actions\BulkActionGroup::make([
                 Tables\Actions\DeleteBulkAction::make(),
-                FilamentExportBulkAction::make('Export')
+                ExportBulkAction::make('Export')
                     ->withColumns(self::TextColumns())
                     ->disableTableColumns()
                     ->formatStates([
