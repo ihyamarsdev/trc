@@ -123,8 +123,11 @@ class FinanceExporter extends Exporter
             ExportColumn::make('bank_name')
                 ->label('Bank'),
             ExportColumn::make('total_support_school')
-                ->label('Total SS')
+                ->label('Realisasi SS')
                 ->prefix('Rp.'),
+            ExportColumn::make('support_school_date')
+                ->label('Tgl SS Dikirim')
+                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('l, jS F Y') : '-'),
             ExportColumn::make('total_net')
                 ->label('Total Net')
                 ->prefix('Rp.'),

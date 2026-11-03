@@ -294,7 +294,11 @@ class InfolistSchema
                                 ->badge()
                                 ->color('gray'),
                         ]),
-                    self::money('total_support_school', 'Total SS'),
+                    Grid::make(['default' => 1, 'sm' => 2])
+                        ->schema([
+                            self::money('total_support_school', 'Realisasi SS'),
+                            self::date('support_school_date', 'Tgl SS Dikirim')->placeholder(self::EMPTY),
+                        ]),
                     self::money('total_net', 'Total Net')
                         ->size(TextEntrySize::Large)
                         ->weight(FontWeight::Bold)

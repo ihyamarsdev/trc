@@ -188,12 +188,16 @@ class FormSchema
                                 ->native(false)
                                 ->placeholder('Pilih bank'),
                         ]),
-                    self::rupiah('total_support_school', 'Total SS')
-                        ->helperText('Diisi manual')
-                        ->live(debounce: 1000)
-                        ->afterStateUpdated(fn (Get $get, Set $set) => SharedSchema::syncNet($get, $set)),
+                    Grid::make(['default' => 1, 'sm' => 2])
+                        ->schema([
+                            self::rupiah('total_support_school', 'Realisasi SS')
+                                ->helperText('Diisi manual')
+                                ->live(debounce: 1000)
+                                ->afterStateUpdated(fn (Get $get, Set $set) => SharedSchema::syncNet($get, $set)),
+                            self::date('support_school_date', 'Tgl SS Dikirim'),
+                        ]),
                     self::rupiah('total_net', 'Total Net')
-                        ->helperText('Total Uang Masuk dikurangi Total SS')
+                        ->helperText('Total Uang Masuk dikurangi Realisasi SS')
                         ->readOnly(),
                 ]),
 

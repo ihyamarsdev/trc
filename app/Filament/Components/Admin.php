@@ -489,7 +489,8 @@ class Admin
                 TextColumn::make('tax_amount')->label('Nominal Pajak'),
                 TextColumn::make('total')->label('Total Dana Sesuai SPJ'),
                 TextColumn::make('total_received')->label('Total Uang Masuk Rekening'),
-                TextColumn::make('total_support_school')->label('Total SS'),
+                TextColumn::make('total_support_school')->label('Realisasi SS'),
+                $date('support_school_date', 'Tgl SS Dikirim', 'j F Y'),
                 TextColumn::make('total_net')->label('Total Net'),
             ],
             'Finance: Invoice & Pembayaran' => [
