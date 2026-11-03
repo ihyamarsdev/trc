@@ -400,7 +400,7 @@ class InfolistSchema
     /**
      * `implementer_12` / `account_7` keep the count in the key; `real` uses the manual real count.
      */
-    private static function optionLabel(?string $state): string
+    public static function optionLabel(?string $state): string
     {
         return match (true) {
             $state === 'real' => 'Jumlah Real',

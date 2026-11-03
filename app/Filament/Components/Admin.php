@@ -2,7 +2,7 @@
 
 namespace App\Filament\Components;
 
-use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use App\Filament\Components\Support\ExportBulkAction;
 use App\Filament\Components\Support\FormSchema;
 use App\Filament\Components\Support\HasProgramMetadata;
 use App\Filament\Components\Support\InfolistSchema;
@@ -29,6 +29,7 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use JaOcero\ActivityTimeline\Components\ActivityDate;
 use JaOcero\ActivityTimeline\Components\ActivityDescription;
 use JaOcero\ActivityTimeline\Components\ActivityIcon;
@@ -357,6 +358,7 @@ class Admin
                 ->indicator('Periode'),
             Tables\Filters\SelectFilter::make('status_color')
                 ->label('Status Warna')
+                ->multiple()
                 ->options([
                     'red' => 'Merah',
                     'yellow' => 'Kuning',
@@ -366,13 +368,13 @@ class Admin
                 ->preload()
                 ->indicator('Status Warna')
                 ->query(function (Builder $query, array $data) {
-                    if (empty($data['value'])) {
+                    if (empty($data['values'])) {
                         return;
                     }
 
                     $query->whereHas(
                         'status',
-                        fn (Builder $q) => $q->where('color', $data['value'])
+                        fn (Builder $q) => $q->whereIn('color', $data['values'])
                     );
                 }),
             Tables\Filters\SelectFilter::make('years')
@@ -405,12 +407,9 @@ class Admin
         return [
             Tables\Actions\BulkActionGroup::make([
                 Tables\Actions\DeleteBulkAction::make(),
-                FilamentExportBulkAction::make('Export')
-                    ->withColumns(self::TextColumns())
-                    ->disableTableColumns()
-                    ->formatStates([
-                        'type' => fn (?Model $record) => strtoupper($record->type),
-                    ]),
+                ExportBulkAction::make('Export')
+                    ->groupedColumns(self::exportColumnGroups())
+                    ->disableTableColumns(),
             ]),
         ];
     }
@@ -420,109 +419,113 @@ class Admin
         return ['admin'];
     }
 
-    public static function TextColumns(): array
+    /**
+     * Export columns per group, in the order they appear in the export modal and the file.
+     *
+     * @return array<string, array<int, TextColumn>>
+     */
+    public static function exportColumnGroups(): array
     {
+        $date = fn (string $name, string $label, string $format = 'l, j F Y'): TextColumn => TextColumn::make($name)
+            ->label($label)
+            ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat($format) : '-');
+
         return [
-            // --- Sales ---
-            TextColumn::make('type')->label('Program'),
-            TextColumn::make('periode')->label('Periode'),
-            TextColumn::make('years')->label('Tahun'),
-            TextColumn::make('date_register')
-                ->label('Tanggal Pendaftaran')
-                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('l, j F Y H:i') : '-'),
-            TextColumn::make('provinces')->label('Provinsi'),
-            TextColumn::make('regencies')->label('Kota / Kabupaten'),
-            TextColumn::make('area')->label('Wilayah'),
-            TextColumn::make('district')->label('Kecamatan'),
-            TextColumn::make('student_count')->label('Jumlah Siswa'),
-            TextColumn::make('implementation_estimate')
-                ->label('Estimasi Pelaksanaan')
-                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('l, j F Y H:i') : '-'),
-            TextColumn::make('curriculum_deputies')->label('Wakakurikulum'),
-            TextColumn::make('curriculum_deputies_phone')->label('No. HP Wakakurikulum'),
-            TextColumn::make('counselor_coordinators')->label('Koordinator BK'),
-            TextColumn::make('counselor_coordinators_phone')->label('No. HP Koordinator BK'),
-            TextColumn::make('proctors')->label('Proktor'),
-            TextColumn::make('proctors_phone')->label('No. HP Proktor'),
-
-            TextColumn::make('schools')->label('Sekolah'),
-            TextColumn::make('class')->label('Kelas'),
-            TextColumn::make('education_level')->label('Jenjang'),
-            TextColumn::make('description')->label('Keterangan'),
-            TextColumn::make('schools_type')->label('Negeri / Swasta'),
-
-            TextColumn::make('principal')->label('Kepala Sekolah'),
-            TextColumn::make('principal_phone')->label('No. HP Kepala Sekolah'),
-
-            // --- Akademik & Teknisi ---
-            TextColumn::make('group')
-                ->label('Tanggal Group')
-                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('l, j F Y') : '-')
-                ->sortable(),
-            TextColumn::make('bimtek')
-                ->label('Tanggal Bimtek')
-                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('l, j F Y') : '-')
-                ->sortable(),
-            TextColumn::make('account_count_created')->label('Akun Dibuat'),
-            TextColumn::make('implementer_count')->label('Jumlah Pelaksana'),
-            TextColumn::make('difference')->label('Selisih'),
-            TextColumn::make('students_download')->label('Unduhan Siswa'),
-            TextColumn::make('schools_download')->label('Unduhan Sekolah'),
-            TextColumn::make('pm')->label('PM'),
-            TextColumn::make('counselor_consultation_date')
-                ->label('Konsultasi BK')
-                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('l, j F Y') : '-'),
-            TextColumn::make('student_consultation_date')
-                ->label('Konsultasi Siswa')
-                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('l, j F Y') : '-'),
-
-            // --- Finance (utama) ---
-            TextColumn::make('price')->label('Harga'),
-            TextColumn::make('total')->label('Total'),
-            TextColumn::make('total_received')->label('Total Uang Masuk Rekening'),
-            TextColumn::make('bank_name')->label('Bank'),
-            TextColumn::make('total_support_school')->label('Total SS'),
-            TextColumn::make('total_net')->label('Total Netto'),
-            TextColumn::make('invoice_date')
-                ->label('Tgl Invoice')
-                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('j F Y') : '-')
-                ->sortable(),
-            TextColumn::make('spk')
-                ->label('Tgl SPK')
-                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('j F Y') : '-')
-                ->sortable(),
-            TextColumn::make('payment_date')
-                ->label('Tgl Pembayaran')
-                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('j F Y') : '-')
-                ->sortable(),
-            TextColumn::make('payment_name')->label('Nama Pembayaran'),
-
-            // --- Finance (Opsi, SS, Pajak) ---
-            TextColumn::make('option_price')->label('Opsi Jumlah'),
-            TextColumn::make('real_count')->label('Jumlah Siswa Real'),
-            TextColumn::make('support_school')->label('SS (Support Sekolah)'),
-            TextColumn::make('net_2')->label('Harga NET'),
-            TextColumn::make('tax_rates')
-                ->label('Pilihan Pajak')
-                ->state(fn (Model $record): string => implode(', ', SharedSchema::taxRateLabels($record->tax_rates, $record->tax_custom_rate))),
-            TextColumn::make('tax_amount')->label('Nominal Pajak'),
-            TextColumn::make('invoice_amount')->label('Nominal Invoice'),
-
-            // --- Invoice detail ---
-            TextColumn::make('detail_invoice')->label('Detail Invoice'),
-            TextColumn::make('number_invoice')->label('Nomor Invoice'),
-            TextColumn::make('qty_invoice')->label('Qty Invoice'),
-            TextColumn::make('unit_price')->label('Harga Satuan'),
-            TextColumn::make('amount_invoice')->label('Jumlah Invoice'),
-            TextColumn::make('ppn')->label('PPN'),
-            TextColumn::make('pph')->label('PPH'),
-            TextColumn::make('subtotal_invoice')->label('Subtotal Invoice'),
-            TextColumn::make('total_invoice')->label('Total Invoice'),
-
-            TextColumn::make('detail_kwitansi')->label('Detail Kwitansi'),
-            TextColumn::make('difference_total')->label('Total Selisih'),
-
-            TextColumn::make('subtotal_2')->label('Subtotal 2'),
+            'Pendaftaran' => [
+                self::optionColumn('type', 'Program', OptionGroup::Program, upper: true),
+                self::optionColumn('periode', 'Periode', OptionGroup::Periode, upper: true),
+                TextColumn::make('years')->label('Tahun'),
+                TextColumn::make('users.name')->label('Salesforce'),
+                TextColumn::make('status.name')->label('Status'),
+                $date('date_register', 'Tanggal Pendaftaran', 'l, j F Y H:i'),
+                $date('implementation_estimate', 'Estimasi Pelaksanaan', 'l, j F Y H:i'),
+                TextColumn::make('student_count')->label('Jumlah Siswa'),
+                TextColumn::make('notes')->label('Catatan'),
+            ],
+            'Sekolah & Lokasi' => [
+                TextColumn::make('schools')->label('Sekolah'),
+                TextColumn::make('class')->label('Kelas'),
+                self::optionColumn('education_level', 'Jenjang', OptionGroup::Jenjang),
+                self::optionColumn('description', 'Keterangan', OptionGroup::Keterangan),
+                self::optionColumn('schools_type', 'Negeri / Swasta', OptionGroup::SchoolType),
+                TextColumn::make('provinces')->label('Provinsi'),
+                TextColumn::make('regencies')->label('Kota / Kabupaten'),
+                TextColumn::make('area')->label('Wilayah'),
+                TextColumn::make('district')->label('Kecamatan'),
+            ],
+            'Kontak Sekolah' => [
+                TextColumn::make('principal')->label('Kepala Sekolah'),
+                TextColumn::make('principal_phone')->label('No. HP Kepala Sekolah'),
+                TextColumn::make('curriculum_deputies')->label('Wakakurikulum'),
+                TextColumn::make('curriculum_deputies_phone')->label('No. HP Wakakurikulum'),
+                TextColumn::make('counselor_coordinators')->label('Koordinator BK'),
+                TextColumn::make('counselor_coordinators_phone')->label('No. HP Koordinator BK'),
+                TextColumn::make('proctors')->label('Proktor'),
+                TextColumn::make('proctors_phone')->label('No. HP Proktor'),
+            ],
+            'Service' => [
+                TextColumn::make('account_count_created')->label('Jumlah Akun Dibuat'),
+                TextColumn::make('implementer_count')->label('Jumlah Akun Pelaksanaan'),
+                TextColumn::make('difference')->label('Selisih'),
+                $date('group', 'Grup'),
+                $date('bimtek', 'Bimtek'),
+                $date('counselor_consultation_date', 'Konsul BK'),
+                $date('student_consultation_date', 'Konsul Siswa'),
+                TextColumn::make('schools_download')->label('Download Sekolah'),
+                TextColumn::make('students_download')->label('Download Siswa'),
+                TextColumn::make('pm')->label('PM'),
+            ],
+            'Finance: Nominal & Pajak' => [
+                TextColumn::make('option_price')
+                    ->label('Dasar Jumlah')
+                    ->formatStateUsing(fn (?string $state): string => InfolistSchema::optionLabel($state)),
+                TextColumn::make('real_count')->label('Jumlah Siswa Real'),
+                TextColumn::make('price')->label('Harga SPJ'),
+                TextColumn::make('support_school')->label('SS (Support Sekolah)'),
+                TextColumn::make('net_2')->label('Harga NET'),
+                TextColumn::make('tax_rates')
+                    ->label('Pilihan Pajak')
+                    ->state(fn (Model $record): string => implode(', ', SharedSchema::taxRateLabels($record->tax_rates, $record->tax_custom_rate))),
+                TextColumn::make('tax_amount')->label('Nominal Pajak'),
+                TextColumn::make('total')->label('Total Dana Sesuai SPJ'),
+                TextColumn::make('total_received')->label('Total Uang Masuk Rekening'),
+                TextColumn::make('total_support_school')->label('Total SS'),
+                TextColumn::make('total_net')->label('Total Net'),
+            ],
+            'Finance: Invoice & Pembayaran' => [
+                $date('invoice_date', 'Tanggal Invoice', 'j F Y'),
+                TextColumn::make('invoice_amount')->label('Nominal Invoice'),
+                self::optionColumn('payment_name', 'Pembayaran Via', OptionGroup::PaymentVia),
+                self::optionColumn('bank_name', 'Bank', OptionGroup::Bank),
+                $date('payment_date', 'Jadwal Pembayaran', 'j F Y'),
+                $date('spk', 'Jadwal SPK', 'j F Y'),
+            ],
+            'Dokumen (Kwitansi & Invoice)' => [
+                TextColumn::make('detail_kwitansi')->label('Detail Kwitansi'),
+                TextColumn::make('number_invoice')->label('Nomor Invoice'),
+                TextColumn::make('detail_invoice')->label('Detail Invoice'),
+                TextColumn::make('qty_invoice')->label('Qty Invoice'),
+                TextColumn::make('unit_price')->label('Harga Satuan'),
+                TextColumn::make('amount_invoice')->label('Jumlah Invoice'),
+                TextColumn::make('pph')->label('PPH'),
+                TextColumn::make('ppn')->label('PPN'),
+                TextColumn::make('subtotal_invoice')->label('Subtotal Invoice'),
+                TextColumn::make('total_invoice')->label('Total Invoice'),
+            ],
         ];
+    }
+
+    /**
+     * Column that exports the label of the stored master-data choice, like the table and infolist show it.
+     */
+    private static function optionColumn(string $name, string $label, OptionGroup $group, bool $upper = false): TextColumn
+    {
+        return TextColumn::make($name)
+            ->label($label)
+            ->formatStateUsing(function (?string $state) use ($group, $upper): string {
+                $text = Option::label($group, $state) ?? (string) $state;
+
+                return $upper ? Str::upper($text) : $text;
+            });
     }
 }
