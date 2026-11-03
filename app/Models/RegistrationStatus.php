@@ -6,7 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class RegistrationStatus extends Model
 {
-    protected $fillable = ['registration_id', 'status_id', 'user_id'];
+    protected $fillable = ['registration_id', 'status_id', 'user_id', 'note', 'is_override'];
+
+    protected function casts(): array
+    {
+        return ['is_override' => 'boolean'];
+    }
 
     public function registration()
     {

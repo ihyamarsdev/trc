@@ -38,7 +38,7 @@ class Service
                             name: 'status',
                             titleAttribute: 'name',
                             modifyQueryUsing: fn (Builder $query) => $query
-                                ->where('order', '<=', 10)
+                                ->whereBetween('order', [2, 10])
                                 ->orderBy('order'),
                         )
                         ->searchable()

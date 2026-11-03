@@ -44,7 +44,7 @@ class FormPagesRenderTest extends TestCase
         $status = Status::create([
             'name' => 'Status Aktif',
             'description' => 'Desc',
-            'color' => 'yellow',
+            'color' => $user->hasRole('finance') ? 'blue' : 'yellow',
             'order' => 1,
             'category' => 'sales',
         ]);
@@ -91,7 +91,7 @@ class FormPagesRenderTest extends TestCase
         $status = Status::create([
             'name' => 'Status Aktif',
             'description' => 'Desc',
-            'color' => 'yellow',
+            'color' => 'red',
             'order' => 1,
             'category' => 'sales',
         ]);
@@ -111,13 +111,13 @@ class FormPagesRenderTest extends TestCase
         $this->assertDatabaseHas(RegistrationData::class, ['schools' => 'SMA Contoh', 'type' => 'anbk', 'price' => '100000']);
     }
 
-    public function test_sales_create_page_renders_with_status_hidden_until_required_fields_are_filled(): void
+    public function test_sales_create_page_has_no_manual_status_field(): void
     {
         $this->actAs('sales');
 
         Livewire::test(CreateSales::class)
             ->assertSuccessful()
             ->assertFormFieldExists('schools')
-            ->assertFormFieldIsHidden('status_id');
+            ->assertFormFieldDoesNotExist('status_id');
     }
 }

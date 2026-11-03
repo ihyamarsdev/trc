@@ -41,6 +41,14 @@ class FinanceResource extends Resource
         return Auth::user()?->hasRole(Finance::getRoles()) ?? false;
     }
 
+    /**
+     * Finance only sees blue (handed over by Service) and green (being billed or finished) records.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->whereRelation('status', fn (Builder $query) => $query->whereIn('color', ['blue', 'green']));
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -59,7 +67,6 @@ class FinanceResource extends Resource
                 fn (Builder $query) => $query
                     ->with(['latestStatusLog.status', 'status'])
                     ->where('years', now('Asia/Jakarta')->format('Y'))
-                    ->whereRelation('status', 'order', '>=', 7)
                     ->orderByDesc('updated_at')
             )
             ->columns(Finance::columns())

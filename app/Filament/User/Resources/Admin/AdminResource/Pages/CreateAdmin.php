@@ -2,8 +2,8 @@
 
 namespace App\Filament\User\Resources\Admin\AdminResource\Pages;
 
+use App\Filament\Components\Support\GuardsStatusTransition;
 use App\Filament\User\Resources\Admin\AdminResource;
-use App\Models\RegistrationStatus;
 use Carbon\Carbon;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 
 class CreateAdmin extends CreateRecord
 {
+    use GuardsStatusTransition;
+
     protected static string $resource = AdminResource::class;
 
     protected function getHeaderActions(): array
@@ -31,6 +33,8 @@ class CreateAdmin extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['users_id'] = Auth::id();
+
+        $this->guardInitialStatus($data);
         // $data['type']     = 'anbk';
 
         // monthYear aman dibentuk (jika date_register diisi)
@@ -49,19 +53,7 @@ class CreateAdmin extends CreateRecord
             return;
         }
 
-        // Cek log terakhir (hindari duplikat)
-        $last = RegistrationStatus::query()
-            ->where('registration_id', $record->id)
-            ->latest('id')
-            ->first();
-
-        if (! $last || (int) $last->status_id !== (int) $record->status_id) {
-            RegistrationStatus::create([
-                'registration_id' => $record->id,
-                'status_id' => $record->status_id,
-                'user_id' => Auth::id(),
-                '',
-            ]);
-        }
+        $this->logStatusChange();
+        $this->promoteWhenComplete();
     }
 }

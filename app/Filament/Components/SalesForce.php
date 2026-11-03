@@ -8,14 +8,10 @@ use App\Filament\Components\Support\InfolistSchema;
 use App\Filament\Components\Support\SharedSchema;
 use App\Filament\Enum\OptionGroup;
 use App\Models\Option;
-use App\Models\Status;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -129,53 +125,6 @@ class SalesForce
                         ->label('Catatan')
                         ->autosize()
                         ->columnSpanFull(),
-                ]),
-
-            Section::make('Status')
-                ->description('Isi sesuai dengan status saat ini')
-                ->icon('heroicon-o-flag')
-                ->visible(function (Get $get) {
-                    $keys = [
-                        'principal',
-                        'principal_phone',
-                        'student_count',
-                        'schools',
-                        'implementation_estimate',
-                        'curriculum_deputies',
-                        'curriculum_deputies_phone',
-                    ];
-
-                    // tampil hanya jika SEMUA kolom di atas terisi (non-blank)
-                    foreach ($keys as $key) {
-                        if (blank($get($key))) {
-                            return false;
-                        }
-                    }
-
-                    return true;
-                })
-                ->schema([
-                    Select::make('status_id')
-                        ->label('Status')
-                        ->preload()
-                        ->relationship(
-                            name: 'status',
-                            titleAttribute: 'name',
-                            modifyQueryUsing: fn (Builder $query) => $query
-                                ->where('order', '<=', 2)
-                                ->orderBy('order'),
-                        )
-                        ->searchable()
-                        ->placeholder('Pilih status...')
-                        ->live()
-                        ->afterStateUpdated(function (Set $set, $state) {
-                            if ($state) {
-                                $color = Status::find($state)?->color;
-                                $set('status_color', $color);
-                            } else {
-                                $set('status_color', null);
-                            }
-                        }),
                 ]),
         ];
     }

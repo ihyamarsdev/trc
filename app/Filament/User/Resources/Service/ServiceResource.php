@@ -43,6 +43,14 @@ class ServiceResource extends Resource
         return Auth::user()?->hasRole(Service::getRoles()) ?? false;
     }
 
+    /**
+     * Service only sees yellow (just handed over by Sales) and blue (being handled) records.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->whereRelation('status', fn (Builder $query) => $query->whereIn('color', ['yellow', 'blue']));
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -64,7 +72,6 @@ class ServiceResource extends Resource
                     return $query
                         ->with(['latestStatusLog.status', 'status'])
                         ->where('years', now('Asia/Jakarta')->format('Y'))
-                        ->whereRelation('status', fn ($q) => $q->whereBetween('order', [2, 10]))
                         ->orderByDesc('updated_at');
                 }
             )

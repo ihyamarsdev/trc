@@ -32,12 +32,9 @@ class ViewActivities extends Page
     {
         $logs = RegistrationStatus::query()
             ->where('registration_id', $this->record->id)
-            ->join('statuses', 'registration_statuses.status_id', '=', 'statuses.id')
-            ->select('registration_statuses.*')
             ->with(['status:id,name,description,color,icon,order', 'user:id,name'])
-            ->orderBy('registration_statuses.created_at')
-            ->orderBy('statuses.order')
-            ->orderBy('registration_statuses.id')
+            ->orderBy('created_at')
+            ->orderBy('id')
             ->get();
 
         $colorByState = [];
@@ -54,7 +51,16 @@ class ViewActivities extends Page
             $state = 'status-'.$status->id;
 
             $title = "Status: <span class='font-semibold'>".e($status->name).'</span>';
+
+            if ($log->is_override) {
+                $title .= " <span class='rounded bg-amber-100 px-1.5 py-0.5 text-xs font-semibold text-amber-800'>Override admin</span>";
+            }
+
             $description = $status->description ? e($status->description) : '—';
+
+            if (filled($log->note)) {
+                $description .= '<br><span class="italic">'.($log->is_override ? 'Alasan: ' : 'Catatan: ').e($log->note).'</span>';
+            }
             $date = $log->created_at?->translatedFormat('l, d/m/Y H:i') ?? '-';
 
             $activities[] = [
