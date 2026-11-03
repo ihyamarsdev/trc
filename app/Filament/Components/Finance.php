@@ -95,7 +95,10 @@ class Finance
                 ->prefix('Rp.'),
             TextColumn::make('total_received')->label('Total Uang Masuk Rekening')->prefix('Rp.'),
             TextColumn::make('bank_name')->label('Bank'),
-            TextColumn::make('total_support_school')->label('Total SS')->prefix('Rp.'),
+            TextColumn::make('total_support_school')->label('Realisasi SS')->prefix('Rp.'),
+            TextColumn::make('support_school_date')
+                ->label('Tgl SS Dikirim')
+                ->formatStateUsing(fn ($state) => $state ? Carbon::parse($state)->translatedFormat('l, jS F Y') : '-'),
             TextColumn::make('total_net')->label('Total Net')->prefix('Rp.'),
 
             TextColumn::make('spk')

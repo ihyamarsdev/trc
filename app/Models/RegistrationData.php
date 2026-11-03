@@ -99,6 +99,7 @@ class RegistrationData extends Model
         'tax_amount',
         'total_received',
         'total_support_school',
+        'support_school_date',
         'bank_name',
         'cb,',
         'status_id', // Foreign key to statuses table
@@ -112,6 +113,7 @@ class RegistrationData extends Model
         'tax_rates' => 'array',
         'spk' => 'datetime',
         'payment_date' => 'datetime',
+        'support_school_date' => 'datetime',
         'group' => 'datetime',
         'implementation_estimate' => 'datetime',
     ];

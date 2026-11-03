@@ -117,6 +117,19 @@ class AdminFinanceFormTest extends TestCase
             ->assertHasFormErrors(['bank_name']);
     }
 
+    public function test_support_school_realization_date_is_saved_next_to_realisasi_ss(): void
+    {
+        $record = $this->makeRecord();
+
+        Livewire::test(EditAdmin::class, ['record' => $record->getKey()])
+            ->assertFormFieldExists('support_school_date')
+            ->fillForm(['total_support_school' => 20000, 'support_school_date' => '2026-11-02'])
+            ->callAction('saveHeader')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame('2026-11-02', $record->refresh()->support_school_date->toDateString());
+    }
+
     public function test_tax_rate_total_sums_selected_rates_and_manual_rate(): void
     {
         $this->assertSame(13.5, SharedSchema::taxRateTotal(['11', '2', '0.5'], null));
