@@ -168,12 +168,9 @@ class Admin
     {
         $logs = RegistrationStatus::query()
             ->where('registration_id', $record->id)
-            ->join('statuses', 'registration_statuses.status_id', '=', 'statuses.id')
-            ->select('registration_statuses.*')
             ->with(['status:id,name,description,color,icon,order', 'user:id,name'])
-            ->orderBy('registration_statuses.created_at')
-            ->orderBy('statuses.order')
-            ->orderBy('registration_statuses.id')
+            ->orderBy('created_at')
+            ->orderBy('id')
             ->get();
 
         $colorByState = [];
@@ -192,6 +189,10 @@ class Admin
             $userName = $log->user?->name ? ' (oleh: '.e($log->user->name).')' : '';
             $title = "Status: <span class='font-semibold'>".e($status->name).'</span>'.$userName;
             $description = $status->description ? e($status->description) : '—';
+
+            if (filled($log->note)) {
+                $description .= '<br><span class="italic">Catatan: '.e($log->note).'</span>';
+            }
             $date = $log->created_at?->translatedFormat('l, d/m/Y H:i') ?? '-';
 
             $activities[] = [

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Components\Admin;
 use App\Filament\Components\Support\StatusTransition;
 use App\Filament\User\Resources\Activity\ActivityResource\Pages\ViewActivities;
 use App\Filament\User\Resources\Admin\AdminResource\Pages\EditAdmin;
@@ -253,5 +254,8 @@ class StatusTransitionTest extends TestCase
 
         Livewire::test(ViewActivities::class, ['record' => $record->getKey()])
             ->assertSee('Catatan: Ubah massal: Serentak Kab. Bogor');
+
+        $modal = collect(Admin::getActivityTimelineData($record)['activities'])->pluck('description')->implode(' ');
+        $this->assertStringContainsString('Catatan: Ubah massal: Serentak Kab. Bogor', $modal);
     }
 }
