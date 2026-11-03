@@ -32,12 +32,9 @@ class ViewActivities extends Page
     {
         $logs = RegistrationStatus::query()
             ->where('registration_id', $this->record->id)
-            ->join('statuses', 'registration_statuses.status_id', '=', 'statuses.id')
-            ->select('registration_statuses.*')
             ->with(['status:id,name,description,color,icon,order', 'user:id,name'])
-            ->orderBy('registration_statuses.created_at')
-            ->orderBy('statuses.order')
-            ->orderBy('registration_statuses.id')
+            ->orderBy('created_at')
+            ->orderBy('id')
             ->get();
 
         $colorByState = [];
@@ -55,6 +52,11 @@ class ViewActivities extends Page
 
             $title = "Status: <span class='font-semibold'>".e($status->name).'</span>';
             $description = $status->description ? e($status->description) : '—';
+
+            if (filled($log->note)) {
+                $description .= '<br><span class="italic">Catatan: '.e($log->note).'</span>';
+            }
+
             $date = $log->created_at?->translatedFormat('l, d/m/Y H:i') ?? '-';
 
             $activities[] = [

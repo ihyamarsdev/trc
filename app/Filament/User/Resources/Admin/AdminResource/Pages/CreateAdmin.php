@@ -2,8 +2,8 @@
 
 namespace App\Filament\User\Resources\Admin\AdminResource\Pages;
 
+use App\Filament\Components\Support\LogsStatusChange;
 use App\Filament\User\Resources\Admin\AdminResource;
-use App\Models\RegistrationStatus;
 use Carbon\Carbon;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 
 class CreateAdmin extends CreateRecord
 {
+    use LogsStatusChange;
+
     protected static string $resource = AdminResource::class;
 
     protected function getHeaderActions(): array
@@ -49,19 +51,7 @@ class CreateAdmin extends CreateRecord
             return;
         }
 
-        // Cek log terakhir (hindari duplikat)
-        $last = RegistrationStatus::query()
-            ->where('registration_id', $record->id)
-            ->latest('id')
-            ->first();
-
-        if (! $last || (int) $last->status_id !== (int) $record->status_id) {
-            RegistrationStatus::create([
-                'registration_id' => $record->id,
-                'status_id' => $record->status_id,
-                'user_id' => Auth::id(),
-                '',
-            ]);
-        }
+        $this->logStatusChange();
+        $this->promoteWhenComplete();
     }
 }

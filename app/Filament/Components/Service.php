@@ -2,6 +2,7 @@
 
 namespace App\Filament\Components;
 
+use App\Filament\Components\Support\ChangeStatusBulkAction;
 use App\Filament\Components\Support\FormSchema;
 use App\Filament\Components\Support\HasProgramMetadata;
 use App\Filament\Components\Support\InfolistSchema;
@@ -38,7 +39,7 @@ class Service
                             name: 'status',
                             titleAttribute: 'name',
                             modifyQueryUsing: fn (Builder $query) => $query
-                                ->where('order', '<=', 10)
+                                ->whereBetween('order', [2, 10])
                                 ->orderBy('order'),
                         )
                         ->searchable()
@@ -168,6 +169,8 @@ class Service
     {
         return [
             Tables\Actions\BulkActionGroup::make([
+                ChangeStatusBulkAction::make()
+                    ->statuses(fn (Builder $query) => $query->whereBetween('order', [2, 10])),
                 Tables\Actions\DeleteBulkAction::make(),
             ]),
         ];

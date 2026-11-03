@@ -116,7 +116,7 @@ class SalesImport implements ToModel, WithHeadingRow
                 'registration_id' => $data->id,
                 'status_id' => $computedStatusId,
                 'user_id' => Auth::id(),
-                'notes' => 'Di-import dari sistem',
+                'note' => 'Di-import dari sistem',
             ]);
         }
 

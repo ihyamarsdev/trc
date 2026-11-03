@@ -68,6 +68,8 @@ class CheckOverdueEstimationsTest extends TestCase
         $this->assertEquals($redStatus->id, $overdueRecord->status_id);
         $this->assertEquals('red', $overdueRecord->status_color);
         $this->assertEquals('red', $overdueRecord->latestStatusLog->status->color);
+        $this->assertSame([$yellowStatus->id, $redStatus->id], $overdueRecord->activity()->orderBy('id')->pluck('status_id')->all());
+        $this->assertSame('Melewati estimasi pelaksanaan', $overdueRecord->latestStatusLog->note);
     }
 
     public function test_yellow_status_remains_yellow_when_implementation_estimate_is_in_future(): void
@@ -117,7 +119,7 @@ class CheckOverdueEstimationsTest extends TestCase
         $this->assertEquals('yellow', $futureRecord->status_color);
     }
 
-    public function test_saving_model_automatically_converts_yellow_status_to_red_if_past_estimate(): void
+    public function test_saving_a_record_does_not_silently_change_its_status(): void
     {
         $user = User::create([
             'name' => 'Test User 3',
@@ -125,34 +127,17 @@ class CheckOverdueEstimationsTest extends TestCase
             'password' => bcrypt('password'),
         ]);
 
-        $redStatus = Status::create([
-            'id' => 28,
-            'name' => 'Aktifitas Marketing',
-            'description' => 'Marketing',
-            'color' => 'red',
-            'order' => 1,
-            'category' => 'sales',
-        ]);
+        Status::create(['id' => 28, 'name' => 'Aktifitas Marketing', 'description' => 'Marketing', 'color' => 'red', 'order' => 1, 'category' => 'sales']);
+        $yellowStatus = Status::create(['id' => 29, 'name' => 'Registrasi / Input Data Sekolah', 'description' => 'Input data', 'color' => 'yellow', 'order' => 2, 'category' => 'sales']);
 
-        $yellowStatus = Status::create([
-            'id' => 29,
-            'name' => 'Registrasi / Input Data Sekolah',
-            'description' => 'Input data',
-            'color' => 'yellow',
-            'order' => 2,
-            'category' => 'sales',
-        ]);
-
-        $record = RegistrationData::factory()->make([
+        $record = RegistrationData::factory()->create([
             'users_id' => $user->id,
             'status_id' => $yellowStatus->id,
             'status_color' => 'yellow',
             'implementation_estimate' => now()->subHours(5),
         ]);
-        $record->save();
 
-        $this->assertEquals($redStatus->id, $record->status_id);
-        $this->assertEquals('red', $record->status_color);
+        $this->assertEquals($yellowStatus->id, $record->fresh()->status_id);
     }
 
     public function test_green_status_does_not_revert_to_red_even_if_past_estimate(): void

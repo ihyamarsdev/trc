@@ -64,6 +64,25 @@ class AdminTableFilterAndExportTest extends TestCase
         return array_replace(array_fill(0, count(Admin::exportColumnGroups()), []), $picked);
     }
 
+    public function test_region_filter_narrows_by_province_and_by_city(): void
+    {
+        $bogor = $this->recordWithColor('red', 1);
+        $bogor->update(['provinces' => 'JAWA BARAT', 'regencies' => 'KAB. BOGOR']);
+        $bandung = $this->recordWithColor('red', 2);
+        $bandung->update(['provinces' => 'JAWA BARAT', 'regencies' => 'KOTA BANDUNG']);
+        $solo = $this->recordWithColor('red', 3);
+        $solo->update(['provinces' => 'JAWA TENGAH', 'regencies' => 'KOTA SURAKARTA']);
+
+        Livewire::test(ListAdmins::class)
+            ->loadTable()
+            ->filterTable('region', ['provinces' => ['JAWA BARAT'], 'regencies' => []])
+            ->assertCanSeeTableRecords([$bogor, $bandung])
+            ->assertCanNotSeeTableRecords([$solo])
+            ->filterTable('region', ['provinces' => ['JAWA BARAT'], 'regencies' => ['KAB. BOGOR']])
+            ->assertCanSeeTableRecords([$bogor])
+            ->assertCanNotSeeTableRecords([$bandung, $solo]);
+    }
+
     public function test_status_color_filter_accepts_multiple_colors(): void
     {
         $red = $this->recordWithColor('red', 1);

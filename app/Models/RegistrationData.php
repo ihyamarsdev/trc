@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Filament\Components\Support\StatusTransition;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -118,91 +119,28 @@ class RegistrationData extends Model
         'implementation_estimate' => 'datetime',
     ];
 
-    protected static function booted(): void
-    {
-        static::saving(function (RegistrationData $record) {
-            if ($record->implementation_estimate && $record->implementation_estimate < now()) {
-                $latestColor = $record->latestStatusLog?->status?->color ?? $record->status?->color ?? $record->status_color;
-
-                if (strtolower((string) $latestColor) === 'yellow') {
-                    $redStatus = Status::query()->where('color', 'red')->orderBy('order')->first()
-                        ?? Status::query()->where('order', 1)->first();
-
-                    if ($redStatus) {
-                        $record->status_id = $redStatus->id;
-                        $record->status_color = $redStatus->color;
-                    }
-                }
-            }
-        });
-    }
-
+    /**
+     * Yellow records whose implementation date has passed go back to red. The yellow log entry is kept
+     * and a red one is appended, so the history shows what happened.
+     */
     public static function updateOverdueYellowStatuses(): int
     {
-        $redStatus = Status::query()->where('color', 'red')->orderBy('order')->first()
-            ?? Status::query()->where('order', 1)->first();
+        $redStatus = Status::query()->where('color', 'red')->orderBy('order')->first();
 
         if (! $redStatus) {
             return 0;
         }
 
-        $yellowStatusIds = Status::query()->where('color', 'yellow')->pluck('id')->toArray();
-
-        if (empty($yellowStatusIds)) {
-            return 0;
-        }
-
         $overdueRecords = static::query()
-            ->whereNotNull('implementation_estimate')
             ->where('implementation_estimate', '<', now())
-            ->where(function ($query) use ($yellowStatusIds) {
-                $query->whereHas('latestStatusLog.status', function ($q) {
-                    $q->where('color', 'yellow');
-                })
-                    ->orWhere(function ($q) use ($yellowStatusIds) {
-                        $q->whereIn('status_id', $yellowStatusIds)
-                            ->whereDoesntHave('latestStatusLog.status', function ($sub) {
-                                $sub->where('color', '!=', 'yellow');
-                            });
-                    });
-            })
+            ->whereRelation('status', 'color', 'yellow')
             ->get();
 
-        $updatedCount = 0;
-
         foreach ($overdueRecords as $record) {
-            $latestColor = $record->latestStatusLog?->status?->color ?? $record->status?->color ?? $record->status_color;
-
-            if (strtolower((string) $latestColor) !== 'yellow') {
-                continue;
-            }
-
-            $record->status_id = $redStatus->id;
-            $record->status_color = $redStatus->color;
-            $record->saveQuietly();
-
-            RegistrationStatus::query()
-                ->where('registration_id', $record->id)
-                ->whereIn('status_id', $yellowStatusIds)
-                ->delete();
-
-            $lastLog = RegistrationStatus::query()
-                ->where('registration_id', $record->id)
-                ->latest('id')
-                ->first();
-
-            if (! $lastLog || (int) $lastLog->status_id !== (int) $redStatus->id) {
-                RegistrationStatus::create([
-                    'registration_id' => $record->id,
-                    'status_id' => $redStatus->id,
-                    'user_id' => $record->users_id,
-                ]);
-            }
-
-            $updatedCount++;
+            StatusTransition::revertOverdue($record, $redStatus);
         }
 
-        return $updatedCount;
+        return $overdueRecords->count();
     }
 
     /**

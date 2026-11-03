@@ -34,7 +34,7 @@ class FinanceFinanceFormTest extends TestCase
         $status = Status::create([
             'name' => 'Status Finance',
             'description' => 'Desc',
-            'color' => 'yellow',
+            'color' => 'blue',
             'order' => 10,
             'category' => 'finance',
         ]);

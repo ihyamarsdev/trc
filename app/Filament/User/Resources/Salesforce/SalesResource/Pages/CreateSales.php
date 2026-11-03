@@ -2,19 +2,18 @@
 
 namespace App\Filament\User\Resources\Salesforce\SalesResource\Pages;
 
+use App\Filament\Components\Support\LogsStatusChange;
 use App\Filament\User\Resources\Salesforce\SalesResource;
-use App\Models\RegistrationStatus;
 use App\Models\Status;
-use App\Models\User;
 use Carbon\Carbon;
 use Filament\Actions;
-use Filament\Notifications\Actions\Action as NotificationAction;
-use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
 
 class CreateSales extends CreateRecord
 {
+    use LogsStatusChange;
+
     protected static string $resource = SalesResource::class;
 
     protected static bool $canCreateAnother = false;
@@ -25,7 +24,7 @@ class CreateSales extends CreateRecord
             Actions\Action::make('createHeader')
                 ->label(__('filament-panels::resources/pages/edit-record.form.actions.save.label'))
                 ->requiresConfirmation()
-                ->modalDescription('Apakah status sudah sesuai? Pastikan kembali status yang Anda pilih sudah benar sebelum menyimpan.')
+                ->modalDescription('Apakah data sudah sesuai? Jika semua data wajib sudah terisi, status otomatis menjadi Kuning.')
                 ->modalIconColor('danger')
                 ->action(fn () => $this->create())
                 ->keyBindings(['mod+s']),
@@ -37,7 +36,7 @@ class CreateSales extends CreateRecord
         return Actions\Action::make('create')
             ->label(__('filament-panels::resources/pages/edit-record.form.actions.save.label'))
             ->requiresConfirmation()
-            ->modalDescription('Apakah status sudah sesuai? Pastikan kembali status yang Anda pilih sudah benar sebelum menyimpan.')
+            ->modalDescription('Apakah data sudah sesuai? Jika semua data wajib sudah terisi, status otomatis menjadi Kuning.')
             ->modalIconColor('danger')
             ->action(fn () => $this->create())
             ->keyBindings(['mod+s']);
@@ -52,15 +51,10 @@ class CreateSales extends CreateRecord
     {
         $data['users_id'] = Auth::id();
 
-        if (empty($data['status_id'])) {
-            $data['status_id'] = Status::where('order', 1)->value('id') ?? 28;
-        }
+        $status = Status::where('order', 1)->first();
 
-        $status = Status::find($data['status_id']);
-
-        if ($status) {
-            $data['status_color'] = $status->color;
-        }
+        $data['status_id'] = $status?->id ?? 28;
+        $data['status_color'] = $status?->color ?? 'red';
 
         // monthYear aman dibentuk (jika date_register diisi)
         if (! empty($data['date_register'])) {
@@ -73,40 +67,7 @@ class CreateSales extends CreateRecord
 
     protected function afterCreate(): void
     {
-        $record = $this->record; // RegistrationData yang baru dibuat
-        if (empty($record->status_id)) {
-            return;
-        }
-
-        $status = Status::find($record->status_id);
-
-        if ($status && $status->order == 2) {
-            $recipients = User::role('service')->get();
-
-            Notification::make()
-                ->title('Data Sekolah '.$record->schools.' memasuki status '.$status->name)
-                ->icon('heroicon-o-document-text')
-                ->success()
-                ->actions([
-                    NotificationAction::make('Lihat')
-                        ->url(SalesResource::getUrl('view', ['record' => $record]))
-                        ->openUrlInNewTab(),
-                ])
-                ->sendToDatabase($recipients);
-        }
-
-        // Cek log terakhir (hindari duplikat)
-        $last = RegistrationStatus::query()
-            ->where('registration_id', $record->id)
-            ->latest('id')
-            ->first();
-
-        if (! $last || (int) $last->status_id !== (int) $record->status_id) {
-            RegistrationStatus::create([
-                'registration_id' => $record->id,
-                'status_id' => $record->status_id,
-                'user_id' => Auth::id(),
-            ]);
-        }
+        $this->logStatusChange();
+        $this->promoteWhenComplete();
     }
 }
