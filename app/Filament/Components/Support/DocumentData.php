@@ -6,6 +6,7 @@ use App\Filament\Components\Format;
 use App\Filament\Enum\OptionGroup;
 use App\Models\Option;
 use App\Models\RegistrationData;
+use Illuminate\Support\Str;
 use NumberFormatter;
 
 /**
@@ -53,7 +54,7 @@ class DocumentData
             'principal' => $record->principal,
             'tanggal' => Format::tanggal($record->payment_date),
             'total' => number_format($total, 0, ',', '.'),
-            'totalSpell' => Format::formatKeRupiah($total),
+            'totalSpell' => Str::title(Format::formatKeRupiah($total)),
         ];
     }
 
