@@ -8,6 +8,7 @@ use App\Models\RegistrationData;
 use App\Models\Status;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -71,8 +72,16 @@ class DocumentDownloadTest extends TestCase
         $routes = [];
 
         foreach (DocumentTemplate::COMPANIES as $company) {
-            foreach (['anbk', 'apps', 'snbt', 'kwitansi', 'invoice'] as $document) {
-                $routes["{$company}.{$document}"] = [$company, $document];
+            foreach (DocumentTemplate::documents($company) as $template) {
+                $documents = match ($template) {
+                    'spk' => ['anbk', 'apps', 'snbt'],
+                    'kuitansi' => ['kwitansi'],
+                    default => [$template],
+                };
+
+                foreach ($documents as $document) {
+                    $routes["{$company}.{$document}"] = [$company, $document];
+                }
             }
         }
 
@@ -129,7 +138,7 @@ class DocumentDownloadTest extends TestCase
         $templates = [];
 
         foreach (DocumentTemplate::COMPANIES as $company) {
-            foreach (DocumentTemplate::DOCUMENTS as $document) {
+            foreach (DocumentTemplate::documents($company) as $document) {
                 $templates["{$company}/{$document}"] = [$company, $document];
             }
         }
@@ -178,5 +187,54 @@ class DocumentDownloadTest extends TestCase
         $this->assertSame('-', $values['pph']);
         $this->assertSame('-', $values['number_invoice']);
         $this->assertSame('25.000.000', $values['subtotal_invoice']);
+    }
+
+    public function test_invoice_tax_rows_carry_the_amount_on_the_subtotal_and_stay_blank_without_tax(): void
+    {
+        $values = DocumentData::invoice($this->record(['subtotal_invoice' => '47000000', 'ppn' => '11', 'pph' => '0']));
+
+        $this->assertSame('PPN (11%)', $values['ppn_label']);
+        $this->assertSame('5.170.000', $values['ppn_amount']);
+        $this->assertSame('Rp 5.170.000', $values['ppn_rupiah']);
+        $this->assertSame('', $values['pph_label']);
+        $this->assertSame('-', $values['pph_amount']);
+        $this->assertSame('', $values['pph_rupiah']);
+        $this->assertSame('Program ANBK', $values['program']);
+    }
+
+    public function test_invoice_date_is_today_not_a_date_of_the_record(): void
+    {
+        $this->travelTo(Carbon::parse('2026-11-04 09:00'));
+
+        $values = DocumentData::invoice($this->record(['date_register' => '2026-03-02', 'payment_date' => '2026-09-17']));
+
+        $this->assertSame('04/11/2026', $values['tanggal']);
+    }
+
+    public function test_a_long_invoice_description_is_printed_smaller(): void
+    {
+        $short = DocumentData::invoice($this->record(['detail_invoice' => str_repeat('A', DocumentData::LONG_DETAIL)]));
+        $long = DocumentData::invoice($this->record(['detail_invoice' => str_repeat('A', DocumentData::LONG_DETAIL + 1)]));
+
+        $this->assertSame('normal', $short['detail_size']);
+        $this->assertSame('small', $long['detail_size']);
+    }
+
+    public function test_kwitansi_carries_the_number_count_and_short_date(): void
+    {
+        $values = DocumentData::kwitansi($this->record([
+            'number_kwitansi' => '055',
+            'qty_invoice' => '100',
+            'payment_date' => '2026-06-10',
+        ]));
+
+        $this->assertSame('055', $values['number']);
+        $this->assertSame('100', $values['qty']);
+        $this->assertSame('10 / 06 / 2026', $values['tanggal_pendek']);
+
+        $values = DocumentData::kwitansi($this->record(['number_kwitansi' => null, 'qty_invoice' => null, 'real_count' => '90']));
+
+        $this->assertSame('', $values['number']);
+        $this->assertSame('90', $values['qty']);
     }
 }

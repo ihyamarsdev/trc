@@ -18,6 +18,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Support\Facades\Auth;
@@ -37,21 +38,24 @@ class DocumentWorkbench extends Component implements HasForms
     private const COMPANIES = [
         'rasyidu' => 'Rasyidu',
         'edunesia' => 'Edunesia',
+        'edusindo' => 'Edusindo',
+        'tdw' => 'TDW',
     ];
 
     private const DOCUMENTS = [
         'spk' => 'SPK',
         'kuitansi' => 'Kwitansi',
         'invoice' => 'Invoice',
+        'invoice-mandiri' => 'Invoice Mandiri',
+        'invoice-dki' => 'Invoice Bank DKI',
     ];
 
     /**
-     * Invoice tax choices: [PPh 23 %, PPN %].
+     * Invoice taxes, each a percentage added on top of the subtotal; any combination may be chosen.
      */
     private const TAXES = [
-        'pph' => [2, 0],
-        'ppn' => [0, 11],
-        'none' => [0, 0],
+        'pph' => 2,
+        'ppn' => 11,
     ];
 
     public RegistrationData $record;
@@ -71,6 +75,7 @@ class DocumentWorkbench extends Component implements HasForms
             'company' => array_key_first(self::COMPANIES),
             'document' => 'spk',
             'detail_kwitansi' => $record->detail_kwitansi,
+            'number_kwitansi' => $record->number_kwitansi,
             'number_invoice' => $record->number_invoice,
             'detail_invoice' => $record->detail_invoice,
             'qty_invoice' => $record->qty_invoice,
@@ -78,7 +83,7 @@ class DocumentWorkbench extends Component implements HasForms
             'amount_invoice' => $record->amount_invoice,
             'subtotal_invoice' => $record->subtotal_invoice,
             'total_invoice' => $record->total_invoice,
-            'tax_option' => $this->taxOptionOf($record),
+            'taxes' => $this->taxesOf($record),
         ]);
     }
 
@@ -92,14 +97,22 @@ class DocumentWorkbench extends Component implements HasForms
                         ToggleButtons::make('company')
                             ->label('Template')
                             ->options(self::COMPANIES)
-                            ->icons(['rasyidu' => 'heroicon-o-building-office-2', 'edunesia' => 'heroicon-o-building-office'])
+                            ->icons(['rasyidu' => 'heroicon-o-building-office-2', 'edunesia' => 'heroicon-o-building-office', 'edusindo' => 'heroicon-o-building-library', 'tdw' => 'heroicon-o-building-storefront'])
                             ->inline()
                             ->grouped()
-                            ->live(),
+                            ->live()
+                            ->afterStateUpdated(function (Set $set, ?string $state, Get $get): void {
+                                $documents = DocumentTemplate::documents((string) $state);
+
+                                if (! in_array($get('document'), $documents, true)) {
+                                    $kind = DocumentTemplate::kind((string) $get('document'));
+                                    $set('document', collect($documents)->first(fn (string $document): bool => DocumentTemplate::kind($document) === $kind) ?? 'kuitansi');
+                                }
+                            }),
                         ToggleButtons::make('document')
                             ->label('Dokumen')
-                            ->options(self::DOCUMENTS)
-                            ->icons(['spk' => 'heroicon-o-document-text', 'kuitansi' => 'heroicon-o-banknotes', 'invoice' => 'heroicon-o-receipt-percent'])
+                            ->options(fn (Get $get): array => array_intersect_key(self::DOCUMENTS, array_flip(DocumentTemplate::documents((string) $get('company')))))
+                            ->icons(['spk' => 'heroicon-o-document-text', 'kuitansi' => 'heroicon-o-banknotes', 'invoice' => 'heroicon-o-receipt-percent', 'invoice-mandiri' => 'heroicon-o-receipt-percent', 'invoice-dki' => 'heroicon-o-receipt-percent'])
                             ->inline()
                             ->grouped()
                             ->live(),
@@ -152,6 +165,10 @@ class DocumentWorkbench extends Component implements HasForms
                 Placeholder::make('schools')
                     ->label('Sekolah')
                     ->content(fn (): string => (string) $this->record->schools),
+                TextInput::make('number_kwitansi')
+                    ->label('Nomor Kwitansi')
+                    ->maxLength(50)
+                    ->live(debounce: 600),
                 Textarea::make('detail_kwitansi')
                     ->label('Guna Pembayaran')
                     ->helperText('Contoh: 146 Paket Program TRY OUT Ujian Tertulis Berbasis Komputer (UTBK SNBT)')
@@ -165,7 +182,7 @@ class DocumentWorkbench extends Component implements HasForms
     {
         return Section::make('Invoice')
             ->icon('heroicon-o-receipt-percent')
-            ->visible(fn (Get $get): bool => $get('document') === 'invoice')
+            ->visible(fn (Get $get): bool => DocumentTemplate::kind((string) $get('document')) === 'invoice')
             ->compact()
             ->columns(2)
             ->schema([
@@ -186,8 +203,8 @@ class DocumentWorkbench extends Component implements HasForms
                     ->afterStateUpdated(fn () => $this->recalculate()),
                 TextInput::make('detail_invoice')
                     ->label('Deskripsi')
-                    ->helperText('Contoh: Try Out Asesmen Nasional (AKM)')
-                    ->maxLength(255)
+                    ->helperText('Contoh: Try Out Asesmen Nasional (AKM). Maksimal '.DocumentData::MAX_DETAIL.' karakter agar muat di invoice.')
+                    ->maxLength(DocumentData::MAX_DETAIL)
                     ->live(debounce: 600)
                     ->columnSpanFull(),
                 TextInput::make('unit_price')
@@ -201,11 +218,12 @@ class DocumentWorkbench extends Component implements HasForms
                     ->prefix('Rp')
                     ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
                     ->readOnly(),
-                ToggleButtons::make('tax_option')
+                ToggleButtons::make('taxes')
                     ->label('Pajak')
-                    ->options(['pph' => 'PPh 23 (2%)', 'ppn' => 'PPN (11%)', 'none' => 'Tanpa pajak'])
+                    ->options(['pph' => 'PPh 23 (2%)', 'ppn' => 'PPN (11%)'])
+                    ->helperText('Boleh dipilih lebih dari satu, atau dikosongkan bila tanpa pajak.')
+                    ->multiple()
                     ->inline()
-                    ->grouped()
                     ->live()
                     ->afterStateUpdated(fn () => $this->recalculate())
                     ->columnSpanFull(),
@@ -219,31 +237,31 @@ class DocumentWorkbench extends Component implements HasForms
     }
 
     /**
-     * Amount, subtotal, taxes and total follow from quantity, unit price and the chosen tax.
-     * As before, the tax percentage is added on top of the subtotal.
+     * Amount, subtotal, taxes and total follow from quantity, unit price and the chosen taxes.
+     * As before, the tax percentages are added on top of the subtotal.
      */
     private function recalculate(): void
     {
         $amount = (float) ($this->data['qty_invoice'] ?? 0) * (float) ($this->data['unit_price'] ?? 0);
-        [$pph, $ppn] = self::TAXES[$this->data['tax_option'] ?? 'none'] ?? self::TAXES['none'];
 
         $this->data['amount_invoice'] = (string) round($amount);
         $this->data['subtotal_invoice'] = (string) round($amount);
-        $this->data['total_invoice'] = (string) round($amount * (1 + ($pph + $ppn) / 100));
+        $this->data['total_invoice'] = (string) round($amount * (1 + ($this->taxPercent('pph') + $this->taxPercent('ppn')) / 100));
+    }
+
+    private function taxPercent(string $tax): int
+    {
+        return in_array($tax, $this->data['taxes'] ?? [], true) ? self::TAXES[$tax] : 0;
     }
 
     /**
-     * Which tax choice the saved percentages correspond to; anything else (older or hand-edited values) is none.
+     * The taxes the saved percentages correspond to; other (older or hand-edited) percentages are not offered.
+     *
+     * @return list<string>
      */
-    private function taxOptionOf(RegistrationData $record): ?string
+    private function taxesOf(RegistrationData $record): array
     {
-        foreach (self::TAXES as $option => [$pph, $ppn]) {
-            if ((float) $record->pph === (float) $pph && (float) $record->ppn === (float) $ppn && ($pph + $ppn) > 0) {
-                return $option;
-            }
-        }
-
-        return ((float) $record->pph + (float) $record->ppn) === 0.0 ? 'none' : null;
+        return array_keys(array_filter(self::TAXES, fn (int $percent, string $tax): bool => (float) $record->{$tax} === (float) $percent, ARRAY_FILTER_USE_BOTH));
     }
 
     /**
@@ -253,10 +271,11 @@ class DocumentWorkbench extends Component implements HasForms
      */
     private function documentValues(): array
     {
-        [$pph, $ppn] = self::TAXES[$this->data['tax_option'] ?? 'none'] ?? [(float) $this->record->pph, (float) $this->record->ppn];
+        [$pph, $ppn] = [$this->taxPercent('pph'), $this->taxPercent('ppn')];
 
         return [
             'detail_kwitansi' => $this->upper($this->data['detail_kwitansi'] ?? null),
+            'number_kwitansi' => $this->data['number_kwitansi'] ?? null,
             'number_invoice' => $this->data['number_invoice'] ?? null,
             'detail_invoice' => $this->upper($this->data['detail_invoice'] ?? null),
             'qty_invoice' => $this->data['qty_invoice'] ?? null,
@@ -296,7 +315,9 @@ class DocumentWorkbench extends Component implements HasForms
 
     private function chosenDocument(): string
     {
-        return array_key_exists($this->data['document'] ?? '', self::DOCUMENTS) ? $this->data['document'] : array_key_first(self::DOCUMENTS);
+        $documents = DocumentTemplate::documents($this->chosenCompany());
+
+        return in_array($this->data['document'] ?? '', $documents, true) ? $this->data['document'] : $documents[0];
     }
 
     public function save(): void
@@ -326,9 +347,9 @@ class DocumentWorkbench extends Component implements HasForms
 
         $company = $this->chosenCompany();
         $route = match ($document) {
-            'invoice' => 'invoice',
             'kuitansi' => 'kwitansi',
-            default => $this->spkRouteSegment(),
+            'spk' => $this->spkRouteSegment(),
+            default => $document,
         };
         $url = route("{$company}.{$route}.download", $this->record);
 

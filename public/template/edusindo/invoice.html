@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Invoice Edusindo</title>
+<style>
+  /*
+   * Template Invoice Edusindo: satu halaman A4. Gambar formulir jadi latar, tiap isian
+   * ditempatkan dengan posisi tetap (mm dari sudut kiri atas halaman).
+   * Isian ditandai dolar + kurung kurawal berisi nama (seperti pada teks di bawah) dan diganti oleh sistem;
+   * ubah left/top/width/height untuk menggeser isian. Isian sebaris memakai tinggi baris yang sama
+   * supaya sejajar.
+   */
+  @page { size: 210mm 297mm; margin: 0; }
+  html, body { margin: 0; padding: 0; }
+  .page { position: relative; width: 210mm; height: 296mm; overflow: hidden;
+          font-family: Helvetica, Arial, sans-serif; }
+  .background { position: absolute; left: 0; top: 0; width: 210mm; height: 271.8mm; }
+  .field { position: absolute; margin: 0; color: #000; }
+</style>
+</head>
+<body>
+<div class="page">
+  <img class="background" src="images/invoice-background.png" alt="">
+
+  <!-- Kepada -->
+  <div class="field" style="left: 21.4mm; top: 73.7mm; width: 127.0mm; height: 5.8mm; font-size: 14pt; line-height: 5.8mm; font-weight: bold; font-family: 'Times New Roman', Times, serif;">${schools}</div>
+  <!-- Invoice No / Date -->
+  <div class="field" style="left: 152.0mm; top: 73.2mm; width: 37.7mm; height: 4.7mm; font-size: 11.5pt; line-height: 4.7mm;">${number_invoice}</div>
+  <div class="field" style="left: 140.4mm; top: 78.9mm; width: 48.0mm; height: 4.7mm; font-size: 11.5pt; line-height: 4.7mm;">${tanggal}</div>
+  <!-- Baris barang: item, harga, total (sebaris) -->
+  <div class="field" style="left: 43.4mm; top: 124.1mm; width: 56.6mm; height: 7.7mm; font-size: 12pt; line-height: 7.7mm;">Asesmen Bakat Minat Murid Indonesia (${qty} peserta didik)</div>
+  <div class="field" style="left: 125.6mm; top: 126.4mm; width: 29.2mm; height: 4.9mm; font-size: 12pt; line-height: 4.9mm;">Rp ${price}</div>
+  <div class="field" style="left: 158.5mm; top: 126.4mm; width: 30.9mm; height: 4.9mm; font-size: 12pt; line-height: 4.9mm;">Rp ${amount}</div>
+  <!-- Pajak (kosong bila tidak dipakai) -->
+  <div class="field" style="left: 123.3mm; top: 142.6mm; width: 34.3mm; height: 4.9mm; font-size: 12pt; line-height: 4.9mm;">${ppn_label}</div>
+  <div class="field" style="left: 158.5mm; top: 142.6mm; width: 30.9mm; height: 4.9mm; font-size: 12pt; line-height: 4.9mm;">${ppn_rupiah}</div>
+  <div class="field" style="left: 123.3mm; top: 156.0mm; width: 34.3mm; height: 4.9mm; font-size: 12pt; line-height: 4.9mm;">${pph_label}</div>
+  <div class="field" style="left: 158.5mm; top: 156.0mm; width: 30.9mm; height: 4.9mm; font-size: 12pt; line-height: 4.9mm;">${pph_rupiah}</div>
+  <!-- Sub total -->
+  <div class="field" style="left: 158.5mm; top: 173.6mm; width: 30.9mm; height: 5.4mm; font-size: 13pt; line-height: 5.4mm; font-weight: bold;">Rp ${total_invoice}</div>
+</div>
+</body>
+</html>

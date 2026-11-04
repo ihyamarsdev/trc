@@ -22,19 +22,26 @@ Route::post('/login', function (Request $request) {
 
 // # DOKUMEN (SPK, kwitansi, invoice) per perusahaan; template HTML ada di public/template/{perusahaan}/
 foreach (DocumentTemplate::COMPANIES as $company) {
-    foreach (['anbk', 'apps', 'snbt'] as $program) {
-        Route::get("/{record}/{$company}/download/{$program}", [DocumentController::class, 'spk'])
-            ->defaults('company', $company)
-            ->name("{$company}.{$program}.download");
+    if (in_array('spk', DocumentTemplate::documents($company), true)) {
+        foreach (['anbk', 'apps', 'snbt'] as $program) {
+            Route::get("/{record}/{$company}/download/{$program}", [DocumentController::class, 'spk'])
+                ->defaults('company', $company)
+                ->name("{$company}.{$program}.download");
+        }
     }
 
     Route::get("/{record}/{$company}/download/kwitansi", [DocumentController::class, 'kwitansi'])
         ->defaults('company', $company)
         ->name("{$company}.kwitansi.download");
 
-    Route::get("/{record}/{$company}/download/invoice", [DocumentController::class, 'invoice'])
-        ->defaults('company', $company)
-        ->name("{$company}.invoice.download");
+    foreach (DocumentTemplate::documents($company) as $document) {
+        if (DocumentTemplate::kind($document) === 'invoice') {
+            Route::get("/{record}/{$company}/download/{$document}", [DocumentController::class, 'invoice'])
+                ->defaults('company', $company)
+                ->defaults('document', $document)
+                ->name("{$company}.{$document}.download");
+        }
+    }
 }
 
 Route::get('/download-sample-excel', [SampleSalesforce::class, 'download'])->name('download.sample.excel');

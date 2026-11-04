@@ -19,6 +19,8 @@ class DocumentController extends Controller
     private const COMPANY_NAMES = [
         'rasyidu' => 'RASYIDUU',
         'edunesia' => 'EDUNESIA',
+        'edusindo' => 'EDUSINDO',
+        'tdw' => 'TDW',
     ];
 
     public function spk(RegistrationData $record, string $company): Response
@@ -31,9 +33,9 @@ class DocumentController extends Controller
         return $this->deliver($record, $company, 'kuitansi', 'KWITANSI');
     }
 
-    public function invoice(RegistrationData $record, string $company): Response
+    public function invoice(RegistrationData $record, string $company, string $document = 'invoice'): Response
     {
-        return $this->deliver($record, $company, 'invoice', 'INVOICE');
+        return $this->deliver($record, $company, $document, 'INVOICE');
     }
 
     private function deliver(RegistrationData $record, string $company, string $document, string $label): Response

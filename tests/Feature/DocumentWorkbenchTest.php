@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Components\Support\DocumentData;
 use App\Filament\User\Resources\Finance\FinanceResource\Pages\ViewFinance;
 use App\Livewire\DocumentWorkbench;
 use App\Models\RegistrationData;
@@ -103,7 +104,43 @@ class DocumentWorkbenchTest extends TestCase
         $this->assertStringContainsString('template/rasyidu/', $component->instance()->previewHtml());
     }
 
-    public function test_invoice_totals_follow_quantity_unit_price_and_tax(): void
+    public function test_tdw_has_no_spk_and_offers_an_invoice_per_bank(): void
+    {
+        $this->actAs('finance');
+
+        $component = Livewire::test(DocumentWorkbench::class, ['record' => $this->record()])
+            ->assertSet('data.document', 'spk')
+            ->set('data.company', 'tdw')
+            ->assertSet('data.document', 'kuitansi');
+
+        $this->assertStringContainsString('template/tdw/', $component->instance()->previewHtml());
+
+        $component->set('data.document', 'spk');
+        $this->assertStringContainsString('kuitansi-background', $component->instance()->previewHtml());
+
+        $component->set('data.document', 'invoice-dki');
+        $this->assertStringContainsString('invoice-dki-background', $component->instance()->previewHtml());
+
+        $component->set('data.document', 'invoice-mandiri');
+        $this->assertStringContainsString('invoice-mandiri-background', $component->instance()->previewHtml());
+
+        $component->call('download');
+        $this->assertStringContainsString('/tdw/download/invoice-mandiri', json_encode($component->effects['xjs'], JSON_UNESCAPED_SLASHES));
+    }
+
+    public function test_switching_company_keeps_the_kind_of_document(): void
+    {
+        $this->actAs('finance');
+
+        Livewire::test(DocumentWorkbench::class, ['record' => $this->record()])
+            ->set('data.document', 'invoice')
+            ->set('data.company', 'tdw')
+            ->assertSet('data.document', 'invoice-mandiri')
+            ->set('data.company', 'edusindo')
+            ->assertSet('data.document', 'invoice');
+    }
+
+    public function test_invoice_totals_follow_quantity_unit_price_and_the_chosen_taxes(): void
     {
         $this->actAs('finance');
 
@@ -111,17 +148,39 @@ class DocumentWorkbenchTest extends TestCase
             ->set('data.document', 'invoice')
             ->set('data.qty_invoice', '250')
             ->set('data.unit_price', '100000')
-            ->set('data.tax_option', 'none')
+            ->set('data.taxes', [])
             ->assertSet('data.amount_invoice', '25000000')
             ->assertSet('data.subtotal_invoice', '25000000')
             ->assertSet('data.total_invoice', '25000000')
-            ->set('data.tax_option', 'ppn')
+            ->set('data.taxes', ['ppn'])
             ->assertSet('data.total_invoice', '27750000')
-            ->set('data.tax_option', 'pph')
+            ->set('data.taxes', ['pph'])
             ->assertSet('data.total_invoice', '25500000')
+            ->set('data.taxes', ['pph', 'ppn'])
+            ->assertSet('data.total_invoice', '28250000')
             ->set('data.qty_invoice', '10')
             ->assertSet('data.subtotal_invoice', '1000000')
-            ->assertSet('data.total_invoice', '1020000');
+            ->assertSet('data.total_invoice', '1130000');
+    }
+
+    public function test_the_invoice_description_is_limited_so_it_fits_the_invoice(): void
+    {
+        $this->actAs('finance');
+        $record = $this->record();
+
+        Livewire::test(DocumentWorkbench::class, ['record' => $record])
+            ->set('data.document', 'invoice')
+            ->set('data.detail_invoice', str_repeat('A', DocumentData::MAX_DETAIL + 1))
+            ->call('save')
+            ->assertHasErrors(['data.detail_invoice' => 'max']);
+
+        $this->assertNull($record->refresh()->detail_invoice);
+
+        Livewire::test(DocumentWorkbench::class, ['record' => $record])
+            ->set('data.document', 'invoice')
+            ->set('data.detail_invoice', str_repeat('A', DocumentData::MAX_DETAIL))
+            ->call('save')
+            ->assertHasNoErrors();
     }
 
     public function test_save_stores_the_documents_data_with_the_taxes_under_their_own_names(): void
@@ -136,7 +195,7 @@ class DocumentWorkbenchTest extends TestCase
             ->set('data.detail_invoice', 'try out asesmen nasional')
             ->set('data.qty_invoice', '250')
             ->set('data.unit_price', '100000')
-            ->set('data.tax_option', 'ppn')
+            ->set('data.taxes', ['ppn'])
             ->call('save')
             ->assertHasNoErrors()
             ->assertNotified('Data kwitansi dan invoice tersimpan');
@@ -151,20 +210,21 @@ class DocumentWorkbenchTest extends TestCase
 
         Livewire::test(DocumentWorkbench::class, ['record' => $record])
             ->set('data.document', 'invoice')
-            ->set('data.tax_option', 'pph')
+            ->set('data.taxes', ['pph', 'ppn'])
             ->call('save');
 
         $this->assertSame('2', $record->refresh()->pph);
-        $this->assertSame('0', $record->ppn);
+        $this->assertSame('11', $record->ppn);
+        $this->assertSame('28250000', $record->total_invoice);
     }
 
-    public function test_the_saved_tax_comes_back_as_the_selected_option(): void
+    public function test_the_saved_taxes_come_back_as_the_selected_options(): void
     {
         $this->actAs('finance');
 
-        foreach ([['2', '0', 'pph'], ['0', '11', 'ppn'], ['0', '0', 'none'], [null, null, 'none'], ['0', '2', null]] as [$pph, $ppn, $expected]) {
+        foreach ([['2', '0', ['pph']], ['0', '11', ['ppn']], ['2', '11', ['pph', 'ppn']], ['0', '0', []], [null, null, []], ['0', '2', []]] as [$pph, $ppn, $expected]) {
             Livewire::test(DocumentWorkbench::class, ['record' => $this->record(['pph' => $pph, 'ppn' => $ppn])])
-                ->assertSet('data.tax_option', $expected);
+                ->assertSet('data.taxes', $expected);
         }
     }
 
@@ -193,5 +253,26 @@ class DocumentWorkbenchTest extends TestCase
             ->assertDontSee('SPK EDUNESIA')
             ->assertDontSee('Kwitansi RASYIDUU')
             ->assertDontSee('Invoice EDUNESIA');
+    }
+
+    public function test_the_kwitansi_number_is_saved_and_printed(): void
+    {
+        $this->actAs('finance');
+        $record = $this->record();
+
+        $component = Livewire::test(DocumentWorkbench::class, ['record' => $record])
+            ->set('data.company', 'tdw')
+            ->set('data.document', 'kuitansi')
+            ->set('data.number_kwitansi', '505')
+            ->set('data.detail_kwitansi', '232 program tka');
+
+        $html = $component->instance()->previewHtml();
+        $this->assertStringContainsString('Pembayaran 232 PROGRAM TKA', $html);
+        $this->assertStringContainsString('>505<', $html);
+
+        $component->call('save');
+
+        $record->refresh();
+        $this->assertSame('505', $record->number_kwitansi);
     }
 }

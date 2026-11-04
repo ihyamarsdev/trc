@@ -14,16 +14,43 @@ use InvalidArgumentException;
  */
 class DocumentTemplate
 {
-    public const COMPANIES = ['rasyidu', 'edunesia'];
+    public const COMPANIES = ['rasyidu', 'edunesia', 'edusindo', 'tdw'];
 
-    public const DOCUMENTS = ['spk', 'kuitansi', 'invoice'];
+    /**
+     * Templates per company. A company with several designs of one document (TDW's invoice per bank)
+     * has them as `invoice-{variant}`.
+     */
+    private const TEMPLATES = [
+        'rasyidu' => ['spk', 'kuitansi', 'invoice'],
+        'edunesia' => ['spk', 'kuitansi', 'invoice'],
+        'edusindo' => ['kuitansi', 'invoice'],
+        'tdw' => ['kuitansi', 'invoice-mandiri', 'invoice-dki'],
+    ];
+
+    /**
+     * The documents a company has a template for.
+     *
+     * @return list<string>
+     */
+    public static function documents(string $company): array
+    {
+        return self::TEMPLATES[$company] ?? [];
+    }
+
+    /**
+     * `invoice` for `invoice-dki`: what the document is, whichever design it has.
+     */
+    public static function kind(string $document): string
+    {
+        return strtok($document, '-');
+    }
 
     /**
      * Absolute path of a template file.
      */
     public static function path(string $company, string $document): string
     {
-        if (! in_array($company, self::COMPANIES, true) || ! in_array($document, self::DOCUMENTS, true)) {
+        if (! in_array($company, self::COMPANIES, true) || ! in_array($document, self::documents($company), true)) {
             throw new InvalidArgumentException("Template {$company}/{$document} is not defined.");
         }
 
