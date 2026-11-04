@@ -275,4 +275,25 @@ class DocumentWorkbenchTest extends TestCase
         $record->refresh();
         $this->assertSame('505', $record->number_kwitansi);
     }
+
+    public function test_the_mandiri_invoice_note_is_saved_printed_and_limited(): void
+    {
+        $this->actAs('finance');
+        $record = $this->record();
+
+        $component = Livewire::test(DocumentWorkbench::class, ['record' => $record])
+            ->set('data.company', 'tdw')
+            ->set('data.document', 'invoice-mandiri')
+            ->set('data.note_invoice', "Bayar sebelum jatuh tempo\nKonfirmasi via WhatsApp");
+
+        $html = $component->instance()->previewHtml();
+        $this->assertStringContainsString('>Bayar sebelum jatuh tempo<', $html);
+        $this->assertStringContainsString('>Konfirmasi via WhatsApp<', $html);
+
+        $component->call('save')->assertHasNoErrors();
+        $this->assertSame("Bayar sebelum jatuh tempo\nKonfirmasi via WhatsApp", $record->refresh()->note_invoice);
+
+        $component->set('data.note_invoice', "satu\ndua\ntiga")->call('save')->assertHasErrors('data.note_invoice');
+        $component->set('data.note_invoice', str_repeat('A', DocumentData::MAX_NOTE_LENGTH + 1))->call('save')->assertHasErrors('data.note_invoice');
+    }
 }

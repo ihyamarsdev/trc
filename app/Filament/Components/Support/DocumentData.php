@@ -24,6 +24,13 @@ class DocumentData
     public const LONG_DETAIL = 40;
 
     /**
+     * The invoice's "NB" notes: one bullet per line on the form.
+     */
+    public const MAX_NOTE_LINES = 2;
+
+    public const MAX_NOTE_LENGTH = 50;
+
+    /**
      * @return array<string, scalar|null>
      */
     public static function spk(RegistrationData $record): array
@@ -93,6 +100,8 @@ class DocumentData
             'ppn_amount' => self::taxAmount($record->subtotal_invoice, $record->ppn, none: '-'),
             'pph_rupiah' => self::taxAmount($record->subtotal_invoice, $record->pph, 'Rp '),
             'ppn_rupiah' => self::taxAmount($record->subtotal_invoice, $record->ppn, 'Rp '),
+            'note_1' => self::noteLines($record->note_invoice)[0] ?? '',
+            'note_2' => self::noteLines($record->note_invoice)[1] ?? '',
             'program' => filled($record->type) ? 'Program '.Str::upper($record->type) : '-',
         ];
     }
@@ -107,6 +116,16 @@ class DocumentData
             'kuitansi' => self::kwitansi($record),
             'invoice' => self::invoice($record),
         };
+    }
+
+    /**
+     * The non-empty lines of an invoice note, trimmed.
+     *
+     * @return list<string>
+     */
+    public static function noteLines(?string $note): array
+    {
+        return array_values(array_filter(array_map('trim', preg_split('/\R/', (string) $note)), 'strlen'));
     }
 
     private static function wholeNumber(mixed $value): int

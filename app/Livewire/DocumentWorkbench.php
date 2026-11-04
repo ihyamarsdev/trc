@@ -78,6 +78,7 @@ class DocumentWorkbench extends Component implements HasForms
             'number_kwitansi' => $record->number_kwitansi,
             'number_invoice' => $record->number_invoice,
             'detail_invoice' => $record->detail_invoice,
+            'note_invoice' => $record->note_invoice,
             'qty_invoice' => $record->qty_invoice,
             'unit_price' => $record->unit_price,
             'amount_invoice' => $record->amount_invoice,
@@ -207,6 +208,20 @@ class DocumentWorkbench extends Component implements HasForms
                     ->maxLength(DocumentData::MAX_DETAIL)
                     ->live(debounce: 600)
                     ->columnSpanFull(),
+                Textarea::make('note_invoice')
+                    ->label('Catatan (NB)')
+                    ->helperText('Tercetak di invoice Mandiri. Satu baris satu poin, maksimal '.DocumentData::MAX_NOTE_LINES.' poin dan '.DocumentData::MAX_NOTE_LENGTH.' karakter per baris.')
+                    ->visible(fn (Get $get): bool => $get('document') === 'invoice-mandiri')
+                    ->rows(2)
+                    ->rules([fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
+                        $lines = DocumentData::noteLines($value);
+
+                        if (count($lines) > DocumentData::MAX_NOTE_LINES || collect($lines)->contains(fn (string $line): bool => Str::length($line) > DocumentData::MAX_NOTE_LENGTH)) {
+                            $fail('Catatan maksimal '.DocumentData::MAX_NOTE_LINES.' baris dengan '.DocumentData::MAX_NOTE_LENGTH.' karakter per baris.');
+                        }
+                    }])
+                    ->live(debounce: 600)
+                    ->columnSpanFull(),
                 TextInput::make('unit_price')
                     ->label('Harga Satuan')
                     ->prefix('Rp')
@@ -278,6 +293,7 @@ class DocumentWorkbench extends Component implements HasForms
             'number_kwitansi' => $this->data['number_kwitansi'] ?? null,
             'number_invoice' => $this->data['number_invoice'] ?? null,
             'detail_invoice' => $this->upper($this->data['detail_invoice'] ?? null),
+            'note_invoice' => implode("\n", DocumentData::noteLines($this->data['note_invoice'] ?? null)) ?: null,
             'qty_invoice' => $this->data['qty_invoice'] ?? null,
             'unit_price' => $this->data['unit_price'] ?? null,
             'amount_invoice' => $this->data['amount_invoice'] ?? null,

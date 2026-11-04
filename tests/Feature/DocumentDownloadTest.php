@@ -237,4 +237,17 @@ class DocumentDownloadTest extends TestCase
         $this->assertSame('', $values['number']);
         $this->assertSame('90', $values['qty']);
     }
+
+    public function test_invoice_note_lines_become_the_nb_bullets(): void
+    {
+        $values = DocumentData::invoice($this->record(['note_invoice' => "Bayar sebelum jatuh tempo\n\n  Konfirmasi via WhatsApp \n"]));
+
+        $this->assertSame('Bayar sebelum jatuh tempo', $values['note_1']);
+        $this->assertSame('Konfirmasi via WhatsApp', $values['note_2']);
+
+        $values = DocumentData::invoice($this->record(['note_invoice' => null]));
+
+        $this->assertSame('', $values['note_1']);
+        $this->assertSame('', $values['note_2']);
+    }
 }
