@@ -57,7 +57,7 @@ class ViewActivities extends Page
                 $description .= '<br><span class="italic">Catatan: '.e($log->note).'</span>';
             }
 
-            $date = $log->created_at?->translatedFormat('l, d/m/Y H:i') ?? '-';
+            $date = $log->created_at?->copy()->timezone('Asia/Jakarta')->translatedFormat('l, d/m/Y H:i') ?? '-';
 
             $activities[] = [
                 'title' => $title,
