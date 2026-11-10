@@ -17,14 +17,14 @@ class DocumentTemplate
     public const COMPANIES = ['rasyidu', 'edunesia', 'edusindo', 'tdw'];
 
     /**
-     * Templates per company. A company with several designs of one document (TDW's invoice per bank)
-     * has them as `invoice-{variant}`.
+     * Templates per company. A company with several designs of one document (TDW's invoice per bank, Rasyidu's
+     * SPK per program) has them as `{document}-{variant}`.
      */
     private const TEMPLATES = [
-        'rasyidu' => ['spk', 'kuitansi', 'invoice'],
+        'rasyidu' => ['spk', 'spk-apps', 'spk-snbt', 'spk-tka', 'kuitansi', 'invoice'],
         'edunesia' => ['spk', 'kuitansi', 'invoice'],
         'edusindo' => ['kuitansi', 'invoice'],
-        'tdw' => ['spk-apps', 'spk-snbt', 'spk-tka', 'kuitansi', 'invoice-mandiri', 'invoice-dki'],
+        'tdw' => ['kuitansi', 'invoice-mandiri', 'invoice-dki'],
     ];
 
     /**

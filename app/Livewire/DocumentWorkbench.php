@@ -10,6 +10,7 @@ use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
@@ -43,11 +44,11 @@ class DocumentWorkbench extends Component implements HasForms
     ];
 
     private const DOCUMENTS = [
-        'spk' => 'SPK',
-        'kuitansi' => 'Kwitansi',
+        'spk' => 'SPK ANBK',
         'spk-apps' => 'SPK APPS',
         'spk-snbt' => 'SPK SNBT',
         'spk-tka' => 'SPK TKA',
+        'kuitansi' => 'Kwitansi',
         'invoice' => 'Invoice',
         'invoice-mandiri' => 'Invoice Mandiri',
         'invoice-dki' => 'Invoice Bank DKI',
@@ -76,7 +77,7 @@ class DocumentWorkbench extends Component implements HasForms
 
         $this->form->fill([
             'company' => array_key_first(self::COMPANIES),
-            'document' => 'spk',
+            'document' => $this->defaultDocument(array_key_first(self::COMPANIES), 'spk'),
             'detail_kwitansi' => $record->detail_kwitansi,
             'number_kwitansi' => $record->number_kwitansi,
             'number_invoice' => $record->number_invoice,
@@ -89,6 +90,20 @@ class DocumentWorkbench extends Component implements HasForms
             'total_invoice' => $record->total_invoice,
             'taxes' => $this->taxesOf($record),
         ]);
+    }
+
+    /**
+     * The document of a kind to open for a company: the one made for the record's program when there is one
+     * (`spk-tka` for a TKA record), else the company's first of that kind, else the kwitansi.
+     */
+    private function defaultDocument(string $company, string $kind): string
+    {
+        $documents = DocumentTemplate::documents($company);
+        $preferred = "{$kind}-".Str::lower((string) $this->record->type);
+
+        return in_array($preferred, $documents, true)
+            ? $preferred
+            : (collect($documents)->first(fn (string $document): bool => DocumentTemplate::kind($document) === $kind) ?? 'kuitansi');
     }
 
     public function form(Form $form): Form
@@ -109,18 +124,13 @@ class DocumentWorkbench extends Component implements HasForms
                                 $documents = DocumentTemplate::documents((string) $state);
 
                                 if (! in_array($get('document'), $documents, true)) {
-                                    $kind = DocumentTemplate::kind((string) $get('document'));
-                                    $variants = array_values(array_filter($documents, fn (string $document): bool => DocumentTemplate::kind($document) === $kind));
-                                    $preferred = "{$kind}-".Str::lower((string) $this->record->type);
-                                    $set('document', in_array($preferred, $variants, true) ? $preferred : ($variants[0] ?? 'kuitansi'));
+                                    $set('document', $this->defaultDocument((string) $state, DocumentTemplate::kind((string) $get('document'))));
                                 }
                             }),
-                        ToggleButtons::make('document')
+                        Select::make('document')
                             ->label('Dokumen')
                             ->options(fn (Get $get): array => array_intersect_key(self::DOCUMENTS, array_flip(DocumentTemplate::documents((string) $get('company')))))
-                            ->icons(['spk' => 'heroicon-o-document-text', 'spk-apps' => 'heroicon-o-document-text', 'spk-snbt' => 'heroicon-o-document-text', 'spk-tka' => 'heroicon-o-document-text', 'kuitansi' => 'heroicon-o-banknotes', 'invoice' => 'heroicon-o-receipt-percent', 'invoice-mandiri' => 'heroicon-o-receipt-percent', 'invoice-dki' => 'heroicon-o-receipt-percent'])
-                            ->inline()
-                            ->grouped()
+                            ->selectablePlaceholder(false)
                             ->live(),
 
                         $this->spkFields(),
@@ -325,8 +335,14 @@ class DocumentWorkbench extends Component implements HasForms
         $draft = $this->record->replicate()->fill($this->documentValues());
         $html = DocumentTemplate::html($company, $document, DocumentData::for($document, $draft));
 
+        // a browser frame ignores the template's @page margin, so show it as padding; the PDF keeps the real margin
+        $margin = preg_match('/@page\s*\{[^}]*?margin:\s*([^;}]+)/', $html, $page) ? trim($page[1]) : '0';
+        $padding = (float) $margin > 0 ? "<style>body{margin:0;padding:{$margin};box-sizing:border-box}</style>" : '';
+
         // the template refers to its images relative to its own folder
-        return str_replace('<head>', '<head><base href="'.e(asset("template/{$company}")).'/">', $html);
+        $html = str_replace('<head>', '<head><base href="'.e(asset("template/{$company}")).'/">', $html);
+
+        return str_replace('</head>', $padding.'</head>', $html);
     }
 
     private function chosenCompany(): string

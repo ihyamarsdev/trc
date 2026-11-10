@@ -83,7 +83,7 @@ class DocumentWorkbenchTest extends TestCase
     {
         $this->actAs('finance');
 
-        foreach ([['apps', 'edunesia', '/edunesia/download/apps'], ['snbt', 'rasyidu', '/rasyidu/download/snbt'], ['tka', 'rasyidu', '/rasyidu/download/anbk']] as [$type, $company, $path]) {
+        foreach ([['apps', 'edunesia', '/edunesia/download/apps'], ['snbt', 'rasyidu', '/rasyidu/download/spk-snbt'], ['tka', 'rasyidu', '/rasyidu/download/spk-tka'], ['anbk', 'rasyidu', '/rasyidu/download/anbk']] as [$type, $company, $path]) {
             $component = Livewire::test(DocumentWorkbench::class, ['record' => $this->record(['type' => $type])])
                 ->set('data.company', $company)
                 ->call('download')
@@ -104,26 +104,38 @@ class DocumentWorkbenchTest extends TestCase
         $this->assertStringContainsString('template/rasyidu/', $component->instance()->previewHtml());
     }
 
-    public function test_tdw_offers_an_spk_per_program_and_an_invoice_per_bank(): void
+    public function test_rasyidu_opens_the_spk_of_the_records_programme_and_offers_the_others(): void
     {
         $this->actAs('finance');
 
         $component = Livewire::test(DocumentWorkbench::class, ['record' => $this->record(['type' => 'tka'])])
-            ->assertSet('data.document', 'spk')
-            ->set('data.company', 'tdw')
             ->assertSet('data.document', 'spk-tka');
 
-        $this->assertStringContainsString('template/tdw/', $component->instance()->previewHtml());
+        $this->assertStringContainsString('template/rasyidu/', $component->instance()->previewHtml());
         $this->assertStringContainsString('Tes Kemampuan Akademik', $component->instance()->previewHtml());
-
-        $component->call('download');
-        $this->assertStringContainsString('/tdw/download/spk-tka', json_encode($component->effects['xjs'], JSON_UNESCAPED_SLASHES));
 
         $component->set('data.document', 'spk-apps');
         $this->assertStringContainsString('Asesmen Psikotes Potensi Siswa', $component->instance()->previewHtml());
 
         $component->set('data.document', 'spk-snbt');
         $this->assertStringContainsString('UTBK-SNBT', $component->instance()->previewHtml());
+
+        $component->set('data.company', 'edunesia')->assertSet('data.document', 'spk');
+    }
+
+    public function test_tdw_has_no_spk_and_offers_an_invoice_per_bank(): void
+    {
+        $this->actAs('finance');
+
+        $component = Livewire::test(DocumentWorkbench::class, ['record' => $this->record()])
+            ->assertSet('data.document', 'spk')
+            ->set('data.company', 'tdw')
+            ->assertSet('data.document', 'kuitansi');
+
+        $this->assertStringContainsString('template/tdw/', $component->instance()->previewHtml());
+
+        $component->set('data.document', 'spk');
+        $this->assertStringContainsString('kuitansi-background', $component->instance()->previewHtml());
 
         $component->set('data.document', 'invoice-dki');
         $this->assertStringContainsString('invoice-dki-background', $component->instance()->previewHtml());
