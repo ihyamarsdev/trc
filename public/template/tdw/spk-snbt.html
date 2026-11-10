@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>SPK SNBT TDW</title>
+<style>
+  /*
+   * Template Surat Perjanjian Kerja Sama UTBK-SNBT (TDW): teks mengalir di A4 tanpa kop.
+   * Isian ditandai dolar + kurung kurawal berisi nama (seperti pada teks di bawah) dan diganti oleh sistem.
+   * Nomor surat dilengkapi manual pada bagian titik-titik.
+   */
+  @page { size: 210mm 297mm; margin: 20mm 22mm; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: "Times New Roman", Times, serif; font-size: 11pt; line-height: 1.4; color: #000; text-align: justify; }
+  p { margin: 0 0 8pt 0; }
+  .center { text-align: center; }
+  .title { font-size: 13pt; font-weight: bold; margin-bottom: 2pt; }
+  .party { border-collapse: collapse; margin-bottom: 8pt; }
+  .party td { padding: 0; vertical-align: top; text-align: left; }
+  .party .label { width: 22mm; }
+  .article { text-align: center; font-weight: bold; margin: 12pt 0 8pt 0; page-break-after: avoid; }
+  .article p { margin: 0; }
+  ol { margin: 0 0 8pt 0; padding-left: 7mm; }
+  .price { width: 100%; border-collapse: collapse; margin-bottom: 8pt; font-size: 10pt; text-align: center; }
+  .price th, .price td { border: 0.3mm solid #000; padding: 2mm; vertical-align: middle; }
+  .price .left { text-align: left; }
+  .price ul { margin: 0; padding: 0; list-style: none; text-align: left; }
+  .sign { width: 100%; border-collapse: collapse; margin-top: 10pt; page-break-inside: avoid; }
+  .sign td { width: 50%; text-align: center; vertical-align: top; padding: 0; font-weight: bold; }
+  .sign .space { height: 24mm; }
+</style>
+</head>
+<body>
+  <p class="center title">SURAT PERJANJIAN KERJA SAMA</p>
+  <p class="center"><b>Nomor : ………… /UTBK/${bulan_romawi}/${tahun}</b></p>
+
+  <p>Pada hari ini, <b>${deskripsi}</b>, bertempat di <b>${schools}</b>, telah dibuat dan disepakati Perjanjian Kerja Sama antara:</p>
+
+  <table class="party">
+    <tr><td class="label"><b>Nama</b></td><td><b>:</b> ${to}</td></tr>
+    <tr><td class="label"><b>Jabatan</b></td><td><b>:</b> ${jabatan}</td></tr>
+    <tr><td class="label"><b>Alamat</b></td><td><b>:</b> ${alamat}</td></tr>
+  </table>
+  <p>selanjutnya disebut <b>PIHAK PERTAMA</b>.</p>
+
+  <table class="party">
+    <tr><td class="label">Nama</td><td>: Wiwied Wijayanti Saputro, S.H.</td></tr>
+    <tr><td class="label"><b>Jabatan</b></td><td><b>:</b> Chief Executive Officer (CEO)</td></tr>
+    <tr><td class="label"><b>Alamat</b></td><td><b>:</b> Jl. Kaliurang No.Km.11, RW.05, Candi, Ngaglik, Sleman, Daerah Istimewa Yogyakarta</td></tr>
+  </table>
+  <p>selanjutnya disebut <b>PIHAK KEDUA</b>.</p>
+
+  <p>PIHAK PERTAMA dan PIHAK KEDUA sepakat untuk bekerja sama dalam pelaksanaan <b>Program Penguatan UTBK-SNBT Tahun Ajaran ${year}</b>, dengan ketentuan sebagai berikut:</p>
+
+  <div class="article"><p>PASAL 1</p><p>RUANG LINGKUP PROGRAM</p></div>
+
+  <p>PIHAK KEDUA menyediakan Program Penguatan UTBK-SNBT bagi peserta didik yang meliputi:</p>
+  <ol>
+    <li>Try Out UTBK;</li>
+    <li>Penguatan materi UTBK;</li>
+  </ol>
+  <p>Pelaksanaan program, jadwal, dan teknis kegiatan akan dikoordinasikan bersama oleh PARA PIHAK.</p>
+
+  <div class="article"><p>PASAL 2</p><p>PESERTA DAN BIAYA</p></div>
+
+  <table class="price">
+    <tr>
+      <th>NO</th><th>NAMA KEGIATAN</th><th>FASILITAS</th><th>NARASUMBER</th><th>JUMLAH SISWA</th><th>HARGA SATUAN</th><th>TOTAL</th>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td class="left">Program Penguatan UTBK-SNBT</td>
+      <td class="left"><ul><li>- Try Out UTBK (2X)</li><li>- Penguatan materi UTBK (10 X)</li></ul></td>
+      <td>PT. TDW KINARYA INDONESIA</td>
+      <td>${siswa}</td>
+      <td>${harga}</td>
+      <td>${total}</td>
+    </tr>
+  </table>
+
+  <p>sudah termasuk PPN dan PPh Pasal 23 sesuai dengan ketentuan perpajakan yang berlaku.</p>
+
+  <p>Pembayaran dapat dilakukan melalui transfer ke rekening berikut:<br>
+  <b>Bank : Mandiri &nbsp; Nomor Rekening : 137 00 702 2020 3 &nbsp; Atas Nama : TDW KINARYA INDONESIA</b></p>
+
+  <div class="article"><p>PASAL 3</p><p>HAK DAN KEWAJIBAN</p></div>
+
+  <p><b>PIHAK PERTAMA berkewajiban:</b></p>
+  <ol>
+    <li>Menyediakan data dan informasi yang diperlukan;</li>
+    <li>Membantu koordinasi dengan peserta didik;</li>
+    <li>Melakukan pembayaran sesuai kesepakatan.</li>
+  </ol>
+
+  <p><b>PIHAK KEDUA berkewajiban:</b></p>
+  <ol>
+    <li>Melaksanakan program sesuai kesepakatan;</li>
+    <li>Melakukan koordinasi dengan PIHAK PERTAMA selama pelaksanaan program.</li>
+  </ol>
+
+  <p>Masing-masing pihak berhak memperoleh layanan dan melaksanakan kewajibannya sesuai dengan isi perjanjian ini.</p>
+
+  <div class="article"><p>PASAL 4</p><p>PERUBAHAN DAN PENYELESAIAN MASALAH</p></div>
+
+  <ol>
+    <li>Perubahan terhadap perjanjian ini dilakukan berdasarkan kesepakatan PARA PIHAK.</li>
+    <li>Apabila terjadi permasalahan, PARA PIHAK sepakat menyelesaikannya terlebih dahulu melalui musyawarah untuk mufakat.</li>
+  </ol>
+
+  <div class="article"><p>PASAL 5</p><p>PENUTUP</p></div>
+
+  <ol>
+    <li>Perjanjian ini berlaku sejak tanggal ditandatangani sampai dengan selesainya program.</li>
+    <li>Hal-hal yang belum diatur dalam perjanjian ini akan disepakati bersama oleh PARA PIHAK.</li>
+    <li>Perjanjian ini dibuat dengan itikad baik dan tanpa adanya paksaan dari pihak mana pun.</li>
+  </ol>
+
+  <p>Demikian Surat Perjanjian Kerja Sama ini dibuat untuk dipergunakan sebagaimana mestinya.</p>
+
+  <table class="sign">
+    <tr><td>PIHAK PERTAMA</td><td>PIHAK KEDUA</td></tr>
+    <tr><td>${jabatan}</td><td>PT TDW Kinarya Indonesia</td></tr>
+    <tr><td class="space">&nbsp;</td><td class="space">&nbsp;</td></tr>
+    <tr><td>${to}</td><td>Wiwied Wijayanti Saputro</td></tr>
+    <tr><td>NIP. ………………………..</td><td>CEO</td></tr>
+  </table>
+</body>
+</html>

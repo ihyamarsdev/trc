@@ -45,6 +45,9 @@ class DocumentWorkbench extends Component implements HasForms
     private const DOCUMENTS = [
         'spk' => 'SPK',
         'kuitansi' => 'Kwitansi',
+        'spk-apps' => 'SPK APPS',
+        'spk-snbt' => 'SPK SNBT',
+        'spk-tka' => 'SPK TKA',
         'invoice' => 'Invoice',
         'invoice-mandiri' => 'Invoice Mandiri',
         'invoice-dki' => 'Invoice Bank DKI',
@@ -107,13 +110,15 @@ class DocumentWorkbench extends Component implements HasForms
 
                                 if (! in_array($get('document'), $documents, true)) {
                                     $kind = DocumentTemplate::kind((string) $get('document'));
-                                    $set('document', collect($documents)->first(fn (string $document): bool => DocumentTemplate::kind($document) === $kind) ?? 'kuitansi');
+                                    $variants = array_values(array_filter($documents, fn (string $document): bool => DocumentTemplate::kind($document) === $kind));
+                                    $preferred = "{$kind}-".Str::lower((string) $this->record->type);
+                                    $set('document', in_array($preferred, $variants, true) ? $preferred : ($variants[0] ?? 'kuitansi'));
                                 }
                             }),
                         ToggleButtons::make('document')
                             ->label('Dokumen')
                             ->options(fn (Get $get): array => array_intersect_key(self::DOCUMENTS, array_flip(DocumentTemplate::documents((string) $get('company')))))
-                            ->icons(['spk' => 'heroicon-o-document-text', 'kuitansi' => 'heroicon-o-banknotes', 'invoice' => 'heroicon-o-receipt-percent', 'invoice-mandiri' => 'heroicon-o-receipt-percent', 'invoice-dki' => 'heroicon-o-receipt-percent'])
+                            ->icons(['spk' => 'heroicon-o-document-text', 'spk-apps' => 'heroicon-o-document-text', 'spk-snbt' => 'heroicon-o-document-text', 'spk-tka' => 'heroicon-o-document-text', 'kuitansi' => 'heroicon-o-banknotes', 'invoice' => 'heroicon-o-receipt-percent', 'invoice-mandiri' => 'heroicon-o-receipt-percent', 'invoice-dki' => 'heroicon-o-receipt-percent'])
                             ->inline()
                             ->grouped()
                             ->live(),
@@ -140,7 +145,7 @@ class DocumentWorkbench extends Component implements HasForms
         return Section::make('SPK')
             ->icon('heroicon-o-document-text')
             ->description('Seluruh isi SPK diambil dari data sekolah dan Finance. Untuk mengubahnya, pakai tombol Ubah.')
-            ->visible(fn (Get $get): bool => $get('document') === 'spk')
+            ->visible(fn (Get $get): bool => DocumentTemplate::kind((string) $get('document')) === 'spk')
             ->compact()
             ->columns(2)
             ->schema([
@@ -357,7 +362,7 @@ class DocumentWorkbench extends Component implements HasForms
     {
         $document = $this->chosenDocument();
 
-        if ($document !== 'spk') {
+        if (DocumentTemplate::kind($document) !== 'spk') {
             $this->save();
         }
 

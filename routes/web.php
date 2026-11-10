@@ -35,8 +35,8 @@ foreach (DocumentTemplate::COMPANIES as $company) {
         ->name("{$company}.kwitansi.download");
 
     foreach (DocumentTemplate::documents($company) as $document) {
-        if (DocumentTemplate::kind($document) === 'invoice') {
-            Route::get("/{record}/{$company}/download/{$document}", [DocumentController::class, 'invoice'])
+        if ($document !== 'spk' && in_array(DocumentTemplate::kind($document), ['spk', 'invoice'], true)) {
+            Route::get("/{record}/{$company}/download/{$document}", [DocumentController::class, DocumentTemplate::kind($document)])
                 ->defaults('company', $company)
                 ->defaults('document', $document)
                 ->name("{$company}.{$document}.download");

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>SPK TKA TDW</title>
+<style>
+  /*
+   * Template Surat Perjanjian Kerja Sama TKA (TDW): teks mengalir di A4 tanpa kop.
+   * Isian ditandai dolar + kurung kurawal berisi nama (seperti pada teks di bawah) dan diganti oleh sistem.
+   * Nomor surat dilengkapi manual pada bagian titik-titik.
+   */
+  @page { size: 210mm 297mm; margin: 20mm 22mm; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: "Times New Roman", Times, serif; font-size: 11pt; line-height: 1.4; color: #000; text-align: justify; }
+  p { margin: 0 0 8pt 0; }
+  .center { text-align: center; }
+  .title { font-size: 13pt; font-weight: bold; margin-bottom: 2pt; }
+  .party { border-collapse: collapse; margin-bottom: 8pt; }
+  .party td { padding: 0; vertical-align: top; text-align: left; }
+  .party .label { width: 22mm; }
+  .article { text-align: center; font-weight: bold; margin: 12pt 0 8pt 0; page-break-after: avoid; }
+  .article p { margin: 0; }
+  ol { margin: 0 0 8pt 0; padding-left: 7mm; }
+  .price { width: 100%; border-collapse: collapse; margin-bottom: 8pt; font-size: 10pt; text-align: center; }
+  .price th, .price td { border: 0.3mm solid #000; padding: 2mm; vertical-align: middle; }
+  .price .left { text-align: left; }
+  .price ul { margin: 0; padding: 0; list-style: none; text-align: left; }
+  .sign { width: 100%; border-collapse: collapse; margin-top: 10pt; page-break-inside: avoid; }
+  .sign td { width: 50%; text-align: center; vertical-align: top; padding: 0; font-weight: bold; }
+  .sign .space { height: 24mm; }
+</style>
+</head>
+<body>
+  <p class="center title">SURAT PERJANJIAN KERJA SAMA</p>
+  <p class="center"><b>Nomor : ………… /TKA/${bulan_romawi}/${tahun}</b></p>
+
+  <p>Pada hari ini, <b>${deskripsi}</b>, bertempat di <b>${schools}</b>, telah dilakukan penandatanganan Surat Perjanjian Kerja Sama untuk pelaksanaan <b>Program Penguatan Tes Kemampuan Akademik (TKA)</b>.</p>
+
+  <table class="party">
+    <tr><td class="label">Nama</td><td>: ${to}</td></tr>
+    <tr><td class="label">Jabatan</td><td>: ${jabatan}</td></tr>
+    <tr><td class="label">Alamat</td><td>: ${alamat}</td></tr>
+  </table>
+  <p>selanjutnya disebut <b>PIHAK PERTAMA</b>.</p>
+
+  <table class="party">
+    <tr><td class="label">Nama</td><td>: Wiwied Wijayanti Saputro, S.H.</td></tr>
+    <tr><td class="label">Jabatan</td><td>: Chief Executive Officer (CEO)</td></tr>
+    <tr><td class="label">Alamat</td><td>: Jl. Kaliurang No.Km.11, RW.05, Candi, Ngaglik, Sleman, Daerah Istimewa Yogyakarta</td></tr>
+  </table>
+  <p>selanjutnya disebut <b>PIHAK KEDUA</b>.</p>
+
+  <p><b>PARA PIHAK</b> sepakat untuk menjalin kerja sama dalam pelaksanaan <b>Program Penguatan Tes Kemampuan Akademik (TKA) Tahun Ajaran ${year}</b>, dengan ketentuan sebagai berikut:</p>
+
+  <div class="article"><p>Pasal 1</p><p>RUANG LINGKUP LAYANAN DAN BIAYA</p></div>
+
+  <table class="price">
+    <tr>
+      <th>NO</th><th>NAMA KEGIATAN</th><th>MAPEL</th><th>NARASUMBER</th><th>JUMLAH SISWA</th><th>HARGA SATUAN</th><th>TOTAL</th>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td class="left">Try Out TKA Paket 1</td>
+      <td class="left"><ul><li>- Matematika (2X)</li><li>- Bahasa Inggris (1X)</li><li>- Bahasa Indonesia (2X)</li></ul></td>
+      <td rowspan="2">PT TDW KINARYA INDONESIA</td>
+      <td rowspan="2">${siswa}</td>
+      <td rowspan="2">${harga}</td>
+      <td rowspan="2">${total}</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td class="left">Try Out TKA Paket 2</td>
+      <td class="left"><ul><li>- Matematika (2X)</li><li>- Bahasa Inggris (1X)</li><li>- Bahasa Indonesia (2X)</li></ul></td>
+    </tr>
+  </table>
+
+  <p>Belum termasuk PPN dan PPh Pasal 23 sesuai dengan ketentuan perpajakan yang berlaku.</p>
+
+  <p>Pembayaran dapat dilakukan melalui transfer ke rekening berikut:<br>
+  <b>Bank : Mandiri &nbsp; Nomor Rekening : 137 00 702 2020 3 &nbsp; Atas Nama : TDW KINARYA INDONESIA</b></p>
+
+  <div class="article"><p>Pasal 2</p><p>PELAKSANAAN PROGRAM</p></div>
+
+  <ol>
+    <li>Pelaksanaan program akan dilakukan sesuai dengan jadwal yang telah disepakati oleh PARA PIHAK.</li>
+    <li>Detail layanan dan jadwal pelaksanaan program akan dituangkan dalam <b>timeline pelaksanaan</b> yang disepakati antara pihak sekolah dan PIHAK KEDUA.</li>
+    <li>Hal-hal teknis terkait pelaksanaan program akan dikoordinasikan lebih lanjut antara panitia sekolah dan PIHAK KEDUA.</li>
+  </ol>
+
+  <div class="article"><p>Pasal 3</p><p>PENUTUP</p></div>
+
+  <ol>
+    <li>Surat Perjanjian Kerja Sama ini dibuat berdasarkan kesepakatan PARA PIHAK dan dilaksanakan dengan penuh tanggung jawab.</li>
+    <li>Hal-hal yang belum diatur dalam Surat Perjanjian Kerja Sama ini akan disepakati kemudian oleh PARA PIHAK dan dituangkan dalam dokumen tambahan apabila diperlukan.</li>
+    <li>Surat Perjanjian Kerja Sama ini dibuat dalam rangkap 2 (dua), masing-masing mempunyai kekuatan hukum yang sama.</li>
+    <li>Surat Perjanjian Kerja Sama ini mulai berlaku sejak tanggal ditandatangani oleh PARA PIHAK.</li>
+  </ol>
+
+  <p>Demikian Surat Perjanjian Kerja Sama ini dibuat dan ditandatangani oleh PARA PIHAK dalam keadaan sadar, tanpa paksaan dari pihak mana pun, untuk dapat dipergunakan sebagaimana mestinya.</p>
+
+  <table class="sign">
+    <tr><td>PIHAK PERTAMA</td><td>PIHAK KEDUA</td></tr>
+    <tr><td>${jabatan}</td><td>PT TDW Kinarya Indonesia</td></tr>
+    <tr><td class="space">&nbsp;</td><td class="space">&nbsp;</td></tr>
+    <tr><td>${to}</td><td>Wiwied Wijayanti Saputro</td></tr>
+    <tr><td>NIP. ………………………..</td><td>CEO</td></tr>
+  </table>
+</body>
+</html>

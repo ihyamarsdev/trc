@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>SPK APPS TDW</title>
+<style>
+  /*
+   * Template Surat Perjanjian Kerja Sama APPS (TDW): teks mengalir di A4 tanpa kop.
+   * Isian ditandai dolar + kurung kurawal berisi nama (seperti pada teks di bawah) dan diganti oleh sistem.
+   * Nomor surat dilengkapi manual pada bagian titik-titik.
+   */
+  @page { size: 210mm 297mm; margin: 20mm 22mm; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: "Times New Roman", Times, serif; font-size: 11pt; line-height: 1.4; color: #000; text-align: justify; }
+  p { margin: 0 0 8pt 0; }
+  .center { text-align: center; }
+  .title { font-size: 13pt; font-weight: bold; margin-bottom: 2pt; }
+  .party { border-collapse: collapse; margin-bottom: 8pt; }
+  .party td { padding: 0; vertical-align: top; text-align: left; }
+  .party .label { width: 22mm; }
+  .article { text-align: center; font-weight: bold; margin: 12pt 0 8pt 0; page-break-after: avoid; }
+  .article p { margin: 0; }
+  ol { margin: 0 0 8pt 0; padding-left: 7mm; }
+  ol ol { margin: 0; }
+  .price { width: 100%; border-collapse: collapse; margin-bottom: 8pt; font-size: 10pt; text-align: center; }
+  .price th, .price td { border: 0.3mm solid #000; padding: 2mm; vertical-align: middle; }
+  .price .left { text-align: left; }
+  .sign { width: 100%; border-collapse: collapse; margin-top: 10pt; page-break-inside: avoid; }
+  .sign td { width: 50%; text-align: center; vertical-align: top; padding: 0; font-weight: bold; }
+  .sign .space { height: 24mm; }
+</style>
+</head>
+<body>
+  <p class="center title">SURAT PERJANJIAN KERJA SAMA (SPK)</p>
+  <p class="center title">PELAKSANAAN ASESMEN PSIKOTES POTENSI SISWA</p>
+  <p class="center"><b>Nomor : ………… /APPS/${bulan_romawi}/${tahun}</b></p>
+
+  <p>Pada hari ini, <b>${deskripsi}</b>, bertempat di <b>${schools}</b>, telah dibuat dan disepakati Perjanjian Kerja Sama antara:</p>
+
+  <table class="party">
+    <tr><td class="label"><b>Nama</b></td><td><b>:</b> ${to}</td></tr>
+    <tr><td class="label"><b>Jabatan</b></td><td><b>:</b> ${jabatan}</td></tr>
+    <tr><td class="label"><b>Alamat</b></td><td><b>:</b> ${alamat}</td></tr>
+  </table>
+  <p>selanjutnya disebut <b>PIHAK PERTAMA</b>.</p>
+
+  <table class="party">
+    <tr><td class="label">Nama</td><td>: Wiwied Wijayanti Saputro, S.H.</td></tr>
+    <tr><td class="label"><b>Jabatan</b></td><td><b>:</b> Chief Executive Officer (CEO)</td></tr>
+    <tr><td class="label"><b>Alamat</b></td><td><b>:</b> Jl. Kaliurang No.Km.11, RW.05, Candi, Ngaglik, Sleman, Daerah Istimewa Yogyakarta</td></tr>
+  </table>
+  <p>selanjutnya disebut <b>PIHAK KEDUA</b>.</p>
+
+  <p><b>PARA PIHAK</b> sepakat untuk menjalin kerja sama dalam pelaksanaan <b>Program Asesmen Psikotes Potensi Siswa (APPS) Tahun Ajaran ${year}</b>, dengan ketentuan sebagai berikut:</p>
+
+  <div class="article"><p>PASAL 1</p><p>MAKSUD DAN TUJUAN</p></div>
+
+  <p>Perjanjian ini bertujuan untuk melaksanakan layanan <b>Asesmen Psikotes Potensi Siswa (APPS)</b> sebagai sarana pemetaan potensi, bakat, minat, kepribadian, dan rekomendasi pengembangan peserta didik.</p>
+
+  <div class="article"><p>PASAL 2</p><p>RUANG LINGKUP</p></div>
+
+  <p>PIHAK KEDUA akan memberikan layanan berupa:</p>
+  <ol>
+    <li>Koordinasi teknis pelaksanaan asesmen secara online.</li>
+    <li>Penyediaan akun atau media asesmen untuk satuan pendidikan dan murid.</li>
+    <li>Pelaksanaan asesmen psikotes berbasis online.</li>
+    <li>Pengolahan dan analisis hasil asesmen berbasis online.</li>
+    <li>Penyusunan laporan hasil:
+      <ol type="a">
+        <li>Tes Kecerdasan Umum (IQ)</li>
+        <li>Tes Minat Bakat</li>
+        <li>Tes Gaya Belajar</li>
+        <li>Tes Daya Juang</li>
+        <li>Tes Kecerdasan Emosi</li>
+        <li>Tes Motivasi Berprestasi</li>
+        <li>Tes Kepribadian</li>
+        <li>Survei 7 Kebiasaan Anak Indonesia Hebat</li>
+      </ol>
+    </li>
+    <li>Konsultasi atau pembacaan hasil kepada sekolah, siswa, dan/atau orang tua secara online.</li>
+    <li>Hasil cetak dan jilid lembar pertama siswa untuk arsip.</li>
+    <li>Hasil cetak dan jilid lembar rekapitulasi untuk arsip.</li>
+  </ol>
+
+  <div class="article"><p>PASAL 3</p><p>HAK DAN KEWAJIBAN PIHAK KEDUA</p></div>
+
+  <p>PIHAK KEDUA berkewajiban:</p>
+  <ol>
+    <li>Melaksanakan kegiatan sesuai jadwal yang disepakati.</li>
+    <li>Melaksanakan asesmen sesuai standar operasional yang berlaku.</li>
+    <li>Menjaga kerahasiaan data peserta.</li>
+    <li>Menyerahkan hasil analisis kepada PIHAK PERTAMA.</li>
+    <li>Memberikan layanan konsultasi hasil sesuai paket kerja sama secara online.</li>
+  </ol>
+
+  <div class="article"><p>PASAL 4</p><p>HAK DAN KEWAJIBAN PIHAK PERTAMA</p></div>
+
+  <p>PIHAK PERTAMA berkewajiban:</p>
+  <ol>
+    <li>Menyerahkan data peserta sesuai kebutuhan pelaksanaan asesmen.</li>
+    <li>Menyediakan tempat pelaksanaan kegiatan.</li>
+    <li>Menyiapkan daftar peserta.</li>
+    <li>Mengoordinasikan peserta sesuai jadwal.</li>
+    <li>Menyelesaikan administrasi dan pembayaran sesuai kesepakatan.</li>
+    <li>Membantu kelancaran pelaksanaan kegiatan.</li>
+  </ol>
+
+  <div class="article"><p>PASAL 5</p><p>WAKTU PELAKSANAAN DAN BIAYA</p></div>
+
+  <table class="price">
+    <tr>
+      <th>NO</th><th>NAMA KEGIATAN</th><th>NARASUMBER</th><th>JUMLAH SISWA</th><th>HARGA SATUAN</th><th>TOTAL</th>
+    </tr>
+    <tr>
+      <td><b>1</b></td>
+      <td class="left"><b>Program Asesmen Psikotes Potensi Siswa (APPS)</b></td>
+      <td><b>PT. TDW KINARYA INDONESIA</b></td>
+      <td><b>${siswa}</b></td>
+      <td><b>${harga}</b></td>
+      <td><b>${total}</b></td>
+    </tr>
+  </table>
+
+  <p>sudah termasuk PPN dan PPh Pasal 23 sesuai dengan ketentuan perpajakan yang berlaku.</p>
+
+  <p>Pembayaran dapat dilakukan melalui transfer ke rekening berikut:<br>
+  <b>Bank : Mandiri &nbsp; Nomor Rekening : 137 00 702 2020 3 &nbsp; Atas Nama : TDW KINARYA INDONESIA</b></p>
+
+  <div class="article"><p>PASAL 6</p><p>KEADAAN KAHAR (FORCE MAJEURE)</p></div>
+
+  <p>Apabila terjadi keadaan di luar kemampuan para pihak seperti bencana alam, gangguan sistem, kebijakan pemerintah, atau keadaan lain yang menyebabkan kegiatan tidak dapat dilaksanakan, maka jadwal pelaksanaan akan ditentukan kembali berdasarkan kesepakatan bersama.</p>
+
+  <div class="article"><p>PASAL 7</p><p>PENYELESAIAN PERSELISIHAN</p></div>
+
+  <p>Apabila terjadi perselisihan dalam pelaksanaan perjanjian ini, kedua belah pihak sepakat menyelesaikannya terlebih dahulu melalui musyawarah untuk mufakat.</p>
+
+  <div class="article"><p>PASAL 8</p><p>PENUTUP</p></div>
+
+  <p>Perjanjian Kerja Sama ini dibuat dalam rangkap dua, masing-masing bermeterai cukup dan mempunyai kekuatan hukum yang sama. Perjanjian mulai berlaku sejak tanggal ditandatangani oleh kedua belah pihak.</p>
+
+  <table class="sign">
+    <tr><td>PIHAK PERTAMA</td><td>PIHAK KEDUA</td></tr>
+    <tr><td>${jabatan}</td><td>PT TDW Kinarya Indonesia</td></tr>
+    <tr><td class="space">&nbsp;</td><td class="space">&nbsp;</td></tr>
+    <tr><td>${to}</td><td>Wiwied Wijayanti Saputro</td></tr>
+  </table>
+</body>
+</html>

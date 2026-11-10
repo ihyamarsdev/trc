@@ -30,6 +30,8 @@ class DocumentData
 
     public const MAX_NOTE_LENGTH = 50;
 
+    private const ROMAN_MONTHS = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+
     /**
      * @return array<string, scalar|null>
      */
@@ -53,6 +55,10 @@ class DocumentData
             'totalSpell' => Format::formatKeRupiah($total),
             'payment' => Option::label(OptionGroup::PaymentVia, $record->payment_name) ?? $record->payment_name,
             'province' => $record->provinces,
+            'schools' => $record->schools,
+            'alamat' => collect([$record->area, $record->district, $record->regencies, $record->provinces])->filter()->implode(', '),
+            'bulan_romawi' => self::ROMAN_MONTHS[$record->date_register->month - 1],
+            'tahun' => $record->date_register->year,
         ];
     }
 

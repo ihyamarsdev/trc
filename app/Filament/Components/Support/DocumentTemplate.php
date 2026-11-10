@@ -24,7 +24,7 @@ class DocumentTemplate
         'rasyidu' => ['spk', 'kuitansi', 'invoice'],
         'edunesia' => ['spk', 'kuitansi', 'invoice'],
         'edusindo' => ['kuitansi', 'invoice'],
-        'tdw' => ['kuitansi', 'invoice-mandiri', 'invoice-dki'],
+        'tdw' => ['spk-apps', 'spk-snbt', 'spk-tka', 'kuitansi', 'invoice-mandiri', 'invoice-dki'],
     ];
 
     /**

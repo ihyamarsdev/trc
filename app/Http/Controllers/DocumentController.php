@@ -23,9 +23,9 @@ class DocumentController extends Controller
         'tdw' => 'TDW',
     ];
 
-    public function spk(RegistrationData $record, string $company): Response
+    public function spk(RegistrationData $record, string $company, string $document = 'spk'): Response
     {
-        return $this->deliver($record, $company, 'spk', 'SPK');
+        return $this->deliver($record, $company, $document, 'SPK');
     }
 
     public function kwitansi(RegistrationData $record, string $company): Response
