@@ -181,6 +181,31 @@ class DocumentWorkbenchTest extends TestCase
             ->assertSet('data.total_invoice', '1130000');
     }
 
+    public function test_a_manual_total_is_kept_while_the_rest_is_recalculated_and_saved(): void
+    {
+        $this->actAs('finance');
+        $record = $this->record();
+
+        Livewire::test(DocumentWorkbench::class, ['record' => $record])
+            ->set('data.document', 'invoice')
+            ->set('data.qty_invoice', '10')
+            ->set('data.unit_price', '100000')
+            ->set('data.manual_total', true)
+            ->set('data.total_invoice', '999000')
+            ->set('data.taxes', ['ppn'])
+            ->assertSet('data.subtotal_invoice', '1000000')
+            ->assertSet('data.total_invoice', '999000')
+            ->call('save');
+
+        $this->assertSame('999000', $record->refresh()->total_invoice);
+
+        Livewire::test(DocumentWorkbench::class, ['record' => $record])
+            ->assertSet('data.manual_total', true)
+            ->set('data.document', 'invoice')
+            ->set('data.manual_total', false)
+            ->assertSet('data.total_invoice', '1110000');
+    }
+
     public function test_the_invoice_description_is_limited_so_it_fits_the_invoice(): void
     {
         $this->actAs('finance');

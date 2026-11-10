@@ -13,6 +13,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Components\View;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -89,7 +90,9 @@ class DocumentWorkbench extends Component implements HasForms
             'amount_invoice' => $record->amount_invoice,
             'subtotal_invoice' => $record->subtotal_invoice,
             'total_invoice' => $record->total_invoice,
-            'taxes' => $this->taxesOf($record),
+            'taxes' => $taxes = $this->taxesOf($record),
+            'manual_total' => filled($record->total_invoice)
+                && (float) $record->total_invoice !== (float) $this->taxedTotal((float) $record->qty_invoice * (float) $record->unit_price, $taxes),
         ]);
     }
 
@@ -264,11 +267,18 @@ class DocumentWorkbench extends Component implements HasForms
                     ->live()
                     ->afterStateUpdated(fn () => $this->recalculate())
                     ->columnSpanFull(),
+                Toggle::make('manual_total')
+                    ->label('Isi Total Manual')
+                    ->helperText('Aktifkan bila total berbeda dari Sub Total + pajak.')
+                    ->live()
+                    ->afterStateUpdated(fn () => $this->recalculate())
+                    ->columnSpanFull(),
                 TextInput::make('total_invoice')
                     ->label('Total')
                     ->prefix('Rp')
                     ->currencyMask(thousandSeparator: ',', decimalSeparator: '.', precision: 0)
-                    ->readOnly()
+                    ->readOnly(fn (Get $get): bool => ! $get('manual_total'))
+                    ->live(debounce: 600)
                     ->columnSpanFull(),
             ]);
     }
@@ -283,7 +293,20 @@ class DocumentWorkbench extends Component implements HasForms
 
         $this->data['amount_invoice'] = (string) round($amount);
         $this->data['subtotal_invoice'] = (string) round($amount);
-        $this->data['total_invoice'] = (string) round($amount * (1 + ($this->taxPercent('pph') + $this->taxPercent('ppn')) / 100));
+
+        if (! ($this->data['manual_total'] ?? false)) {
+            $this->data['total_invoice'] = $this->taxedTotal($amount, $this->data['taxes'] ?? []);
+        }
+    }
+
+    /**
+     * @param  list<string>  $taxes
+     */
+    private function taxedTotal(float $subtotal, array $taxes): string
+    {
+        $percent = array_sum(array_intersect_key(self::TAXES, array_flip($taxes)));
+
+        return (string) round($subtotal * (1 + $percent / 100));
     }
 
     private function taxPercent(string $tax): int
