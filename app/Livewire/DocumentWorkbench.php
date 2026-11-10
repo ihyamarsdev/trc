@@ -79,6 +79,7 @@ class DocumentWorkbench extends Component implements HasForms
             'company' => array_key_first(self::COMPANIES),
             'document' => $this->defaultDocument(array_key_first(self::COMPANIES), 'spk'),
             'detail_kwitansi' => $record->detail_kwitansi,
+            'number_spk' => $record->number_spk,
             'number_kwitansi' => $record->number_kwitansi,
             'number_invoice' => $record->number_invoice,
             'detail_invoice' => $record->detail_invoice,
@@ -146,7 +147,7 @@ class DocumentWorkbench extends Component implements HasForms
     }
 
     /**
-     * The SPK has nothing to type: everything in it comes from the school's data, so it only lists what is used.
+     * The SPK is filled from the school's data; only its number is typed. The rest is listed so it can be checked.
      */
     private function spkFields(): Section
     {
@@ -154,11 +155,17 @@ class DocumentWorkbench extends Component implements HasForms
 
         return Section::make('SPK')
             ->icon('heroicon-o-document-text')
-            ->description('Seluruh isi SPK diambil dari data sekolah dan Finance. Untuk mengubahnya, pakai tombol Ubah.')
+            ->description('Isi SPK diambil dari data sekolah dan Finance; hanya nomor yang diisi di sini. Bulan romawi mengikuti bulan pendaftaran.')
             ->visible(fn (Get $get): bool => DocumentTemplate::kind((string) $get('document')) === 'spk')
             ->compact()
             ->columns(2)
             ->schema([
+                TextInput::make('number_spk')
+                    ->label('Nomor SPK')
+                    ->helperText('Hanya angka urut, contoh: 505. Tercetak sebagai 505/APPS/IX/2026.')
+                    ->maxLength(50)
+                    ->live(debounce: 600)
+                    ->columnSpanFull(),
                 Placeholder::make('spk_to')->label('Pihak Pertama')->content($value('to'))->columnSpanFull(),
                 Placeholder::make('spk_jabatan')->label('Jabatan')->content($value('jabatan'))->columnSpanFull(),
                 Placeholder::make('spk_siswa')->label('Jumlah Siswa')->content($value('siswa')),
@@ -305,6 +312,7 @@ class DocumentWorkbench extends Component implements HasForms
 
         return [
             'detail_kwitansi' => $this->upper($this->data['detail_kwitansi'] ?? null),
+            'number_spk' => $this->data['number_spk'] ?? null,
             'number_kwitansi' => $this->data['number_kwitansi'] ?? null,
             'number_invoice' => $this->data['number_invoice'] ?? null,
             'detail_invoice' => $this->upper($this->data['detail_invoice'] ?? null),
@@ -366,21 +374,19 @@ class DocumentWorkbench extends Component implements HasForms
         $this->record->fill($this->documentValues())->save();
 
         Notification::make()
-            ->title('Data kwitansi dan invoice tersimpan')
+            ->title('Data dokumen tersimpan')
             ->success()
             ->send();
     }
 
     /**
-     * Saves what was typed (kwitansi and invoice only; an SPK has nothing to save) and starts the PDF download.
+     * Saves what was typed and starts the PDF download.
      */
     public function download(): void
     {
         $document = $this->chosenDocument();
 
-        if (DocumentTemplate::kind($document) !== 'spk') {
-            $this->save();
-        }
+        $this->save();
 
         $company = $this->chosenCompany();
         $route = match ($document) {

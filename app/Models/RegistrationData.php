@@ -68,6 +68,7 @@ class RegistrationData extends Model
         'difference_total',
         'detail_kwitansi',
         'number_kwitansi',
+        'number_spk',
         'note_invoice',
 
         'detail_invoice',

@@ -79,15 +79,14 @@ class DocumentWorkbenchTest extends TestCase
         $this->assertStringContainsString('invoice-background', $component->instance()->previewHtml());
     }
 
-    public function test_spk_download_goes_to_the_route_of_the_programme_without_saving(): void
+    public function test_spk_download_goes_to_the_route_of_the_programme(): void
     {
         $this->actAs('finance');
 
         foreach ([['apps', 'rasyidu', '/rasyidu/download/spk-apps'], ['snbt', 'rasyidu', '/rasyidu/download/spk-snbt'], ['tka', 'rasyidu', '/rasyidu/download/spk-tka']] as [$type, $company, $path]) {
             $component = Livewire::test(DocumentWorkbench::class, ['record' => $this->record(['type' => $type])])
                 ->set('data.company', $company)
-                ->call('download')
-                ->assertNotNotified();
+                ->call('download');
 
             $this->assertStringContainsString($path, json_encode($component->effects['xjs'], JSON_UNESCAPED_SLASHES));
         }
@@ -217,7 +216,7 @@ class DocumentWorkbenchTest extends TestCase
             ->set('data.taxes', ['ppn'])
             ->call('save')
             ->assertHasNoErrors()
-            ->assertNotified('Data kwitansi dan invoice tersimpan');
+            ->assertNotified('Data dokumen tersimpan');
 
         $record->refresh();
         $this->assertSame('PAKET TRY OUT', $record->detail_kwitansi);
@@ -293,6 +292,22 @@ class DocumentWorkbenchTest extends TestCase
 
         $record->refresh();
         $this->assertSame('505', $record->number_kwitansi);
+    }
+
+    public function test_the_spk_number_is_saved_and_printed_with_the_roman_registration_month(): void
+    {
+        $this->actAs('finance');
+        $record = $this->record(['type' => 'tka', 'date_register' => '2026-09-29']);
+
+        $component = Livewire::test(DocumentWorkbench::class, ['record' => $record])
+            ->assertSet('data.document', 'spk-tka')
+            ->set('data.number_spk', '505');
+
+        $this->assertStringContainsString('Nomor : 505/TKA/IX/2026', $component->instance()->previewHtml());
+
+        $component->call('save');
+
+        $this->assertSame('505', $record->refresh()->number_spk);
     }
 
     public function test_the_mandiri_invoice_note_is_saved_printed_and_limited(): void

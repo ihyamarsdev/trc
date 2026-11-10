@@ -59,6 +59,7 @@ class DocumentData
             'alamat' => collect([$record->area, $record->district, $record->regencies, $record->provinces])->filter()->implode(', '),
             'bulan_romawi' => self::ROMAN_MONTHS[$record->date_register->month - 1],
             'tahun' => $record->date_register->year,
+            'nomor' => $record->number_spk ?? '',
         ];
     }
 
