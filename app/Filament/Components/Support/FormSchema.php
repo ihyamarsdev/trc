@@ -219,7 +219,7 @@ class FormSchema
             ->displayFormat(self::DATE_FORMAT);
     }
 
-    private static function rupiah(string $name, string $label): TextInput
+    public static function rupiah(string $name, string $label): TextInput
     {
         return TextInput::make($name)
             ->label($label)

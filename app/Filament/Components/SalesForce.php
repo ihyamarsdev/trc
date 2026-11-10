@@ -106,7 +106,7 @@ class SalesForce
                         ->defaultCountry('ID'),
                 ]),
 
-            Section::make('Jadwal & Catatan')
+            Section::make('Jadwal & Fasilitas')
                 ->icon('heroicon-o-clock')
                 ->columns(['default' => 1, 'sm' => 2])
                 ->schema([
@@ -122,9 +122,17 @@ class SalesForce
                         ->displayFormat('l, jS F Y H:i')
                         ->live(),
                     Textarea::make('notes')
-                        ->label('Catatan')
+                        ->label('Fasilitas')
                         ->autosize()
                         ->columnSpanFull(),
+                ]),
+
+            Section::make('Nominal')
+                ->icon('heroicon-o-banknotes')
+                ->columns(['default' => 1, 'sm' => 2])
+                ->schema([
+                    FormSchema::rupiah('net_2', 'Harga NET'),
+                    FormSchema::rupiah('price', 'Harga SPJ'),
                 ]),
         ];
     }

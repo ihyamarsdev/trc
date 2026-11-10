@@ -491,7 +491,7 @@ class Admin
                 $date('date_register', 'Tanggal Pendaftaran', 'l, j F Y H:i'),
                 $date('implementation_estimate', 'Estimasi Pelaksanaan', 'l, j F Y H:i'),
                 TextColumn::make('student_count')->label('Jumlah Siswa'),
-                TextColumn::make('notes')->label('Catatan'),
+                TextColumn::make('notes')->label('Fasilitas'),
             ],
             'Sekolah & Lokasi' => [
                 TextColumn::make('schools')->label('Sekolah'),
