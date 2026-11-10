@@ -21,8 +21,8 @@ class DocumentTemplate
      * SPK per program) has them as `{document}-{variant}`.
      */
     private const TEMPLATES = [
-        'rasyidu' => ['spk', 'spk-apps', 'spk-snbt', 'spk-tka', 'kuitansi', 'invoice'],
-        'edunesia' => ['spk', 'kuitansi', 'invoice'],
+        'rasyidu' => ['spk-apps', 'spk-snbt', 'spk-tka', 'kuitansi', 'invoice'],
+        'edunesia' => ['kuitansi', 'invoice'],
         'edusindo' => ['kuitansi', 'invoice'],
         'tdw' => ['kuitansi', 'invoice-mandiri', 'invoice-dki'],
     ];

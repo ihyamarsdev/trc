@@ -105,7 +105,7 @@ class DocumentDownloadTest extends TestCase
     {
         $record = $this->record();
 
-        $this->get(route('rasyidu.anbk.download', $record))->assertForbidden();
+        $this->get(route('rasyidu.spk-tka.download', $record))->assertForbidden();
     }
 
     public function test_the_download_is_announced_to_the_user(): void

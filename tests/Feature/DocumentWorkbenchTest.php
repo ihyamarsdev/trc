@@ -60,11 +60,11 @@ class DocumentWorkbenchTest extends TestCase
 
         $component = Livewire::test(DocumentWorkbench::class, ['record' => $record])
             ->assertSet('data.company', 'rasyidu')
-            ->assertSet('data.document', 'spk');
+            ->assertSet('data.document', 'spk-apps');
 
         $html = $component->instance()->previewHtml();
         $this->assertStringContainsString('template/rasyidu/', $html);
-        $this->assertStringContainsString('SURAT PERJANJIAN KERJASAMA', $html);
+        $this->assertStringContainsString('PELAKSANAAN ASESMEN PSIKOTES POTENSI SISWA', $html);
         $this->assertStringContainsString('KEPALA SEKOLAH SMAN 1 Contoh', $html);
         $this->assertStringNotContainsString('${', $html);
 
@@ -83,7 +83,7 @@ class DocumentWorkbenchTest extends TestCase
     {
         $this->actAs('finance');
 
-        foreach ([['apps', 'edunesia', '/edunesia/download/apps'], ['snbt', 'rasyidu', '/rasyidu/download/spk-snbt'], ['tka', 'rasyidu', '/rasyidu/download/spk-tka'], ['anbk', 'rasyidu', '/rasyidu/download/anbk']] as [$type, $company, $path]) {
+        foreach ([['apps', 'rasyidu', '/rasyidu/download/spk-apps'], ['snbt', 'rasyidu', '/rasyidu/download/spk-snbt'], ['tka', 'rasyidu', '/rasyidu/download/spk-tka']] as [$type, $company, $path]) {
             $component = Livewire::test(DocumentWorkbench::class, ['record' => $this->record(['type' => $type])])
                 ->set('data.company', $company)
                 ->call('download')
@@ -120,7 +120,7 @@ class DocumentWorkbenchTest extends TestCase
         $component->set('data.document', 'spk-snbt');
         $this->assertStringContainsString('UTBK-SNBT', $component->instance()->previewHtml());
 
-        $component->set('data.company', 'edunesia')->assertSet('data.document', 'spk');
+        $component->set('data.company', 'edunesia')->assertSet('data.document', 'kuitansi');
     }
 
     public function test_tdw_has_no_spk_and_offers_an_invoice_per_bank(): void
@@ -128,7 +128,7 @@ class DocumentWorkbenchTest extends TestCase
         $this->actAs('finance');
 
         $component = Livewire::test(DocumentWorkbench::class, ['record' => $this->record()])
-            ->assertSet('data.document', 'spk')
+            ->assertSet('data.document', 'spk-apps')
             ->set('data.company', 'tdw')
             ->assertSet('data.document', 'kuitansi');
 
