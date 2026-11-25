@@ -10,7 +10,7 @@ return new class extends Migration
      *
      * @var list<string>
      */
-    private const DEFAULT_YEARS = ['2024', '2025', '2026'];
+    private const DEFAULT_YEARS = ['2024', '2025', '2026', '2027'];
 
     /**
      * Run the migrations.

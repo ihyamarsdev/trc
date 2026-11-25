@@ -28,7 +28,7 @@ class Registration extends Seeder
             $userIds = User::take(10)->pluck('id')->all();
         }
 
-        $yearsList = ['2024', '2025', '2026'];
+        $yearsList = ['2024', '2025', '2026', '2027'];
 
         foreach ($userIds as $userId) {
             foreach ($yearsList as $year) {

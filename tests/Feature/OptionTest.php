@@ -47,7 +47,7 @@ class OptionTest extends TestCase
     {
         $this->assertSame(['anbk', 'apps', 'snbt', 'tka', 'pasj'], array_keys(Option::list(OptionGroup::Program)));
         $this->assertSame(['PERIODE 1', 'PERIODE 2'], array_keys(Option::list(OptionGroup::Periode)));
-        $this->assertSame(['2024', '2025', '2026'], array_keys(Option::list(OptionGroup::Year)));
+        $this->assertSame(['2024', '2025', '2026', '2027'], array_keys(Option::list(OptionGroup::Year)));
         $this->assertSame(['SD', 'MI', 'SMP', 'MTS', 'SMA', 'MA', 'SMK'], array_keys(Option::list(OptionGroup::Jenjang)));
         $this->assertSame(['SIPLAH', 'SI/TF', 'CASH'], array_keys(Option::list(OptionGroup::PaymentVia)));
         $this->assertCount(4, Option::list(OptionGroup::Bank));
@@ -256,18 +256,18 @@ class OptionTest extends TestCase
         $user = $this->actAs('admin', 'admin');
 
         Livewire::test(CreateOption::class)
-            ->fillForm(['group' => 'year', 'label' => '2027', 'value' => '2027'])
+            ->fillForm(['group' => 'year', 'label' => '2028', 'value' => '2028'])
             ->call('create')
             ->assertHasNoFormErrors();
 
-        $this->assertArrayHasKey('2027', Option::list(OptionGroup::Year));
+        $this->assertArrayHasKey('2028', Option::list(OptionGroup::Year));
 
         $status = Status::create(['name' => 'S', 'description' => 'd', 'color' => 'red', 'order' => 1, 'category' => 'sales']);
-        $record2027 = RegistrationData::factory()->create([
+        $record2028 = RegistrationData::factory()->create([
             'users_id' => $user->id,
             'status_id' => $status->id,
-            'years' => '2027',
-            'date_register' => '2027-01-01',
+            'years' => '2028',
+            'date_register' => '2028-01-01',
         ]);
         $record2026 = RegistrationData::factory()->create([
             'users_id' => $user->id,
@@ -276,7 +276,7 @@ class OptionTest extends TestCase
             'date_register' => '2026-01-01',
         ]);
 
-        $usedYear = Option::query()->where('group', 'year')->where('value', '2027')->firstOrFail();
+        $usedYear = Option::query()->where('group', 'year')->where('value', '2028')->firstOrFail();
         $this->assertSame(1, $usedYear->usageCount());
 
         Filament::setCurrentPanel(Filament::getPanel('user'));
@@ -285,29 +285,29 @@ class OptionTest extends TestCase
             ->fillForm([
                 'type' => 'anbk',
                 'status_id' => $status->id,
-                'schools' => 'SMA Tahun 2027',
-                'years' => '2027',
+                'schools' => 'SMA Tahun 2028',
+                'years' => '2028',
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
-        $this->assertDatabaseHas(RegistrationData::class, ['schools' => 'SMA Tahun 2027', 'years' => '2027']);
+        $this->assertDatabaseHas(RegistrationData::class, ['schools' => 'SMA Tahun 2028', 'years' => '2028']);
 
         Livewire::test(ListAdmins::class)
             ->loadTable()
-            ->filterTable('years', '2027')
-            ->assertCanSeeTableRecords([$record2027])
+            ->filterTable('years', '2028')
+            ->assertCanSeeTableRecords([$record2028])
             ->assertCanNotSeeTableRecords([$record2026]);
 
         Livewire::test(SalesForceStatsWidget::class)
             ->assertSuccessful()
             ->assertFormFieldExists('years')
-            ->set('years', '2027')
+            ->set('years', '2028')
             ->assertSuccessful();
 
         Livewire::test(SalesLeaderboard::class)
             ->loadTable()
-            ->filterTable('years', '2027')
+            ->filterTable('years', '2028')
             ->assertSuccessful();
 
         $this->actAs('sales', 'user');
@@ -316,12 +316,12 @@ class OptionTest extends TestCase
             ->assertFormFieldExists('years')
             ->fillForm([
                 'type' => 'anbk',
-                'years' => '2027',
-                'schools' => 'SMA Sales 2027',
+                'years' => '2028',
+                'schools' => 'SMA Sales 2028',
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
-        $this->assertDatabaseHas(RegistrationData::class, ['schools' => 'SMA Sales 2027', 'years' => '2027']);
+        $this->assertDatabaseHas(RegistrationData::class, ['schools' => 'SMA Sales 2028', 'years' => '2028']);
     }
 }
