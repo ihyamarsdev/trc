@@ -140,6 +140,7 @@ class SharedSchema
                 TextColumn::make('years')
                     ->label('Tahun')
                     ->description('Tahun', position: 'above')
+                    ->formatStateUsing($label(OptionGroup::Year))
                     ->visibleFrom('md'),
                 self::statusColumn()
                     ->description('Status', position: 'above')
@@ -173,6 +174,7 @@ class SharedSchema
                         ->label('Tahun')
                         ->color('gray')
                         ->size(TextColumnSize::Small)
+                        ->formatStateUsing($label(OptionGroup::Year))
                         ->grow(false)
                         ->hiddenFrom('md'),
                 ]),

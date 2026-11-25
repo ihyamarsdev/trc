@@ -7,7 +7,12 @@ use App\Filament\Resources\OptionResource;
 use App\Filament\Resources\OptionResource\Pages\CreateOption;
 use App\Filament\Resources\OptionResource\Pages\EditOption;
 use App\Filament\Resources\OptionResource\Pages\ListOptions;
+use App\Filament\User\Resources\Admin\AdminResource\Pages\CreateAdmin;
 use App\Filament\User\Resources\Admin\AdminResource\Pages\EditAdmin;
+use App\Filament\User\Resources\Admin\AdminResource\Pages\ListAdmins;
+use App\Filament\User\Resources\Salesforce\SalesResource\Pages\CreateSales;
+use App\Filament\User\Widgets\SalesForceStatsWidget;
+use App\Filament\User\Widgets\SalesLeaderboard;
 use App\Models\Option;
 use App\Models\RegistrationData;
 use App\Models\Status;
@@ -42,6 +47,7 @@ class OptionTest extends TestCase
     {
         $this->assertSame(['anbk', 'apps', 'snbt', 'tka', 'pasj'], array_keys(Option::list(OptionGroup::Program)));
         $this->assertSame(['PERIODE 1', 'PERIODE 2'], array_keys(Option::list(OptionGroup::Periode)));
+        $this->assertSame(['2024', '2025', '2026'], array_keys(Option::list(OptionGroup::Year)));
         $this->assertSame(['SD', 'MI', 'SMP', 'MTS', 'SMA', 'MA', 'SMK'], array_keys(Option::list(OptionGroup::Jenjang)));
         $this->assertSame(['SIPLAH', 'SI/TF', 'CASH'], array_keys(Option::list(OptionGroup::PaymentVia)));
         $this->assertCount(4, Option::list(OptionGroup::Bank));
@@ -237,9 +243,85 @@ class OptionTest extends TestCase
             ->assertSuccessful()
             ->assertCanSeeTableRecords(Option::query()->where('group', 'program')->get())
             ->assertCanNotSeeTableRecords(Option::query()->where('group', 'bank')->get())
+            ->set('activeTab', 'year')
+            ->assertCanSeeTableRecords(Option::query()->where('group', 'year')->get())
             ->set('activeTab', 'bank')
             ->assertCanSeeTableRecords(Option::query()->where('group', 'bank')->get());
 
         $this->assertSame('Data Master', OptionResource::getNavigationLabel());
+    }
+
+    public function test_year_options_from_data_master_drive_forms_and_filters(): void
+    {
+        $user = $this->actAs('admin', 'admin');
+
+        Livewire::test(CreateOption::class)
+            ->fillForm(['group' => 'year', 'label' => '2027', 'value' => '2027'])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertArrayHasKey('2027', Option::list(OptionGroup::Year));
+
+        $status = Status::create(['name' => 'S', 'description' => 'd', 'color' => 'red', 'order' => 1, 'category' => 'sales']);
+        $record2027 = RegistrationData::factory()->create([
+            'users_id' => $user->id,
+            'status_id' => $status->id,
+            'years' => '2027',
+            'date_register' => '2027-01-01',
+        ]);
+        $record2026 = RegistrationData::factory()->create([
+            'users_id' => $user->id,
+            'status_id' => $status->id,
+            'years' => '2026',
+            'date_register' => '2026-01-01',
+        ]);
+
+        $usedYear = Option::query()->where('group', 'year')->where('value', '2027')->firstOrFail();
+        $this->assertSame(1, $usedYear->usageCount());
+
+        Filament::setCurrentPanel(Filament::getPanel('user'));
+
+        Livewire::test(CreateAdmin::class)
+            ->fillForm([
+                'type' => 'anbk',
+                'status_id' => $status->id,
+                'schools' => 'SMA Tahun 2027',
+                'years' => '2027',
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas(RegistrationData::class, ['schools' => 'SMA Tahun 2027', 'years' => '2027']);
+
+        Livewire::test(ListAdmins::class)
+            ->loadTable()
+            ->filterTable('years', '2027')
+            ->assertCanSeeTableRecords([$record2027])
+            ->assertCanNotSeeTableRecords([$record2026]);
+
+        Livewire::test(SalesForceStatsWidget::class)
+            ->assertSuccessful()
+            ->assertFormFieldExists('years')
+            ->set('years', '2027')
+            ->assertSuccessful();
+
+        Livewire::test(SalesLeaderboard::class)
+            ->loadTable()
+            ->filterTable('years', '2027')
+            ->assertSuccessful();
+
+        $this->actAs('sales', 'user');
+        Livewire::test(CreateSales::class)
+            ->assertSuccessful()
+            ->assertFormFieldExists('years')
+            ->fillForm([
+                'type' => 'anbk',
+                'years' => '2027',
+                'schools' => 'SMA Sales 2027',
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas(RegistrationData::class, ['schools' => 'SMA Sales 2027', 'years' => '2027']);
     }
 }

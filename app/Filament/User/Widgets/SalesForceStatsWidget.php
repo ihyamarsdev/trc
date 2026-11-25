@@ -49,14 +49,7 @@ class SalesForceStatsWidget extends Widget implements HasForms
                     ->afterStateUpdated(fn () => $this->dispatch('$refresh')),
                 Select::make('years')
                     ->label('Tahun')
-                    ->options(function () {
-                        return RegistrationData::query()
-                            ->whereNotNull('years')
-                            ->distinct()
-                            ->orderBy('years', 'desc')
-                            ->pluck('years', 'years')
-                            ->toArray();
-                    })
+                    ->options(Option::list(OptionGroup::Year, onlyActive: false))
                     ->placeholder('Semua Tahun')
                     ->live()
                     ->afterStateUpdated(fn () => $this->dispatch('$refresh')),

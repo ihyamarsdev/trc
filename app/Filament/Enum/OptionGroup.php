@@ -10,6 +10,7 @@ enum OptionGroup: string
 {
     case Program = 'program';
     case Periode = 'periode';
+    case Year = 'year';
     case Jenjang = 'jenjang';
     case Keterangan = 'keterangan';
     case SchoolType = 'school_type';
@@ -22,6 +23,7 @@ enum OptionGroup: string
         return match ($this) {
             self::Program => 'Program',
             self::Periode => 'Periode',
+            self::Year => 'Tahun',
             self::Jenjang => 'Jenjang',
             self::Keterangan => 'Keterangan',
             self::SchoolType => 'Negeri / Swasta',
@@ -39,6 +41,7 @@ enum OptionGroup: string
         return match ($this) {
             self::Program => 'type',
             self::Periode => 'periode',
+            self::Year => 'years',
             self::Jenjang => 'education_level',
             self::Keterangan => 'description',
             self::SchoolType => 'schools_type',

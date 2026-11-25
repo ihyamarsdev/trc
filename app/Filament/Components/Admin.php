@@ -76,9 +76,7 @@ class Admin
                                         ->searchable()
                                         ->placeholder('Pilih status...'),
                                     FormSchema::optionSelect('periode', 'Periode', OptionGroup::Periode),
-                                    TextInput::make('years')
-                                        ->label('Tahun Ajaran')
-                                        ->maxLength(255),
+                                    FormSchema::optionSelect('years', 'Tahun Ajaran', OptionGroup::Year),
                                 ]),
 
                             Section::make('Data Sekolah')
@@ -360,15 +358,7 @@ class Admin
                 ->indicator('Periode'),
             Tables\Filters\SelectFilter::make('years')
                 ->label('Tahun Ajaran')
-                ->options(function () {
-                    // Mengambil daftar tahun unik yang benar-benar ada di database
-                    return RegistrationData::query() // Ganti Sales dengan nama Model Anda
-                        ->whereNotNull('years')
-                        ->distinct()
-                        ->orderBy('years', 'desc')
-                        ->pluck('years', 'years')
-                        ->toArray();
-                })
+                ->options(Option::list(OptionGroup::Year, onlyActive: false))
                 ->searchable()
                 ->preload()
                 ->indicator('Tahun Ajaran'),
@@ -485,7 +475,7 @@ class Admin
             'Pendaftaran' => [
                 self::optionColumn('type', 'Program', OptionGroup::Program, upper: true),
                 self::optionColumn('periode', 'Periode', OptionGroup::Periode, upper: true),
-                TextColumn::make('years')->label('Tahun'),
+                self::optionColumn('years', 'Tahun', OptionGroup::Year),
                 TextColumn::make('users.name')->label('Salesforce'),
                 TextColumn::make('status.name')->label('Status'),
                 $date('date_register', 'Tanggal Pendaftaran', 'l, j F Y H:i'),

@@ -117,7 +117,7 @@ class InfolistSchema
                             ->state(fn (Model $record): array => array_values(array_filter([
                                 filled($record->type) ? $program['nameRegister'] : null,
                                 self::choiceLabel(OptionGroup::Periode, $record->periode),
-                                $record->years,
+                                self::choiceLabel(OptionGroup::Year, $record->years),
                                 self::choiceLabel(OptionGroup::Jenjang, $record->education_level),
                                 self::choiceLabel(OptionGroup::SchoolType, $record->schools_type),
                             ])))

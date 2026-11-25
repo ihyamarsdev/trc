@@ -38,7 +38,7 @@ class SalesForce
                 ->schema([
                     FormSchema::optionSelect('type', 'Program', OptionGroup::Program),
                     FormSchema::optionSelect('periode', 'Periode', OptionGroup::Periode),
-                    TextInput::make('years')->label('Tahun')->maxLength(255),
+                    FormSchema::optionSelect('years', 'Tahun', OptionGroup::Year),
                 ]),
 
             Section::make('Data Sekolah')
